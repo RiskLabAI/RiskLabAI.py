@@ -1,6 +1,8 @@
 import pandas as pd
 from typing import Optional
 
+from .create_ohlcv_dataframe import *
+
 def generate_volume_bar_dataframe(
     tick_data: pd.DataFrame,
     volume_per_bar: int = 10000,
