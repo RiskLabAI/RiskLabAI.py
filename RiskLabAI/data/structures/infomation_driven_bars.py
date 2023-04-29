@@ -1,12 +1,10 @@
 from typing import Tuple, Union
-
 import numpy as np
 import pandas as pd
 
-from .compute_thresholds import *
-from .create_ohlcv_dataframe import *
+from .utilities import *
 
-def information_driven_bars(
+def generate_information_driven_bars(
     tick_data: pd.DataFrame,
     bar_type: str = "volume",
     initial_expected_ticks: int = 2000
