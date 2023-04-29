@@ -80,9 +80,6 @@ def compute_thresholds(
 
     return time_deltas, absolute_thetas, thresholds, times, thetas, grouping_ids
 
-
-import pandas as pd
-
 def create_ohlcv_dataframe(
     tick_data_grouped: pd.core.groupby.DataFrameGroupBy
 ) -> pd.DataFrame:
