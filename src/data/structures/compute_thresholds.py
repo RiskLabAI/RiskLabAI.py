@@ -1,0 +1,81 @@
+import numpy as np
+import time
+from typing import List, Tuple
+from utils import exponential_weighted_moving_average, progress_bar
+
+def compute_thresholds(
+    target_column: np.ndarray,
+    initial_expected_ticks: int,
+    initial_bar_size: float
+) -> Tuple[List[float], np.ndarray, np.ndarray, List[int], np.ndarray, np.ndarray]:
+    """
+    Group the DataFrame based on a feature and calculate thresholds.
+
+    This function groups the target_column DataFrame based on a feature
+    and calculates the thresholds, which can be used in financial machine learning
+    applications such as dynamic time warping.
+
+    Reference:
+        De Prado, M. (2018). Advances in financial machine learning. John Wiley & Sons.
+
+    Args:
+        target_column (np.ndarray): Target column of the DataFrame.
+        initial_expected_ticks (int): Initial expected number of ticks.
+        initial_bar_size (float): Initial expected size of each tick.
+
+    Returns:
+        Tuple[List[float], np.ndarray, np.ndarray, List[int], np.ndarray, np.ndarray]:
+        A tuple containing the time deltas, absolute theta values, thresholds, times,
+        theta values, and grouping IDs.
+    """
+    num_values = target_column.shape[0]
+    target_column = target_column.values.astype(np.float64)
+    absolute_thetas = np.zeros(num_values)
+    thresholds = np.zeros(num_values)
+    thetas = np.zeros(num_values)
+    grouping_ids = np.zeros(num_values)
+
+    current_theta = target_column[0]
+    thetas[0] = current_theta
+    absolute_thetas[0] = np.abs(current_theta)
+    current_grouping_id = 0
+    grouping_ids[0] = current_grouping_id
+
+    time_deltas = []
+    times = []
+    previous_time = 0
+    expected_ticks = initial_expected_ticks
+    expected_bar_value = initial_bar_size
+
+    start_time = time.time()
+
+    for i in range(1, num_values):
+        current_theta += target_column[i]
+        thetas[i] = current_theta
+        absolute_theta = np.abs(current_theta)
+        absolute_thetas[i] = absolute_theta
+
+        threshold = expected_ticks * expected_bar_value
+        thresholds[i] = threshold
+        grouping_ids[i] = current_grouping_id
+
+        if absolute_theta >= threshold:
+            current_grouping_id += 1
+            current_theta = 0
+            time_delta = np.float64(i - previous_time)
+            time_deltas.append(time_delta)
+            times.append(i)
+            previous_time = i
+            expected_ticks = exponential_weighted_moving_average(
+                np.array(time_deltas), window_length=np.int64(len(time_deltas))
+            )[-1]
+            expected_bar_value = np.abs(
+                exponential_weighted_moving_average(
+                    target_column[:i], window_length=np.int64(initial_expected_ticks)
+                )[-1]
+            )
+
+        # Replace 'progress_bar' with your actual progress bar function
+        progress_bar(i, num_values, start_time)
+
+    return time_deltas, absolute_thetas, thresholds, times, thetas, grouping_ids
