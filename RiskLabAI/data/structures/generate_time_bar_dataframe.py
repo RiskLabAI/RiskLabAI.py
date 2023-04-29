@@ -1,3 +1,4 @@
+import pandas as pd
 from .create_ohlcv_dataframe import *
 
 def generate_time_bar_dataframe(
