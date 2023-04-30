@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Optional
 
 from .utilities import *
+from ...utils import *
 
 def generate_dollar_bar_dataframe(
     tick_data: pd.DataFrame,
