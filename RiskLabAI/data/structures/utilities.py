@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 import time
 from typing import List, Tuple
-from utils import exponential_weighted_moving_average, progress_bar
+from RiskLabAI.utils import exponential_weighted_moving_average, progress_bar
 
 def compute_thresholds(
     target_column: np.ndarray,
