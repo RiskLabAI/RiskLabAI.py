@@ -37,8 +37,8 @@ methodology: page 108, snippet 7.2
 """
 
 def embargo_times(
-  times: pd.Series, # Entire observation times
-  percent_embargo: float
+    times: pd.Series, # Entire observation times
+    percent_embargo: float
 ) -> pd.Series: # Embargo size percentage divided by 100
 
     step = int(times.shape[0] * percent_embargo) # find the number of embargo bars
@@ -56,12 +56,13 @@ class and functions: splits the data and performes cross validation when observa
 reference: De Prado, M. (2018) Advances in financial machine learning.
 methodology: page 109, snippet 7.3
 """
-
 class PurgedKFold(KFold):
-    def __init__(self, # The PurgedKFold class containing observations and split information
-                 n_splits: int=3, # The number of KFold splits
-                 times: pd.Series=None, # Entire observation times
-                 percent_embargo: float=0.0): # Embargo size percentage divided by 100
+    def __init__(
+        self, # The PurgedKFold class containing observations and split information
+        n_splits: int=3, # The number of KFold splits
+        times: pd.Series=None, # Entire observation times
+        percent_embargo: float=0.0 # Embargo size percentage divided by 100
+    ):
         
         if not isinstance(times, pd.Series): # check if times parameter is a pd.Series
             raise ValueError('Label Through Dates must be a pandas series') # raise error 
@@ -70,10 +71,12 @@ class PurgedKFold(KFold):
         self.times = times # set the times property in class
         self.percent_embargo = percent_embargo # set the percent_embargo property in class
         
-    def split(self, # The PurgedKFold class containing observations and split information
-              data: pd.DataFrame, # The sample that is going be splited
-              labels: pd.Series=None, # The labels that are going be splited
-              groups=None): # Group our labels
+    def split(
+        self, # The PurgedKFold class containing observations and split information
+        data: pd.DataFrame, # The sample that is going be splited
+        labels: pd.Series=None, # The labels that are going be splited
+        groups=None # Group our labels
+    ):
         
         if (data.index == self.times.index).sum() != len(self.times): # check if data and times have the same index (starting time)
             raise ValueError('data and ThruDateValues must have the same index') # raise error
