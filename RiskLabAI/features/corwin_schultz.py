@@ -2,23 +2,15 @@ import numpy as np
 import pandas as pd
 
 """
-function: Corwin and Schultz β Estimation 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 285 snippet 19.1
+    function: Corwin and Schultz β Estimation 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 285 snippet 19.1
 """
-
-
 def beta_estimates(
     high_prices: pd.Series,  # high prices vector
     low_prices: pd.Series,  # low prices vector
     window_span: int  # rolling window span
 ) -> pd.Series:
-
-    # log_ratios = np.log(high_prices / low_prices) ** 2
-
-    # beta = rolling_sum(log_ratios, 2)
-    # beta = rolling_mean(beta, window_span)
-    # return beta
 
     log_ratios = np.log(high_prices / low_prices) ** 2
     beta = log_ratios.rolling(window=2).sum()
@@ -27,12 +19,10 @@ def beta_estimates(
     return beta
 
 """
-function: Corwin and Schultz γ Estimation 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 285 snippet 19.1
+    function: Corwin and Schultz γ Estimation 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 285 snippet 19.1
 """
-
-
 def gamma_estimates(
     high_prices: pd.Series,  # high prices vector
     low_prices: pd.Series,  # low prices vector
@@ -45,12 +35,10 @@ def gamma_estimates(
 
 
 """
-function: Corwin and Schultz α Estimation 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 285 snippet 19.1
+    function: Corwin and Schultz α Estimation 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 285 snippet 19.1
 """
-
-
 def alpha_estimates(
     beta: pd.Series,  # β Estimates vector
     gamma: pd.Series  # γ Estimates vector
@@ -65,12 +53,10 @@ def alpha_estimates(
 
 
 """
-function: Corwin and Schultz spread estimator 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 285 snippet 19.1
+    function: Corwin and Schultz spread estimator 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 285 snippet 19.1
 """
-
-
 def corwin_schultz_estimator(
     high_prices: pd.Series,  # high prices vector
     low_prices: pd.Series,  # low prices vector

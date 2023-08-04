@@ -4,15 +4,15 @@ import numpy as np
 
 
 """
-function: Calculates accuracy of bagging classifier
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: page 96 Improved Accuracy section
+    function: Calculates accuracy of bagging classifier
+    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+    methodology: page 96 Improved Accuracy section
 """
 def bagging_classifier_accuracy(
-    N: int,  # number of independent classifers
-    p: float,  # The accuracy of a classifier is the probability p of labeling a prediction as 1
-    k: int = 2,  # number of classes
-) -> float:
+        N: int,  # number of independent classifers
+        p: float,  # The accuracy of a classifier is the probability p of labeling a prediction as 1
+        k: int = 2,  # number of classes
+    ) -> float: # returns bagging classifier accuracy
 
     probability_sum = 0
     for i in range(0, int(N / k) + 1):

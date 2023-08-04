@@ -7,9 +7,9 @@ import pandas as pd
 import numpy as np
 
 """
-function: Clustered feature importance MDA
-reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
-methodology: page 87 Clustered MDA section
+    function: Clustered feature importance MDA
+    reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
+    methodology: page 87 Clustered MDA section
 """
 def clustered_feature_importance_MDA(
     classifier,

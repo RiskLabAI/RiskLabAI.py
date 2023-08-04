@@ -5,13 +5,11 @@ import numpy as np, pandas as pd
 from scipy.linalg import block_diag
 from sklearn.utils import check_random_state
 
-"""----------------------------------------------------------------------
+"""
     function: Derive the correlation matrix from a covariance matrix
     reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
     methodology: Snipet 2.3, Page 27
-----------------------------------------------------------------------"""
-
-
+"""
 def covToCorr(covariance):  # covariance matrix
     std = np.sqrt(np.diag(covariance))  # standard deviations
     correlation = covariance / np.outer(std, std)  # create correlation matrix
@@ -19,13 +17,11 @@ def covToCorr(covariance):  # covariance matrix
     return correlation
 
 
-"""----------------------------------------------------------------------
+"""
     function: Clustering
     reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
     methodology: Snipet 4.1, Page 56
-----------------------------------------------------------------------"""
-
-
+"""
 def clusterKMeansBase(
     correlation, numberClusters=10, iterations=10  # corr pd.dataframe  # maximum number of clusters
 ):  # iterations
@@ -48,13 +44,11 @@ def clusterKMeansBase(
     return correlationSorted, clusters, silh
 
 
-"""----------------------------------------------------------------------
-function: make new clustering
-reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-methodology: Snipet 4.2, Page 58
-----------------------------------------------------------------------"""
-
-
+"""
+    function: make new clustering
+    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
+    methodology: Snipet 4.2, Page 58
+"""
 def makeNewOutputs(correlation, clusters, clusters2):  # corr dataframe  # cluster 1  # cluster 2
     # merge two clusters
     clustersNew = {}
@@ -73,13 +67,11 @@ def makeNewOutputs(correlation, clusters, clusters2):  # corr dataframe  # clust
     return correlationNew, clustersNew, silhNew
 
 
-"""----------------------------------------------------------------------
-function: clustering (ONC)
-reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-methodology: Snipet 4.2, Page 58
-----------------------------------------------------------------------"""
-
-
+"""
+    function: clustering (ONC)
+    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
+    methodology: Snipet 4.2, Page 58
+"""
 def clusterKMeansTop(
     correlation, numberClusters=None, iterations=10  # corr dataframe  # number of clusters
 ):  # number of iterations
@@ -120,13 +112,11 @@ def clusterKMeansTop(
             return correlationNew, clustersNew, silhNew
 
 
-"""----------------------------------------------------------------------
-function: Compute sub cov matrix
-reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-methodology: Snipet 4.3, Page 61
-----------------------------------------------------------------------"""
-
-
+"""
+    function: Compute sub cov matrix
+    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
+    methodology: Snipet 4.3, Page 61
+"""
 def randomCovarianceSub(
     numberObservations,  # number of observations
     numberColumns,  # number of cols
@@ -144,13 +134,11 @@ def randomCovarianceSub(
     return covariance
 
 
-"""----------------------------------------------------------------------
-function: Compute random block cov matrix
-reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-methodology: Snipet 4.3, Page 61
-----------------------------------------------------------------------"""
-
-
+"""
+    function: Compute random block cov matrix
+    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
+    methodology: Snipet 4.3, Page 61
+"""
 def randomBlockCovariance(
     numberColumns,  # number of cols
     numberBlocks,  # number of blocks
@@ -177,13 +165,11 @@ def randomBlockCovariance(
     return cov
 
 
-"""----------------------------------------------------------------------
-function: Compute random block corr matrix
-reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-methodology: Snipet 4.3, Page 61
-----------------------------------------------------------------------"""
-
-
+"""
+    function: Compute random block corr matrix
+    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
+    methodology: Snipet 4.3, Page 61
+"""
 def randomBlockCorrelation(
     numberColumns, numberBlocks, randomState=None, blockSizeMin=1  # number of cols  # number of blocks  # for rand data
 ):  #  minimum size of block

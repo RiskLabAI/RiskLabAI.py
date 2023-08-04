@@ -1,11 +1,7 @@
 import pandas as pd
 from typing import List
 
-def symmetric_cusum_filter(
-    input_data: pd.DataFrame,
-    threshold: float
-) -> pd.DatetimeIndex:
-    """
+"""
     Implementation of the symmetric CUSUM filter.
 
     :param input_data: DataFrame of prices and dates
@@ -18,7 +14,11 @@ def symmetric_cusum_filter(
     Reference:
         De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
         Methodology 39.
-    """
+"""
+def symmetric_cusum_filter(
+    input_data: pd.DataFrame,
+    threshold: float
+) -> pd.DatetimeIndex:
     time_events, shift_positive, shift_negative = [], 0, 0
     price_delta = input_data.diff()
 

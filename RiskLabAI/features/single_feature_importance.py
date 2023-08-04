@@ -10,9 +10,9 @@ import pandas as pd
 import numpy as np
 
 """
-function: Implementation of SFI method
-reference: De Prado, M. (2018) Advances In Financial Machine Learning
-methodology: page 118 SFI section snippet 8.4
+    function: Implementation of SFI method
+    reference: De Prado, M. (2018) Advances In Financial Machine Learning
+    methodology: page 118 SFI section snippet 8.4
 """
 def feature_importance_SFI(
     classifier,  # classifier for fit and prediction

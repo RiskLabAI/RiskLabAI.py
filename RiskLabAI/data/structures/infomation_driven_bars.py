@@ -4,12 +4,7 @@ import pandas as pd
 
 from .utilities import *
 
-def generate_information_driven_bars(
-    tick_data: pd.DataFrame,
-    bar_type: str = "volume",
-    initial_expected_ticks: int = 2000
-) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
-    """
+"""
     Implements Information-Driven Bars.
 
     Reference: De Prado, M. (2018) Advances in Financial Machine Learning. John Wiley & Sons.
@@ -28,8 +23,13 @@ def generate_information_driven_bars(
     :param bar_type: User can choose between "tick", "volume", or "dollar" imbalanced bars. Default is "volume".
     :param initial_expected_ticks: The initial value of expected ticks. Default is 2000.
     :return: Tuple containing the OHLCV DataFrame, thetas_absolute, and thresholds.
-    """
-
+"""
+def generate_information_driven_bars(
+    tick_data: pd.DataFrame,
+    bar_type: str = "volume",
+    initial_expected_ticks: int = 2000
+) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+    
     if bar_type == "volume":
         input_data = tick_data['volumelabeled']
     elif bar_type == "tick":
