@@ -1,9 +1,9 @@
 from math import log2
 
 """
-function: Shannon Entropy 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 263 SHANNON’S ENTROPY section
+    function: Shannon Entropy 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 263 SHANNON’S ENTROPY section
 """
 def shannon_entropy(
     message:str # input encoded message
@@ -26,9 +26,9 @@ def shannon_entropy(
 
 
 """
-function: A LIBRARY BUILT USING THE LZ ALGORITHM
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 266 LEMPEL-ZIV ESTIMATORS section
+    function: A LIBRARY BUILT USING THE LZ ALGORITHM
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 266 LEMPEL-ZIV ESTIMATORS section
 """
 def lemple_ziv_entropy(
     message:str # input encoded message
@@ -51,7 +51,6 @@ def lemple_ziv_entropy(
     return len(library) / len(message)
 
 
-from math import log2
 def probability_mass_function(
     message:str, # input encoded message
     approximate_word_length:int # approximation of word length
@@ -78,9 +77,9 @@ def probability_mass_function(
     return probability_mass_function_
 
 """
-function: Plug-in Entropy Estimator Implementation
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 265 THE PLUG-IN (OR MAXIMUM LIKELIHOOD) ESTIMATOR section
+    function: Plug-in Entropy Estimator Implementation
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 265 THE PLUG-IN (OR MAXIMUM LIKELIHOOD) ESTIMATOR section
 """
 def plug_in_entropy_estimator(
     message:str, # input encoded message
@@ -94,9 +93,9 @@ def plug_in_entropy_estimator(
 
 
 """
-function: COMPUTES THE LENGTH OF THE LONGEST MATCH
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 267 LEMPEL-ZIV ESTIMATORS section
+    function: COMPUTES THE LENGTH OF THE LONGEST MATCH
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 267 LEMPEL-ZIV ESTIMATORS section
 """
 def longest_match_length(
     message:str,
@@ -118,9 +117,9 @@ def longest_match_length(
 
 
 """
-function: IMPLEMENTATION OF ALGORITHMS DISCUSSED IN GAO ET AL.
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 268 LEMPEL-ZIV ESTIMATORS section
+    function: IMPLEMENTATION OF ALGORITHMS DISCUSSED IN GAO ET AL.
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 268 LEMPEL-ZIV ESTIMATORS section
 """
 def kontoyiannis_entorpy(
     message:str, # input encoded message

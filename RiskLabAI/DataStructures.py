@@ -7,9 +7,9 @@ from scipy import stats
 from statsmodels.stats import stattools
 
 """
-function: shows the progress bar
-reference: n/a
-methodology: n/a
+  function: shows the progress bar
+  reference: n/a
+  methodology: n/a
 """
 def progressBar(value, # value of an event
                 endValue, # length of that event
@@ -26,9 +26,9 @@ def progressBar(value, # value of an event
     sys.stdout.flush() # release stdout
 
 """
-function: computes the ewma, ewma var, and ewma stds
-reference: https://stackoverflow.com/questions/40754262/pandas-ewm-std-calculation
-methodology: n/a
+  function: computes the ewma, ewma var, and ewma stds
+  reference: https://stackoverflow.com/questions/40754262/pandas-ewm-std-calculation
+  methodology: n/a
 """
 def ewma(input, # input time series array 
          windowLength): # window for exponential weighted moving average
@@ -45,9 +45,9 @@ def ewma(input, # input time series array
   return outputEwma
 
 """
-function: grouping dataframe based on a feature and then calculates thresholds
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: grouping dataframe based on a feature and then calculates thresholds
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def grouping(targetCol, # target column of tick dataframe
              tickExpectedInit, # initial expected ticks
@@ -81,9 +81,9 @@ def grouping(targetCol, # target column of tick dataframe
   return timesDelta, thetasAbsolute, thresholds, times, thetas, groupingID
 
 """
-function: implements Information-Driven Bars
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: 29
+  function: implements Information-Driven Bars
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: 29
 """
 def infoBar(tickData, # dataframe of tick data
             type = "volume", # User can choose between "tick", "volume" or "dollar" imbalanced bars
@@ -106,9 +106,9 @@ def infoBar(tickData, # dataframe of tick data
   return ohlcvDataframe, thetasAbsolute, thresholds
 
 """
-function: Takes grouped dataframe, combining and creating the new one with info. about prices and volume.
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: Takes grouped dataframe, combining and creating the new one with info. about prices and volume.
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def ohlcv(tickDataGrouped): #grouped dataframes
   ohlc = tickDataGrouped['price'].ohlc() # find price in each tick
@@ -121,9 +121,9 @@ def ohlcv(tickDataGrouped): #grouped dataframes
 
 
 """
-function: Takes dataframe and generating time bar dataframe
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: Takes dataframe and generating time bar dataframe
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def timeBar(tickData, # dataframe of tick data
             frequency = "5Min"): # frequency for rounding date time
@@ -133,9 +133,9 @@ def timeBar(tickData, # dataframe of tick data
 
 
 """
-function: Takes dataframe and generating tick bar dataframe
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: Takes dataframe and generating tick bar dataframe
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def tickBar(tickData, # dataframe of tick data
             tickPerBar = 10,  # number of ticks in each bar
@@ -151,9 +151,9 @@ def tickBar(tickData, # dataframe of tick data
   return ohlcvDataframe
 
 """
-function: Takes dataframe and generating volume bar dataframe
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: Takes dataframe and generating volume bar dataframe
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def volumeBar(tickData, # dataframe of tick data
               volumePerBar = 10000,   # volumes in each bar
@@ -172,9 +172,9 @@ def volumeBar(tickData, # dataframe of tick data
   return ohlcvDataframe
 
 """
-function: Takes dataframe and generating volume bar dataframe
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: n/a
+  function: Takes dataframe and generating volume bar dataframe
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: n/a
 """
 def dollarBar(tickData, # dataframe of tick data
               dollarPerBar = 100000,  # dollars in each bar
@@ -195,9 +195,9 @@ def dollarBar(tickData, # dataframe of tick data
 
 
 """
-function: Calculates hedging weights using cov, risk distribution(RiskDist) and σ
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: 36
+  function: Calculates hedging weights using cov, risk distribution(RiskDist) and σ
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: 36
 """
 def PCAWeights(cov, #covariance matrix
                riskDisturbution = None, # risk distribution
@@ -216,9 +216,9 @@ def PCAWeights(cov, #covariance matrix
 
 
 """
-function:  Implementation of the symmetric CUSUM filter
-reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-methodology: 39
+  function:  Implementation of the symmetric CUSUM filter
+  reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+  methodology: 39
 """
 def events(input, # dataframe of prices and dates
            threshold): # threshold

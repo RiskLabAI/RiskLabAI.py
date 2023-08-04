@@ -1,12 +1,7 @@
 import numpy as np
 from typing import Optional
 
-def pca_weights(
-    cov: np.ndarray,
-    risk_distribution: Optional[np.ndarray] = None,
-    risk_target: float = 1.0
-) -> np.ndarray:
-    """
+"""
     Calculates hedging weights using covariance, risk distribution, and risk target.
 
     :param cov: Covariance matrix
@@ -21,7 +16,12 @@ def pca_weights(
     Reference:
         De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
         Methodology 36.
-    """
+"""
+def pca_weights(
+    cov: np.ndarray,
+    risk_distribution: Optional[np.ndarray] = None,
+    risk_target: float = 1.0
+) -> np.ndarray:
     eigen_values, eigen_vectors = np.linalg.eigh(cov)  # must be Hermitian
     indices = eigen_values.argsort()[::-1]  # arguments for sorting eigen_values descending
     eigen_values, eigen_vectors = eigen_values[indices], eigen_vectors[:, indices]

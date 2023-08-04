@@ -2,12 +2,10 @@ import pandas as pd
 import numpy as np
 
 """
-function: Group Mean and Standard Deviation
-reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
-methodology: page 86 Clustered MDI section
+    function: Group Mean and Standard Deviation
+    reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
+    methodology: page 86 Clustered MDI section
 """
-
-
 def group_mean_std(
     dataframe0: pd.DataFrame,  # input dataframe
     clusters: dict  # clusters
@@ -24,12 +22,10 @@ def group_mean_std(
 
 
 """
-function: Clustered feature importance MDI
-reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
-methodology: page 86 Clustered MDI section
+    function: Clustered feature importance MDI
+    reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
+    methodology: page 86 Clustered MDI section
 """
-
-
 def clustered_feature_importance_MDI(
     classifier,  # classifier for mdi
     feature_names,  # feature names

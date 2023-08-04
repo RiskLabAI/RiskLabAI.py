@@ -3,9 +3,9 @@ import numpy as np
 from CorwinSchultz import *
 
 """
-function: Bekker-Parkinson volatility σ Estimation 
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 286 snippet 19.2
+    function: Bekker-Parkinson volatility σ Estimation 
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 286 snippet 19.2
 """
 def sigma_estimates(
     beta:pd.Series, # β Estimates vector
@@ -23,9 +23,9 @@ def sigma_estimates(
 
 
 """
-function: Bekker-Parkinson volatility Estimation
-reference: De Prado, M. (18) Advances in Financial Machine Learning
-methodology: page 286 Corwin and Schultz section 
+    function: Bekker-Parkinson volatility Estimation
+    reference: De Prado, M. (18) Advances in Financial Machine Learning
+    methodology: page 286 Corwin and Schultz section 
 """
 def bekker_parkinson_volatility_estimates(
     highPrices:pd.Series, # high prices vector

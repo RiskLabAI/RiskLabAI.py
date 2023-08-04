@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 
 """
-function: Implementation of Orthogonal Features (Compute Eigen Vectors)
-reference: De Prado, M. (2018) Advances In Financial Machine Learning
-methodology: page 119 Orthogonal Features section snippet 8.5
+    function: Implementation of Orthogonal Features (Compute Eigen Vectors)
+    reference: De Prado, M. (2018) Advances In Financial Machine Learning
+    methodology: page 119 Orthogonal Features section snippet 8.5
 """
 def eigen_vectors(
     dot_product: np.ndarray,  # input dot product matrix
@@ -33,9 +33,9 @@ def eigen_vectors(
 
 
 """
-function: Implementation of Orthogonal Features
-reference: De Prado, M. (2018) Advances In Financial Machine Learning
-methodology: page 119 Orthogonal Features section snippet 8.5
+    function: Implementation of Orthogonal Features
+    reference: De Prado, M. (2018) Advances In Financial Machine Learning
+    methodology: page 119 Orthogonal Features section snippet 8.5
 """
 def orthogonal_features(
     X:np.ndarray, # features matrix
