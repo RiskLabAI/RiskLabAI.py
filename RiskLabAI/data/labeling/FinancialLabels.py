@@ -44,4 +44,4 @@ def bins_from_trend(molecule, # index of observations we wish to label
     outputs['End Time'] = pd.to_datetime(outputs['End Time']) # convert to datetime
     outputs['Trend'] = pd.to_numeric(outputs['Trend'], downcast='signed') # convert to numeric
     
-    return outputs.dropna(subset=['Trend']) # drop NaN values from trends
+    return outputs.dropna(subset=['Trend']) # drop nan values from trends
