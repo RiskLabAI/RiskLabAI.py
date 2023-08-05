@@ -3,11 +3,10 @@ from sympy import *
 import scipy.stats as ss
 
 """
-function: targets a Sharpe ratio as a function of the number of bets
-reference: De Prado, M. (2018) Advances in financial machine learning.
-methodology: page 213, snippet 15.1
+	function: targets a Sharpe ratio as a function of the number of bets
+	reference: De Prado, M. (2018) Advances in financial machine learning.
+	methodology: page 213, snippet 15.1
 """
-
 def sharpe_ratio_trials(p, # probability of success
                         n_run): # number of runs
 
@@ -21,11 +20,10 @@ def sharpe_ratio_trials(p, # probability of success
     return np.mean(output), np.std(output), np.mean(output) / np.std(output)
 
 """
-function: uses the SymPy library for symbolic operations 
-reference: De Prado, M. (2018) Advances in financial machine learning.
-methodology: page 214, snippet 15.2
+	function: uses the SymPy library for symbolic operations 
+	reference: De Prado, M. (2018) Advances in financial machine learning.
+	methodology: page 214, snippet 15.2
 """
-
 def target_sharpe_ratio_symbolic():
 
     p,u,d = symbols("p u d") # Create symbols
@@ -37,11 +35,10 @@ def target_sharpe_ratio_symbolic():
     return factor(v) 
 
 """
-function: computes implied precision 
-reference: De Prado, M. (2018) Advances in financial machine learning.
-methodology: page 214, snippet 15.3
+	function: computes implied precision 
+	reference: De Prado, M. (2018) Advances in financial machine learning.
+	methodology: page 214, snippet 15.3
 """
-
 def implied_precision(stop_loss, # stop loss threshold
 			   		  profit_taking, # profit taking threshold
 			   		  frequency, # number of bets per year
@@ -55,11 +52,10 @@ def implied_precision(stop_loss, # stop loss threshold
 	return precision
 
 """
-function: computes the number of bets/year needed to achieve a Sharpe ratio with a certain precision rate
-reference: De Prado, M. (2018) Advances in financial machine learning.
-methodology: page 215, snippet 15.4
+	function: computes the number of bets/year needed to achieve a Sharpe ratio with a certain precision rate
+	reference: De Prado, M. (2018) Advances in financial machine learning.
+	methodology: page 215, snippet 15.4
 """
-
 def bin_frequency(stop_loss, # stop loss threshold
 				  profit_taking, # profit taking threshold
 				  precision, # precision rate p
@@ -76,11 +72,10 @@ def binSR(sl, pt, frequency, p):
     return ((pt - sl)*p + sl) / ((pt - sl)*(p*(1 - p))**0.5)*frequency**0.5  # Define Sharpe Ratio function        
 
 """
-function: calculates the strategy risk in practice
-reference: De Prado, M. (2018) Advances in financial machine learning.
-methodology: page 215, snippet 15.4
+	function: calculates the strategy risk in practice
+	reference: De Prado, M. (2018) Advances in financial machine learning.
+	methodology: page 215, snippet 15.4
 """
-
 def mixGaussians(μ1, # mean of the first gaussian distribution to generate bet outcomes
 				 μ2, # mean of the second gaussian distribution to generate bet outcomes
 			     σ1, # standard deviation of the first gaussian distribution to generate bet outcomes
