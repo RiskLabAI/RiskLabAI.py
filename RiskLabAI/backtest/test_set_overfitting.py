@@ -4,11 +4,10 @@ from scipy.stats import norm
 import scipy.stats as ss
 
 """
-function: validates the False Strategy Theorem experimentally
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 110, snippet 8.1
+    function: validates the False Strategy Theorem experimentally
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 110, snippet 8.1
 """
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def expected_max_sharpe_ratio(nTrials, # number of trials
                               mean_sharpe_ratio, # mean Sharpe Ratio
                               std_sharpe_ratio): # standard deviation of Sharpe Ratios
@@ -20,7 +19,7 @@ def expected_max_sharpe_ratio(nTrials, # number of trials
     sharpe_ratio = mean_sharpe_ratio + std_sharpe_ratio*sharpe_ratio # get max Sharpe Ratio, controlling for SBuMT
 
     return sharpe_ratio
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 def generated_max_sharpe_ratio(nSims, # number of simulations
                                nTrials, # number of trials
                                std_sharpe_ratio, # mean Sharpe Ratio
@@ -43,13 +42,11 @@ def generated_max_sharpe_ratio(nSims, # number of simulations
         output = output.append(output_, ignore_index=True) # append output
 
     return output
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 """
-function: calculates mean and standard deviation of the predicted errors
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 112, snippet 8.2
+    function: calculates mean and standard deviation of the predicted errors
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 112, snippet 8.2
 """
-
 def mean_std_error(nSims0, # number of max{SR} used to estimate E[max{SR}]
                    nSims1, # number of errors on which std is computed
                    nTrials, # array of numbers of SR used to derive max{SR}
@@ -73,13 +70,12 @@ def mean_std_error(nSims0, # number of max{SR} used to estimate E[max{SR}]
     output = pd.DataFrame.from_dict(output, orient='columns') # create output
 
     return output
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 """
-function: calculates type I error probability of stratgies
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 119, snippet 8.3
+    function: calculates type I error probability of stratgies
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 119, snippet 8.3
 """
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def estimated_sharpe_ratio_z_statistics(sharpe_ratio, # estimated Sharpe Ratio
                                         t, # number of observations
                                         sharpe_ratio_=0, # true Sharpe Ratio
@@ -90,7 +86,6 @@ def estimated_sharpe_ratio_z_statistics(sharpe_ratio, # estimated Sharpe Ratio
     z /= (1 - skew*sharpe_ratio + (kurt - 1) / 4.0*sharpe_ratio**2)**0.5 # calculate z statistic
 
     return z
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def strategy_type1_error_probability(z, # z statistic for the estimated Sharpe Ratios
                                      k=1): # number of tests
     # false positive rate
@@ -98,11 +93,11 @@ def strategy_type1_error_probability(z, # z statistic for the estimated Sharpe R
     α_k = 1 - (1 - α)**k # correct for multi-testing 
 
     return α_k
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 """
-function: calculates type II error probability of stratgies
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 121, snippet 8.4
+    function: calculates type II error probability of stratgies
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 121, snippet 8.4
 """
 def theta_for_type2_error(sharpe_ratio, # estimated Sharpe Ratio
                           t, # number of observations
@@ -114,7 +109,6 @@ def theta_for_type2_error(sharpe_ratio, # estimated Sharpe Ratio
     θ /= (1 - skew*sharpe_ratio + (kurt - 1) / 4.0*sharpe_ratio**2)**0.5
     
     return θ
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def strategy_type2_error_probability(α_k, # type I error
                                      k, # number of tests
                                      θ): # calculated theta parameter
@@ -123,6 +117,5 @@ def strategy_type2_error_probability(α_k, # type I error
     β = ss.norm.cdf(z - θ) # calculate false negative rate
 
     return β
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 

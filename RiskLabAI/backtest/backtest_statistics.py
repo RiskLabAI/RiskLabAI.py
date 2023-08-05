@@ -2,11 +2,10 @@ import numpy as np
 import pandas as pd
 
 """
-function: returns timing of bets when positions flatten or flip
-reference: De Prado, M (2018) Advances in financial machine learning
-methodology: page 197, snippet 14.1
+    function: returns timing of bets when positions flatten or flip
+    reference: De Prado, M (2018) Advances in financial machine learning
+    methodology: page 197, snippet 14.1
 """
-
 def bet_timing(target_positions: pd.Series):  # series of target positions
     zero_positions = target_positions[target_positions == 0].index # get zero positions indices
 
@@ -23,11 +22,10 @@ def bet_timing(target_positions: pd.Series):  # series of target positions
     return bets
 
 """
-function: derives avgerage holding period (in days) using avg entry time pairing algo
-refernce: De Prado, M (2018) Advances in financial machine learning
-methodology: page 197, snippet 14.2
+    function: derives avgerage holding period (in days) using avg entry time pairing algo
+    refernce: De Prado, M (2018) Advances in financial machine learning
+    methodology: page 197, snippet 14.2
 """
-
 def holding_period(target_positions: pd.Series):  # series of target positions
     hold_period, time_entry = pd.DataFrame(columns = ['dT', 'w']), 0.0 # initialize holding periods and entry time
     position_difference, time_difference = target_positions.diff(), (target_positions.index - target_positions.index[0]) / np.timedelta64(1,'D') # find position difference and elapssed time
@@ -51,18 +49,17 @@ def holding_period(target_positions: pd.Series):  # series of target positions
     return hold_period, mean
 
 """
-function: derives the algorithm for deriving hhi concentration
-refernce: De Prado, M (2018) Advances in financial machine learning
-methodology: page 201, snippet 14.3
+    function: derives the algorithm for deriving hhi concentration
+    refernce: De Prado, M (2018) Advances in financial machine learning
+    methodology: page 201, snippet 14.3
 """
-
 def hhi_concentration(returns: pd.Series):  # series of returns
     returns_hhi_positive = hhi(returns[returns >= 0]) # get concentration of positive returns per bet
     ruturns_hhi_negative = hhi(returns[returns < 0]) # get concentration of negative returns per bet
     time_concentrated_hhi = hhi(returns.groupby(pd.Grouper(freq='M')).count()) # get concentr. bets/month
 
     return returns_hhi_positive, ruturns_hhi_negative, time_concentrated_hhi
-#————————————————————————————————————————
+
 def hhi(bet_returns: pd.Series):  # bet returns
     if bet_returns.shape[0] <= 2: # find returns length is less than 3
         return np.nan
@@ -74,32 +71,10 @@ def hhi(bet_returns: pd.Series):  # bet returns
     return hhi_
 
 """
-function: computes series of drawdowns and the time under water associated with them
-refernce: De Prado, M (2018) Advances in financial machine learning
-methodology: page 201, snippet 14.4
+    function: computes series of drawdowns and the time under water associated with them
+    refernce: De Prado, M (2018) Advances in financial machine learning
+    methodology: page 201, snippet 14.4
 """
-
-# def compute_drawdowns_time_under_water(series: pd.Series, # series of returns or dollar performance
-#                                        dollars=False): # returns or dollar performance
-
-#     series_df = series.to_frame('pnl') # convert to DataFrame
-#     series_df['hwm'] = series.expanding().max() # find max of expanding window
-
-#     profit_and_loss = series_df.groupby('hwm').min().reset_index() # group by high water mark
-#     profit_and_loss.columns = ['hwm','min'] # initiate columns
-#     profit_and_loss.index = series_df['hwm'].drop_duplicates(keep='first').index # get time of high water mark
-#     profit_and_loss = profit_and_loss[profit_and_loss['hwm'] > profit_and_loss['min']] # get high water mark followed by a drawdown
-
-#     if dollars:
-#         drawdown = profit_and_loss['hwm'] - profit_and_loss['min'] # calculate drawdowns
-#     else:
-#         drawdown = 1 - profit_and_loss['min'] / profit_and_loss['hwm'] # calculate drawdowns
-
-#     time_under_water = ((profit_and_loss.index[1:] - profit_and_loss.index[:-1]) / np.timedelta64(1, 'Y')).values # convert time under water to years
-#     time_under_water = pd.Series(time_under_water, index=profit_and_loss.index[:-1]) # create Series
-
-#     return drawdown, time_under_water
-
 def compute_drawdowns_time_under_water(series: pd.Series, # series of returns or dollar performance
                                        dollars=False): # returns or dollar performance
 
