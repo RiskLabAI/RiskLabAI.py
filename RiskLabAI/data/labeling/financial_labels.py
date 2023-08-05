@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 
 """
-function: calculates the t-value of a linear trend
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 68, snippet 5.1
+    function: calculates the t-value of a linear trend
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 68, snippet 5.1
 """
 def t_value_linear_regression(price:pd.Series): # time series of prices
     x = np.arange(price.shape[0]) # create regression data
@@ -15,9 +15,9 @@ def t_value_linear_regression(price:pd.Series): # time series of prices
     return t_value
 
 """
-function: implements the trend scanning method
-refernce: De Prado, M (2020) Machine Learning for Asset Managers
-methodology: page 68, snippet 5.2
+    function: implements the trend scanning method
+    refernce: De Prado, M (2020) Machine Learning for Asset Managers
+    methodology: page 68, snippet 5.2
 """
 def bins_from_trend(molecule, # index of observations we wish to label
                     close, # time series of prices

@@ -42,6 +42,7 @@ def generated_max_sharpe_ratio(nSims, # number of simulations
         output = output.append(output_, ignore_index=True) # append output
 
     return output
+
 """
     function: calculates mean and standard deviation of the predicted errors
     refernce: De Prado, M (2020) Machine Learning for Asset Managers
@@ -86,6 +87,7 @@ def estimated_sharpe_ratio_z_statistics(sharpe_ratio, # estimated Sharpe Ratio
     z /= (1 - skew*sharpe_ratio + (kurt - 1) / 4.0*sharpe_ratio**2)**0.5 # calculate z statistic
 
     return z
+
 def strategy_type1_error_probability(z, # z statistic for the estimated Sharpe Ratios
                                      k=1): # number of tests
     # false positive rate
@@ -109,6 +111,7 @@ def theta_for_type2_error(sharpe_ratio, # estimated Sharpe Ratio
     θ /= (1 - skew*sharpe_ratio + (kurt - 1) / 4.0*sharpe_ratio**2)**0.5
     
     return θ
+
 def strategy_type2_error_probability(α_k, # type I error
                                      k, # number of tests
                                      θ): # calculated theta parameter
