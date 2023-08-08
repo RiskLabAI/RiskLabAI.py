@@ -4,31 +4,32 @@ import time
 from typing import List, Tuple
 from RiskLabAI.utils import exponential_weighted_moving_average, progress_bar
 
-"""
-    Group the DataFrame based on a feature and calculate thresholds.
 
-    This function groups the target_column DataFrame based on a feature
-    and calculates the thresholds, which can be used in financial machine learning
-    applications such as dynamic time warping.
-
-    Reference:
-        De Prado, M. (2018). Advances in financial machine learning. John Wiley & Sons.
-
-    Args:
-        target_column (np.ndarray): Target column of the DataFrame.
-        initial_expected_ticks (int): Initial expected number of ticks.
-        initial_bar_size (float): Initial expected size of each tick.
-
-    Returns:
-        Tuple[List[float], np.ndarray, np.ndarray, List[int], np.ndarray, np.ndarray]:
-        A tuple containing the time deltas, absolute theta values, thresholds, times,
-        theta values, and grouping IDs.
-"""
 def compute_thresholds(
     target_column: np.ndarray,
     initial_expected_ticks: int,
     initial_bar_size: float
 ) -> Tuple[List[float], np.ndarray, np.ndarray, List[int], np.ndarray, np.ndarray]:
+    """
+        Group the DataFrame based on a feature and calculate thresholds.
+
+        This function groups the target_column DataFrame based on a feature
+        and calculates the thresholds, which can be used in financial machine learning
+        applications such as dynamic time warping.
+
+        Reference:
+            De Prado, M. (2018). Advances in financial machine learning. John Wiley & Sons.
+
+        Args:
+            target_column (np.ndarray): Target column of the DataFrame.
+            initial_expected_ticks (int): Initial expected number of ticks.
+            initial_bar_size (float): Initial expected size of each tick.
+
+        Returns:
+            Tuple[List[float], np.ndarray, np.ndarray, List[int], np.ndarray, np.ndarray]:
+            A tuple containing the time deltas, absolute theta values, thresholds, times,
+            theta values, and grouping IDs.
+    """
     
     num_values = target_column.shape[0]
     target_column = target_column.values.astype(np.float64)
