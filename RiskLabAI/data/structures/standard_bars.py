@@ -4,23 +4,24 @@ from typing import Optional
 from .utilities import *
 from ...utils import *
 
-"""
-    Takes a dataframe and generates a dollar bar dataframe.
 
-    :param tick_data: Dataframe of tick data
-    :type tick_data: pd.DataFrame
-    :param dollar_per_bar: Dollars in each bar, defaults to 100000
-    :type dollar_per_bar: int, optional
-    :param number_bars: Number of bars, defaults to None
-    :type number_bars: Optional[int], optional
-    :return: A dataframe containing OHLCV data and other relevant information based on dollar bars
-    :rtype: pd.DataFrame
-"""
 def generate_dollar_bar_dataframe(
     tick_data: pd.DataFrame,
     dollar_per_bar: int = 100000,
     number_bars: Optional[int] = None
 ) -> pd.DataFrame:
+    """
+        Takes a dataframe and generates a dollar bar dataframe.
+
+        :param tick_data: Dataframe of tick data
+        :type tick_data: pd.DataFrame
+        :param dollar_per_bar: Dollars in each bar, defaults to 100000
+        :type dollar_per_bar: int, optional
+        :param number_bars: Number of bars, defaults to None
+        :type number_bars: Optional[int], optional
+        :return: A dataframe containing OHLCV data and other relevant information based on dollar bars
+        :rtype: pd.DataFrame
+    """
 
     tick_data['dollar'] = tick_data['price'] * tick_data['size']  # generate dollar column by multiplying price and size
     tick_data['dollars_cumulated'] = tick_data['dollar'].cumsum()  # cumulative sum of dollars
@@ -56,6 +57,18 @@ def generate_tick_bar_dataframe(
     tick_per_bar: int = 10,
     number_bars: Optional[int] = None
 ) -> pd.DataFrame:
+    """
+        Takes a dataframe and generates a tick bar dataframe.
+
+        :param tick_data: Dataframe of tick data
+        :type tick_data: pd.DataFrame
+        :param tick_per_bar: Number of ticks in each bar, defaults to 10
+        :type tick_per_bar: int, optional
+        :param number_bars: Number of bars, defaults to None
+        :type number_bars: Optional[int], optional
+        :return: A dataframe containing OHLCV data and other relevant information based on tick bars
+        :rtype: pd.DataFrame
+"""
 
     # If tick_per_bar is not mentioned, then calculate it with the number of all ticks divided by the number of bars
     if not tick_per_bar:
@@ -88,23 +101,24 @@ def generate_time_bar_dataframe(
     ohlcv_dataframe = create_ohlcv_dataframe(tick_data_grouped)  # create a dataframe based on time bars with frequency freq
     return ohlcv_dataframe
 
-"""
-    Takes a dataframe and generates a volume bar dataframe.
 
-    :param tick_data: Dataframe of tick data
-    :type tick_data: pd.DataFrame
-    :param volume_per_bar: Volumes in each bar, defaults to 10000
-    :type volume_per_bar: int, optional
-    :param number_bars: Number of bars, defaults to None
-    :type number_bars: Optional[int], optional
-    :return: A dataframe containing OHLCV data and other relevant information based on volume bars
-    :rtype: pd.DataFrame
-"""
 def generate_volume_bar_dataframe(
     tick_data: pd.DataFrame,
     volume_per_bar: int = 10000,
     number_bars: Optional[int] = None
 ) -> pd.DataFrame:
+    """
+        Takes a dataframe and generates a volume bar dataframe.
+
+        :param tick_data: Dataframe of tick data
+        :type tick_data: pd.DataFrame
+        :param volume_per_bar: Volumes in each bar, defaults to 10000
+        :type volume_per_bar: int, optional
+        :param number_bars: Number of bars, defaults to None
+        :type number_bars: Optional[int], optional
+        :return: A dataframe containing OHLCV data and other relevant information based on volume bars
+        :rtype: pd.DataFrame
+    """
 
     tick_data['volume_cumulated'] = tick_data['size'].cumsum()  # cumulative sum of size
 

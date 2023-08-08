@@ -1,7 +1,12 @@
 import numpy as np
 from typing import List, Tuple
 
-"""
+
+def exponential_weighted_moving_average(
+    input_series: np.ndarray,
+    window_length: int
+) -> np.ndarray:
+    """
     Compute the exponential weighted moving average (EWMA) of a time series array.
 
     The EWMA is calculated using the formula:
@@ -19,11 +24,7 @@ from typing import List, Tuple
 
     Returns:
         np.ndarray: An array containing the computed EWMA values.
-"""
-def exponential_weighted_moving_average(
-    input_series: np.ndarray,
-    window_length: int
-) -> np.ndarray:
+    """
     
     num_values = input_series.shape[0]
     ewma_output = np.empty(num_values, dtype='float64')
