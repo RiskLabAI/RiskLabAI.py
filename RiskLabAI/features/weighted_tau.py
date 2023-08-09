@@ -1,14 +1,18 @@
 import scipy.stats as Stats
 import numpy as np
 
-"""
-    function: Weighted τ calculation
-    reference: De Prado, M. (2018) Advances In Financial Machine Learning
-    methodology: page 121 Orthogonal Features section snippet 8.6
-"""
 def weighted_tau(
-    feature_importances:np.ndarray, # vector of feature importances 
-    principal_component_ranks:np.ndarray, # vector of principal component ranks
-)->float:
+    feature_importances: np.ndarray,
+    principal_component_ranks: np.ndarray
+) -> float:
+    """
+    Calculate weighted τ using feature importances and principal component ranks.
 
+    :param feature_importances: Vector of feature importances
+    :type feature_importances: np.ndarray
+    :param principal_component_ranks: Vector of principal component ranks
+    :type principal_component_ranks: np.ndarray
+    :return: Weighted τ value
+    :rtype: float
+    """
     return Stats.weightedtau(feature_importances, 1 / principal_component_ranks)[0]

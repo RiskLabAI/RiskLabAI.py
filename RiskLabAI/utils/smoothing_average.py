@@ -1,22 +1,16 @@
 import numpy as np
-from typing import List, Tuple
+from typing import List
 
 
-def exponential_weighted_moving_average(
-    input_series: np.ndarray,
-    window_length: int
-) -> np.ndarray:
+def exponential_weighted_moving_average(input_series: np.ndarray, window_length: int) -> np.ndarray:
     """
     Compute the exponential weighted moving average (EWMA) of a time series array.
 
     The EWMA is calculated using the formula:
+        EWMA_t = (x_t + (1 - alpha) * x_{t-1} + (1 - alpha)^2 * x_{t-2} + ...) / omega_t
 
-    .. math::
-
-        EWMA_t = \\frac{x_t + (1 - \\alpha) * x_{t-1} + (1 - \\alpha)^2 * x_{t-2} + \\cdots}{\\omega_t}
-
-    where :math:`\\omega_t = 1 + (1 - \\alpha) + (1 - \\alpha)^2 + \\cdots + (1 - \\alpha)^t`,
-    and :math:`\\alpha = \\frac{2}{\\text{window_length} + 1}`
+    where omega_t = 1 + (1 - alpha) + (1 - alpha)^2 + ... + (1 - alpha)^t,
+    and alpha = 2 / (window_length + 1)
 
     Args:
         input_series (np.ndarray): Input time series array.
@@ -25,7 +19,6 @@ def exponential_weighted_moving_average(
     Returns:
         np.ndarray: An array containing the computed EWMA values.
     """
-    
     num_values = input_series.shape[0]
     ewma_output = np.empty(num_values, dtype='float64')
     omega = 1

@@ -1,21 +1,19 @@
 from math import log2
 
-"""
-    function: Shannon Entropy 
-    reference: De Prado, M. (18) Advances in Financial Machine Learning
-    methodology: page 263 SHANNON’S ENTROPY section
-"""
-def shannon_entropy(
-    message:str # input encoded message
-) -> float:
+def shannon_entropy(message: str) -> float:
+    """
+    Calculate Shannon Entropy.
 
-    char_to_count = dict()
+    :param message: Input encoded message
+    :type message: str
+    :return: Calculated Shannon Entropy
+    :rtype: float
+    """
+    char_to_count = {}
     entropy = 0
+
     for character in message:
-        try:
-            char_to_count[character] += 1
-        except:
-            char_to_count[character] = 1
+        char_to_count[character] = char_to_count.get(character, 0) + 1
 
     message_length = len(message)
     for count in char_to_count.values():
@@ -24,22 +22,24 @@ def shannon_entropy(
 
     return entropy
 
+def lemple_ziv_entropy(message: str) -> float:
+    """
+    Calculate Lemple-Ziv Entropy.
 
-"""
-    function: A LIBRARY BUILT USING THE LZ ALGORITHM
-    reference: De Prado, M. (18) Advances in Financial Machine Learning
-    methodology: page 266 LEMPEL-ZIV ESTIMATORS section
-"""
-def lemple_ziv_entropy(
-    message:str # input encoded message
-) -> float:
-
+    :param message: Input encoded message
+    :type message: str
+    :return: Calculated Lemple-Ziv Entropy
+    :rtype: float
+    """
     i, library = 0, set([str(message[1])])
     message_length = len(message)
+
     while i < message_length:
         last_j_value = message_length - 1
+
         for j in range(i, message_length):
-            message_ = message[i+1:j+2]
+            message_ = message[i + 1:j + 2]
+
             if message_ not in library:
                 library.add(message_)
                 last_j_value = j
@@ -47,27 +47,29 @@ def lemple_ziv_entropy(
 
         i = last_j_value + 1
 
-
     return len(library) / len(message)
 
+def probability_mass_function(message: str, approximate_word_length: int) -> dict:
+    """
+    Calculate Probability Mass Function.
 
-def probability_mass_function(
-    message:str, # input encoded message
-    approximate_word_length:int # approximation of word length
-) -> dict:
-
-    library = dict()
+    :param message: Input encoded message
+    :type message: str
+    :param approximate_word_length: Approximation of word length
+    :type approximate_word_length: int
+    :return: Probability Mass Function
+    :rtype: dict
+    """
+    library = {}
 
     message_length = len(message)
     for index in range(approximate_word_length, message_length):
-        message_ = message[index-approximate_word_length:index] 
+        message_ = message[index - approximate_word_length:index]
 
         if message_ not in library:
-            library[message_] = [index-approximate_word_length]
+            library[message_] = [index - approximate_word_length]
         else:
-            library[message_] = library[message_] + [index-approximate_word_length]
-            # library[message_].append(index-approximate_word_length)
-
+            library[message_].append(index - approximate_word_length)
 
     denominator = float(message_length - approximate_word_length)
     probability_mass_function_ = {
@@ -76,76 +78,76 @@ def probability_mass_function(
 
     return probability_mass_function_
 
-"""
-    function: Plug-in Entropy Estimator Implementation
-    reference: De Prado, M. (18) Advances in Financial Machine Learning
-    methodology: page 265 THE PLUG-IN (OR MAXIMUM LIKELIHOOD) ESTIMATOR section
-"""
-def plug_in_entropy_estimator(
-    message:str, # input encoded message
-    approximate_word_length:int=1, # approximation of word length
-) -> float:
+def plug_in_entropy_estimator(message: str, approximate_word_length: int = 1) -> float:
+    """
+    Calculate Plug-in Entropy Estimator.
 
+    :param message: Input encoded message
+    :type message: str
+    :param approximate_word_length: Approximation of word length, default is 1
+    :type approximate_word_length: int
+    :return: Calculated Plug-in Entropy Estimator
+    :rtype: float
+    """
     pmf = probability_mass_function(message, approximate_word_length)
-    plugInEntropyEstimator = -sum([pmf[key] * log2(pmf[key]) for key in pmf.keys()]) / approximate_word_length
-    return plugInEntropyEstimator
-    
+    plug_in_entropy_estimator = -sum([pmf[key] * log2(pmf[key]) for key in pmf.keys()]) / approximate_word_length
+    return plug_in_entropy_estimator
 
+def longest_match_length(message: str, i: int, n: int) -> tuple:
+    """
+    Calculate the length of the longest match.
 
-"""
-    function: COMPUTES THE LENGTH OF THE LONGEST MATCH
-    reference: De Prado, M. (18) Advances in Financial Machine Learning
-    methodology: page 267 LEMPEL-ZIV ESTIMATORS section
-"""
-def longest_match_length(
-    message:str,
-    i:int,
-    n:int
-) -> tuple:
-
+    :param message: Input encoded message
+    :type message: str
+    :param i: Index value
+    :type i: int
+    :param n: Length parameter
+    :type n: int
+    :return: Tuple containing matched length and substring
+    :rtype: tuple
+    """
     sub_string = ""
     for l in range(1, n + 1):
-        message1 = message[i:i+l+1]
-        for j in range(i-n+1, i+1):
-            message0 = message[j:j+l+1]
+        message1 = message[i:i + l + 1]
+        for j in range(i - n + 1, i + 1):
+            message0 = message[j:j + l + 1]
             if message1 == message0:
                 sub_string = message1
-                break # search for higher l.
+                break
 
+    return len(sub_string) + 1, sub_string
 
-    return (len(sub_string) + 1, sub_string) # matched length + 1 
+def kontoyiannis_entorpy(message: str, window: int = 0) -> float:
+    """
+    Calculate Kontoyiannis Entropy.
 
+    :param message: Input encoded message
+    :type message: str
+    :param window: Length of expanding window, default is 0
+    :type window: int
+    :return: Calculated Kontoyiannis Entropy
+    :rtype: float
+    """
+    output = {"num": 0, "sum": 0, "subString": []}
 
-"""
-    function: IMPLEMENTATION OF ALGORITHMS DISCUSSED IN GAO ET AL.
-    reference: De Prado, M. (18) Advances in Financial Machine Learning
-    methodology: page 268 LEMPEL-ZIV ESTIMATORS section
-"""
-def kontoyiannis_entorpy(
-    message:str, # input encoded message
-    window:int=0, # length of expanding window 
-) -> float:
-
-    output = {"num" : 0, "sum" : 0, "subString" : []}
-    if window == None:
-        points = range(2, len(message)/2+2)
+    if window is None:
+        points = range(2, len(message) // 2 + 2)
     else:
-        window = min(window, len(message) / 2)
-        points = range(window+1, len(message)-window+2)
+        window = min(window, len(message) // 2)
+        points = range(window + 1, len(message) - window + 2)
 
     for i in points:
-        if window == None:
-            (l, message_) = longest_match_length(message, i, i)
-            output["sum"] += log2(i) / l # to avoid Doeblin condition
+        if window is None:
+            l, message_ = longest_match_length(message, i, i)
+            output["sum"] += log2(i) / l
         else:
-            (l, message_) = longest_match_length(message, i, window)
-            output["sum"] += log2(window) / l # to avoid Doeblin condition
+            l, message_ = longest_match_length(message, i, window)
+            output["sum"] += log2(window) / l
 
         output["subString"].append(message_)
         output["num"] += 1
 
     output["h"] = output["sum"] / output["num"]
-    output["r"] = 1 - output["h"] / log2(len(message)) 
+    output["r"] = 1 - output["h"] / log2(len(message))
 
-    return output["h"] 
-
+    return output["h"]
