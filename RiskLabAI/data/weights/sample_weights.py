@@ -1,127 +1,154 @@
+import numpy as np
+import pandas as pd
 
-import imp
-import numpy as np 
-import pandas as pd 
+def expand_label_for_meta_labeling(
+        close_index: pd.DataFrame,
+        timestamp: pd.DataFrame,
+        molecule: pd.Index
+) -> pd.Series:
+    """
+    Expand label to incorporate meta-labeling.
 
-"""
-    function: expand label tO incorporate meta-labeling
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.1
-"""
-def concurrencyEvents(closeIndex, # DataFrame that has events
-                      timestamp, # DateFrame that has return and label of each period
-                      molecule, # index that function must apply on it
-    ): #1) find events that span the period [molecule[0],molecule[-1]]
-    timestamp=timestamp.fillna(closeIndex[-1]) # unclosed events still must impact other weights
-    timestamp=timestamp[timestamp>=molecule[0]] # events that end at or after molecule[0]
-    timestamp=timestamp.loc[:timestamp[molecule].max()] # events that start at or before t1[molecule].max()
-    #2) count events spanning a bar
-    iloc=closeIndex.searchsorted(np.array([timestamp.index[0],timestamp.max()]))
-    count=pd.Series(0,index=closeIndex[iloc[0]:iloc[1]+1])
-    for tIn,tOut in timestamp.iteritems():
-        count.loc[tIn:tOut]+=1. #add for new events 
+    :param close_index: DataFrame that has events.
+    :param timestamp: DataFrame that has return and label of each period.
+    :param molecule: Index that function must apply on it.
+    :return: Series with the count of events spanning a bar for each molecule.
+    """
+    timestamp = timestamp.fillna(close_index[-1])
+    timestamp = timestamp[timestamp >= molecule[0]]
+    timestamp = timestamp.loc[:timestamp[molecule].max()]
+    iloc = close_index.searchsorted(np.array([timestamp.index[0], timestamp.max()]))
+    count = pd.Series(0, index=close_index[iloc[0]:iloc[1] + 1])
+
+    for t_in, t_out in timestamp.iteritems():
+        count.loc[t_in:t_out] += 1
 
     return count.loc[molecule[0]:timestamp[molecule].max()]
 
-"""
-    function: SampleWeight with triple barrier
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.2
-"""
-def mpSampleWeight(
-        timestamp, # DataFrame of events start and end for labelling 
-        concurrencyEvents, # Data frame of concurrent events for each events 
-        molecule # index that function must apply on it
-    ): # Derive average uniqueness over the event's lifespan
-    weight=pd.Series(index=molecule) # create pandas object fot weights 
-    for tIn,tOut in timestamp.loc[weight.index].iteritems():
-        weight.loc[tIn]=(1./concurrencyEvents.loc[tIn:tOut]).mean() #compute sample weight according to book equation 
+def calculate_sample_weight(
+        timestamp: pd.DataFrame,
+        concurrency_events: pd.DataFrame,
+        molecule: pd.Index
+) -> pd.Series:
+    """
+    Calculate sample weight using triple barrier method.
+
+    :param timestamp: DataFrame of events start and end for labelling.
+    :param concurrency_events: Data frame of concurrent events for each event.
+    :param molecule: Index that function must apply on it.
+    :return: Series of sample weights.
+    """
+    weight = pd.Series(index=molecule)
+
+    for t_in, t_out in timestamp.loc[weight.index].iteritems():
+        weight.loc[t_in] = (1. / concurrency_events.loc[t_in:t_out]).mean()
+
     return weight
 
-"""
-    function: Creating Index matrix 
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.3 
-"""
-def index_matrix(
-        barIndex, #index of all data 
-        timestamp #times of events contain starting and ending time 
-    ): # Get indicator matrix
-    indM=pd.DataFrame(0,index=barIndex,columns=range(timestamp.shape[0]))
+def create_index_matrix(
+        bar_index: pd.Index,
+        timestamp: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Create an indicator matrix.
+
+    :param bar_index: Index of all data.
+    :param timestamp: DataFrame with starting and ending times of events.
+    :return: Indicator matrix.
+    """
+    ind_matrix = pd.DataFrame(0, index=bar_index, columns=range(timestamp.shape[0]))
+
     for row in timestamp.itertuples():
-        t0 =  int(row.date) 
+        t0 = int(row.date)
         t1 = int(row.timestamp)
-        indM.loc[t0:t1,row.Index]=1.
-    return indM
+        ind_matrix.loc[t0:t1, row.Index] = 1
 
-"""
-    function: compute average uniqueness
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.4
-"""   
-def averageUniqueness(indexMatrix):
-    # Average uniqueness from indicator matrix
-    c=indexMatrix.sum(axis=1) # concurrency
-    u=indexMatrix.div(c,axis=0) # uniqueness
-    averageUniqueness_=u[u>0].mean() # average uniqueness
-    return averageUniqueness_
+    return ind_matrix
 
-"""
-    function:  SequentialBootstrap implementation 
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.5
-"""
-def sequential_bootstrap(
-        indexMatrix, #matrix that Indicator for events 
-        sampleLength # number of sample
-    ): # Generate a sample via sequential bootstrap
-    if sampleLength is None:sampleLength=indexMatrix.shape[1]
-    phi=[]
-    while len(phi)<sampleLength:
-        averageUniqueness_=pd.Series(dtype=np.float64)
-        for i in indexMatrix:
-            indexMatrix_=indexMatrix[phi+[i]] # reduce indM
-            averageUniqueness_.loc[i]=averageUniqueness(indexMatrix_).iloc[-1]
-        prob=averageUniqueness_/averageUniqueness_.sum() # draw prob
-        phi+=[np.random.choice(indexMatrix.columns,p=prob)]
+def calculate_average_uniqueness(index_matrix: pd.DataFrame) -> pd.Series:
+    """
+    Calculate average uniqueness from indicator matrix.
+
+    :param index_matrix: Indicator matrix.
+    :return: Series of average uniqueness values.
+    """
+    concurrency = index_matrix.sum(axis=1)
+    uniqueness = index_matrix.div(concurrency, axis=0)
+    average_uniqueness = uniqueness[uniqueness > 0].mean()
+
+    return average_uniqueness
+
+def perform_sequential_bootstrap(
+        index_matrix: pd.DataFrame,
+        sample_length: int
+) -> list:
+    """
+    Perform sequential bootstrap to generate a sample.
+
+    :param index_matrix: Matrix of indicators for events.
+    :param sample_length: Number of samples.
+    :return: List of indices representing the sample.
+    """
+    if sample_length is None:
+        sample_length = index_matrix.shape[1]
+
+    phi = []
+
+    while len(phi) < sample_length:
+        average_uniqueness = pd.Series(dtype=np.float64)
+
+        for i in index_matrix:
+            index_matrix_ = index_matrix[phi + [i]]
+            average_uniqueness.loc[i] = calculate_average_uniqueness(index_matrix_).iloc[-1]
+
+        prob = average_uniqueness / average_uniqueness.sum()
+        phi += [np.random.choice(index_matrix.columns, p=prob)]
+
     return phi
 
-"""
-    function:  sample weight with returns 
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.10
-"""
-def mpSampleWeightAbsoluteReturn(
-        timestamp, # dataFrame for events 
-        concurrencyEvents, # dataframe that contain number of concurrent events for each events
-        returns, # data frame that contains returns
-        molecule # molecule
-    ): # Derive sample weight by return attribution
-    
-    return_=np.log(returns).diff() # log-returns, so that they are additive
-    weight=pd.Series(index=molecule)
-    for tIn,tOut in timestamp.loc[weight.index].iteritems():
-        weight.loc[tIn]=(return_.loc[tIn:tOut]/concurrencyEvents.loc[tIn:tOut]).sum() # compute sample weight 
+def calculate_sample_weight_absolute_return(
+        timestamp: pd.DataFrame,
+        concurrency_events: pd.DataFrame,
+        returns: pd.DataFrame,
+        molecule: pd.Index
+) -> pd.Series:
+    """
+    Calculate sample weight using absolute returns.
+
+    :param timestamp: DataFrame for events.
+    :param concurrency_events: DataFrame that contains number of concurrent events for each event.
+    :param returns: DataFrame that contains returns.
+    :param molecule: Index for the calculation.
+    :return: Series of sample weights.
+    """
+    return_ = np.log(returns).diff()
+    weight = pd.Series(index=molecule)
+
+    for t_in, t_out in timestamp.loc[weight.index].iteritems():
+        weight.loc[t_in] = (return_.loc[t_in:t_out] / concurrency_events.loc[t_in:t_out]).sum()
+
     return weight.abs()
 
-"""
-    function:  compute TimeDecay
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: SNIPPET 4.11
-"""
-def timeDecay(
-        weight, #weight that compute for each event 
-        clfLastW = 1.0 # weight of oldest observation
-    ): # apply piecewise-linear decay to observed uniqueness (weight)
+def calculate_time_decay(
+        weight: pd.Series,
+        clf_last_weight: float = 1.0
+) -> pd.Series:
+    """
+    Calculate time decay on weight.
 
-    # newest observation gets weight=1, oldest observation gets weight=clfLastW
-    clfW=weight.sort_index().cumsum() # compute cumulative sum of weights 
-    if clfLastW>=0:
-        slope=(1.-clfLastW)/clfW.iloc[-1] # compute slope of line 
+    :param weight: Weight computed for each event.
+    :param clf_last_weight: Weight of oldest observation.
+    :return: Series of weights after applying time decay.
+    """
+    clf_weight = weight.sort_index().cumsum()
+
+    if clf_last_weight >= 0:
+        slope = (1. - clf_last_weight) / clf_weight.iloc[-1]
     else:
-        slope=1./((clfLastW+1)*clfW.iloc[-1]) # compute slope of line 
-    const=1.-slope*clfW.iloc[-1] # compute b in y =ax + b 
-    clfW=const+slope*clfW # compute points on line 
-    clfW[clfW<0]=0 # if clfw is less than zero set that entry to zero 
-    return clfW
+        slope = 1. / ((clf_last_weight + 1) * clf_weight.iloc[-1])
 
+    const = 1. - slope * clf_weight.iloc[-1]
+    clf_weight = const + slope * clf_weight
+    clf_weight[clf_weight < 0] = 0
+
+    return clf_weight
