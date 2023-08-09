@@ -1,32 +1,43 @@
-import sklearn.metrics as Metrics
-import sklearn.ensemble as Ensemble
-import sklearn.tree as Tree
-import sklearn.datasets as Datasets
-import sklearn.model_selection as ModelSelection
+import sklearn.metrics as metrics
+import sklearn.ensemble as ensemble
+import sklearn.tree as tree
+import sklearn.datasets as datasets
+import sklearn.model_selection as model_selection
 import pandas as pd
 import numpy as np
 
-"""
-    function: Implementation of MDA
-    reference: De Prado, M. (2020) MACHINE LEARNING FOR ASSET MANAGERS
-    methodology: page 82 Mean-Decrease Accuracy section snippet 6.3 (snippet 8.3 2018)
-"""
 def feature_importance_MDA(
-    classifier,  # classifier for fit and prediction
-    X: pd.DataFrame,  # features matrix
-    y: pd.DataFrame,  # labels vector
-    n_splits: int,  # cross-validation n folds
-    score_sample_weights: list = None,  # sample weights for score step
-    train_sample_weights: list = None,  # sample weights for train step
+    classifier, 
+    X: pd.DataFrame, 
+    y: pd.Series, 
+    n_splits: int, 
+    score_sample_weights: list = None, 
+    train_sample_weights: list = None
 ) -> pd.DataFrame:
+    """
+    Calculate feature importances using Mean-Decrease Accuracy (MDA) method.
 
-    train_sample_weights = np.ones(X.shape[0]) if train_sample_weights == None else train_sample_weights
-    score_sample_weights = np.ones(X.shape[0]) if score_sample_weights == None else score_sample_weights
+    :param classifier: Classifier for fit and prediction
+    :type classifier: object
+    :param X: Features matrix
+    :type X: pd.DataFrame
+    :param y: Labels vector
+    :type y: pd.Series
+    :param n_splits: Number of cross-validation folds
+    :type n_splits: int
+    :param score_sample_weights: Sample weights for score step, default is None
+    :type score_sample_weights: list
+    :param train_sample_weights: Sample weights for train step, default is None
+    :type train_sample_weights: list
+    :return: Dataframe containing feature importances
+    :rtype: pd.DataFrame
+    """
+    train_sample_weights = np.ones(X.shape[0]) if train_sample_weights is None else train_sample_weights
+    score_sample_weights = np.ones(X.shape[0]) if score_sample_weights is None else score_sample_weights
 
-    cv_generator = ModelSelection.KFold(n_splits=n_splits)
+    cv_generator = model_selection.KFold(n_splits=n_splits)
     score0, score1 = pd.Series(), pd.DataFrame(columns=X.columns)
 
-    # for each fold of k-fold
     for (i, (train, test)) in enumerate(cv_generator.split(X=X)):
         print(f"fold {i} start ...")
 
@@ -35,8 +46,8 @@ def feature_importance_MDA(
 
         fit = classifier.fit(X=X0, y=y0, sample_weight=sample_weights0)
 
-        prediction_probability = fit.predict_proba(X1)  # prediction before shuffling
-        score0.loc[i] = -Metrics.log_loss(
+        prediction_probability = fit.predict_proba(X1)
+        score0.loc[i] = -metrics.log_loss(
             y1,
             prediction_probability,
             labels=classifier.classes_,
@@ -47,7 +58,7 @@ def feature_importance_MDA(
             X1_ = X1.copy(deep=True)
             np.random.shuffle(X1_[j].values)
             prediction_probability = fit.predict_proba(X1_)
-            log_loss = Metrics.log_loss(
+            log_loss = metrics.log_loss(
                 y1,
                 prediction_probability,
                 labels=classifier.classes_)
