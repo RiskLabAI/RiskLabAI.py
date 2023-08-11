@@ -186,12 +186,6 @@ def randomBlockCorrelation(
     correlation = covToCorr(covariance1)  # corr matrix
     correlation = pd.DataFrame(correlation)  # pd.dataframe of corr matrix
     return correlation
-import numpy as np
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_samples
-from scipy.linalg import block_diag
-from sklearn.utils import check_random_state
 
 def cov_to_corr(covariance):
     """
