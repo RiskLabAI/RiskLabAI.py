@@ -1,88 +1,110 @@
-import matplotlib.pyplot as mpl
-import random,numpy as np,pandas as pd
-import matplotlib.pyplot as mpl,seaborn as sns
 import numpy as np
+import pandas as pd
 from scipy.linalg import block_diag
 import yfinance as yf
 from sklearn.metrics import silhouette_samples
 from sklearn.cluster import KMeans
 
-"""----------------------------------------------------------------------
-    function: Derive the correlation matrix from a covariance matrix
-    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-    methodology: Snipet 2.3, Page 27
-----------------------------------------------------------------------"""
-def covToCorr(cov): # covariance matrix
-    std = np.sqrt(np.diag(cov)) # standard deviations
-    corr = cov/np.outer(std, std) # create correlation matrix
-    corr[corr < -1], corr[corr > 1] = -1, 1 # numerical error
+def cov_to_corr(cov):
+    """
+    Derive the correlation matrix from a covariance matrix.
+
+    Parameters:
+        cov (numpy.ndarray): Covariance matrix.
+
+    Returns:
+        numpy.ndarray: Correlation matrix.
+    """
+    std = np.sqrt(np.diag(cov))
+    corr = cov / np.outer(std, std)
+    corr[corr < -1] = -1
+    corr[corr > 1] = 1
     return corr
 
+def opt_port(cov, mu=None):
+    """
+    Optimal portfolio weights.
 
-"""----------------------------------------------------------------------
-    function: Monte Carlo simulation
-    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-    methodology: Snipet 2.10, Page 34
-----------------------------------------------------------------------"""
-def optPort(cov, # covariance matrix
-            mu = None): # mean vector
-    inv = np.linalg.inv(cov) # inverse of cov 
-    ones = np.ones(shape = (inv.shape[0], 1)) # ones matrix for mean vector
-    if mu is None:mu = ones
-    w = np.dot(inv, mu) # compute weights
-    w /= np.dot(ones.T, w) # normalize weights
+    Parameters:
+        cov (numpy.ndarray): Covariance matrix.
+        mu (numpy.ndarray, optional): Mean vector. Defaults to None.
+
+    Returns:
+        numpy.ndarray: Portfolio weights.
+    """
+    inv = np.linalg.inv(cov)
+    ones = np.ones(shape=(inv.shape[0], 1))
+    if mu is None:
+        mu = ones
+    w = np.dot(inv, mu)
+    w /= np.dot(ones.T, w)
     return w
+
+def opt_port_nco(covariance, mu=None, number_clusters=None):
+    """
+    NCO algorithm for optimal portfolio weights.
+
+    Parameters:
+        covariance (numpy.ndarray): Covariance matrix.
+        mu (numpy.ndarray, optional): Mean vector. Defaults to None.
+        number_clusters (int, optional): Maximum number of clusters. Defaults to None.
+
+    Returns:
+        numpy.ndarray: Optimal portfolio weights using NCO algorithm.
+    """
+    covariance = pd.DataFrame(covariance)
+    if mu is not None:
+        mu = pd.Series(mu[:, 0])
+    correlation = cov_to_corr(covariance)
+    if number_clusters is None:
+        number_clusters = int(correlation.shape[0] / 2)
+    correlation, clusters, _ = cluster_k_means_base(correlation, number_clusters, iterations=10)
+    weights_intra_cluster = pd.DataFrame(0, index=covariance.index, columns=clusters.keys())
+    for i in clusters:
+        covariance_intra_cluster = covariance.loc[clusters[i], clusters[i]].values
+        if mu is None:
+            mu_intra_cluster = None
+        else:
+            mu_intra_cluster = mu.loc[clusters[i]].values.reshape(-1, 1)
+        weights_intra_cluster.loc[clusters[i], i] = opt_port(covariance_intra_cluster, mu_intra_cluster).flatten()
+    covariance_inter_cluster = weights_intra_cluster.T.dot(np.dot(covariance, weights_intra_cluster))
+    mu_inter_cluster = (None if mu is None else weights_intra_cluster.T.dot(mu))
+    weights_inter_cluster = pd.Series(opt_port(covariance_inter_cluster, mu_inter_cluster).flatten(),
+                                      index=covariance_inter_cluster.index)
+    weights_nco = weights_intra_cluster.mul(weights_inter_cluster, axis=1).sum(axis=1).values.reshape(-1, 1)
+    return weights_nco
+
+def cluster_k_means_base(correlation, number_clusters=10, iterations=10):
+    """
+    Clustering using K-means algorithm.
+
+    Parameters:
+        correlation (pd.DataFrame): Correlation matrix.
+        number_clusters (int, optional): Maximum number of clusters. Defaults to 10.
+        iterations (int, optional): Number of iterations. Defaults to 10.
+
+    Returns:
+        pd.DataFrame, dict, pd.Series: Updated correlation matrix, cluster members, silhouette scores.
+    """
+    distance = ((1 - correlation.fillna(0)) / 2.) ** 0.5
+    silh = pd.Series()
     
-"""----------------------------------------------------------------------
-    function: NCO algorithm
-    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-    methodology: Snipet 7.6, Page 100
-----------------------------------------------------------------------"""
-def optPortNCO(covariance, # covariance matrix
-               mu = None, # mean vector
-               numberClusters = None): # maximum number of clusters
-  covariance = pd.DataFrame(covariance)
-  if mu is not None:mu = pd.Series(mu[:, 0])
-  correlation = covToCorr(covariance) # corr dataframe
-  if numberClusters == None:
-    numberClusters = int(correlation.shape[0]/2) # set maximum number of clusters
-  correlation, clusters, _ = clusterKMeansBase(correlation, numberClusters, iterations = 10) # clustering
-  weightsIntraCluster = pd.DataFrame(0, index = covariance.index, columns = clusters.keys()) # dataframe of intraclustering weights
-  for i in clusters:
-    covarianceIntraCluster = covariance.loc[clusters[i], clusters[i]].values # slice cov matrix
-    if mu is None:muIntraCluster = None
-    else:muIntraCluster = mu.loc[clusters[i]].values.reshape(-1, 1)
-    weightsIntraCluster.loc[clusters[i], i] = optPort(covarianceIntraCluster, muIntraCluster).flatten() # calculate weights of intraclustering
-  covarianceInterCluster = weightsIntraCluster.T.dot(np.dot(covariance, weightsIntraCluster)) # reduce covariance matrix
-  muInterCluster = (None if mu is None else weightsIntraCluster.T.dot(mu)) # calculate mean for each cluster
-  weightsInterCluster = pd.Series(optPort(covarianceInterCluster, muInterCluster).flatten(), index = covarianceInterCluster.index) # calculate weights of interclustering
-  weightsNCO = weightsIntraCluster.mul(weightsInterCluster, axis = 1).sum(axis = 1).values.reshape(-1, 1) # calculate weights
-  return weightsNCO
+    for init in range(iterations):
+        for i in range(2, number_clusters + 1):
+            kmeans_ = KMeans(n_clusters=i, n_jobs=1, iterations=1)
+            kmeans_ = kmeans_.fit(distance)
+            silh_ = silhouette_samples(distance, kmeans_.labels_)
+            statistic = (silh_.mean() / silh_.std(), silh.mean() / silh.std())
+            
+            if np.isnan(statistic[1]) or statistic[0] > statistic[1]:
+                silh, kmeans = silh_, kmeans_
 
-"""----------------------------------------------------------------------
-    function: Clustering
-    reference: De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
-    methodology: Snipet 4.1, Page 56
-----------------------------------------------------------------------"""
-def clusterKMeansBase(correlation, # corr pd.dataframe
-                      numberClusters = 10, # maximum number of clusters 
-                      iterations = 10): # iterations
-  distance, silh=((1 - correlation.fillna(0))/2.)**.5,pd.Series() # observations matrix
-  for init in range(iterations):
-    for i in range(2,numberClusters + 1):
-      kmeans_ = KMeans(n_clusters = i, n_jobs = 1, iterations = 1) # clustering distance with maximum cluster i
-      kmeans_ = kmeans_.fit(distance) # fit kmeans 
-      silh_ = silhouette_samples(distance, kmeans_.labels_) # calculate silh scores
-      statistic = (silh_.mean()/silh_.std(), silh.mean()/silh.std()) # calculate t-statistic
-      if np.isnan(statistic[1]) or statistic[0]>statistic[1]:
-        silh, kmeans = silh_, kmeans_ # choose better clustering
-  indexNew = np.argsort(kmeans.labels_) # sort arguments
-  correlationNew = correlation.iloc[indexNew] # reorder rows
-  correlationNew = correlationNew.iloc[:, indexNew] # reorder columns
-  clusters = {i:correlation.columns[np.where(kmeans.labels_==i)[0]].tolist() for i in np.unique(kmeans.labels_)} # cluster members
-  silh = pd.Series(silh, index = distance.index) # silh scores
-  return correlationNew, clusters, silh
-
-
-
-
+    index_new = np.argsort(kmeans.labels_)
+    correlation_new = correlation.iloc[index_new]
+    correlation_new = correlation_new.iloc[:, index_new]
+    
+    clusters = {i: correlation.columns[np.where(kmeans.labels_ == i)[0]].tolist()
+                for i in np.unique(kmeans.labels_)}
+    
+    silh = pd.Series(silh, index=distance.index)
+    return correlation_new, clusters, silh
