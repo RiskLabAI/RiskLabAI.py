@@ -1,157 +1,244 @@
+import numpy as np
 import pandas as pd
-import numpy as np 
-import datetime
-import time
-import sys
-from scipy import stats
-from statsmodels.stats import stattools
 from statsmodels.tsa.stattools import adfuller
-import statsmodels.api as sm
 
-"""----------------------------------------------------------------------
-    function: Takes grouped dataframe, combining and creating the new one with info. about prices and volume.
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: n/a
-----------------------------------------------------------------------"""
-def ohlcv(tickDataGrouped): #grouped dataframes
-  ohlc = tickDataGrouped['price'].ohlc() # find price in each tick
-  ohlc['volume'] = tickDataGrouped['size'].sum() # find volume traded
-  ohlc['ValueOfTrades'] = tickDataGrouped.apply(lambda x:(x['price']*x['size']).sum()/x['size'].sum()) # find value of trades
-  ohlc['PriceMean'] = tickDataGrouped['price'].mean() # mean of price
-  ohlc['TickCount'] = tickDataGrouped['price'].count()# number of ticks
-  ohlc['PriceMeanLogReturn'] = np.log(ohlc['PriceMean']) - np.log(ohlc['PriceMean'].shift(1)) # find log return
-  return ohlc
+def calculate_weights(
+        degree: float,
+        size: int
+) -> np.ndarray:
+    """
+    Compute the weights for fractionally differentiated series.
 
-"""----------------------------------------------------------------------
-    function: Takes dataframe and generating time bar dataframe
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: n/a
-----------------------------------------------------------------------"""
-def timeBar(tickData, # dataframe of tick data
-            frequency = "5Min"): # frequency for rounding date time
-  tickDataGrouped = tickData.groupby(pd.Grouper(freq = frequency)) # group data sets based on time freq
-  ohlcvDataframe = ohlcv(tickDataGrouped) # create a dataframe based on time bars with frequency freq
-  return ohlcvDataframe
+    :param degree: Degree of the binomial series.
+    :param size: Length of the time series.
+    :return: Array of weights.
 
-"""----------------------------------------------------------------------
-    function: The sequence of weights used to compute each value of the fractionally differentiated series.
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 79
-----------------------------------------------------------------------"""
-def weighting(degree, # degree
-              size): #size
-    weight = [1.] # array of weights
+    Formula:
+        .. math::
+            w(k) = -w(k-1) / k * (degree - k + 1)
+    """
+    weights = [1.]
     for k in range(1, size):
-        thisWeight = -weight[-1]/k*(degree - k + 1)  # calculate each weight
-        weight.append(thisWeight) # append weight into array
-    weight = np.array(weight[ : : -1]).reshape(-1, 1) # reshape weight array
-    return weight
+        weight = -weights[-1] / k * (degree - k + 1)
+        weights.append(weight)
+    return np.array(weights[::-1]).reshape(-1, 1)
 
-"""----------------------------------------------------------------------
-    function: plot weights
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 79
-----------------------------------------------------------------------"""
-def plotWeights(degreeRange, # range for degree
-                numberDegrees, # number of degrees
-                size): # number of weights
-    weight = pd.DataFrame() # dataframe of weights
-    for degree in np.linspace(degreeRange[0], degreeRange[1], numberDegrees):
-        degree = np.round(degree,2) # round degree with digits = 2
-        thisweight = weighting(degree, size = size) # calculate weights for each degree
-        thisweight = pd.DataFrame(thisweight, index = range(thisweight.shape[0])[ : : -1], columns = [degree])
-        # dataframe of weights for each degree
-        weight = weight.join(thisweight, how = 'outer') # append into weight
-    fig = weight.plot() # plot weights
-    fig.show() # show weights
-    return
+def plot_weights(
+        degree_range: tuple[float, float],
+        number_degrees: int,
+        size: int
+):
+    """
+    Plot the weights of fractionally differentiated series.
 
+    :param degree_range: Tuple containing the minimum and maximum degree values.
+    :param number_degrees: Number of degrees to plot.
+    :param size: Length of the time series.
+    """
+    weights_df = pd.DataFrame()
+    for degree in np.linspace(degree_range[0], degree_range[1], number_degrees):
+        degree = round(degree, 2)
+        weight = calculate_weights(degree, size)
+        weight_df = pd.DataFrame(weight, index=range(weight.shape[0])[::-1], columns=[degree])
+        weights_df = weights_df.join(weight_df, how='outer')
 
-"""----------------------------------------------------------------------
-    function: standard fractionally differentiated
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 82
-----------------------------------------------------------------------"""
-def fracDiff(series, # dataframe of dates and prices
-             degree, # degree of binomial series
-             threshold = .01): # threshold for weight-loss
-    weights = weighting(degree, series.shape[0]) # calculate weights
-    weights_ = np.cumsum(abs(weights)) # cumulate weights
-    weights_ /= weights_[-1] # determine the relative weight-loss
-    skip = weights_[weights_ > threshold].shape[0]  # number of results where the weight-loss is beyond the acceptable value
-    dataframe = {} # dataframe of output
+    ax = weights_df.plot()
+    ax.show()
+
+def fractional_difference(
+        series: pd.DataFrame,
+        degree: float,
+        threshold: float = 0.01
+) -> pd.DataFrame:
+    """
+    Compute the standard fractionally differentiated series.
+
+    :param series: Dataframe of dates and prices.
+    :param degree: Degree of the binomial series.
+    :param threshold: Threshold for weight-loss.
+    :return: Dataframe of fractionally differentiated series.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 82.
+    """
+    weights = calculate_weights(degree, series.shape[0])
+    weights_cumsum = np.cumsum(abs(weights))
+    weights_cumsum /= weights_cumsum[-1]
+    skip = weights_cumsum[weights_cumsum > threshold].shape[0]
+    result_dict = {}
     for name in series.columns:
-        seriesFiltered = series[[name]].fillna(method = 'ffill').dropna() # filter for missing data
-        dataframeFiltered = pd.Series(dtype = "float64") # create a pd series
-        for iloc in range(skip, seriesFiltered.shape[0]):
-            date = seriesFiltered.index[iloc] # find date of obs 
-            price = series.loc[date,name] # price for that date
+        series_filtered = series[[name]].fillna(method='ffill').dropna()
+        result_series = pd.Series(dtype="float64")
+        for iloc in range(skip, series_filtered.shape[0]):
+            date = series_filtered.index[iloc]
+            price = series.loc[date, name]
             if isinstance(price, (pd.Series, pd.DataFrame)):
                 price = price.resample('1m').mean()
-            if not np.isfinite(price).any(): # check for being finite
-                 continue # exclude NAs
-            try: # the (iloc)^th obs will use all the weights from the start to the (iloc)^th
-                dataframeFiltered.loc[date] = np.dot(weights[-(iloc + 1):, :].T, seriesFiltered.loc[:date])[0, 0] # calculate values
+            if not np.isfinite(price).any():
+                continue
+            try:
+                result_series.loc[date] = np.dot(weights[-(iloc + 1):, :].T, series_filtered.loc[:date])[0, 0]
             except:
                 continue
-        dataframe[name] = dataframeFiltered.copy(deep = True) # update dataframe
-    dataframe = pd.concat(dataframe, axis = 1) # concat dataframes into dataframe
-    return dataframe
+        result_dict[name] = result_series.copy(deep=True)
+    return pd.concat(result_dict, axis=1)
 
-"""----------------------------------------------------------------------
-    function: weights for fixed-width window method
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 83
-----------------------------------------------------------------------"""
-def weightingFFD(degree, 
-                 threshold):
-    weights = [1.] # array of weights
-    k = 1 # initial value of k
-    while abs(weights[-1]) >= threshold:  
-        thisweight = -weights[-1]/k*(degree - k + 1) # calculate each weight
-        weights.append(thisweight) # append into array
-        k += 1 # update k
-    weights = np.array(weights[ : : -1]).reshape(-1, 1)[1 : ] # reshape into a vector
-    return weights
+def calculate_weights_ffd(
+        degree: float,
+        threshold: float
+) -> np.ndarray:
+    """
+    Compute the weights for fixed-width window fractionally differentiated method.
 
-"""----------------------------------------------------------------------
-    function: Fixed-width window fractionally differentiated method
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 83
-----------------------------------------------------------------------"""
-def fracDiffFixed(series, # dataframe of dates and prices
-                  degree, # degree of binomial series
-                  threshold = 1e-5): # threshold for weight-loss
-    weights = weightingFFD(degree, threshold) # compute weights for the longest series
-    width = len(weights) - 1 # length of weights
-    dataframe = {} # empty dict
+    :param degree: Degree of the binomial series.
+    :param threshold: Threshold for weight-loss.
+    :return: Array of weights.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 83.
+    """
+    weights = [1.]
+    k = 1
+    while abs(weights[-1]) >= threshold:
+        weight = -weights[-1] / k * (degree - k + 1)
+        weights.append(weight)
+        k += 1
+    return np.array(weights[::-1]).reshape(-1, 1)[1:]
+
+def fractional_difference_fixed(
+        series: pd.DataFrame,
+        degree: float,
+        threshold: float = 1e-5
+) -> pd.DataFrame:
+    """
+    Compute the fixed-width window fractionally differentiated series.
+
+    :param series: Dataframe of dates and prices.
+    :param degree: Degree of the binomial series.
+    :param threshold: Threshold for weight-loss.
+    :return: Dataframe of fractionally differentiated series.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 83.
+    """
+    weights = calculate_weights_ffd(degree, threshold)
+    width = len(weights) - 1
+    result_dict = {}
     for name in series.columns:
-        seriesFiltered = series[[name]].fillna(method = 'ffill').dropna()  # filter for missing data
-        dataframeFiltered = pd.Series(dtype = "float64") # empty pd.series
-        for iloc in range(width, seriesFiltered.shape[0]):
-            day1 = seriesFiltered.index[iloc - width] # first day
-            day2 = seriesFiltered.index[iloc] # last day
+        series_filtered = series[[name]].fillna(method='ffill').dropna()
+        result_series = pd.Series(dtype="float64")
+        for iloc in range(width, series_filtered.shape[0]):
+            day1 = series_filtered.index[iloc - width]
+            day2 = series_filtered.index[iloc]
             if not np.isfinite(series.loc[day2, name]):
-                continue # exclude NAs
-            dataframeFiltered[day2] = np.dot(weights.T, seriesFiltered.loc[day1 : day2])[0, 0] # calculate value
-    
-        dataframe[name] = dataframeFiltered.copy(deep = True) # copy dataframeFiltered into dataframe
-    dataframe = pd.concat(dataframe, axis = 1) # concat all into dataframe
-    return dataframe
+                continue
+            result_series[day2] = np.dot(weights.T, series_filtered.loc[day1:day2])[0, 0]
+        result_dict[name] = result_series.copy(deep=True)
+    return pd.concat(result_dict, axis=1)
 
-"""----------------------------------------------------------------------
-    function: Find the minimum degree value that passes the ADF test
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: 85
-----------------------------------------------------------------------"""
-def minFFD(input):
-    out = pd.DataFrame(columns = ['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr']) # dataframe of output
+def minimum_ffd(
+        input_series: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Find the minimum degree value that passes the ADF test.
+
+    :param input_series: Dataframe of input data.
+    :return: Dataframe of ADF test results.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 85.
+    """
+    results = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
     for d in np.linspace(0, 1, 11):
-        dataframe = np.log(input[['close']]).resample('1D').last() # dataframe of price and dates
-        differentiated = fracDiffFixed(dataframe, d, threshold = .01) # call fixed-width frac diff method
-        corr = np.corrcoef(dataframe.loc[differentiated.index, 'close'], differentiated['close'])[0, 1] # correlation 
-        differentiated = adfuller(differentiated['close'], maxlag = 1, regression = 'c', autolag = None) # ADF test
-        out.loc[d] = list(differentiated[ : 4]) + [differentiated[4]['5%']] + [corr] # push new observation with critical value
-    return out
+        dataframe = np.log(input_series[['close']]).resample('1D').last()
+        differentiated = fractional_difference_fixed(dataframe, d, threshold=0.01)
+        corr = np.corrcoef(dataframe.loc[differentiated.index, 'close'], differentiated['close'])[0, 1]
+        differentiated = adfuller(differentiated['close'], maxlag=1, regression='c', autolag=None)
+        results.loc[d] = list(differentiated[:4]) + [differentiated[4]['5%']] + [corr]
+    return results
 
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.stattools import adfuller
 
+def get_weights(
+    degree: float,
+    length: int
+) -> np.ndarray:
+    """
+    Calculate the weights for the fractional differentiation method.
+
+    :param degree: Degree of binomial series.
+    :param length: Length of the series.
+    :return: Array of calculated weights.
+
+    Related mathematical formula:
+    .. math::
+        w_i = -w_{i-1}/i*(degree - i + 1)
+    """
+    weights = [1.]
+    k = 1
+    while True:
+        weight = -weights[-1] / k * (degree - k + 1)
+        if abs(weight) < 1e-5:
+            break
+        weights.append(weight)
+        k += 1
+    return np.array(weights[::-1]).reshape(-1, 1)[1:]
+
+def fractional_difference(
+    series: pd.DataFrame,
+    degree: float,
+    threshold: float = 0.01
+) -> pd.DataFrame:
+    """
+    Calculate the fractionally differentiated series using the fixed-width window method.
+
+    :param series: DataFrame of dates and prices.
+    :param degree: Degree of binomial series.
+    :param threshold: Threshold for weight-loss.
+    :return: DataFrame of fractionally differentiated series.
+
+    Related mathematical formula:
+    .. math::
+        F_t^{(d)} = \sum_{i=0}^{t} w_i F_{t-i}
+    """
+    weights = get_weights(degree, series.shape[0])
+    skip = weights.shape[0]
+    output = {}
+    for name in series.columns:
+        series_filtered = series[[name]].fillna(method='ffill').dropna()
+        series_result = pd.Series(dtype='float64')
+        for iloc in range(skip, series_filtered.shape[0]):
+            date = series_filtered.index[iloc]
+            price = series.loc[date, name]
+            if not np.isfinite(price):
+                continue
+            try:
+                series_result.loc[date] = np.dot(weights.T, series_filtered.loc[:date])[0, 0]
+            except:
+                continue
+        output[name] = series_result.copy(deep=True)
+    return pd.concat(output, axis=1)
+
+def minimum_adf_degree(
+    input_series: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Find the minimum degree value that passes the ADF test.
+
+    :param input_series: DataFrame of input series.
+    :return: DataFrame of output results with ADF statistics.
+
+    Related mathematical formula:
+    .. math::
+        F_t^{(d)} = \sum_{i=0}^{t} w_i F_{t-i}
+    """
+    output = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
+    for d in np.linspace(0, 1, 11):
+        dataframe = np.log(input_series[['close']]).resample('1D').last()
+        differentiated = fractional_difference(dataframe, d, threshold=0.01)
+        corr = np.corrcoef(dataframe.loc[differentiated.index, 'close'], differentiated['close'])[0, 1]
+        adf_result = adfuller(differentiated['close'], maxlag=1, regression='c', autolag=None)
+        output.loc[d] = list(adf_result[:4]) + [adf_result[4]['5%']] + [corr]
+    return output
