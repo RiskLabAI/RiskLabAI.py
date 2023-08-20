@@ -4,67 +4,65 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import BaggingClassifier
 from sklearn.pipeline import Pipeline
 
+# Import the required package for PurgedKFold
+# Note: You must install or have the mlfinlab package which provides the PurgedKFold class
+from mlfinlab.cross_validation import PurgedKFold
+
+
 class MyPipeline(Pipeline):
     """
     Custom pipeline class to include sample_weight in fit_params.
     """
-    def fit(self, X, y, sample_weight=None, **fit_params):
+
+    def fit(
+        self, 
+        X: pd.DataFrame, 
+        y: pd.DataFrame, 
+        sample_weight: list = None, 
+        **fit_params
+    ) -> 'MyPipeline':
         """
         Fit the pipeline while considering sample weights.
         
         :param X: Feature data.
-        :type X: pd.DataFrame
         :param y: Labels of data.
-        :type y: pd.DataFrame
         :param sample_weight: Sample weights for fit, defaults to None.
-        :type sample_weight: list or None
         :param **fit_params: Additional fit parameters.
         :return: Fitted pipeline.
-        :rtype: MyPipeline
         """
         if sample_weight is not None:
             fit_params[self.steps[-1][0] + '__sample_weight'] = sample_weight
         return super(MyPipeline, self).fit(X, y, **fit_params)
 
+
 def clf_hyper_fit(
-        feature_data,  # Data of features
-        label,  # Labels of data
-        time,  # Observation time
-        pipe_clf,  # Our estimator
-        param_grid,  # Parameter space
-        cv=3,  # Number of groups for cross validation
-        bagging=[0, -1, 1.],  # Bagging type
-        rnd_search_iter=0,
-        n_jobs=-1,
-        percent_embargo=0,  # Percent of embargo
-        **fit_params
-):
+    feature_data: pd.DataFrame,
+    label: pd.DataFrame,
+    time: float,
+    pipe_clf: Pipeline,
+    param_grid: dict,
+    cv: int = 3,
+    bagging: list = [0, -1, 1.],
+    rnd_search_iter: int = 0,
+    n_jobs: int = -1,
+    percent_embargo: int = 0,
+    **fit_params
+) -> MyPipeline:
     """
     Perform hyperparameter tuning and model fitting.
 
     :param feature_data: Data of features.
-    :type feature_data: pd.DataFrame
     :param label: Labels of data.
-    :type label: pd.DataFrame
     :param time: Observation time.
-    :type time: float
     :param pipe_clf: Our estimator.
-    :type pipe_clf: sklearn.pipeline.Pipeline
     :param param_grid: Parameter space.
-    :type param_grid: dict
     :param cv: Number of groups for cross validation, defaults to 3.
-    :type cv: int
     :param bagging: Bagging type, defaults to [0, -1, 1.].
-    :type bagging: list
     :param rnd_search_iter: Number of iterations for randomized search, defaults to 0.
-    :type rnd_search_iter: int
     :param n_jobs: Number of jobs for parallel processing, defaults to -1.
-    :type n_jobs: int
     :param percent_embargo: Percent of embargo, defaults to 0.
-    :type percent_embargo: int
     :param **fit_params: Additional fit parameters.
     :return: Fitted pipeline.
-    :rtype: MyPipeline
     """
     if set(label.values) == {0, 1}:
         scoring = 'f1'  # F1-score for meta-labeling

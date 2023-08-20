@@ -1,13 +1,19 @@
 import numpy as np
 import pandas as pd
+from typing import List, Series, DataFrame
 
 def expand_label_for_meta_labeling(
-        close_index: pd.DataFrame,
-        timestamp: pd.DataFrame,
-        molecule: pd.Index
+    close_index: pd.DataFrame,
+    timestamp: pd.DataFrame,
+    molecule: pd.Index
 ) -> pd.Series:
     """
     Expand label to incorporate meta-labeling.
+
+    This function expands the label to incorporate meta-labeling by taking
+    a DataFrame with events, another DataFrame with the return and label of each period,
+    and an Index to apply the function on. It then returns a Series with the count
+    of events spanning a bar for each molecule.
 
     :param close_index: DataFrame that has events.
     :param timestamp: DataFrame that has return and label of each period.
@@ -26,9 +32,9 @@ def expand_label_for_meta_labeling(
     return count.loc[molecule[0]:timestamp[molecule].max()]
 
 def calculate_sample_weight(
-        timestamp: pd.DataFrame,
-        concurrency_events: pd.DataFrame,
-        molecule: pd.Index
+    timestamp: pd.DataFrame,
+    concurrency_events: pd.DataFrame,
+    molecule: pd.Index
 ) -> pd.Series:
     """
     Calculate sample weight using triple barrier method.
@@ -45,9 +51,9 @@ def calculate_sample_weight(
 
     return weight
 
-def create_index_matrix(
-        bar_index: pd.Index,
-        timestamp: pd.DataFrame
+def create_index_matgrix(
+    bar_index: pd.Index,
+    timestamp: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Create an indicator matrix.
@@ -79,9 +85,9 @@ def calculate_average_uniqueness(index_matrix: pd.DataFrame) -> pd.Series:
     return average_uniqueness
 
 def perform_sequential_bootstrap(
-        index_matrix: pd.DataFrame,
-        sample_length: int
-) -> list:
+    index_matrix: pd.DataFrame,
+    sample_length: int
+) -> List[int]:
     """
     Perform sequential bootstrap to generate a sample.
 
@@ -107,10 +113,10 @@ def perform_sequential_bootstrap(
     return phi
 
 def calculate_sample_weight_absolute_return(
-        timestamp: pd.DataFrame,
-        concurrency_events: pd.DataFrame,
-        returns: pd.DataFrame,
-        molecule: pd.Index
+    timestamp: pd.DataFrame,
+    concurrency_events: pd.DataFrame,
+    returns: pd.DataFrame,
+    molecule: pd.Index
 ) -> pd.Series:
     """
     Calculate sample weight using absolute returns.
@@ -130,8 +136,8 @@ def calculate_sample_weight_absolute_return(
     return weight.abs()
 
 def calculate_time_decay(
-        weight: pd.Series,
-        clf_last_weight: float = 1.0
+    weight: pd.Series,
+    clf_last_weight: float = 1.0
 ) -> pd.Series:
     """
     Calculate time decay on weight.

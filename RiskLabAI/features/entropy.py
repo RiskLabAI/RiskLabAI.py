@@ -1,4 +1,7 @@
+from collections import Counter
 from math import log2
+from typing import Dict, Tuple
+
 
 def shannon_entropy(message: str) -> float:
     """
@@ -9,47 +12,44 @@ def shannon_entropy(message: str) -> float:
     :return: Calculated Shannon Entropy
     :rtype: float
     """
-    char_to_count = {}
-    entropy = 0
-
-    for character in message:
-        char_to_count[character] = char_to_count.get(character, 0) + 1
-
+    character_counts = Counter(message)
     message_length = len(message)
-    for count in char_to_count.values():
-        frequency = count / message_length
-        entropy -= frequency * log2(frequency)
+
+    entropy = -sum(
+        count / message_length * log2(count / message_length)
+        for count in character_counts.values()
+    )
 
     return entropy
 
-def lemple_ziv_entropy(message: str) -> float:
+
+def lempel_ziv_entropy(message: str) -> float:
     """
-    Calculate Lemple-Ziv Entropy.
+    Calculate Lempel-Ziv Entropy.
 
     :param message: Input encoded message
     :type message: str
-    :return: Calculated Lemple-Ziv Entropy
+    :return: Calculated Lempel-Ziv Entropy
     :rtype: float
     """
-    i, library = 0, set([str(message[1])])
+    library = set()
     message_length = len(message)
+    i = 0
 
     while i < message_length:
-        last_j_value = message_length - 1
+        j = i
+        while message[i:j + 1] in library and j < message_length:
+            j += 1
+        library.add(message[i:j + 1])
+        i = j + 1
 
-        for j in range(i, message_length):
-            message_ = message[i + 1:j + 2]
+    return len(library) / message_length
 
-            if message_ not in library:
-                library.add(message_)
-                last_j_value = j
-                break
 
-        i = last_j_value + 1
-
-    return len(library) / len(message)
-
-def probability_mass_function(message: str, approximate_word_length: int) -> dict:
+def probability_mass_function(
+    message: str,
+    approximate_word_length: int
+) -> Dict[str, float]:
     """
     Calculate Probability Mass Function.
 
@@ -60,25 +60,20 @@ def probability_mass_function(message: str, approximate_word_length: int) -> dic
     :return: Probability Mass Function
     :rtype: dict
     """
-    library = {}
+    library = Counter(message[i:i + approximate_word_length]
+                     for i in range(len(message) - approximate_word_length + 1))
 
-    message_length = len(message)
-    for index in range(approximate_word_length, message_length):
-        message_ = message[index - approximate_word_length:index]
-
-        if message_ not in library:
-            library[message_] = [index - approximate_word_length]
-        else:
-            library[message_].append(index - approximate_word_length)
-
-    denominator = float(message_length - approximate_word_length)
-    probability_mass_function_ = {
-        key: len(library[key]) / denominator for key in library
-    }
+    denominator = float(len(message) - approximate_word_length)
+    probability_mass_function_ = {key: len(library[key]) / denominator
+                                 for key in library}
 
     return probability_mass_function_
 
-def plug_in_entropy_estimator(message: str, approximate_word_length: int = 1) -> float:
+
+def plug_in_entropy_estimator(
+    message: str,
+    approximate_word_length: int = 1
+) -> float:
     """
     Calculate Plug-in Entropy Estimator.
 
@@ -90,10 +85,19 @@ def plug_in_entropy_estimator(message: str, approximate_word_length: int = 1) ->
     :rtype: float
     """
     pmf = probability_mass_function(message, approximate_word_length)
-    plug_in_entropy_estimator = -sum([pmf[key] * log2(pmf[key]) for key in pmf.keys()]) / approximate_word_length
+    plug_in_entropy_estimator = -sum(
+        pmf[key] * log2(pmf[key])
+        for key in pmf.keys()
+    ) / approximate_word_length
+
     return plug_in_entropy_estimator
 
-def longest_match_length(message: str, i: int, n: int) -> tuple:
+
+def longest_match_length(
+    message: str,
+    i: int,
+    n: int
+) -> Tuple[int, str]:
     """
     Calculate the length of the longest match.
 
@@ -106,48 +110,49 @@ def longest_match_length(message: str, i: int, n: int) -> tuple:
     :return: Tuple containing matched length and substring
     :rtype: tuple
     """
-    sub_string = ""
+    longest_match = ""
     for l in range(1, n + 1):
-        message1 = message[i:i + l + 1]
+        pattern = message[i:i + l + 1]
         for j in range(i - n + 1, i + 1):
-            message0 = message[j:j + l + 1]
-            if message1 == message0:
-                sub_string = message1
+            candidate = message[j:j + l + 1]
+            if pattern == candidate:
+                longest_match = pattern
                 break
 
-    return len(sub_string) + 1, sub_string
+    return len(longest_match) + 1, longest_match
 
-def kontoyiannis_entorpy(message: str, window: int = 0) -> float:
+
+def kontoyiannis_entropy(
+    message: str,
+    window: int = None
+) -> float:
     """
     Calculate Kontoyiannis Entropy.
 
     :param message: Input encoded message
     :type message: str
-    :param window: Length of expanding window, default is 0
-    :type window: int
+    :param window: Length of expanding window, default is None
+    :type window: int or None
     :return: Calculated Kontoyiannis Entropy
     :rtype: float
     """
-    output = {"num": 0, "sum": 0, "subString": []}
+    output = {"num": 0, "sum": 0, "sub_string": []}
+    message_length = len(message)
 
     if window is None:
-        points = range(2, len(message) // 2 + 2)
+        points = range(2, message_length // 2 + 2)
     else:
-        window = min(window, len(message) // 2)
-        points = range(window + 1, len(message) - window + 2)
+        window = min(window, message_length // 2)
+        points = range(window + 1, message_length - window + 2)
 
     for i in points:
-        if window is None:
-            l, message_ = longest_match_length(message, i, i)
-            output["sum"] += log2(i) / l
-        else:
-            l, message_ = longest_match_length(message, i, window)
-            output["sum"] += log2(window) / l
-
-        output["subString"].append(message_)
+        n = i if window is None else window
+        l, sub_string = longest_match_length(message, i, n)
+        output["sum"] += log2(n) / l
+        output["sub_string"].append(sub_string)
         output["num"] += 1
 
     output["h"] = output["sum"] / output["num"]
-    output["r"] = 1 - output["h"] / log2(len(message))
+    output["r"] = 1 - output["h"] / log2(message_length)
 
     return output["h"]

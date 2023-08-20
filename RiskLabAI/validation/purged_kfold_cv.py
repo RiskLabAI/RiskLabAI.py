@@ -1,137 +1,155 @@
-# import pandas as pd
-# import numpy as np
-# from sklearn.model_selection import KFold
-# from sklearn.base import ClassifierMixin
-# from sklearn.model_selection import BaseCrossValidator
-# from sklearn.metrics import log_loss,accuracy_score
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import KFold
+from sklearn.base import ClassifierMixin, BaseCrossValidator
+from sklearn.metrics import log_loss, accuracy_score
 
-# """
-# function: purges test observations in the training set
-# reference: De Prado, M. (2018) Advances in financial machine learning.
-# methodology: page 106, snippet 7.1
-# """
-# def purged_train_times(
-#     data: pd.Series, # Times of entire observations.
-#     test: pd.Series
-# ) -> pd.Series: # Times of testing observations.
-#     # pd.Series.index: Time when the observation started.
-#     # pd.Series.values: Time when the observation ended.
-    
-#     train_times = data.copy(deep=True) # get a deep copy of train times
-    
-#     for start, end in test.iteritems():
-#         start_within_test_times = train_times[(start <= train_times.index) & (train_times.index <= end)].index # get times when train starts within test
-#         end_within_test_times = train_times[(start <= train_times) & (train_times <= end)].index # get times when train ends within test
-#         envelope_test_times = train_times[(train_times.index <= start) & (end <= train_times)].index # get times when train envelops test
-#         train_times = train_times.drop(start_within_test_times.union(end_within_test_times).union(envelope_test_times)) # purge observations
-        
-#     return train_times
 
-# """
-# function: gets embargo time for each bar
-# reference: De Prado, M. (2018) Advances in financial machine learning.
-# methodology: page 108, snippet 7.2
-# """
-# def embargo_times(
-#     times: pd.Series, # Entire observation times
-#     percent_embargo: float
-# ) -> pd.Series: # Embargo size percentage divided by 100
+def purged_train_times(
+        data: pd.Series,  # Times of entire observations
+        test: pd.Series  # Times of testing observations
+) -> pd.Series:
+    """
+    Purges test observations in the training set.
 
-#     step = int(times.shape[0] * percent_embargo) # find the number of embargo bars
-    
-#     if step == 0:
-#         embargo = pd.Series(times, index=times) # do not perform embargo when the step equals zero
-#     else:
-#         embargo = pd.Series(times[step:], index=times[:-step]) # find the embargo time for each time
-#         embargo = embargo.append(pd.Series(times[-1], index=times[-step:])) # find the embargo time for the last "step" number of bars and join all embargo times
-        
-#     return embargo
+    :param data: Times of entire observations
+    :param test: Times of testing observations
+    :return: Updated training times
 
-# """
-# class and functions: splits the data and performes cross validation when observations overlap  
-# reference: De Prado, M. (2018) Advances in financial machine learning.
-# methodology: page 109, snippet 7.3
-# """
-# class PurgedKFold(KFold):
-#     def __init__(
-#         self, # The PurgedKFold class containing observations and split information
-#         n_splits: int=3, # The number of KFold splits
-#         times: pd.Series=None, # Entire observation times
-#         percent_embargo: float=0.0 # Embargo size percentage divided by 100
-#     ):
-        
-#         if not isinstance(times, pd.Series): # check if times parameter is a pd.Series
-#             raise ValueError('Label Through Dates must be a pandas series') # raise error 
-        
-#         super(PurgedKFold,self).__init__(n_splits, shuffle=False, random_state=None) # create the PurgedKFold class from Sklearn's KFold
-#         self.times = times # set the times property in class
-#         self.percent_embargo = percent_embargo # set the percent_embargo property in class
-        
-#     def split(
-#         self, # The PurgedKFold class containing observations and split information
-#         data: pd.DataFrame, # The sample that is going be splited
-#         labels: pd.Series=None, # The labels that are going be splited
-#         groups=None # Group our labels
-#     ):
-        
-#         if (data.index == self.times.index).sum() != len(self.times): # check if data and times have the same index (starting time)
-#             raise ValueError('data and ThruDateValues must have the same index') # raise error
-        
-#         indices = np.arange(data.shape[0]) # get data positions
-#         embargo = int(data.shape[0]*self.percent_embargo) # get embargo size
-        
-#         test_starts = [(i[0], i[-1] + 1) for i in \
-#             np.array_split(np.arange(data.shape[0]), self.n_splits)] # get all test indices
-        
-#         for start, end in test_starts:
-#             first_test_index = self.times.index[start] # get the start of the current test set
-#             test_indices = indices[start:end] # get test indices for current split
-#             max_test_index = self.times.index.searchsorted(self.times[test_indices].max()) # get the farthest test index
-#             train_indices = self.times.index.searchsorted(self.times[self.times<=first_test_index].index) # find the left side of the training data
-            
-#             if max_test_index + embargo < data.shape[0]:
-#                 train_indices = np.concatenate((train_indices, indices[max_test_index + embargo:])) # find the right side of the training data with embargo
-            
-#             yield train_indices,test_indices
+    Reference: De Prado, M. (2018) Advances in Financial Machine Learning
+    Methodology: page 106, snippet 7.1
+    """
+    train_times = data.copy(deep=True)
 
-# """
-# function: uses the PurgedKFold class and functions
-# reference: De Prado, M. (2018) Advances in financial machine learning.
-# methodology: page 110, snippet 7.4
-# """
-# def cross_validation_score(classifier: ClassifierMixin, # A classifier model
-#                            data: pd.DataFrame, # The sample that is going be splited,
-#                            labels: pd.Series=None, # The labels that are going be splited
-#                            sample_weight: np.ndarray=None, # The sample weights for the classifier
-#                            scoring='neg_log_loss', # Scoring type: ['neg_log_loss','accuracy']
-#                            times: pd.Series=None, # Entire observation times
-#                            n_splits: int=None, # The number of KFold splits,
-#                            cross_validation_generator: BaseCrossValidator=None,
-#                            percent_embargo: float=0.0) -> np.array: # Embargo size percentage divided by 100:
-    
-#     if scoring not in ['neg_log_loss','accuracy']: # check if the scoring method is correct
-#         raise Exception('wrong scoring method.') # raise error
-    
-#     if cross_validation_generator is None: # check if the PurgedKFold is nothing
-#         cross_validation_generator = PurgedKFold(n_splits=n_splits, times=times, percent_embargo=percent_embargo) # initialize
-        
-#     if sample_weight is None: # check if the sample_weight is nothing
-#         sample_weight = pd.Series(np.ones(len(data))) # initialize    
-        
-#     score = [] # initialize scores
-    
-#     for train, test in cross_validation_generator.split(data):
-#         fit = classifier.fit(X=data.iloc[train,:], y=labels.iloc[train],
-#                              sample_weight=sample_weight[train]) # fit model
-        
-#         if scoring == 'neg_log_loss':
-#             prob = fit.predict_proba(data.iloc[test,:]) # predict test
-#             score_ = -log_loss(labels.iloc[test], prob,
-#                                sample_weight=sample_weight.iloc[test].values, labels=classifier.classes_) # calculate score
-#         else:
-#             pred = fit.predict(data.iloc[test,:]) # predict test
-#             score_ = accuracy_score(labels.iloc[test], pred, sample_weight=sample_weight.iloc[test].values) # calculate score
-            
-#         score.append(score_) # append score
-        
-#     return np.array(score)
+    for start, end in test.iteritems():
+        mask = train_times.index.to_series().between(start, end, inclusive=True)
+        train_times = train_times.drop(train_times[mask].index)
+
+    return train_times
+
+
+def embargo_times(
+        times: pd.Series,  # Entire observation times
+        percent_embargo: float  # Embargo size percentage divided by 100
+) -> pd.Series:
+    """
+    Gets embargo time for each bar.
+
+    :param times: Entire observation times
+    :param percent_embargo: Embargo size percentage divided by 100
+    :return: Series with embargo times for each bar
+
+    Reference: De Prado, M. (2018) Advances in Financial Machine Learning
+    Methodology: page 108, snippet 7.2
+    """
+    step = int(times.shape[0] * percent_embargo)
+
+    if step == 0:
+        return pd.Series(times, index=times)
+    else:
+        embargo = pd.Series(times[step:], index=times[:-step])
+        embargo = embargo.append(pd.Series(times[-1], index=times[-step:]))
+        return embargo
+
+
+class PurgedKFold(KFold):
+    """
+    Splits the data and performs cross-validation when observations overlap.
+
+    Reference: De Prado, M. (2018) Advances in Financial Machine Learning
+    Methodology: page 109, snippet 7.3
+    """
+
+    def __init__(
+            self,
+            n_splits: int = 3,  # The number of KFold splits
+            times: pd.Series = None,  # Entire observation times
+            percent_embargo: float = 0.0  # Embargo size percentage divided by 100
+    ):
+        if not isinstance(times, pd.Series):
+            raise ValueError('Label Through Dates must be a pandas series')
+        super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=None)
+        self.times = times
+        self.percent_embargo = percent_embargo
+
+    def split(
+            self,
+            data: pd.DataFrame,  # The sample that is going to be split
+            labels: pd.Series = None,  # The labels that are going to be split
+            groups=None  # Group our labels
+    ):
+        if (data.index == self.times.index).sum() != len(self.times):
+            raise ValueError('data and ThruDateValues must have the same index')
+
+        indices = np.arange(data.shape[0])
+        embargo = int(data.shape[0] * self.percent_embargo)
+
+        test_starts = [(i[0], i[-1] + 1) for i in \
+                       np.array_split(np.arange(data.shape[0]), self.n_splits)]
+
+        for start, end in test_starts:
+            first_test_index = self.times.index[start]
+            test_indices = indices[start:end]
+            max_test_index = self.times.index.searchsorted(self.times[test_indices].max())
+            train_indices = self.times.index.searchsorted(self.times[self.times <= first_test_index].index)
+
+            if max_test_index + embargo < data.shape[0]:
+                train_indices = np.concatenate((train_indices, indices[max_test_index + embargo:]))
+
+            yield train_indices, test_indices
+
+
+def cross_validation_score(
+        classifier: ClassifierMixin,  # A classifier model
+        data: pd.DataFrame,  # The sample that is going to be split
+        labels: pd.Series = None,  # The labels that are going to be split
+        sample_weight: np.ndarray = None,  # The sample weights for the classifier
+        scoring: str = 'neg_log_loss',  # Scoring type: ['neg_log_loss','accuracy']
+        times: pd.Series = None,  # Entire observation times
+        n_splits: int = None,  # The number of KFold splits
+        cross_validation_generator: BaseCrossValidator = None,
+        percent_embargo: float = 0.0  # Embargo size percentage divided by 100
+) -> np.array:
+    """
+    Uses the PurgedKFold class and functions to perform cross-validation.
+
+    :param classifier: A classifier model
+    :param data: The sample that is going to be split
+    :param labels: The labels that are going to be split
+    :param sample_weight: The sample weights for the classifier
+    :param scoring: Scoring type: ['neg_log_loss','accuracy']
+    :param times: Entire observation times
+    :param n_splits: The number of KFold splits
+    :param cross_validation_generator: Cross-validation generator instance
+    :param percent_embargo: Embargo size percentage divided by 100
+    :return: Array with cross-validation scores
+
+    Reference: De Prado, M. (2018) Advances in Financial Machine Learning
+    Methodology: page 110, snippet 7.4
+    """
+    if scoring not in ['neg_log_loss', 'accuracy']:
+        raise Exception('wrong scoring method.')
+
+    if cross_validation_generator is None:
+        cross_validation_generator = PurgedKFold(n_splits=n_splits, times=times, percent_embargo=percent_embargo)
+
+    if sample_weight is None:
+        sample_weight = pd.Series(np.ones(len(data)))
+
+    scores = []
+
+    for train, test in cross_validation_generator.split(data):
+        fit = classifier.fit(X=data.iloc[train, :], y=labels.iloc[train],
+                             sample_weight=sample_weight[train])
+
+        if scoring == 'neg_log_loss':
+            prob = fit.predict_proba(data.iloc[test, :])
+            score = -log_loss(labels.iloc[test], prob,
+                              sample_weight=sample_weight.iloc[test].values, labels=classifier.classes_)
+        else:
+            pred = fit.predict(data.iloc[test, :])
+            score = accuracy_score(labels.iloc[test], pred, sample_weight=sample_weight.iloc[test].values)
+
+        scores.append(score)
+
+    return np.array(scores)

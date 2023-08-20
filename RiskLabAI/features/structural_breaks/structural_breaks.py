@@ -1,79 +1,120 @@
+import numpy as np
+import pandas as pd
 
-import numpy as np 
-import pandas as pd 
+def lag_dataframe(
+    market_data: pd.DataFrame,
+    lags: int
+) -> pd.DataFrame:
+    """
+    Apply lags to DataFrame.
 
-"""----------------------------------------------------------------------
-    function: apply lags to dataframe 
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: snippet 17.3
-----------------------------------------------------------------------"""
-def lagDF(marketData,# data of price or log price
-          lags): # arrays of lag or integer that show number of lags 
-    laggedData=pd.DataFrame() # create lagged Dataframe 
-    if isinstance(lags,int): #check lags is array of integer or is integer  and if it is integer change it to array 
-        lags=range(lags+1)
+    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+    Methodology: Snippet 17.3
+
+    :param market_data: Data of price or log price.
+    :param lags: Arrays of lag or integer that shows number of lags.
+    :return: DataFrame with lagged data.
+    """
+    lagged_data = pd.DataFrame()
+
+    if isinstance(lags, int):
+        lags = range(lags + 1)
     else:
-        lags=[int(lag) for lag in lags]
+        lags = [int(lag) for lag in lags]
+
     for lag in lags:
-        tempData=pd.DataFrame(marketData.shift(lag).copy(deep=True)) # shift market data 
-        tempData.columns=[str(i)+'_'+str(lag) for i in tempData.columns] # change column names 
-        laggedData=laggedData.join(tempData,how='outer') # add tempData to laggedData
-    return laggedData
+        temp_data = pd.DataFrame(market_data.shift(lag).copy(deep=True))
+        temp_data.columns = [f'{i}_{lag}' for i in temp_data.columns]
+        lagged_data = lagged_data.join(temp_data, how='outer')
 
-"""----------------------------------------------------------------------
-    function: preparing the datasets
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: snippet 17.2
-----------------------------------------------------------------------"""
-def prepareData(series, # data of price or log price
-                constant, # string thant must be "nc" or "ct" or "ctt"
-                lags): # arrays of lag or integer that show number of lags 
-    series_=series.diff().dropna() #compute data difference  
-    x=lagDF(series_,lags).dropna()  # compute lagged data 
-    x.iloc[:,0]=series.values[-x.shape[0]-1:-1,0] # lagged level
-    y=series_.iloc[-x.shape[0]:].values # dependent variable 
-    if constant!='nc': # check type of model 
-        x=np.append(x,np.ones((x.shape[0],1)),axis=1) #add a column with 1 entry 
-    if constant[:2]=='ct':
-        trend=np.arange(x.shape[0]).reshape(-1,1)  #add first moment of trend 
-        x=np.append(x,trend,axis=1)
-    if constant=='ctt':
-        x=np.append(x,trend**2,axis=1)  # add second moment of trend 
-    return y,x
+    return lagged_data
 
-"""----------------------------------------------------------------------
-    function: fitting the adf specification
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: snippet 17.4
-----------------------------------------------------------------------"""
-def computeBeta(y, # dependent variable
-                x):# matrix of independent variable 
-    xInvers = np.linalg.inv(np.dot(x.T,x))
-    betaMean = xInvers * np.dot(x.T,y)  # Compute β with OLS estimator 
-    epsilon=y-np.dot(x,betaMean) # compute error 
-    betaVariance=np.dot(epsilon.T,epsilon)/(x.shape[0]-x.shape[1])*xInvers # compute variance of β
-    return betaMean ,betaVariance
 
-"""----------------------------------------------------------------------
-    function: sadf’s inner loop
-    reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    methodology: snippet 17.1
-----------------------------------------------------------------------"""
-def ADF(logPrice, #  pandas dataframe of logprice 
-        minSampleLength, #minimum sample length
-        constant,  # string thant must be "nc" or "ct" or "ctt"
-        lags): # arrays of lag or integer that show number of lags 
-    y,x=prepareData(logPrice,constant=constant,lags=lags)  # preparing data 
-    startPoints,bsadf,allADF=range(0,y.shape[0]+lags-minSampleLength+1),-1 *np.inf,[] #initial variable bsadf is best supremum ADF 
-    for start in startPoints:
-        y_,x_=y[start:],x[start:] # select data 
-        betaMean_,betaStd_=computeBeta(y_,x_) # compute beta mean and beta std with OLS
-        betaMean_,betaStd_=betaMean_[0,0],betaStd_[0,0]**.5 # select coefficient of first independent variable 
-        allADF.append(betaMean_/betaStd_) # append it to allADF
-        if allADF[-1]>bsadf:
-            bsadf=allADF[-1] # update  bsadf 
-    out={'Time':logPrice.index[-1],'gsadf':bsadf}
+def prepare_data(
+    series: pd.DataFrame,
+    constant: str,
+    lags: int
+) -> (np.ndarray, np.ndarray):
+    """
+    Prepare the datasets.
+
+    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+    Methodology: Snippet 17.2
+
+    :param series: Data of price or log price.
+    :param constant: String that must be "nc" or "ct" or "ctt".
+    :param lags: Arrays of lag or integer that shows number of lags.
+    :return: Tuple of y and x arrays.
+    """
+    series_ = series.diff().dropna()
+    x = lag_dataframe(series_, lags).dropna()
+    x.iloc[:, 0] = series.values[-x.shape[0]-1:-1, 0]
+    y = series_.iloc[-x.shape[0]:].values
+
+    if constant != 'nc':
+        x = np.append(x, np.ones((x.shape[0], 1)), axis=1)
+
+    if constant[:2] == 'ct':
+        trend = np.arange(x.shape[0]).reshape(-1, 1)
+        x = np.append(x, trend, axis=1)
+
+    if constant == 'ctt':
+        x = np.append(x, trend**2, axis=1)
+
+    return y, x
+
+
+def compute_beta(
+    y: np.ndarray,
+    x: np.ndarray
+) -> (np.ndarray, np.ndarray):
+    """
+    Fit the ADF specification.
+
+    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+    Methodology: Snippet 17.4
+
+    :param y: Dependent variable.
+    :param x: Matrix of independent variable.
+    :return: Tuple of beta_mean and beta_variance.
+    """
+    x_inverse = np.linalg.inv(np.dot(x.T, x))
+    beta_mean = x_inverse * np.dot(x.T, y)
+    epsilon = y - np.dot(x, beta_mean)
+    beta_variance = np.dot(epsilon.T, epsilon) / (x.shape[0] - x.shape[1]) * x_inverse
+
+    return beta_mean, beta_variance
+
+
+def adf(
+    log_price: pd.DataFrame,
+    min_sample_length: int,
+    constant: str,
+    lags: int
+) -> dict:
+    """
+    SADF's inner loop.
+
+    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
+    Methodology: Snippet 17.1
+
+    :param log_price: Pandas DataFrame of log price.
+    :param min_sample_length: Minimum sample length.
+    :param constant: String that must be "nc" or "ct" or "ctt".
+    :param lags: Arrays of lag or integer that shows number of lags.
+    :return: Dictionary with Time and gsadf values.
+    """
+    y, x = prepare_data(log_price, constant=constant, lags=lags)
+    start_points, bsadf, all_adf = range(0, y.shape[0] + lags - min_sample_length + 1), -np.inf, []
+
+    for start in start_points:
+        y_, x_ = y[start:], x[start:]
+        beta_mean_, beta_std_ = compute_beta(y_, x_)
+        beta_mean_, beta_std_ = beta_mean_[0, 0], beta_std_[0, 0] ** 0.5
+        all_adf.append(beta_mean_ / beta_std_)
+
+        if all_adf[-1] > bsadf:
+            bsadf = all_adf[-1]
+
+    out = {'Time': log_price.index[-1], 'gsadf': bsadf}
     return out
-
-
-

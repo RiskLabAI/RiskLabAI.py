@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from typing import Dict, List
 
 def group_mean_std(
     dataframe: pd.DataFrame,
-    clusters: dict
+    clusters: Dict[str, List[str]]
 ) -> pd.DataFrame:
     """
     Calculate the group mean and standard deviation for the given clusters.
@@ -23,14 +25,15 @@ def group_mean_std(
     for cluster_index, column_indices in clusters.items():
         cluster_data = dataframe[column_indices].sum(axis=1)
         output.loc["C_" + str(cluster_index), "Mean"] = cluster_data.mean()
-        output.loc["C_" + str(cluster_index), "StandardDeviation"] = cluster_data.std() * cluster_data.shape[0] ** -0.5
+        output.loc["C_" + str(cluster_index), "StandardDeviation"] = \
+            cluster_data.std() * cluster_data.shape[0] ** -0.5
 
     return output
 
-def clustered_feature_importance_MDA(
-    classifier,
-    feature_names: list,
-    clusters: dict
+def clustered_feature_importance_mdi(
+    classifier: RandomForestClassifier,
+    feature_names: List[str],
+    clusters: Dict[str, List[str]]
 ) -> pd.DataFrame:
     """
     Calculate clustered feature importance using Mean Decrease Impurity (MDI).
