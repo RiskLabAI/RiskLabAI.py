@@ -1,13 +1,20 @@
-from scipy import stats
 import numpy as np
 import pandas as pd
+from scipy import stats
+from typing import List, Tuple
 
-def calculate_t_value_linear_regression(price: pd.Series) -> float:
+
+def calculate_t_value_linear_regression(
+        price: pd.Series
+) -> float:
     """
     Calculate the t-value of a linear trend.
 
-    :param price: Time series of prices.
-    :return: Calculated t-value.
+    This function computes the t-value of a linear trend in a time series of prices. 
+    The t-value is calculated as the ratio of the slope to the standard error of the regression.
+
+    :param price: Time series of prices as a Pandas Series.
+    :return: Calculated t-value as a float.
     """
     x = np.arange(price.shape[0])
     ols = stats.linregress(x, price.values)
@@ -15,18 +22,24 @@ def calculate_t_value_linear_regression(price: pd.Series) -> float:
     
     return t_value
 
+
 def find_trend_using_trend_scanning(
         molecule: pd.Index,
         close: pd.Series,
-        span: tuple
+        span: Tuple[int, int]
 ) -> pd.DataFrame:
     """
     Implement the trend scanning method to find trends.
 
-    :param molecule: Index of observations to label.
-    :param close: Time series of prices.
-    :param span: Range of span lengths to evaluate for the maximum absolute t-value.
-    :return: DataFrame containing trend information.
+    This function identifies trends in a time series of prices using the trend scanning method. 
+    It calculates the t-value for linear regression of price over a range of spans and 
+    identifies the span with the maximum absolute t-value as the trend. The sign of the t-value 
+    indicates the direction of the trend.
+
+    :param molecule: Index of observations to label as a Pandas Index.
+    :param close: Time series of prices as a Pandas Series.
+    :param span: Range of span lengths to evaluate for the maximum absolute t-value as a tuple.
+    :return: DataFrame containing trend information with columns ['End Time', 't-Value', 'Trend'].
     """
     outputs = pd.DataFrame(index=molecule, columns=['End Time', 't-Value', 'Trend'])
     spans = range(*span)
