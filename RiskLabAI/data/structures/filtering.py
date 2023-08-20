@@ -11,11 +11,9 @@ def symmetric_cusum_filter(
     This method is used to detect changes in a time series data.
 
     :param input_data: DataFrame containing price data.
-    :type input_data: pd.DataFrame
     :param threshold: Threshold value for the CUSUM filter.
-    :type threshold: float
+
     :return: Datetime index of events based on the symmetric CUSUM filter.
-    :rtype: pd.DatetimeIndex
 
     .. note:: 
        Reference:
@@ -38,8 +36,8 @@ def symmetric_cusum_filter(
     price_change = input_data.diff()
 
     for time_index in price_change.index[1:]:
-        cumulative_sum_positive = max(0, cumulative_sum_positive + price_change.loc[time_index])
-        cumulative_sum_negative = min(0, cumulative_sum_negative + price_change.loc[time_index])
+        cumulative_sum_positive = max(0, cumulative_sum_positive + price_change.loc[time_index].item())
+        cumulative_sum_negative = min(0, cumulative_sum_negative + price_change.loc[time_index].item())
 
         if cumulative_sum_negative < -threshold:
             cumulative_sum_negative = 0

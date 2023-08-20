@@ -1,7 +1,5 @@
 from math import pi
 import pandas as pd
-
-# Assuming that the CorwinSchultz module provides these functions
 from CorwinSchultz import beta_estimates, gamma_estimates
 
 def sigma_estimates(
@@ -13,10 +11,10 @@ def sigma_estimates(
 
     This function calculates the Bekker-Parkinson volatility estimates based on the provided
     beta and gamma values. The mathematical formula used is:
-    
+
     .. math::
-        \sigma = \frac{(2^0.5 - 1) * (\beta ^ 0.5)}{3 - 2 * (2^0.5)} 
-                + \left(\frac{\gamma}{{(8/\pi)^0.5}^2 * (3 - 2 * (2^0.5))}\right)^0.5
+        \sigma = \frac{(2^{0.5} - 1) \cdot (\beta ^ {0.5})}{3 - 2 \cdot (2^{0.5})}
+                + \left(\frac{\gamma}{\left(\frac{8}{\pi}\right)^{0.5} \cdot (3 - 2 \cdot (2^{0.5}))}\right)^{0.5}
 
     Negative resulting values are set to 0.
 
@@ -45,8 +43,8 @@ def bekker_parkinson_volatility_estimates(
     """
     Compute Bekker-Parkinson volatility estimates based on high and low prices.
 
-    Utilizes Corwin and Schultz estimation techniques to calculate the Bekker-Parkinson 
-    volatility. The function first determines the beta and gamma values and then 
+    Utilizes Corwin and Schultz estimation techniques to calculate the Bekker-Parkinson
+    volatility. The function first determines the beta and gamma values and then
     uses them to compute the volatility estimates.
 
     :param high_prices: High prices vector.

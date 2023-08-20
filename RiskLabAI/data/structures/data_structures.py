@@ -1,12 +1,15 @@
-import pandas as pd
-import numpy as np
-import datetime
-import time
 import sys
-from scipy import stats
-from statsmodels.stats import stattools
+import time
+import numpy as np
+import pandas as pd
+from typing import Tuple
 
-def progress_bar(value: int, end_value: int, start_time: float, bar_length: int = 20) -> None:
+def progress_bar(
+    value: int,
+    end_value: int,
+    start_time: float,
+    bar_length: int = 20
+) -> None:
     """
     Display a progress bar in the console.
 
@@ -27,7 +30,11 @@ def progress_bar(value: int, end_value: int, start_time: float, bar_length: int 
     )
     sys.stdout.flush()
 
-def compute_ewma(input_array: np.ndarray, window_length: int) -> np.ndarray:
+
+def compute_ewma(
+    input_array: np.ndarray,
+    window_length: int
+) -> np.ndarray:
     """
     Computes the Exponentially Weighted Moving Average (EWMA).
 
@@ -38,18 +45,23 @@ def compute_ewma(input_array: np.ndarray, window_length: int) -> np.ndarray:
     N = input_array.shape[0]
     output_ewma = np.empty(N, dtype='float64')
     omega = 1
-    ALPHA = 2 / float(window_length + 1)
+    alpha = 2 / float(window_length + 1)
     current_value = input_array[0]
     output_ewma[0] = current_value
 
     for i in range(1, N):
-        omega += (1 - ALPHA) ** i
-        current_value = current_value * (1 - ALPHA) + input_array[i]
+        omega += (1 - alpha) ** i
+        current_value = current_value * (1 - alpha) + input_array[i]
         output_ewma[i] = current_value / omega
 
     return output_ewma
 
-def compute_grouping(target_col: pd.Series, initial_expected_ticks: int, bar_size: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+
+def compute_grouping(
+    target_col: pd.Series,
+    initial_expected_ticks: int,
+    bar_size: float
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Group a DataFrame based on a feature and calculates thresholds.
 
@@ -88,14 +100,25 @@ def compute_grouping(target_col: pd.Series, initial_expected_ticks: int, bar_siz
 
     return times_delta, thetas_absolute, thresholds, times, thetas, grouping_id
 
-def generate_information_driven_bars(tick_data: pd.DataFrame, bar_type: str = "volume", tick_expected_initial: int = 2000) -> (pd.DataFrame, np.array, np.array):
+import pandas as pd
+import numpy as np
+from typing import Tuple
+
+
+def generate_information_driven_bars(
+    tick_data: pd.DataFrame,
+    bar_type: str = "volume",
+    tick_expected_initial: int = 2000
+) -> Tuple[pd.DataFrame, np.array, np.array]:
     """
-    Implements Information-Driven Bars as per the methodology described in "Advances in financial machine learning" by De Prado (2018).
+    Implements Information-Driven Bars as per the methodology described in
+    "Advances in financial machine learning" by De Prado (2018).
 
     :param tick_data: DataFrame of tick data.
     :param bar_type: Type of the bars, options: "tick", "volume", "dollar".
     :param tick_expected_initial: Initial expected ticks value.
-    :return: A tuple containing the OHLCV DataFrame, thetas absolute array, and thresholds array.
+    :return: A tuple containing the OHLCV DataFrame, thetas absolute array,
+        and thresholds array.
     """
     if bar_type == "volume":
         input_data = tick_data['volume_labeled']
@@ -108,22 +131,28 @@ def generate_information_driven_bars(tick_data: pd.DataFrame, bar_type: str = "v
 
     bar_expected_value = np.abs(input_data.mean())
 
-    times_delta, thetas_absolute, thresholds, _, _, grouping_id = compute_grouping(input_data, tick_expected_initial, bar_expected_value)
+    times_delta, thetas_absolute, thresholds, _, _, grouping_id = compute_grouping(
+        input_data, tick_expected_initial, bar_expected_value)
 
     tick_grouped = tick_data.reset_index().assign(grouping_id=grouping_id)
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
 
-    ohlcv_dataframe = ohlcv(tick_grouped.groupby('grouping_id'))
+    ohlcv_dataframe = compute_ohlcv(tick_grouped.groupby('grouping_id'))
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe, thetas_absolute, thresholds
 
-def ohlcv(tick_data_grouped: pd.core.groupby.generic.DataFrameGroupBy) -> pd.DataFrame:
+
+def compute_ohlcv(
+    tick_data_grouped: pd.core.groupby.generic.DataFrameGroupBy
+) -> pd.DataFrame:
     """
     Computes various statistics for the grouped tick data.
 
-    Takes a grouped dataframe, combines the data, and creates a new one with information about prices, volume, and other
-    statistics. This is typically used in the context of financial tick data to generate OHLCV data (Open, High, Low, Close, Volume).
+    Takes a grouped dataframe, combines the data, and creates a new one with
+    information about prices, volume, and other statistics. This is typically
+    used in the context of financial tick data to generate OHLCV data
+    (Open, High, Low, Close, Volume).
 
     :param tick_data_grouped: Grouped DataFrame containing tick data.
     :return: A DataFrame containing OHLCV data and other derived statistics.
@@ -139,25 +168,36 @@ def ohlcv(tick_data_grouped: pd.core.groupby.generic.DataFrameGroupBy) -> pd.Dat
 
     return ohlc
 
-def generate_time_bar(tick_data: pd.DataFrame, frequency: str = "5Min") -> pd.DataFrame:
+
+def generate_time_bar(
+    tick_data: pd.DataFrame,
+    frequency: str = "5Min"
+) -> pd.DataFrame:
     """
     Generates time bars for tick data.
 
-    This function groups tick data by a specified time frequency and then computes OHLCV (Open, High, Low, Close, Volume) statistics.
+    This function groups tick data by a specified time frequency and then
+    computes OHLCV (Open, High, Low, Close, Volume) statistics.
 
     :param tick_data: DataFrame containing tick data.
     :param frequency: Time frequency for rounding datetime.
     :return: A DataFrame containing OHLCV data grouped by time.
     """
     tick_data_grouped = tick_data.groupby(pd.Grouper(freq=frequency))
-    ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
+    ohlcv_dataframe = compute_ohlcv(tick_data_grouped)
     return ohlcv_dataframe
 
-def generate_tick_bar(tick_data: pd.DataFrame, ticks_per_bar: int = 10, number_bars: int = None) -> pd.DataFrame:
+
+def generate_tick_bar(
+    tick_data: pd.DataFrame,
+    ticks_per_bar: int = 10,
+    number_bars: int = None
+) -> pd.DataFrame:
     """
     Generates tick bars for tick data.
 
-    This function groups tick data by a specified number of ticks and then computes OHLCV statistics.
+    This function groups tick data by a specified number of ticks and then
+    computes OHLCV statistics.
 
     :param tick_data: DataFrame containing tick data.
     :param ticks_per_bar: Number of ticks in each bar.
@@ -170,12 +210,19 @@ def generate_tick_bar(tick_data: pd.DataFrame, ticks_per_bar: int = 10, number_b
     tick_grouped = tick_data.reset_index().assign(grouping_id=lambda x: x.index // ticks_per_bar)
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
-    ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
+    ohlcv_dataframe = compute_ohlcv(tick_data_grouped)
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe
 
-def generate_volume_bar(tick_data: pd.DataFrame, volume_per_bar: int = 10000, number_bars: int = None) -> pd.DataFrame:
+import pandas as pd
+import numpy as np
+
+def generate_volume_bar(
+    tick_data: pd.DataFrame,
+    volume_per_bar: int = 10000,
+    number_bars: int = None
+) -> pd.DataFrame:
     """
     Generates volume bars for tick data.
 
@@ -184,6 +231,7 @@ def generate_volume_bar(tick_data: pd.DataFrame, volume_per_bar: int = 10000, nu
     :param tick_data: DataFrame containing tick data.
     :param volume_per_bar: Volume size for each bar.
     :param number_bars: Number of bars to generate.
+
     :return: A DataFrame containing OHLCV data grouped by volume.
     """
     tick_data['volume_cumulated'] = tick_data['size'].cumsum()
@@ -193,7 +241,9 @@ def generate_volume_bar(tick_data: pd.DataFrame, volume_per_bar: int = 10000, nu
         volume_per_bar = volume_total / number_bars
         volume_per_bar = round(volume_per_bar, -2)
 
-    tick_grouped = tick_data.reset_index().assign(grouping_id=lambda x: x.volumecumulated // volume_per_bar)
+    tick_grouped = tick_data.reset_index().assign(
+        grouping_id=lambda x: x['volume_cumulated'] // volume_per_bar
+    )
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
     ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
@@ -201,7 +251,12 @@ def generate_volume_bar(tick_data: pd.DataFrame, volume_per_bar: int = 10000, nu
 
     return ohlcv_dataframe
 
-def generate_dollar_bar(tick_data: pd.DataFrame, dollar_per_bar: float = 100000, number_bars: int = None) -> pd.DataFrame:
+
+def generate_dollar_bar(
+    tick_data: pd.DataFrame,
+    dollar_per_bar: float = 100000,
+    number_bars: int = None
+) -> pd.DataFrame:
     """
     Generates dollar bars for tick data.
 
@@ -210,6 +265,7 @@ def generate_dollar_bar(tick_data: pd.DataFrame, dollar_per_bar: float = 100000,
     :param tick_data: DataFrame containing tick data.
     :param dollar_per_bar: Dollar amount for each bar.
     :param number_bars: Number of bars to generate.
+
     :return: A DataFrame containing OHLCV data grouped by dollar amount.
     """
     tick_data['dollar'] = tick_data['price'] * tick_data['size']
@@ -220,7 +276,9 @@ def generate_dollar_bar(tick_data: pd.DataFrame, dollar_per_bar: float = 100000,
         dollar_per_bar = dollars_total / number_bars
         dollar_per_bar = round(dollar_per_bar, -2)
 
-    tick_grouped = tick_data.reset_index().assign(grouping_id=lambda x: x.dollars_cumulated // dollar_per_bar)
+    tick_grouped = tick_data.reset_index().assign(
+        grouping_id=lambda x: x['dollars_cumulated'] // dollar_per_bar
+    )
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
     ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
@@ -228,29 +286,39 @@ def generate_dollar_bar(tick_data: pd.DataFrame, dollar_per_bar: float = 100000,
 
     return ohlcv_dataframe
 
-def calculate_pca_weights(cov: np.ndarray, risk_distribution: np.ndarray = None, risk_target: float = 1.0) -> np.ndarray:
-    """
-    Calculates hedging weights using covariance matrix, risk distribution, and risk target.
 
-    :param cov: Covariance matrix.
+def calculate_pca_weights(
+    covariance_matrix: np.ndarray,
+    risk_distribution: np.ndarray = None,
+    risk_target: float = 1.0
+) -> np.ndarray:
+    """
+    Calculates hedging weights using the covariance matrix, risk distribution, and risk target.
+
+    :param covariance_matrix: Covariance matrix.
     :param risk_distribution: Risk distribution vector.
     :param risk_target: Risk target value.
+
     :return: Weights.
     """
-    eigenvalues, eigenvectors = np.linalg.eigh(cov)
+    eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
     indices = eigenvalues.argsort()[::-1]
     eigenvalues, eigenvectors = eigenvalues[indices], eigenvectors[:, indices]
 
     if risk_distribution is None:
-        risk_distribution = np.zeros(cov.shape[0])
-        risk_distribution[-1] = 1.
+        risk_distribution = np.zeros(covariance_matrix.shape[0])
+        risk_distribution[-1] = 1.0
 
-    loads = risk_target * (risk_distribution / eigenvalues)**0.5
+    loads = risk_target * (risk_distribution / eigenvalues) ** 0.5
     weights = np.dot(eigenvectors, np.reshape(loads, (-1, 1)))
 
     return weights
 
-def events(input_data: pd.DataFrame, threshold: float) -> pd.DatetimeIndex:
+
+def events(
+    input_data: pd.DataFrame,
+    threshold: float
+) -> pd.DatetimeIndex:
     """
     Implementation of the symmetric CUSUM filter.
 
@@ -258,6 +326,7 @@ def events(input_data: pd.DataFrame, threshold: float) -> pd.DatetimeIndex:
 
     :param input_data: DataFrame of prices and dates.
     :param threshold: Threshold for price change.
+
     :return: DatetimeIndex containing events.
     """
     time_events, shift_positive, shift_negative = [], 0, 0

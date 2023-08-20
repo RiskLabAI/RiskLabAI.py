@@ -1,32 +1,32 @@
 import pandas as pd
 import numpy as np
 
-def eigen_vectors(
-    dot_product: np.ndarray, 
-    explained_variance_threshold: float
+
+def compute_eigenvectors(
+        dot_product: np.ndarray,
+        explained_variance_threshold: float
 ) -> pd.DataFrame:
     """
-    Compute eigenvalues and eigenvectors for Orthogonal Features.
+    Compute eigenvalues and eigenvectors for orthogonal features.
 
-    :param dot_product: Input dot product matrix
+    :param dot_product: Input dot product matrix.
     :type dot_product: np.ndarray
-    :param explained_variance_threshold: Threshold for cumulative explained variance
+    :param explained_variance_threshold: Threshold for cumulative explained variance.
     :type explained_variance_threshold: float
-    :return: DataFrame containing eigenvalues, eigenvectors, and cumulative explained variance
+    :return: DataFrame containing eigenvalues, eigenvectors, and cumulative explained variance.
     :rtype: pd.DataFrame
     """
-    e_values, e_vectors = np.linalg.eigh(dot_product)
+    eigenvalues, eigenvectors = np.linalg.eigh(dot_product)
 
     eigen_dataframe = pd.DataFrame({
-        "Index": [f"PC {i}" for i in range(1, len(e_values) + 1)],
-        "EigenValue": e_values,
-        "EigenVector": [ev for ev in e_vectors]
+        "Index": [f"PC {i}" for i in range(1, len(eigenvalues) + 1)],
+        "EigenValue": eigenvalues,
+        "EigenVector": [ev for ev in eigenvectors]
     })
 
     eigen_dataframe = eigen_dataframe.sort_values("EigenValue", ascending=False)
 
     cumulative_variance = np.cumsum(eigen_dataframe["EigenValue"]) / np.sum(eigen_dataframe["EigenValue"])
-
     eigen_dataframe["CumulativeVariance"] = cumulative_variance
 
     index = cumulative_variance.searchsorted(explained_variance_threshold)
@@ -37,25 +37,25 @@ def eigen_vectors(
 
 
 def orthogonal_features(
-    X: np.ndarray, 
-    variance_threshold: float = 0.95
+        features: np.ndarray,
+        variance_threshold: float = 0.95
 ) -> tuple:
     """
-    Compute Orthogonal Features using eigenvalues and eigenvectors.
+    Compute orthogonal features using eigenvalues and eigenvectors.
 
-    :param X: Features matrix
-    :type X: np.ndarray
-    :param variance_threshold: Threshold for cumulative explained variance, default is 0.95
+    :param features: Features matrix.
+    :type features: np.ndarray
+    :param variance_threshold: Threshold for cumulative explained variance, default is 0.95.
     :type variance_threshold: float
-    :return: Tuple containing Orthogonal Features and eigenvalues information
+    :return: Tuple containing orthogonal features and eigenvalues information.
     :rtype: tuple
     """
-    Z = (X - X.mean(axis=0)) / X.std(axis=0)
-    dot_product = Z.T @ Z
-    eigen_dataframe = eigen_vectors(dot_product, variance_threshold)
+    normalized_features = (features - features.mean(axis=0)) / features.std(axis=0)
+    dot_product = normalized_features.T @ normalized_features
+    eigen_dataframe = compute_eigenvectors(dot_product, variance_threshold)
 
-    W = np.vstack(eigen_dataframe["EigenVector"].values).T
+    transformation_matrix = np.vstack(eigen_dataframe["EigenVector"].values).T
 
-    P = Z @ W
+    orthogonal_features = normalized_features @ transformation_matrix
 
-    return P, eigen_dataframe
+    return orthogonal_features, eigen_dataframe
