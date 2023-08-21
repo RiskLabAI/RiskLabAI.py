@@ -115,10 +115,6 @@ def linear_partitions(
     return partitions
 
 
-import numpy as np
-import pandas as pd
-
-
 def nested_partitions(
     num_atoms: int,
     num_threads: int,
