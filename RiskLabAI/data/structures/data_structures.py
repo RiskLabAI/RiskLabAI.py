@@ -31,7 +31,7 @@ def progress_bar(
     sys.stdout.flush()
 
 
-def compute_ewma(
+def ewma(
     input_array: np.ndarray,
     window_length: int
 ) -> np.ndarray:
@@ -143,7 +143,7 @@ def generate_information_driven_bars(
     return ohlcv_dataframe, thetas_absolute, thresholds
 
 
-def compute_ohlcv(
+def ohlcv(
     tick_data_grouped: pd.core.groupby.generic.DataFrameGroupBy
 ) -> pd.DataFrame:
     """
@@ -214,9 +214,6 @@ def generate_tick_bar(
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe
-
-import pandas as pd
-import numpy as np
 
 def generate_volume_bar(
     tick_data: pd.DataFrame,
