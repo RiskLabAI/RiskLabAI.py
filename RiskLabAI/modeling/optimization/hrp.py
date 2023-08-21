@@ -93,12 +93,6 @@ def recursive_bisection(covariance_matrix: pd.DataFrame, sorted_items: list) -> 
 
     return weights
 
-import random
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-
 def distance_corr(
         corr_matrix: np.ndarray
 ) -> np.ndarray:
@@ -171,12 +165,6 @@ def random_data(
     data = np.append(data1, data2, axis=1)
     data = pd.DataFrame(data, columns=range(1, data.shape[1] + 1))
     return data, columns_correlated
-
-import numpy as np
-import pandas as pd
-import scipy.cluster.hierarchy as sch
-import random
-
 
 def random_data(
         number_observations: int,
@@ -318,9 +306,6 @@ def hrp_mc(
     
     std_results, var_results = results_df.std(), results_df.var()  # std and var for each method
     print(pd.concat([std_results, var_results, var_results / var_results["hrp"] - 1], axis=1))
-
-import numpy as np
-import pandas as pd
 
 
 def distance_corr(corr: pd.DataFrame) -> np.ndarray:

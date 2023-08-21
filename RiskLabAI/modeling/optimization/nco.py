@@ -113,4 +113,5 @@ def cluster_k_means_base(
     correlation_new = correlation_new.iloc[:, index_new]
     clusters = {i: correlation.columns[np.where(kmeans.labels_ == i)[0]].tolist() for i in np.unique(kmeans.labels_)}
     silhouette_scores = pd.Series(silhouette_scores, index=distance.index)
+ 
     return correlation_new, clusters, silhouette_scores
