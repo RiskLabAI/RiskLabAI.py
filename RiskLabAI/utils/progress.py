@@ -35,6 +35,7 @@ def progress_bar(
     spaces = ' ' * (bar_length - len(arrow))
 
     elapsed_time = time.time() - start_time
+    
     if current_progress == 0:
         remaining_time = "Calculating..."
     else:
@@ -44,7 +45,9 @@ def progress_bar(
 
     if current_progress == total_progress:
         sys.stdout.write("\rCompleted: [{0}] 100% - Task completed!\n".format('-' * bar_length))
+    
     else:
         sys.stdout.write("\rCompleted: [{0}] {1}% - {2} minutes remaining.".format(
             arrow + spaces, int(round(percentage * 100)), remaining_time))
+    
     sys.stdout.flush()
