@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.autograd as autograd
 import numpy as np
-
+from .model import*
 
 def initialize_weights(m: nn.Module) -> None:
     """
