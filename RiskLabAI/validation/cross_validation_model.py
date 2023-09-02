@@ -1,148 +1,196 @@
-import pandas as pd
+from typing import Dict, Union, Tuple, List, Optional
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import KFold, BaseCrossValidator
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import log_loss, accuracy_score
 
-
 class CrossValidationModel(KFold):
     """
-    Implements a KFold cross-validator with purging and embargo.
-    Reference: De Prado, M. (2018) Advances in Financial Machine Learning.
-    Methodology: Page 109, Snippet 7.3
+    Implements a KFold cross-validator with purging and embargo based on 
+    De Prado's "Advances in Financial Machine Learning" methodology.
+
+    :param n_splits: Number of KFold splits
+    :param times: Entire observation times
+    :param percent_embargo: Embargo size percentage divided by 100
     """
 
     def __init__(
         self,
-        n_splits: int,  # The number of KFold splits
-        times: pd.Series,  # Entire observation times
-        percent_embargo: float  # Embargo size percentage divided by 100
+        n_splits: int,
+        times: pd.Series,
+        percent_embargo: float
     ):
-        super(CrossValidationModel, self).__init__(n_splits, shuffle=False, random_state=None)  # create the KFold class from Sklearn's KFold
-        self.times = times  # set the times property in class
-        self.percent_embargo = percent_embargo  # set the percent_embargo property in class
+        super().__init__(n_splits, shuffle=False, random_state=None)
+        self.times = times
+        self.percent_embargo = percent_embargo
 
     def purged_kfold_split(
         self,
-        data: dict  # The sample that is going be split
-    ):
+        data: Dict[str, pd.DataFrame]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Splits the data using purged KFold cross-validator with purging and embargo.
-        """
-        test_starts = {}
-        for ticker in data.keys():
-            test_starts[ticker] = [(i[0], i[-1] + 1) for i in \
-                                   np.array_split(np.arange(data[ticker].shape[0]), self.n_splits)]  # get all test indices
 
-        mono_asset = len(list(data.keys())) == 1
+        :param data: The sample to be split
+        :return: Tuple of training and test indices
+        """
+        test_starts = {
+            ticker: [(i[0], i[-1] + 1) for i in np.array_split(
+                np.arange(df.shape[0]), self.n_splits
+            )]
+            for ticker, df in data.items()
+        }
+
+        is_single_asset = len(list(data.keys())) == 1
 
         for split in range(self.n_splits):
-            trains = {}
-            tests = {}
+            train_indices = {}
+            test_indices = {}
 
-            for ticker in data:
-                indices = np.arange(data[ticker].shape[0])  # get data positions
-                embargo = int(data[ticker].shape[0] * self.percent_embargo)  # get embargo size
+            for ticker, df in data.items():
+                all_indices = np.arange(df.shape[0])
+                embargo_size = int(df.shape[0] * self.percent_embargo)
 
                 start, end = test_starts[ticker][split]
 
-                first_test_index = self.times[ticker].index[start]  # get the start of the current test set
-                test_indices = indices[start:end]  # get test indices for current split
-                max_test_index = self.times[ticker].index.searchsorted(self.times[ticker][test_indices].max())  # get the farthest test index
-                train_indices = self.times[ticker].index.searchsorted(self.times[ticker][self.times[ticker] <= first_test_index].index)  # find the left side of the training data
+                first_test_time = self.times[ticker].index[start]
+                current_test_indices = all_indices[start:end]
+                max_test_time = self.times[ticker][current_test_indices].max()
+                max_test_index = self.times[ticker].index.searchsorted(max_test_time)
 
-                if max_test_index + embargo < data[ticker].shape[0]:
-                    train_indices = np.concatenate((train_indices, indices[max_test_index + embargo:]))  # find the right side of the training data with embargo
+                left_train_indices = self.times[ticker].index.searchsorted(
+                    self.times[ticker][self.times[ticker] <= first_test_time].index
+                )
 
-                trains[ticker] = np.array(train_indices)
-                tests[ticker] = np.array(test_indices)
+                if max_test_index + embargo_size < df.shape[0]:
+                    right_train_indices = all_indices[max_test_index + embargo_size:]
+                    all_train_indices = np.concatenate((left_train_indices, right_train_indices))
+                else:
+                    all_train_indices = left_train_indices
 
-            if mono_asset:
-                trains = trains['ASSET']
-                tests = tests['ASSET']
+                train_indices[ticker] = np.array(all_train_indices)
+                test_indices[ticker] = np.array(current_test_indices)
 
-            yield trains, tests
+            if is_single_asset:
+                train_indices = train_indices['ASSET']
+                test_indices = test_indices['ASSET']
+
+            yield train_indices, test_indices
 
     @staticmethod
     def purged_train_times(
-        data: pd.Series,  # Times of entire observations.
-        test: pd.Series  # Times of testing observations.
+        data: pd.Series,
+        test: pd.Series
     ) -> pd.Series:
         """
         Purges test observations in the training set.
-        Reference: De Prado, M. (2018) Advances in Financial Machine Learning.
-        Methodology: page 106, snippet 7.1
+        
+        .. math:: \\text{Not applicable.}
+        
+        :param data: Times of entire observations
+        :param test: Times of testing observations
+        :return: Purged train times
         """
-        train_times = data.copy(deep=True)  # get a deep copy of train times
+        train_times = data.copy(deep=True)
 
         for start, end in test.iteritems():
-            start_within_test_times = train_times[(start <= train_times.index) & (train_times.index <= end)].index  # get times when train starts within test
-            end_within_test_times = train_times[(start <= train_times) & (train_times <= end)].index  # get times when train ends within test
-            envelope_test_times = train_times[(train_times.index <= start) & (end <= train_times)].index  # get times when train envelops test
-            train_times = train_times.drop(start_within_test_times.union(end_within_test_times).union(envelope_test_times))  # purge observations
+            mask = ((start <= train_times.index) & (train_times.index <= end)) | \
+                   ((start <= train_times) & (train_times <= end)) | \
+                   ((train_times.index <= start) & (end <= train_times))
+
+            train_times = train_times.loc[~mask]
 
         return train_times
 
     @staticmethod
     def embargo_times(
-        times: pd.Series,  # Entire observation times
-        percent_embargo: float  # Embargo size percentage divided by 100
+        times: pd.Series,
+        percent_embargo: float
     ) -> pd.Series:
         """
         Gets embargo time for each bar.
-        Reference: De Prado, M. (2018) Advances in Financial Machine Learning.
-        Methodology: page 108, snippet 7.2
+        
+        .. math:: \\text{Not applicable.}
+        
+        :param times: Entire observation times
+        :param percent_embargo: Embargo size percentage divided by 100
+        :return: Series of embargo times
         """
-        step = int(times.shape[0] * percent_embargo)  # find the number of embargo bars
+        step = int(times.shape[0] * percent_embargo)
 
         if step == 0:
-            embargo = pd.Series(times, index=times)  # do not perform embargo when the step equals zero
-        else:
-            embargo = pd.Series(times[step:], index=times[:-step])  # find the embargo time for each time
-            embargo = embargo.append(pd.Series(times[-1], index=times[-step:]))  # find the embargo time for the last "step" number of bars and join all embargo times
+            return pd.Series(times, index=times)
+
+        embargo = pd.Series(times[step:], index=times[:-step])
+        embargo = embargo.append(pd.Series(times[-1], index=times[-step:]))
 
         return embargo
 
     @staticmethod
     def cross_validation_score(
-        classifier: ClassifierMixin,  # A classifier model
-        data: pd.DataFrame,  # The sample that is going be split,
-        labels: pd.Series = None,  # The labels that are going be split
-        sample_weight: np.ndarray = None,  # The sample weights for the classifier
-        scoring: str = 'neg_log_loss',  # Scoring type: ['neg_log_loss','accuracy']
-        times: pd.Series = None,  # Entire observation times
-        n_splits: int = None,  # The number of KFold splits,
-        cross_validation_generator: BaseCrossValidator = None,
-        percent_embargo: float = 0.0  # Embargo size percentage divided by 100:
-    ) -> np.array:
+        classifier: ClassifierMixin,
+        data: pd.DataFrame,
+        labels: Optional[pd.Series] = None,
+        sample_weight: Optional[np.ndarray] = None,
+        scoring: str = 'neg_log_loss',
+        times: Optional[pd.Series] = None,
+        n_splits: Optional[int] = None,
+        cross_validation_generator: Optional[BaseCrossValidator] = None,
+        percent_embargo: float = 0.0
+    ) -> np.ndarray:
         """
-        Uses the PurgedKFold class and functions to perform cross-validation.
-        Reference: De Prado, M. (2018) Advances in Financial Machine Learning.
-        Methodology: page 110, snippet 7.4
+        Uses the CrossValidationModel to perform cross-validation.
+        
+        .. math:: \\text{Scoring can be either negative log loss or accuracy.}
+
+        :param classifier: A classifier model
+        :param data: The sample to be split
+        :param labels: The labels to be split
+        :param sample_weight: The sample weights for the classifier
+        :param scoring: Scoring type: ['neg_log_loss','accuracy']
+        :param times: Entire observation times
+        :param n_splits: Number of KFold splits
+        :param cross_validation_generator: Cross-validation generator
+        :param percent_embargo: Embargo size percentage divided by 100
+        :return: Array of scores
         """
-        if scoring not in ['neg_log_loss', 'accuracy']:  # check if the scoring method is correct
-            raise Exception('wrong scoring method.')  # raise error
+        if scoring not in ['neg_log_loss', 'accuracy']:
+            raise Exception('Invalid scoring method.')
 
-        if cross_validation_generator is None:  # check if the PurgedKFold is nothing
-            cross_validation_generator = CrossValidationModel(n_splits=n_splits, times=times, percent_embargo=percent_embargo)  # initialize
+        if cross_validation_generator is None:
+            cross_validation_generator = CrossValidationModel(
+                n_splits=n_splits, times=times, percent_embargo=percent_embargo
+            )
 
-        if sample_weight is None:  # check if the sample_weight is nothing
-            sample_weight = pd.Series(np.ones(len(data)))  # initialize
+        if sample_weight is None:
+            sample_weight = np.ones(len(data))
 
-        scores = []  # initialize scores
+        scores = []
 
         for train, test in cross_validation_generator.purged_kfold_split(data):
-            fit = classifier.fit(X=data.iloc[train, :], y=labels.iloc[train],
-                                  sample_weight=sample_weight[train])  # fit model
+            fit = classifier.fit(
+                X=data.iloc[train, :],
+                y=labels.iloc[train],
+                sample_weight=sample_weight[train]
+            )
 
             if scoring == 'neg_log_loss':
-                prob = fit.predict_proba(data.iloc[test, :])  # predict test
-                score = -log_loss(labels.iloc[test], prob,
-                                  sample_weight=sample_weight.iloc[test].values, labels=classifier.classes_)  # calculate score
+                probabilities = fit.predict_proba(data.iloc[test, :])
+                score = -log_loss(
+                    labels.iloc[test],
+                    probabilities,
+                    sample_weight=sample_weight[test],
+                    labels=classifier.classes_
+                )
             else:
-                pred = fit.predict(data.iloc[test, :])  # predict test
-                score = accuracy_score(labels.iloc[test], pred, sample_weight=sample_weight.iloc[test].values)  # calculate score
+                predictions = fit.predict(data.iloc[test, :])
+                score = accuracy_score(
+                    labels.iloc[test],
+                    predictions,
+                    sample_weight=sample_weight[test]
+                )
 
-            scores.append(score)  # append score
+            scores.append(score)
 
         return np.array(scores)
