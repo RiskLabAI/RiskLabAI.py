@@ -1,12 +1,10 @@
+from sklearn.model_selection import KFold
 import pandas as pd
 import numpy as np
-from itertools import combinations
-from cross_validator import CrossValidator
 
-class CombinatorialPurgedKFold(CrossValidator):
+class PurgedKFold(KFold):
     """
-    Extends the CrossValidator class to prevent information leakage in the presence of overlapping samples,
-    while also generating combinatorial training and test splits.
+    Extends the KFold class to prevent information leakage in the presence of overlapping samples.
 
     Reference: De Prado, M. (2018) Advances in Financial Machine Learning
     Methodology: page 109, snippet 7.3
@@ -19,7 +17,7 @@ class CombinatorialPurgedKFold(CrossValidator):
             percent_embargo: float = 0.0
     ):
         """
-        Initialize the CombinatorialPurgedKFold class with the number of splits, times, and embargo percentage.
+        Initialize the PurgedKFold class with the number of splits, times, and embargo percentage.
 
         :param int n_splits: Number of KFold splits.
         :param pd.Series times: Series representing the entire observation times.
@@ -65,8 +63,4 @@ class CombinatorialPurgedKFold(CrossValidator):
             if max_test_idx + embargo_size < data.shape[0]:
                 train_indices = np.concatenate((train_indices, indices[max_test_idx + embargo_size:]))
 
-            # Generate combinatorial training sets by adding one more element to the existing train set.
-            for i in range(len(train_indices) - 1):
-                combo_train_indices = list(combinations(train_indices, i + 1))
-                for each_combo_train_indices in combo_train_indices:
-                    yield each_combo_train_indices, test_indices
+            yield train_indices, test_indices
