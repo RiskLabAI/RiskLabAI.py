@@ -1,48 +1,74 @@
-from sklearn.model_selection import KFold
+from cross_validator_interface import CrossValidator
+from typing import Iterator, Tuple, Union
 import pandas as pd
 import numpy as np
 
-class PurgedKFold(KFold):
+class PurgedKFold(CrossValidator):
     """
-    Extends the KFold class to prevent information leakage in the presence of overlapping samples.
+    Extends the CrossValidator interface to prevent information leakage in the presence of overlapping samples.
 
     Reference: De Prado, M. (2018) Advances in Financial Machine Learning
     Methodology: page 109, snippet 7.3
+
+    Methods
+    -------
+    split(
+        data: pd.DataFrame,
+        labels: Union[None, pd.Series] = None,
+        groups: Union[None, pd.Series] = None
+    ) -> Iterator[Tuple[np.ndarray, np.ndarray]]
+        Yields the indices for the training and test data.
     """
 
     def __init__(
             self, 
-            n_splits: int = 3,
-            times: pd.Series = None, 
-            percent_embargo: float = 0.0
+            n_splits: int,
+            times: pd.Series, 
+            percent_embargo: float
     ):
         """
         Initialize the PurgedKFold class with the number of splits, times, and embargo percentage.
 
-        :param int n_splits: Number of KFold splits.
-        :param pd.Series times: Series representing the entire observation times.
-        :param float percent_embargo: Embargo size as a percentage divided by 100.
+        Parameters
+        ----------
+        n_splits : int
+            Number of KFold splits.
+        times : pd.Series
+            Series representing the entire observation times.
+        percent_embargo : float
+            Embargo size as a percentage divided by 100.
         """
-        if not isinstance(times, pd.Series):
-            raise ValueError('Label through dates must be a pandas Series')
-
-        super().__init__(n_splits, shuffle=False, random_state=None)
+        self.n_splits = n_splits
         self.times = times
         self.percent_embargo = percent_embargo
 
     def split(
             self, 
             data: pd.DataFrame, 
-            labels: pd.Series = None, 
-            groups = None
-    ):
+            labels: Union[None, pd.Series] = None,
+            groups: Union[None, pd.Series] = None
+    ) -> Iterator[Tuple[np.ndarray, np.ndarray]]:
         """
         Generate indices to split data into training and test set.
 
-        :param pd.DataFrame data: The sample data that is going to be split.
-        :param pd.Series labels: The labels that are going to be split.
-        :param groups: Group labels for the samples used while splitting the dataset.
-        :yield: Indices for training and test data.
+        Parameters
+        ----------
+        data : pd.DataFrame
+            The sample data that is going to be split.
+        labels : Union[None, pd.Series], optional
+            The labels that are going to be split, by default None
+        groups : Union[None, pd.Series], optional
+            Group labels for the samples used while splitting the dataset, by default None
+
+        Returns
+        -------
+        Iterator[Tuple[np.ndarray, np.ndarray]]
+            Yields the indices for the training and test data.
+
+        .. note:: 
+            This implementation respects time series structures, ensuring that the training set 
+            does not include any data "from the future" (i.e., data that would have been unknown
+            at the time the model was trained).
         """
         if (data.index == self.times.index).sum() != len(self.times):
             raise ValueError('Data and through date values must have the same index')
