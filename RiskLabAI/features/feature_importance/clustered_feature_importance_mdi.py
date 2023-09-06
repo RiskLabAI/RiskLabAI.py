@@ -1,5 +1,3 @@
-# clustered_feature_importance_mdi.py
-
 from feature_importance_strategy import FeatureImportanceStrategy
 import pandas as pd
 import numpy as np

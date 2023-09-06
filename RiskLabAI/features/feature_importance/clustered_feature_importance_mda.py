@@ -9,14 +9,17 @@ class FeatureImportanceStrategy:
         pass
 
 class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
-    def calculate_importance(self, 
-                              classifier: RandomForestClassifier,
-                              x: pd.DataFrame,
-                              y: pd.Series,
-                              clusters: Dict[str, List[str]],
-                              n_splits: int = 10,
-                              score_sample_weights: List[float] = None,
-                              train_sample_weights: List[float] = None) -> pd.DataFrame:
+    def calculate_importance(
+            self, 
+            classifier: RandomForestClassifier,
+            x: pd.DataFrame,
+            y: pd.Series,
+            clusters: Dict[str, List[str]],
+            n_splits: int = 10,
+            score_sample_weights: List[float] = None,
+            train_sample_weights: List[float] = None
+        ) -> pd.DataFrame:
+        
         if train_sample_weights is None:
             train_sample_weights = np.ones(x.shape[0])
         if score_sample_weights is None:
