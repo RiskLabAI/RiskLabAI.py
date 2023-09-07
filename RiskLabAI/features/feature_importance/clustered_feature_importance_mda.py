@@ -2,24 +2,25 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import log_loss
 
-from FeatureImportanceStrategy import FeatureImportanceStrategy
+from feature_importance_strategy import FeatureImportanceStrategy
 
-class FeatureImportanceStrategy:
-    def calculate_importance(self, *args, **kwargs) -> pd.DataFrame:
-        pass
+from typing import Dict, Tuple, List
+
+import numpy as np
+import pandas as pd
+
 
 class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
-    def calculate_importance(
-            self, 
-            classifier: RandomForestClassifier,
-            x: pd.DataFrame,
-            y: pd.Series,
-            clusters: Dict[str, List[str]],
-            n_splits: int = 10,
-            score_sample_weights: List[float] = None,
-            train_sample_weights: List[float] = None
-        ) -> pd.DataFrame:
-        
+    def compute(
+        self,
+        classifier: RandomForestClassifier,
+        x: pd.DataFrame,
+        y: pd.Series,
+        clusters: Dict[str, List[str]],
+        n_splits: int = 10,
+        score_sample_weights: List[float] = None,
+        train_sample_weights: List[float] = None,
+    ) -> pd.DataFrame:
         if train_sample_weights is None:
             train_sample_weights = np.ones(x.shape[0])
         if score_sample_weights is None:
@@ -37,12 +38,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
             fit = classifier.fit(X=x0, y=y0, sample_weight=weights0)
             prediction_probability = fit.predict_proba(x1)
 
-            score0[i] = -log_loss(
-                y1,
-                prediction_probability,
-                labels=classifier.classes_,
-                sample_weight=weights1
-            )
+            score0[i] = -log_loss(y1, prediction_probability, labels=classifier.classes_, sample_weight=weights1)
 
             for j in score1.columns:
                 x1_ = x1.copy(deep=True)
@@ -52,12 +48,11 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
                 score1.loc[i, j] = -log_loss(y1, prob, labels=classifier.classes_)
 
         importances = (-1 * score1).add(score0, axis=0)
-        importances /= (-1 * score1)
+        importances /= -1 * score1
 
-        importances = pd.concat({
-            "Mean": importances.mean(),
-            "StandardDeviation": importances.std() * importances.shape[0] ** -0.5
-        }, axis=1)  # Central Limit Theorem
+        importances = pd.concat(
+            {"Mean": importances.mean(), "StandardDeviation": importances.std() * importances.shape[0] ** -0.5}, axis=1
+        )  # Central Limit Theorem
 
         importances.index = ["C_" + str(i) for i in importances.index]
         return importances
