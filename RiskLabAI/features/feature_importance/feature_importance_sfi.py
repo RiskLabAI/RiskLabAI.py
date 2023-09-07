@@ -1,16 +1,41 @@
-from feature_importance_strategy import (
-    FeatureImportanceStrategy,
-)  # Assuming the abstract class is in the same directory
+from feature_importance_strategy import FeatureImportanceStrategy
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
 from sklearn.model_selection import KFold
+from typing import List, Optional, Union
 
 
 class FeatureImportanceSFI(FeatureImportanceStrategy):
+    """
+    Computes the Single Feature Importance (SFI).
+
+    The method calculates the importance of each feature by evaluating its performance 
+    individually in the classifier.
+
+    """
+
     def __init__(
-        self, classifier, x, y, n_splits=10, score_sample_weights=None, train_sample_weights=None, scoring="log_loss"
-    ):
+            self,
+            classifier: object,
+            x: pd.DataFrame,
+            y: Union[pd.Series, List[Optional[float]]],
+            n_splits: int = 10,
+            score_sample_weights: Optional[List[float]] = None,
+            train_sample_weights: Optional[List[float]] = None,
+            scoring: str = "log_loss"
+    ) -> None:
+        """
+        Initialize the class with parameters.
+
+        :param classifier: The classifier object.
+        :param x: The feature data.
+        :param y: The target data.
+        :param n_splits: The number of splits for cross-validation.
+        :param score_sample_weights: Sample weights for scoring.
+        :param train_sample_weights: Sample weights for training.
+        :param scoring: Scoring method ("log_loss" or "accuracy").
+        """
         self.classifier = classifier
         self.features = x
         self.labels = y
@@ -20,6 +45,11 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
         self.scoring = scoring
 
     def compute(self) -> pd.DataFrame:
+        """
+        Compute the Single Feature Importance.
+
+        :return: Feature importances as a dataframe with "FeatureName", "Mean", and "StandardDeviation" columns.
+        """
         if self.train_sample_weights is None:
             self.train_sample_weights = np.ones(self.features.shape[0])
         if self.score_sample_weights is None:
@@ -27,7 +57,7 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
 
         cv_generator = KFold(n_splits=self.n_splits)
         feature_names = self.features.columns
-        importances = pd.DataFrame(columns=["FeatureName", "Mean", "StandardDeviation"])
+        importances = []
 
         for feature_name in feature_names:
             scores = []
@@ -63,13 +93,10 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
 
                 scores.append(score)
 
-            importances = importances.append(
-                {
-                    "FeatureName": feature_name,
-                    "Mean": np.mean(scores),
-                    "StandardDeviation": np.std(scores, ddof=1) * len(scores) ** -0.5,
-                },
-                ignore_index=True,
-            )
+            importances.append({
+                "FeatureName": feature_name,
+                "Mean": np.mean(scores),
+                "StandardDeviation": np.std(scores, ddof=1) * len(scores) ** -0.5,
+            })
 
-        return importances
+        return pd.DataFrame(importances)
