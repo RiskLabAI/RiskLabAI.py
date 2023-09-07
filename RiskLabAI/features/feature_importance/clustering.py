@@ -5,6 +5,7 @@ from sklearn.metrics import silhouette_samples
 from scipy.linalg import block_diag
 from sklearn.utils import check_random_state
 
+
 def covariance_to_correlation(covariance: np.ndarray) -> np.ndarray:
     """
     Derive the correlation matrix from a covariance matrix.
@@ -23,9 +24,8 @@ def covariance_to_correlation(covariance: np.ndarray) -> np.ndarray:
     correlation[correlation < -1], correlation[correlation > 1] = -1, 1
     return correlation
 
-def cluster_kmeans_base(correlation: pd.DataFrame,
-                        number_clusters: int = 10,
-                        iterations: int = 10) -> tuple:
+
+def cluster_kmeans_base(correlation: pd.DataFrame, number_clusters: int = 10, iterations: int = 10) -> tuple:
     """
     Apply the K-means clustering algorithm.
 
@@ -56,9 +56,8 @@ def cluster_kmeans_base(correlation: pd.DataFrame,
     silh = pd.Series(silh, index=distance.index)
     return correlation_sorted, clusters, silh
 
-def make_new_outputs(correlation: pd.DataFrame,
-                     clusters: dict,
-                     clusters2: dict) -> tuple:
+
+def make_new_outputs(correlation: pd.DataFrame, clusters: dict, clusters2: dict) -> tuple:
     """
     Merge two sets of clusters and derive new outputs.
 
@@ -86,9 +85,8 @@ def make_new_outputs(correlation: pd.DataFrame,
     silh_new = pd.Series(silhouette_samples(distance, labels_kmeans), index=distance.index)
     return correlation_new, clusters_new, silh_new
 
-def cluster_kmeans_top(correlation: pd.DataFrame,
-                       number_clusters: int = None,
-                       iterations: int = 10) -> tuple:
+
+def cluster_kmeans_top(correlation: pd.DataFrame, number_clusters: int = None, iterations: int = 10) -> tuple:
     """
     Apply the K-means clustering algorithm with hierarchical re-clustering.
 
@@ -105,7 +103,9 @@ def cluster_kmeans_top(correlation: pd.DataFrame,
     """
     if number_clusters is None:
         number_clusters = correlation.shape[1] - 1
-    correlation_sorted, clusters, silh = cluster_kmeans_base(correlation, min(number_clusters, correlation.shape[1] - 1), iterations)
+    correlation_sorted, clusters, silh = cluster_kmeans_base(
+        correlation, min(number_clusters, correlation.shape[1] - 1), iterations
+    )
     cluster_tstats = {i: np.mean(silh[clusters[i]]) / np.std(silh[clusters[i]]) for i in clusters.keys()}
     tstat_mean = sum(cluster_tstats.values()) / len(cluster_tstats)
     redo_clusters = [i for i in cluster_tstats.keys() if cluster_tstats[i] < tstat_mean]
@@ -115,24 +115,27 @@ def cluster_kmeans_top(correlation: pd.DataFrame,
         keys_redo = [j for i in redo_clusters for j in clusters[i]]
         correlation_temp = correlation.loc[keys_redo, keys_redo]
         tstat_mean = np.mean([cluster_tstats[i] for i in redo_clusters])
-        correlation_sorted2, clusters2, silh2 = cluster_kmeans_top(correlation_temp, min(number_clusters, correlation_temp.shape[1] - 1), iterations)
-        correlation_new, clusters_new, silh_new = make_new_outputs(correlation, {i: clusters[i] for i in clusters.keys() if i not in redo_clusters}, clusters2)
-        new_tstat_mean = np.mean([np.mean(silh_new[clusters_new[i]]) / np.std(silh_new[clusters_new[i]]) for i in clusters_new.keys()])
+        correlation_sorted2, clusters2, silh2 = cluster_kmeans_top(
+            correlation_temp, min(number_clusters, correlation_temp.shape[1] - 1), iterations
+        )
+        correlation_new, clusters_new, silh_new = make_new_outputs(
+            correlation, {i: clusters[i] for i in clusters.keys() if i not in redo_clusters}, clusters2
+        )
+        new_tstat_mean = np.mean(
+            [np.mean(silh_new[clusters_new[i]]) / np.std(silh_new[clusters_new[i]]) for i in clusters_new.keys()]
+        )
         if new_tstat_mean <= tstat_mean:
             return correlation_sorted, clusters, silh
         else:
             return correlation_new, clusters_new, silh_new
 
+
 import numpy as np
 from scipy.linalg import block_diag
 from sklearn.utils import check_random_state
 
-def random_covariance_sub(
-    number_observations: int,
-    number_columns: int,
-    sigma: float,
-    random_state=None
-) -> np.ndarray:
+
+def random_covariance_sub(number_observations: int, number_columns: int, sigma: float, random_state=None) -> np.ndarray:
     """
     Compute a sub covariance matrix.
 
@@ -158,11 +161,7 @@ def random_covariance_sub(
 
 
 def random_block_covariance(
-    number_columns: int,
-    number_blocks: int,
-    block_size_min: int = 1,
-    sigma: float = 1.0,
-    random_state=None
+    number_columns: int, number_blocks: int, block_size_min: int = 1, sigma: float = 1.0, random_state=None
 ) -> np.ndarray:
     """
     Compute a random block covariance matrix.
@@ -180,18 +179,16 @@ def random_block_covariance(
        Methodology: Snipet 4.3, Page 61.
     """
     domain = check_random_state(random_state)
-    parts = domain.choice(range(1, number_columns - (block_size_min - 1) * number_blocks),
-                          number_blocks - 1, replace=False)
+    parts = domain.choice(
+        range(1, number_columns - (block_size_min - 1) * number_blocks), number_blocks - 1, replace=False
+    )
     parts.sort()
     parts = np.append(parts, number_columns - (block_size_min - 1) * number_blocks)
     parts = np.append(parts[0], np.diff(parts)) - 1 + block_size_min
     cov = None
     for column in parts:
         this_covariance = random_covariance_sub(
-            int(max(column * (column + 1) / 2.0, 100)),
-            column,
-            sigma,
-            random_state=domain
+            int(max(column * (column + 1) / 2.0, 100)), column, sigma, random_state=domain
         )  # sub covariance
         if cov is None:
             cov = this_covariance.copy()  # copy covariance matrix
@@ -206,11 +203,9 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
 from sklearn.utils import check_random_state
 
+
 def random_block_correlation(
-    number_columns: int,
-    number_blocks: int,
-    random_state=None,
-    block_size_min: int = 1
+    number_columns: int, number_blocks: int, random_state=None, block_size_min: int = 1
 ) -> pd.DataFrame:
     """
     Compute a random block correlation matrix.
@@ -228,16 +223,17 @@ def random_block_correlation(
        Methodology: Snipet 4.3, Page 61.
     """
     domain = check_random_state(random_state)
-    covariance1 = random_block_covariance(number_columns, number_blocks,
-                                          block_size_min=block_size_min, sigma=0.5,
-                                          random_state=domain)
-    covariance2 = random_block_covariance(number_columns, 1,
-                                          block_size_min=block_size_min, sigma=1.0,
-                                          random_state=domain)
+    covariance1 = random_block_covariance(
+        number_columns, number_blocks, block_size_min=block_size_min, sigma=0.5, random_state=domain
+    )
+    covariance2 = random_block_covariance(
+        number_columns, 1, block_size_min=block_size_min, sigma=1.0, random_state=domain
+    )
     covariance1 += covariance2
     correlation = cov_to_corr(covariance1)
     correlation = pd.DataFrame(correlation)
     return correlation
+
 
 def cov_to_corr(covariance: np.ndarray) -> np.ndarray:
     """
@@ -255,10 +251,9 @@ def cov_to_corr(covariance: np.ndarray) -> np.ndarray:
     correlation[correlation > 1] = 1
     return correlation
 
+
 def cluster_kmeans_base(
-    correlation: pd.DataFrame,
-    number_clusters: int = 10,
-    iterations: int = 10
+    correlation: pd.DataFrame, number_clusters: int = 10, iterations: int = 10
 ) -> (pd.DataFrame, dict, pd.Series):
     """
     Perform KMeans clustering on a correlation matrix.
@@ -288,13 +283,11 @@ def cluster_kmeans_base(
     correlation_sorted = correlation.iloc[index_sorted]
     correlation_sorted = correlation_sorted.iloc[:, index_sorted]
 
-    clusters = {
-        i: correlation.columns[np.where(kmeans.labels_ == i)[0]].tolist()
-        for i in np.unique(kmeans.labels_)
-    }
+    clusters = {i: correlation.columns[np.where(kmeans.labels_ == i)[0]].tolist() for i in np.unique(kmeans.labels_)}
 
     silh = pd.Series(silh, index=distance.index)
     return correlation_sorted, clusters, silh
+
 
 # Example usage:
 if __name__ == "__main__":
