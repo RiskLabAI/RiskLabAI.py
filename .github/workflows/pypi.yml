@@ -29,3 +29,5 @@ jobs:
       run: |
         python3 -m build
         twine upload dist/*
+        echo ${{ secrets.PYPI_TOKEN }} > .pypitoken
+        # Your publish script here, using .pypitoken where needed
