@@ -24,7 +24,7 @@ jobs:
         pip install setuptools wheel twine build
     - name: Build and publish
       env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERS }}
+        TWINE_USERNAME: __token__
       run: |
         python3 -m build
         twine upload dist/*
