@@ -1,1 +1,1 @@
-from . import *
+from .structural_breaks import *
