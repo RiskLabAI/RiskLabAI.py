@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 import pandas as pd
 import numpy as np
 
-from cross_validator_interface import CrossValidator
+from .cross_validator_interface import CrossValidator
 
 class PurgedKFold(CrossValidator):
 
