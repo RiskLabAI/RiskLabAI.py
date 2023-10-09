@@ -38,7 +38,7 @@ def symmetric_cusum_filter(
     return pd.DatetimeIndex(time_events)
 
 
-def aggregate_ohlcv(tick_data_grouped: pd.GroupBy) -> pd.DataFrame:
+def aggregate_ohlcv(tick_data_grouped) -> pd.DataFrame:
     """
     Aggregates tick data into OHLCV bars.
 
