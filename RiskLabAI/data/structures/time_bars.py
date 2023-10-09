@@ -3,7 +3,7 @@ from typing import Union
 
 import numpy as np
 
-from model.abstract_bars import AbstractBars
+from data.structures.abstract_bars import AbstractBars
 
 
 class TimeBars(AbstractBars):

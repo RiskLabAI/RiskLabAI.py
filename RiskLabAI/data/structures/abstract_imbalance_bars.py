@@ -1,4 +1,4 @@
-from model.abstract_information_driven_bars import *
+from data.structures.abstract_information_driven_bars import *
 from utils.constants import *
 
 

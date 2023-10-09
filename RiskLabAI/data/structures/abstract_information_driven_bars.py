@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from utils.ewma import ewma
-from model.abstract_bars import AbstractBars
+from data.structures.abstract_bars import AbstractBars
 from utils.constants import *
 
 
