@@ -3,7 +3,7 @@ from typing import Union
 
 import numpy as np
 
-from RiskLabAI.structures.abstract_bars import AbstractBars
+from RiskLabAI.data.structures.abstract_bars import AbstractBars
 
 
 class TimeBars(AbstractBars):
