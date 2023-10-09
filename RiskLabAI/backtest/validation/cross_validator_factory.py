@@ -1,9 +1,9 @@
 from typing import Type
 import pandas as pd
-from kfold import KFold
-from purged_kfold import PurgedKFold
-from combinatorial_purged import CombinatorialPurged
-from cross_validator_interface import CrossValidator
+from .kfold import KFold
+from .purged_kfold import PurgedKFold
+from .combinatorial_purged import CombinatorialPurged
+from .cross_validator_interface import CrossValidator
 
 class CrossValidatorFactory:
     """
