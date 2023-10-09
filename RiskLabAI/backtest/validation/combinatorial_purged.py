@@ -7,7 +7,7 @@ from collections import ChainMap, defaultdict
 from joblib import Parallel, delayed
 from math import comb
 
-from purged_kfold import PurgedKFold
+from .purged_kfold import PurgedKFold
 
 class CombinatorialPurged(PurgedKFold):
     """
