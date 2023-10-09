@@ -2,7 +2,7 @@ import imp
 
 import numpy as np
 import pandas as pd 
-from HPC import mpPandasObj
+from RiskLabAI.hpc import *
 from scipy.stats import norm
 
 """----------------------------------------------------------------------
