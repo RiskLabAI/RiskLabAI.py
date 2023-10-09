@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import block_diag
 from sklearn.covariance import LedoitWolf
 from sklearn.neighbors._kde import KernelDensity
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 
 def marcenko_pastur_pdf(
