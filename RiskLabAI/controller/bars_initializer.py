@@ -2,10 +2,10 @@ from typing import Tuple, Union
 
 import pandas as pd
 
-from RiskLabAI.structures.imbalance_bars import ExpectedImbalanceBars, FixedImbalanceBars
-from RiskLabAI.structures.run_bars import ExpectedRunBars, FixedRunBars
-from RiskLabAI.structures.standard_bars import StandardBars
-from RiskLabAI.structures.time_bars import TimeBars
+from RiskLabAI.data.structures.imbalance_bars import ExpectedImbalanceBars, FixedImbalanceBars
+from RiskLabAI.data.structures.run_bars import ExpectedRunBars, FixedRunBars
+from RiskLabAI.data.structures.standard_bars import StandardBars
+from RiskLabAI.data.structures.time_bars import TimeBars
 
 from utils.constants import CUMULATIVE_DOLLAR, CUMULATIVE_VOLUME, CUMULATIVE_TICKS
 

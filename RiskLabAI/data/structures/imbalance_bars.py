@@ -2,7 +2,7 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from RiskLabAI.structures.abstract_imbalance_bars import AbstractImbalanceBars
+from RiskLabAI.data.structures.abstract_imbalance_bars import AbstractImbalanceBars
 from utils.constants import *
 from utils.ewma import ewma
 
