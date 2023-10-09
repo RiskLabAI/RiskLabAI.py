@@ -3,7 +3,7 @@ from typing import Union, Iterable, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ..data.structures.abstract_run_bars import AbstractRunBars
+from RiskLabAI.structures.abstract_run_bars import AbstractRunBars
 from utils.ewma import ewma
 
 from utils.constants import *
