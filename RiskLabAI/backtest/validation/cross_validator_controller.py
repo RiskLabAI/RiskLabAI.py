@@ -1,5 +1,5 @@
 #%%
-from cross_validator_factory import CrossValidatorFactory
+from .cross_validator_factory import CrossValidatorFactory
 
 class CrossValidatorController:
     """
