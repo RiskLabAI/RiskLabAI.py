@@ -2,7 +2,7 @@ from typing import Union
 
 import numpy as np
 
-from ..data.structures.abstract_bars import AbstractBars
+from RiskLabAI.structures.abstract_bars import AbstractBars
 
 
 class StandardBars(AbstractBars):

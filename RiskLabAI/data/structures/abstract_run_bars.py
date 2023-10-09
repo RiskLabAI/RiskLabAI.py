@@ -1,4 +1,4 @@
-from ..data.structures.abstract_information_driven_bars import *
+from RiskLabAI.structures.abstract_information_driven_bars import *
 from utils.constants import *
 
 
