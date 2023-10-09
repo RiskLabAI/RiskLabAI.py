@@ -148,7 +148,6 @@ def cluster_k_means_top(
 
 import numpy as np
 import pandas as pd
-from numpy.random import check_random_state
 from scipy.linalg import block_diag
 
 
