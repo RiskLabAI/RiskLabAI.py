@@ -8,7 +8,7 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from utils.constants import *
+from RiskLabAI.utils.constants import *
 
 
 class AbstractBars(ABC):
