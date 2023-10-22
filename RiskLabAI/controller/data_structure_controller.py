@@ -4,9 +4,9 @@ from typing import Iterable, Optional, Generator, Union
 
 import pandas as pd
 
-from controller.bars_initializer import BarsInitializerController
+from RiskLabAI.controller.bars_initializer import BarsInitializerController
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
-from utils.constants import (
+from RiskLabAI.utils.constants import (
     DATE_TIME, TICK_NUMBER, OPEN_PRICE, HIGH_PRICE,
     LOW_PRICE, CLOSE_PRICE, CUMULATIVE_VOLUME,
     CUMULATIVE_BUY_VOLUME, CUMULATIVE_SELL_VOLUME,

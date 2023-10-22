@@ -1,7 +1,8 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import log_loss
-from feature_importance_strategy import FeatureImportanceStrategy
+# from feature_importance_strategy import FeatureImportanceStrategy
+from RiskLabAI.features.feature_importance_strategy import FeatureImportanceStrategy
 from typing import Dict, Tuple, List
 import numpy as np
 import pandas as pd

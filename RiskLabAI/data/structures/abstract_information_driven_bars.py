@@ -9,9 +9,9 @@ from typing import Tuple, Union, Generator, Iterable, Optional
 import numpy as np
 import pandas as pd
 
-from utils.ewma import ewma
+from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
-from utils.constants import *
+from RiskLabAI.utils.constants import *
 
 
 class AbstractInformationDrivenBars(AbstractBars):

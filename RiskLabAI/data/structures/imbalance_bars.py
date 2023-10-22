@@ -3,8 +3,8 @@ from typing import Tuple, Union
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_imbalance_bars import AbstractImbalanceBars
-from utils.constants import *
-from utils.ewma import ewma
+from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.ewma import ewma
 
 
 class ExpectedImbalanceBars(AbstractImbalanceBars):
