@@ -1,5 +1,5 @@
 from RiskLabAI.data.structures.abstract_information_driven_bars import *
-from utils.constants import *
+from RiskLabAI.utils.constants import *
 
 
 class AbstractImbalanceBars(AbstractInformationDrivenBars):

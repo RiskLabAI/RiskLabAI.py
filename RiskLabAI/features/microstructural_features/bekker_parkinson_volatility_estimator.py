@@ -1,6 +1,7 @@
 from math import pi
 import pandas as pd
-from CorwinSchultz import beta_estimates, gamma_estimates
+from RiskLabAI.features.microstructural_features.corwin_schultz import beta_estimates, gamma_estimates
+
 
 def sigma_estimates(
     beta: pd.Series,

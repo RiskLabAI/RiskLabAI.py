@@ -7,7 +7,7 @@ from RiskLabAI.data.structures.run_bars import ExpectedRunBars, FixedRunBars
 from RiskLabAI.data.structures.standard_bars import StandardBars
 from RiskLabAI.data.structures.time_bars import TimeBars
 
-from utils.constants import CUMULATIVE_DOLLAR, CUMULATIVE_VOLUME, CUMULATIVE_TICKS
+from RiskLabAI.utils.constants import CUMULATIVE_DOLLAR, CUMULATIVE_VOLUME, CUMULATIVE_TICKS
 
 
 class BarsInitializerController:

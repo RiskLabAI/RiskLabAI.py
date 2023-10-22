@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 
 from RiskLabAI.data.structures.abstract_run_bars import AbstractRunBars
-from utils.ewma import ewma
+from RiskLabAI.utils.ewma import ewma
 
-from utils.constants import *
+from RiskLabAI.utils.constants import *
 
 
 class ExpectedRunBars(AbstractRunBars):
