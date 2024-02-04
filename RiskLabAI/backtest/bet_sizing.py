@@ -1,9 +1,79 @@
 import imp
-
 import numpy as np
 import pandas as pd 
+from numba import jit
 from RiskLabAI.hpc import *
 from scipy.stats import norm
+
+def probability_bet_size(
+    probabilities: np.ndarray,
+    sides: np.ndarray
+) -> np.ndarray:
+    """
+    Calculate the bet size based on probabilities and side.
+
+    :param probabilities: array of probabilities
+    :param sides: array indicating the side of the bet (e.g., long/short or buy/sell)
+    :return: array of bet sizes
+
+    .. math::
+
+       \text{bet size} = \text{side} \times (2 \times \text{CDF}(\text{probabilities}) - 1)
+    """
+    return sides * (2 * norm.cdf(probabilities) - 1)
+
+@jit(nopython=True)
+def average_bet_sizes(
+    price_dates: np.ndarray,
+    start_dates: np.ndarray,
+    end_dates: np.ndarray,
+    bet_sizes: np.ndarray
+) -> np.ndarray:
+    """
+    Compute average bet sizes for each date.
+
+    :param price_dates: array of price dates
+    :param start_dates: array of start dates for bets
+    :param end_dates: array of end dates for bets
+    :param bet_sizes: array of bet sizes for each date range
+    :return: array of average bet sizes for each price date
+    """
+    num_dates = len(price_dates)
+    avg_bet_sizes = np.zeros(num_dates)
+    
+    for i in range(num_dates):
+        total = 0
+        count = 0
+        for j in range(len(start_dates)):
+            if start_dates[j] <= price_dates[i] <= end_dates[j]:
+                total += bet_sizes[j]
+                count += 1
+        if count > 0:
+            avg_bet_sizes[i] = total / count
+            
+    return avg_bet_sizes
+
+def strategy_bet_sizing(
+    price_timestamps: pd.Series,
+    times: pd.Series,
+    sides: pd.Series,
+    probabilities: pd.Series
+) -> pd.Series:
+    """
+    Calculate the average bet size for a trading strategy given price timestamps.
+
+    :param price_timestamps: series of price timestamps
+    :param times: series with start times as indices and end times as values
+    :param sides: series indicating the side of the position (e.g., long/short)
+    :param probabilities: series of probabilities associated with each position
+    :return: series of average bet sizes for each price timestamp
+    """
+    
+    bet_sizes = probability_bet_size(probabilities.to_numpy(), sides.to_numpy())
+    
+    avg_bet_sizes = average_bet_sizes(price_timestamps.to_numpy(), times.index.to_numpy(), times.values, bet_sizes)
+
+    return pd.Series(avg_bet_sizes, index=price_timestamps)
 
 """----------------------------------------------------------------------
     function: Calculation of Average Active Signals 
