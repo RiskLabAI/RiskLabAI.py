@@ -4,6 +4,41 @@ from scipy import stats
 from statsmodels.stats import stattools
 import multiprocessing as mp
 
+def cusum_filter_events_dynamic_threshold(
+        prices: pd.Series,
+        threshold: pd.Series
+) -> pd.DatetimeIndex:
+    """
+    Detect events using the Symmetric Cumulative Sum (CUSUM) filter.
+
+    The Symmetric CUSUM filter is a change-point detection algorithm used to identify events where the price difference
+    exceeds a predefined threshold.
+
+    :param prices: A pandas Series of prices.
+    :param threshold: A pandas Series containing the predefined threshold values for event detection.
+    :return: A pandas DatetimeIndex containing timestamps of detected events.
+
+    References:
+    - De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons. (Methodology: 39)
+    """
+    time_events, shift_positive, shift_negative = [], 0, 0
+    price_delta = prices.diff().dropna()
+    thresholds = threshold.copy()
+    price_delta, thresholds = price_delta.align(thresholds, join="inner", copy=False)
+
+    for (index, value), threshold_ in zip(price_delta.to_dict().items(), thresholds.to_dict().values()):
+        shift_positive = max(0, shift_positive + value)
+        shift_negative = min(0, shift_negative + value)
+
+        if shift_negative < -threshold_:
+            shift_negative = 0
+            time_events.append(index)
+
+        elif shift_positive > threshold_:
+            shift_positive = 0
+            time_events.append(index)
+
+    return pd.DatetimeIndex(time_events)
 
 def symmetric_cusum_filter(
         prices: pd.Series,
@@ -36,6 +71,8 @@ def symmetric_cusum_filter(
             time_events.append(i)
 
     return pd.DatetimeIndex(time_events)
+
+
 
 
 def aggregate_ohlcv(tick_data_grouped) -> pd.DataFrame:
