@@ -3,21 +3,21 @@ import pandas as pd
 from typing import List, Series, DataFrame
 
 def expand_label_for_meta_labeling(
-    close_index: pd.DataFrame,
-    timestamp: pd.DataFrame,
+    close_index: pd.Index,
+    timestamp: pd.Series,
     molecule: pd.Index
 ) -> pd.Series:
     """
-    Expand label to incorporate meta-labeling.
+    Expand labels for meta-labeling.
 
-    This function expands the label to incorporate meta-labeling by taking
-    a DataFrame with events, another DataFrame with the return and label of each period,
-    and an Index to apply the function on. It then returns a Series with the count
+    This function expands labels to incorporate meta-labeling by taking
+    an event Index, a Series with the return and label of each period,
+    and an Index specifying the molecules to apply the function to. It then returns a Series with the count
     of events spanning a bar for each molecule.
 
-    :param close_index: DataFrame that has events.
-    :param timestamp: DataFrame that has return and label of each period.
-    :param molecule: Index that function must apply on it.
+    :param event_index: Index of events.
+    :param return_label_dataframe: Series containing returns and labels of each period.
+    :param molecule_index: Index specifying molecules to apply the function on.
     :return: Series with the count of events spanning a bar for each molecule.
     """
     timestamp = timestamp.fillna(close_index[-1])
@@ -26,7 +26,7 @@ def expand_label_for_meta_labeling(
     iloc = close_index.searchsorted(np.array([timestamp.index[0], timestamp.max()]))
     count = pd.Series(0, index=close_index[iloc[0]:iloc[1] + 1])
 
-    for t_in, t_out in timestamp.iteritems():
+    for t_in, t_out in timestamp.items():
         count.loc[t_in:t_out] += 1
 
     return count.loc[molecule[0]:timestamp[molecule].max()]
@@ -134,6 +134,31 @@ def calculate_sample_weight_absolute_return(
         weight.loc[t_in] = (return_.loc[t_in:t_out] / concurrency_events.loc[t_in:t_out]).sum()
 
     return weight.abs()
+
+def sample_weight_absolute_return_meta_labeling(
+    timestamp: pd.Series,
+    price: pd.Series,
+    molecule: pd.Index
+) -> pd.Series:
+    """
+    Calculate sample weights using absolute returns.
+
+    :param event_timestamps: Series containing event timestamps.
+    :param price_series: Series containing prices.
+    :param molecule_index: Index for the calculation.
+    :return: Series of sample weights.
+    """
+    concurrency_events = expand_label_for_meta_labeling(price.index, timestamp, molecule)
+
+    return_ = np.log(price).diff()
+    weight = pd.Series(index=molecule, dtype=float)
+
+    for t_in, t_out in timestamp.loc[weight.index].items():
+        weight.loc[t_in] = (return_.loc[t_in:t_out] / concurrency_events.loc[t_in:t_out]).sum()
+
+    weight = weight.abs()
+
+    return weight * len(weight) / weight.sum()
 
 def calculate_time_decay(
     weight: pd.Series,
