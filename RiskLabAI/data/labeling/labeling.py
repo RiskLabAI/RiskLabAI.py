@@ -233,7 +233,7 @@ def get_barrier_touch_time(close: pd.Series,
     return events
 
 
-def get_vertical_barrier(
+def vertical_barrier(
     close: pd.Series,
     time_events: pd.DatetimeIndex,
     number_days: int
@@ -270,7 +270,7 @@ def get_labels(events: pd.DataFrame,
     out['bin'] = np.sign(out['ret'])
     return out
 
-def get_meta_events(
+def meta_events(
     close: pd.Series,
     time_events: pd.DatetimeIndex,
     ptsl: list,
