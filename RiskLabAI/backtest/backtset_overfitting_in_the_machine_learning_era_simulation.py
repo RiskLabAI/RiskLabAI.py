@@ -5,7 +5,7 @@ from scipy import stats as ss
 import ta
 import itertools
 import warnings
-from typing import Dict, Union, Tuple, List
+from typing import Dict, Union, Tuple, List, Any
 
 from RiskLabAI.data.differentiation import fractionally_differentiated_log_price
 from RiskLabAI.data.labeling import daily_volatility_with_log_returns, cusum_filter_events_dynamic_threshold, vertical_barrier, meta_events, meta_labeling
@@ -14,38 +14,27 @@ from RiskLabAI.utils import determine_strategy_side
 from RiskLabAI.backtest.validation import CrossValidatorController
 from RiskLabAI.backtest import probability_of_backtest_overfitting, probabilistic_sharpe_ratio, benchmark_sharpe_ratio, sharpe_ratio, strategy_bet_sizing
 
-def backtset_overfitting_simulation(
+def backtest_overfitting_simulation(
     prices: pd.Series, 
-    strategy_parameters: Dict[str, Union[int, float, list]],
-    models: Dict[str, Dict[str, any]],
+    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
+    models: Dict[str, Dict[str, Any]],
     step_risk_free_rate: float,
     overfitting_partitions_length: int,
 ) -> Tuple[Dict[str, List[float]], Dict[str, List[float]]]:
     """
-    Perform a backtest overfitting simulation for evaluating advanced statistical models and machine learning techniques in financial analytics.
+    Conducts a simulation to evaluate the performance of trading strategies and models, assessing the risk of overfitting.
 
-    This research addresses the need for robust model evaluation and out-of-sample testing methodologies in quantitative finance, specifically tailored to financial markets. It explores the integration of advanced data-driven methods, contrasting with traditional approaches. The analysis considers the unique characteristics of financial data, including non-stationarity, autocorrelation, and regime shifts.
-
-    The function presents a comprehensive framework to assess these methods, emphasizing the Combinatorial Purged (CPCV) method's superiority in mitigating overfitting risks. CPCV outperforms traditional methods like K-Fold, Purged K-Fold, and Walk-Forward, as evidenced by its lower Probability of Backtest Overfitting (PBO) and superior Deflated Sharpe Ratio (DSR) Test Statistic. In contrast, Walk-Forward exhibits shortcomings in false discovery prevention, characterized by increased temporal variability and weaker stationarity.
-
-    The analysis highlights CPCV's stability and efficiency, confirming its reliability for financial strategy development. Additionally, it suggests caution in choosing between Purged K-Fold and K-Fold due to their comparable performance and potential impact on training data robustness in out-of-sample testing.
-
-    The research utilizes a Synthetic Controlled Environment, incorporating advanced models like Heston Stochastic Volatility, Merton Jump Diffusion, and Drift-Burst Hypothesis, alongside regime-switching models, for a nuanced simulation of market conditions. This approach offers new insights into evaluating cross-validation techniques.
-
-    The study underscores the necessity of specialized validation methods in financial modeling, addressing growing regulatory demands and complex market dynamics. It bridges theoretical and practical finance, offering a fresh outlook on financial model validation.
-
-    In conclusion, this function enhances the reliability and applicability of financial models in decision-making by highlighting the significance of advanced cross-validation techniques like CPCV.
+    This function simulates a trading environment to assess various cross-validation methods in the context of financial analytics. It uses a set of market regime parameters and machine learning models to backtest trading strategies and compute metrics indicative of overfitting.
 
     Args:
-    - prices (pd.Series): A pandas Series containing price data.
-    - strategy_parameters (Dict): A dictionary containing parameters for the trading strategy.
-    - models (Dict): A dictionary of machine learning models to be tested.
-    - step_risk_free_rate (float): The risk-free rate used for probabilistic Sharpe ratio calculation.
-    - overfitting_partitions_length (int): The length of partitions for overfitting analysis.
+        prices (pd.Series): Time series of asset prices.
+        strategy_parameters (dict): Parameters dictating trading strategy behavior, including window sizes and flags for mean reversion.
+        models (dict): A collection of machine learning models and their associated parameters.
+        step_risk_free_rate (float): The risk-free rate used in the simulation for Sharpe ratio calculations.
+        overfitting_partitions_length (int): The number of partitions to divide the dataset into for temporal overfitting analysis.
 
     Returns:
-    - cv_pbo (Dict): Dictionary containing Probability of Backtest Overfitting (PBO) values for different cross-validation methods.
-    - cv_deflated_sr (Dict): Dictionary containing deflated Sharpe Ratios for different cross-validation methods.
+        Tuple[Dict[str, List[float]], Dict[str, List[float]]]: A tuple containing two dictionaries, one for the Probability of Backtest Overfitting (PBO) and the other for the Deflated Sharpe Ratio (DSR), for each cross-validation method tested.
     """
 
     fd_log_price = fractionally_differentiated_log_price(prices)
