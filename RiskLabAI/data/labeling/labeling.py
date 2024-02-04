@@ -93,12 +93,34 @@ def compute_daily_volatility(
 
     return pd.concat([returns, stds], axis=1)
 
+def daily_volatility_with_log_returns(
+        close: pd.Series,
+        span: int = 100
+) -> pd.Series:
+    """
+    Calculate the daily volatility at intraday estimation points using Exponentially Weighted Moving Average (EWMA).
+
+    :param close: A pandas Series of daily close prices.
+    :param span: The span parameter for the Exponentially Weighted Moving Average (EWMA).
+    :return: A pandas Series containing daily volatilities.
+
+    References:
+    - De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons. (Methodology: Page 44)
+    """
+    df = close.index.searchsorted(close.index - pd.Timedelta(days=1))
+    df = df[df > 0]
+    df = pd.Series(close.index[df - 1], index=close.index[close.shape[0] - df.shape[0]:])
+    returns = np.log(close.loc[df.index] / close.loc[df.values].values)
+    stds = returns.ewm(span=span).std().rename("std")
+
+    return stds
 
 def triple_barrier(
-        close: pd.Series,
-        events: pd.DataFrame,
-        profit_taking_stop_loss: list[float, float],
-        molecule: list) -> pd.DataFrame:
+    close: pd.Series,
+    events: pd.DataFrame,
+    profit_taking_stop_loss: list[float, float],
+    molecule: list
+) -> pd.DataFrame:
     """
     Implements the triple-barrier method.
 
@@ -112,21 +134,21 @@ def triple_barrier(
     - De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons. (Methodology: Page 45)
     """
     events_filtered = events.loc[molecule]
-    output = events_filtered[['timestamp']].copy(deep=True)
+    output = events_filtered[['End Time']].copy(deep=True)
 
     if profit_taking_stop_loss[0] > 0:
-        profit_taking = profit_taking_stop_loss[0] * events_filtered['target']
+        profit_taking = profit_taking_stop_loss[0] * events_filtered['Base Width']
     else:
         profit_taking = pd.Series(index=events.index)
 
     if profit_taking_stop_loss[1] > 0:
-        stop_loss = -profit_taking_stop_loss[1] * events_filtered['target']
+        stop_loss = -profit_taking_stop_loss[1] * events_filtered['Base Width']
     else:
         stop_loss = pd.Series(index=events.index)
 
-    for location, timestamp in events_filtered['timestamp'].fillna(close.index[-1]).iteritems():
+    for location, timestamp in events_filtered['End Time'].fillna(close.index[-1]).items():
         df = close[location:timestamp]
-        df = (df / close[location] - 1) * events_filtered.at[location, 'side']
+        df = np.log(df / close[location]) * events_filtered.at[location, 'Side']
         output.loc[location, 'stop_loss'] = df[df < stop_loss[location]].index.min()
         output.loc[location, 'profit_taking'] = df[df > profit_taking[location]].index.min()
 
@@ -174,12 +196,14 @@ def get_barrier_touch_time(close: pd.Series,
     return events
 
 
-def get_vertical_barrier(close: pd.Series, 
-                         time_events: pd.DatetimeIndex, 
-                         number_days: int) -> pd.Series:
+def get_vertical_barrier(
+    close: pd.Series,
+    time_events: pd.DatetimeIndex,
+    number_days: int
+) -> pd.Series:
     """
     Shows one way to define a vertical barrier.
-    
+
     :param close: A dataframe of prices and dates.
     :param time_events: A vector of timestamps.
     :param number_days: A number of days for the vertical barrier.
@@ -209,18 +233,19 @@ def get_labels(events: pd.DataFrame,
     out['bin'] = np.sign(out['ret'])
     return out
 
-
-def get_meta_events(close: pd.Series, 
-                    time_events: pd.DatetimeIndex, 
-                    ptsl: list, 
-                    target: pd.Series, 
-                    return_min: float, 
-                    num_threads: int, 
-                    timestamp: pd.Series = False, 
-                    side: pd.Series = None) -> pd.DataFrame:
+def get_meta_events(
+    close: pd.Series,
+    time_events: pd.DatetimeIndex,
+    ptsl: list,
+    target: pd.Series,
+    return_min: float,
+    num_threads: int,
+    timestamp: pd.Series = False,
+    side: pd.Series = None
+) -> pd.DataFrame:
     """
     Expand events to incorporate meta-labeling.
-    
+
     :param close: A dataframe of prices and dates.
     :param time_events: A vector of timestamps.
     :param ptsl: A list of two non-negative float values that multiply the target.
@@ -242,18 +267,32 @@ def get_meta_events(close: pd.Series,
     else:
         side_position, profit_loss = side.loc[target.index], ptsl[:2]
 
-    events = pd.concat({'timestamp': timestamp, 'target': target, 'side': side_position}, axis=1).dropna(subset=['target'])
-    
-    with ProcessPoolExecutor(num_threads) as executor:
-        df0 = list(executor.map(triple_barrier, [(close, events.loc[molecule], profit_loss) for molecule in np.array_split(events.index, num_threads)]))
+    events = pd.concat({'End Time': timestamp, 'Base Width': target, 'Side': side_position}, axis=1).dropna(subset=['Base Width'])
+    if num_threads > 1:
+        with ProcessPoolExecutor(num_threads) as executor:
+            df0 = list(executor.map(
+                triple_barrier,
+                [close] * num_threads,
+                [events] * num_threads,
+                [profit_loss] * num_threads,
+                list(np.array_split(time_events, num_threads))
+            ))
+    else:
+        df0 = list(map(
+            triple_barrier,
+            [close] * num_threads,
+            [events] * num_threads,
+            [profit_loss] * num_threads,
+            list(np.array_split(time_events, num_threads))
+        ))        
     df0 = pd.concat(df0, axis=0)
-    
-    events['timestamp'] = df0.dropna(how='all').min(axis=1)
+
+    events['End Time'] = df0.dropna(how='all').min(axis=1)
 
     if side is None:
-        events = events.drop('side', axis=1)
+        events = events.drop('Side', axis=1)
     return events
-
+        
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
@@ -262,8 +301,9 @@ import time
 import sys
 
 def meta_labeling(
-        events: pd.DataFrame,
-        close: pd.Series) -> pd.DataFrame:
+    events: pd.DataFrame,
+    close: pd.Series
+) -> pd.DataFrame:
     """
     Expands label to incorporate meta-labeling.
 
@@ -275,18 +315,19 @@ def meta_labeling(
     De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
     Methodology: 51
     """
-    events_filtered = events.dropna(subset=['timestamp'])
-    all_dates = events_filtered.index.union(events_filtered['timestamp'].values).drop_duplicates()
+    events_filtered = events.dropna(subset=['End Time'])
+    all_dates = events_filtered.index.union(events_filtered['End Time'].values).drop_duplicates()
     close_filtered = close.reindex(all_dates, method='bfill')
     out = pd.DataFrame(index=events_filtered.index)
-    out['ret'] = close_filtered.loc[events_filtered['timestamp'].values].values / close_filtered.loc[events_filtered.index] - 1
-    if 'side' in events_filtered:
-        out['ret'] *= events_filtered['side']
-    out['bin'] = np.sign(out['ret'])
-    if 'side' in events_filtered:
-        out.loc[out['ret'] <= 0, 'bin'] = 0
+    out['End Time'] = events['End Time']
+    out['Return'] = close_filtered.loc[events_filtered['End Time'].values].values / close_filtered.loc[events_filtered.index] - 1
+    if 'Side' in events_filtered:
+        out['Return'] *= events_filtered['Side']
+    out['Label'] = np.sign(out['Return'])
+    if 'Side' in events_filtered:
+        out.loc[out['Return'] <= 0, 'Label'] = 0
+        out['Side'] = events_filtered['Side']
     return out
-
 
 def drop_label(
         events: pd.DataFrame,
