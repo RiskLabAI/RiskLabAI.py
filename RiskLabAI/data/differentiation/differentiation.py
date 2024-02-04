@@ -136,6 +136,35 @@ def fractional_difference_fixed(
         result_dict[name] = result_series.copy(deep=True)
     return pd.concat(result_dict, axis=1)
 
+def fractional_difference_fixed_single(
+        series: pd.Series,
+        degree: float,
+        threshold: float = 1e-5
+) -> pd.DataFrame:
+    """
+    Compute the fixed-width window fractionally differentiated series.
+
+    :param series: Series of dates and prices.
+    :param degree: Degree of the binomial series.
+    :param threshold: Threshold for weight-loss.
+    :return: Fractionally differentiated series.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 83.
+    """
+    weights = calculate_weights_ffd(degree, threshold)
+    width = len(weights) - 1
+    series_filtered = series.fillna(method='ffill').dropna()
+    result_series = pd.Series(dtype="float64", index=series.index)
+    for iloc in range(width, series_filtered.shape[0]):
+        day1 = series_filtered.index[iloc - width]
+        day2 = series_filtered.index[iloc]
+        if not np.isfinite(series.loc[day2]):
+            continue
+        result_series[day2] = np.dot(weights.T, series_filtered.loc[day1:day2])[0]
+
+    return result_series
+
 def minimum_ffd(
         input_series: pd.DataFrame
 ) -> pd.DataFrame:
@@ -242,3 +271,34 @@ def minimum_adf_degree(
         adf_result = adfuller(differentiated['close'], maxlag=1, regression='c', autolag=None)
         output.loc[d] = list(adf_result[:4]) + [adf_result[4]['5%']] + [corr]
     return output
+
+def fractionally_differentiated_log_price(
+    input_series: pd.Series,
+    threshold=0.01,
+    step=0.1,
+    base_p_value=0.05
+) -> float:
+    """
+    Calculate the fractionally differentiated log price with the minimum degree differentiation
+    that passes the Augmented Dickey-Fuller (ADF) test.
+
+    :param input_series: Time series of input data.
+    :param threshold: The threshold for fractionally differentiating the log price.
+    :param step: The increment step for adjusting the differentiation degree.
+    :param base_p_value: The significance level for the ADF test.
+    :return: Fractionally differentiated log price series.
+
+    Methodology reference:
+        De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons, p. 85.
+    """
+    log_price = np.log(input_series)
+    degree = -step
+    p_value = 1
+
+    while p_value > base_p_value:
+        degree += step
+        differentiated = fractional_difference_fixed_single(log_price, degree, threshold=threshold)
+        adf_test = adfuller(differentiated.dropna(), maxlag=1, regression='c', autolag=None)
+        p_value = adf_test[1]
+
+    return differentiated
