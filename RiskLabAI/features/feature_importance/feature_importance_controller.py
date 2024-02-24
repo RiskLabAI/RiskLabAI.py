@@ -1,5 +1,6 @@
-from feature_importance_factory import FeatureImportanceFactory
-from RiskLabAI.features.feature_importance_factory import FeatureImportanceFactory
+#from feature_importance_factory import FeatureImportanceFactory
+
+from RiskLabAI.features.feature_importance.feature_importance_factory import FeatureImportanceFactory
 
 
 class FeatureImportanceController:

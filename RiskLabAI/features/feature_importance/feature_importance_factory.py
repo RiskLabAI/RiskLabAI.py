@@ -1,5 +1,5 @@
 # from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance_strategy import FeatureImportanceStrategy
+from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
 
 from typing import Optional
 import pandas as pd
