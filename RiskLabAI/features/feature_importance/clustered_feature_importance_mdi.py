@@ -1,5 +1,5 @@
 # from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance_strategy import FeatureImportanceStrategy
+from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier

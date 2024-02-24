@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import List, Series, DataFrame
+#from typing import List, Series, DataFrame
 
 def expand_label_for_meta_labeling(
     close_index: pd.Index,
@@ -87,7 +87,7 @@ def calculate_average_uniqueness(index_matrix: pd.DataFrame) -> pd.Series:
 def perform_sequential_bootstrap(
     index_matrix: pd.DataFrame,
     sample_length: int
-) -> List[int]:
+) -> list:
     """
     Perform sequential bootstrap to generate a sample.
 

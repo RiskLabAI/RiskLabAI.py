@@ -2,7 +2,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
-from RiskLabAI.utilities import compute_thresholds, create_ohlcv_dataframe
+from RiskLabAI.data.structures.utilities_lopez import compute_thresholds, create_ohlcv_dataframe
 
 def generate_information_driven_bars(
     tick_data: pd.DataFrame,

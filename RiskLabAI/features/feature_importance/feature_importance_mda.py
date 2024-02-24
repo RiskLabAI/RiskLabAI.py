@@ -1,5 +1,5 @@
 # from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance_strategy import FeatureImportanceStrategy
+from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss

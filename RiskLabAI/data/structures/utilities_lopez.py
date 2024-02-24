@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import time
 from typing import List, Tuple
-from RiskLabAI.utils import exponential_weighted_moving_average, progress_bar
+from RiskLabAI.utils.smoothing_average import compute_exponential_weighted_moving_average
+from RiskLabAI.utils.progress import  progress_bar
 
 
 def compute_thresholds(
@@ -65,11 +66,11 @@ def compute_thresholds(
             time_deltas.append(time_delta)
             times.append(i)
             previous_time = i
-            expected_ticks = exponential_weighted_moving_average(
+            expected_ticks = compute_exponential_weighted_moving_average(
                 np.array(time_deltas), window_length=np.int64(len(time_deltas))
             )[-1]
             expected_bar_value = np.abs(
-                exponential_weighted_moving_average(
+                compute_exponential_weighted_moving_average(
                     target_column_values[:i], window_length=np.int64(initial_expected_ticks)
                 )[-1]
             )
