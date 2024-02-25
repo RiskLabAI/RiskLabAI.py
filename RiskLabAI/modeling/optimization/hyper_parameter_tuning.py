@@ -3,10 +3,7 @@ import pandas as pd
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import BaggingClassifier
 from sklearn.pipeline import Pipeline
-
-# Import the required package for PurgedKFold
-# Note: You must install or have the mlfinlab package which provides the PurgedKFold class
-from mlfinlab.cross_validation import PurgedKFold
+from RiskLabAI.backtest.validation import CrossValidatorController
 
 
 class MyPipeline(Pipeline):
@@ -38,14 +35,14 @@ class MyPipeline(Pipeline):
 def clf_hyper_fit(
     feature_data: pd.DataFrame,
     label: pd.DataFrame,
-    time: float,
+    times: pd.Series,
     pipe_clf: Pipeline,
     param_grid: dict,
-    cv: int = 3,
+    validator_type: str = 'purgedkfold',
+    validator_params: dict = None,
     bagging: list = [0, -1, 1.],
     rnd_search_iter: int = 0,
     n_jobs: int = -1,
-    percent_embargo: int = 0,
     **fit_params
 ) -> MyPipeline:
     """
@@ -53,14 +50,14 @@ def clf_hyper_fit(
 
     :param feature_data: Data of features.
     :param label: Labels of data.
-    :param time: Observation time.
+    :param times: The timestamp series associated with the labels.
     :param pipe_clf: Our estimator.
     :param param_grid: Parameter space.
-    :param cv: Number of groups for cross validation, defaults to 3.
+    :param validator_type: Type of cross-validator to create.
+    :param validator_params: Additional keyword arguments to be passed to the cross-validator's constructor.
     :param bagging: Bagging type, defaults to [0, -1, 1.].
     :param rnd_search_iter: Number of iterations for randomized search, defaults to 0.
     :param n_jobs: Number of jobs for parallel processing, defaults to -1.
-    :param percent_embargo: Percent of embargo, defaults to 0.
     :param **fit_params: Additional fit parameters.
     :return: Fitted pipeline.
     """
@@ -69,8 +66,19 @@ def clf_hyper_fit(
     else:
         scoring = 'neg_log_loss'  # Symmetric towards all cases
 
+    if validator_params is None:
+        validator_params = {
+            'times' : times,
+            'n_splits' : 5,
+            'embargo' : 0.01,
+        }
+
     # Hyperparameter search on train data
-    inner_cv = PurgedKFold(n_splits=cv, times=time, percent_embargo=percent_embargo)  # Purged
+    inner_cv =  CrossValidatorController(
+        validator_type,
+        **validator_params
+    ).cross_validator
+    
     if rnd_search_iter == 0:
         gs = GridSearchCV(estimator=pipe_clf, param_grid=param_grid, scoring=scoring, cv=inner_cv, n_jobs=n_jobs)
     else:
