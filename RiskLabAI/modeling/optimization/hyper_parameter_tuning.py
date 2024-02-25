@@ -3,7 +3,8 @@ import pandas as pd
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import BaggingClassifier
 from sklearn.pipeline import Pipeline
-from RiskLabAI.backtest.validation import CrossValidatorController
+
+from RiskLabAI.backtest.validation.cross_validator_controller import CrossValidatorController
 
 
 class MyPipeline(Pipeline):
