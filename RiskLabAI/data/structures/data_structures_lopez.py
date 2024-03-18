@@ -3,6 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 from typing import Tuple
+from RiskLabAI.data.structures.utilities_lopez import *
 
 def progress_bar(
     value: int,
