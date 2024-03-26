@@ -60,7 +60,7 @@ class BarsInitializerController:
             initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
             window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
             expected_ticks_number_bounds=expected_ticks_number_bounds,
-            analyze_thresholds=analyze_thresholds
+            analyse_thresholds=analyze_thresholds
         )
 
     @staticmethod
