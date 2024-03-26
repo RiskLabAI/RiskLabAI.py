@@ -46,7 +46,7 @@ def calculate_sample_weight(
     """
     weight = pd.Series(index=molecule)
 
-    for t_in, t_out in timestamp.loc[weight.index].iteritems():
+    for t_in, t_out in timestamp.loc[weight.index].items():
         weight.loc[t_in] = (1. / concurrency_events.loc[t_in:t_out]).mean()
 
     return weight

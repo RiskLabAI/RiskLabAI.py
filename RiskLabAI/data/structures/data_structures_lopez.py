@@ -94,8 +94,8 @@ def compute_grouping(
             times_delta.append(np.float64(i - time_prev))
             times.append(i)
             time_prev = i
-            expected_ticks = compute_ewma(np.array(times_delta), window_length=np.int64(len(times_delta)))[-1]
-            expected_bar_value = np.abs(compute_ewma(target_col[:i], window_length=np.int64(initial_expected_ticks))[0])
+            expected_ticks = ewma(np.array(times_delta), window_length=np.int64(len(times_delta)))[-1]
+            expected_bar_value = np.abs(ewma(target_col[:i], window_length=np.int64(initial_expected_ticks))[0])
 
         progress_bar(i, N, start_time)
 
@@ -126,7 +126,7 @@ def generate_information_driven_bars(
     elif bar_type == "tick":
         input_data = tick_data['label']
     elif bar_type == "dollar":
-        input_data = tick_data['dollars_labeled']
+        input_data = tick_data['dollarslabeled']
     else:
         raise ValueError("Invalid bar_type provided. Choose among 'tick', 'volume', 'dollar'.")
 
@@ -138,7 +138,7 @@ def generate_information_driven_bars(
     tick_grouped = tick_data.reset_index().assign(grouping_id=grouping_id)
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
 
-    ohlcv_dataframe = compute_ohlcv(tick_grouped.groupby('grouping_id'))
+    ohlcv_dataframe = ohlcv(tick_grouped.groupby('grouping_id'))
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe, thetas_absolute, thresholds
@@ -185,7 +185,7 @@ def generate_time_bar(
     :return: A DataFrame containing OHLCV data grouped by time.
     """
     tick_data_grouped = tick_data.groupby(pd.Grouper(freq=frequency))
-    ohlcv_dataframe = compute_ohlcv(tick_data_grouped)
+    ohlcv_dataframe = ohlcv(tick_data_grouped)
     return ohlcv_dataframe
 
 
@@ -211,7 +211,7 @@ def generate_tick_bar(
     tick_grouped = tick_data.reset_index().assign(grouping_id=lambda x: x.index // ticks_per_bar)
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
-    ohlcv_dataframe = compute_ohlcv(tick_data_grouped)
+    ohlcv_dataframe = ohlcv(tick_data_grouped)
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe
@@ -244,7 +244,7 @@ def generate_volume_bar(
     )
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
-    ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
+    ohlcv_dataframe = ohlcv(tick_data_grouped)
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe
@@ -279,7 +279,7 @@ def generate_dollar_bar(
     )
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']
     tick_data_grouped = tick_grouped.groupby('grouping_id')
-    ohlcv_dataframe = generate_ohlcv_data(tick_data_grouped)
+    ohlcv_dataframe = ohlcv(tick_data_grouped)
     ohlcv_dataframe.set_index(dates, drop=True, inplace=True)
 
     return ohlcv_dataframe
