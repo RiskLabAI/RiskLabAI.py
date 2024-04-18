@@ -45,36 +45,43 @@ class PurgedKFold(CrossValidator):
 
         indices_to_drop: Set[int] = set()
         embargo_length = int(len(data_info_range) * embargo_fraction)
+        sorted_test_time_range = test_time_range.sort_index().copy()
 
-        effective_test_time_range = test_time_range if not continous_test_times else pd.Series(test_time_range.iloc[-1], index=[test_time_range.index[0]])
-
-        if embargo_length == 0:
-            embargoed_data_info_range = pd.Series(test_time_range.values, index=test_time_range.values)
+        if not continous_test_times:
+            sorted_test_time_range = pd.DataFrame({
+                'start' : sorted_test_time_range.index,
+                'end' : sorted_test_time_range.values
+            })
+            # Identify where the new range starts immediately after or before the previous range ends
+            gaps = sorted_test_time_range['start'] > sorted_test_time_range['end'].shift(1)
+            # Cumulative sum to identify contiguous blocks
+            blocks = gaps.cumsum()
+            # Aggregate to find the min start and max end for each block
+            effective_test_time_range = sorted_test_time_range.groupby(blocks).agg({'start': 'min', 'end': 'max'})
+            effective_test_time_range = pd.Series(effective_test_time_range['end'].values, index=effective_test_time_range['start'])
 
         else:
-            effective_sample = data_info_range.loc[test_time_range.index.min():].copy().drop_duplicates()
+            effective_test_time_range = pd.Series(sorted_test_time_range.iloc[-1], index=[sorted_test_time_range.index[0]])
+
+        if embargo_length == 0:
+            embargoed_data_info_range = pd.Series(effective_test_time_range.values, index=effective_test_time_range.values)
+
+        else:
+            effective_sample = data_info_range.loc[effective_test_time_range.index.min():].copy().drop_duplicates()
             embargoed_data_info_range = pd.Series(effective_sample.values, index=effective_sample.values)
-            embargoed_data_info_range = embargoed_data_info_range.shift(-embargo_length).fillna(embargoed_data_info_range.values[-1]) 
+            embargoed_data_info_range = embargoed_data_info_range.shift(-embargo_length).fillna(embargoed_data_info_range.values[-1])   
 
-        for start_ix, end_ix in effective_test_time_range.items():
-            # Adding the embargo period
-            end_ix_embargoed = embargoed_data_info_range.loc[end_ix]
+        effective_ranges = pd.Series(embargoed_data_info_range.loc[effective_test_time_range].values, index=effective_test_time_range.index)
 
-            overlapping_start = data_info_range[
-                (start_ix <= data_info_range.index) & (data_info_range.index <= end_ix_embargoed)
-            ].index
+        for start_ix, end_ix_embargoed in effective_ranges.items():
 
-            overlapping_end = data_info_range[
-                (start_ix <= data_info_range) & (data_info_range <= end_ix_embargoed)
-            ].index
-
-            enveloping = data_info_range[
-                (data_info_range.index <= start_ix) & (end_ix_embargoed <= data_info_range)
-            ].index
-
-            indices_to_drop.update(overlapping_start)
-            indices_to_drop.update(overlapping_end)
-            indices_to_drop.update(enveloping)
+            indices_to_drop.update(
+                data_info_range[
+                    ((start_ix <= data_info_range.index) & (data_info_range.index <= end_ix_embargoed)) |
+                    ((start_ix <= data_info_range) & (data_info_range <= end_ix_embargoed)) |
+                    ((data_info_range.index <= start_ix) & (end_ix_embargoed <= data_info_range))
+                ].index
+            )
 
         return data_info_range.drop(indices_to_drop)
 
