@@ -1,18 +1,3 @@
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "RiskLabAI"  # Replace 'your_package_name' with the actual name of your package
-# version = "0.0.76"  # Specify your package version
-# description = "A brief description of your package"  # Provide a short description of what your package does
-# authors = [{ name = "Your Name", email = "your.email@example.com" }]  # Replace with your details
-dependencies = [
-    "quantecon",
-    "ta",
-    "numpy",
-    "pandas",
-    "statsmodels",
-    "scikit-learn",
-    "scipy"
-]
+requires = ['setuptools>=42']
+build-backend = 'setuptools.build_meta'
