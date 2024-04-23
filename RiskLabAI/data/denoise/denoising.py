@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.linalg import block_diag
+from scipy.optimize import minimize
 from sklearn.covariance import LedoitWolf
 from sklearn.neighbors._kde import KernelDensity
 from typing import Tuple, Union, Optional
@@ -339,7 +340,8 @@ def denoise_cov(
     """
     corr0 = cov_to_corr(cov0)
     eval0, evec0 = np.linalg.eigh(corr0)
-    emax0, var0 = find_max_eval(np.diag(eval0), q, bandwidth)
+    eval0 = np.diag(eval0)
+    emax0, var0 = find_max_eval(eval0, q, bandwidth)
     n_facts0 = eval0.shape[0] - np.diag(eval0)[::-1].searchsorted(emax0)
     corr1 = denoised_corr(eval0, evec0, n_facts0)
     cov1 = corr_to_cov(corr1, np.diag(cov0)**0.5)
