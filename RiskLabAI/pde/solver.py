@@ -26,7 +26,8 @@ class FBSDESolver:
             pde,
             layer_sizes,
             learning_rate,
-            solving_method
+            solving_method, 
+            device
     ):
         """
         Initializes the FBSDESolver.
@@ -41,16 +42,17 @@ class FBSDESolver:
         self.layer_size = layer_sizes
         self.learning_rate = learning_rate
         self.method = solving_method
+        self.device = device
         if solving_method == 'Monte-Carlo':
             self.solver = TimeDependentNetworkMonteCarlo(pde.dim, self.layer_size, pde.dim, pde.sigma)
         elif solving_method == 'Deep-Time-SetTransformer':
             self.solver = DeepTimeSetTransformer(1)
         elif solving_method == 'DTNN':
-            self.solver = TimeDependentNetwork(pde.dim, self.layer_size, pde.dim).to(device)
+            self.solver = TimeDependentNetwork(pde.dim, self.layer_size, pde.dim).to(self.device)
         elif solving_method == 'DeepBSDE':
             self.solver = []
             for i in range(self.pde.num_time_interval):
-              self.solver.append(DeepBSDE(layer_sizes).to(device))
+              self.solver.append(DeepBSDE(layer_sizes).to(self.device))
 
 
 
@@ -68,14 +70,14 @@ class FBSDESolver:
                      ):
 
       batch_size = y.size()[0]
-      y_terminal = torch.ones((batch_size,)).to(device) * init.to(device)
+      y_terminal = torch.ones((batch_size,)).to(self.device) * init.to(self.device)
 
-      coef = torch.ones((batch_size,)).to(device)
-      dw_coef = torch.zeros((batch_size,)).to(device)
+      coef = torch.ones((batch_size,)).to(self.device)
+      dw_coef = torch.zeros((batch_size,)).to(self.device)
       L1 = 0.0
       if self.method == 'Monte-Carlo':
           num_sample = 5000
-          primary_sample = torch.unsqueeze(torch.randn(size=[num_sample, self.pde.dim]), dim=0).to(device)
+          primary_sample = torch.unsqueeze(torch.randn(size=[num_sample, self.pde.dim]), dim=0).to(self.device)
       for z in range(self.pde.num_time_interval):
           S0 = y[:, :, z]
 
@@ -83,17 +85,17 @@ class FBSDESolver:
           if self.method == 'Monte-Carlo':
               ders = []
               time_length = (self.pde.num_time_interval - z) * self.pde.delta_t
-              current_state = torch.unsqueeze(S0, dim=1).to(device)
-              dw_sample = primary_sample * torch.tensor(np.sqrt(time_length)).to(device)
+              current_state = torch.unsqueeze(S0, dim=1).to(self.device)
+              dw_sample = primary_sample * torch.tensor(np.sqrt(time_length)).to(self.device)
               k = (1 + self.pde.mu_bar * time_length) * current_state + (self.pde.sigma * current_state * dw_sample)
               ddw = dw_sample
               means = torch.mean((self.pde.terminal_for_sample(k)), dim=1, keepdim=True)
               mins = torch.mean((self.pde.terminal_for_sample(k) - means) * ddw, dim=1) / torch.tensor(
-                  (self.pde.num_time_interval - z) * self.pde.delta_t).to(device)
-              ders = torch.tensor(mins).to(torch.float32).to(device)
+                  (self.pde.num_time_interval - z) * self.pde.delta_t).to(self.device)
+              ders = torch.tensor(mins).to(torch.float32).to(self.device)
               out1 = self.solver(t0, S0, ders)
           elif self.method == 'Deep-Time-SetTransformer':
-              t = torch.ones((batch_size, 1, 1)).to(device)
+              t = torch.ones((batch_size, 1, 1)).to(self.device)
               t0 = t * self.pde.delta_t * z
               S0 = S0.reshape(S0.size()[0], 100, 1).requires_grad_(True)
               out1 = self.solver(t0, S0)
@@ -109,7 +111,7 @@ class FBSDESolver:
                 out1 = self.solver[z](S0)
                 #out1 = torch.zeros((S0.size()[0] , self.pde.dim)).to(device)
               else :
-                out1 = init_grad * torch.ones((S0.size()[0] , self.pde.dim)).to(device)
+                out1 = init_grad * torch.ones((S0.size()[0] , self.pde.dim)).to(self.device)
                 #out1 = torch.zeros((S0.size()[0] , self.pde.dim)).to(device)
 
 
@@ -117,22 +119,22 @@ class FBSDESolver:
           else:
               print('Model type is not true')
 
-          samp = dw[:, :, z].to(device)
+          samp = dw[:, :, z].to(self.device)
 
           nsim = S0.size()[0]
-          interest_rate = torch.squeeze(self.pde.r_u(t0, S0, y_terminal, out1).to(device))
+          interest_rate = torch.squeeze(self.pde.r_u(t0, S0, y_terminal, out1).to(self.device))
           hz = self.pde.h_z(t0, S0, y_terminal, out1)
           if z > 0:
               dw_coef = dw_coef * (1 + interest_rate * self.pde.delta_t) + torch.squeeze(
                   torch.bmm(torch.unsqueeze(out1, 1), torch.unsqueeze(samp, 2))) + torch.squeeze(
-                  self.pde.h_z(t0, S0, y_terminal, out1)).to(device) * self.pde.delta_t
+                  self.pde.h_z(t0, S0, y_terminal, out1)).to(self.device) * self.pde.delta_t
           else:
               dw_coef = torch.squeeze(
                   torch.bmm(torch.unsqueeze(out1, 1), torch.unsqueeze(samp, 2))) + torch.squeeze(
-                  self.pde.h_z(t0, S0, y_terminal, out1)).to(device) * self.pde.delta_t
+                  self.pde.h_z(t0, S0, y_terminal, out1)).to(self.device) * self.pde.delta_t
           coef = coef * (1 + interest_rate * self.pde.delta_t)
           y_terminal = y_terminal * (1 + interest_rate * self.pde.delta_t) + torch.squeeze(
-              self.pde.h_z(t0, S0, y_terminal, out1).to(device)) * self.pde.delta_t + torch.squeeze(
+              self.pde.h_z(t0, S0, y_terminal, out1).to(self.device)) * self.pde.delta_t + torch.squeeze(
               torch.bmm(torch.unsqueeze(out1, 1), torch.unsqueeze(samp, 2)))
 
 
@@ -141,7 +143,7 @@ class FBSDESolver:
 
       payoff = self.pde.terminal(t0, S0)
 
-      coef = coef.to(device)
+      coef = coef.to(self.device)
 
 
 
@@ -152,7 +154,6 @@ class FBSDESolver:
             num_iterations,
             batch_size,
             init,
-            device,
             sample_size=None
     ):
         """
@@ -174,24 +175,24 @@ class FBSDESolver:
 
 
         torch.seed()
-        init_grad = (torch.zeros(1,self.pde.dim).to(device)).to(device).requires_grad_()
+        init_grad = (torch.zeros(1,self.pde.dim).to(self.device)).to(self.device).requires_grad_()
         if self.method != 'DeepBSDE':
           self.solver.train()
         else :
           for i in range(self.pde.num_time_interval):
             self.solver[i].train()
-          init =  (torch.ones(1).to(device) *init).to(device).requires_grad_()
-          init_grad = (torch.zeros(1,self.pde.dim).to(device)).to(device).requires_grad_()
+          init =  (torch.ones(1).to(self.device) *init).to(self.device).requires_grad_()
+          init_grad = (torch.zeros(1,self.pde.dim).to(self.device)).to(self.device).requires_grad_()
           init_opt = torch.optim.Adam([init],lr=0.1, betas=(0.9, 0.99))
           init_grad_opt = torch.optim.Adam([init_grad],lr=0.001, betas=(0.9, 0.99))
 
 
         dw_val, y_val = self.pde.sample(128)
         y_val = torch.tensor(y_val)
-        y_val = y_val.to(torch.float32).to(device)
+        y_val = y_val.to(torch.float32).to(self.device)
         dw_val = torch.tensor(dw_val).to(torch.float32)
-        dw_val = dw_val.to(device)
-        t_val = torch.ones((128, 1)).to(device)
+        dw_val = dw_val.to(self.device)
+        t_val = torch.ones((128, 1)).to(self.device)
 
 
         for j in range(num_iterations):
@@ -201,8 +202,8 @@ class FBSDESolver:
             y = torch.tensor(y)
             y = y.to(torch.float32)
             dw = torch.tensor(dw).to(torch.float32)
-            dw = dw.to(device)
-            t = torch.ones((batch_size, 1)).to(device)
+            dw = dw.to(self.device)
+            t = torch.ones((batch_size, 1)).to(self.device)
 
             self.optimizer.zero_grad()
             if self.method  == 'DeepBSDE' :
@@ -210,7 +211,7 @@ class FBSDESolver:
               init_grad_opt.zero_grad()
 
 
-            y = y.to(device)
+            y = y.to(self.device)
 
             loss,coef,dw_coef,payoff = self.compute_loss(y,dw,t,init , init_grad)
 
@@ -251,6 +252,7 @@ class FBSNNolver:
             pde,
             layer_sizes,
             learning_rate,
+            device
     ):
         """
         Initializes the FBSDESolver.
@@ -264,6 +266,7 @@ class FBSNNolver:
         self.pde = pde
         self.layer_size = layer_sizes
         self.learning_rate = learning_rate
+        self.device = device
 
 
 
@@ -278,9 +281,9 @@ class FBSNNolver:
                      init
     ):
       batch_size = y.size()[0]
-      y_terminal = torch.ones((batch_size,)).to(device) * init.to(device)
+      y_terminal = torch.ones((batch_size,)).to(self.device) * init.to(self.device)
 
-      y_terminal = y_terminal.to(device)
+      y_terminal = y_terminal.to(self.device)
       L1 = 0.0
       loss = 0
       for z in range(self.pde.num_time_interval):
@@ -300,13 +303,13 @@ class FBSNNolver:
           #out1 = torch.autograd.grad(self.solver(torch.cat((t0, x),dim = 1) ), x, torch.ones_like(self.solver(torch.cat((t0, x),dim = 1) )), create_graph=True, retain_graph=True)
           #print(torch.autograd.grad(outputs=torch.sum(out1[0]), inputs=self.solver.parameters(),create_graph=True, allow_unused=True)[0] )
 
-          samp = dw[:, :, z].to(device)
+          samp = dw[:, :, z].to(self.device)
 
           nsim = S0.size()[0]
-          interest_rate = torch.squeeze(self.pde.r_u(t0, S0, y_0, Z).to(device))
+          interest_rate = torch.squeeze(self.pde.r_u(t0, S0, y_0, Z).to(self.device))
           hz = self.pde.h_z(t0, S0, y_0, Z)
           y_1_hat = y_0 * (1 + interest_rate * self.pde.delta_t) + torch.squeeze(
-              self.pde.h_z(t0, S0, y_0, Z).to(device)) * self.pde.delta_t + torch.squeeze(
+              self.pde.h_z(t0, S0, y_0, Z).to(self.device)) * self.pde.delta_t + torch.squeeze(
               torch.bmm(torch.unsqueeze(Z, 1), torch.unsqueeze(samp, 2)))
           loss += torch.mean(torch.square(torch.squeeze(y_1_hat) - torch.squeeze(y_1)))
 
@@ -332,7 +335,6 @@ class FBSNNolver:
             num_iterations,
             batch_size,
             init,
-            device,
             sample_size=None
     ):
         """
@@ -351,16 +353,16 @@ class FBSNNolver:
         """
         losses = []
         inits = []
-        self.solver.to(device)
+        self.solver.to(self.device)
 
         torch.seed()
         self.solver.train()
         dw_val, y_val = self.pde.sample(128)
         y_val = torch.tensor(y_val)
-        y_val = y_val.to(torch.float32).to(device)
+        y_val = y_val.to(torch.float32).to(self.device)
         dw_val = torch.tensor(dw_val).to(torch.float32)
-        dw_val = dw_val.to(device)
-        t_val = torch.ones((128, 1)).to(device)
+        dw_val = dw_val.to(self.device)
+        t_val = torch.ones((128, 1)).to(self.device)
 
         for j in range(num_iterations):
             print(j + 1)
@@ -369,12 +371,12 @@ class FBSNNolver:
             y = torch.tensor(y)
             y = y.to(torch.float32)
             dw = torch.tensor(dw).to(torch.float32)
-            dw = dw.to(device)
-            t = torch.ones((batch_size, 1)).to(device)
+            dw = dw.to(self.device)
+            t = torch.ones((batch_size, 1)).to(self.device)
 
             self.optimizer.zero_grad()
 
-            y = y.to(device)
+            y = y.to(self.device)
 
             loss = self.compute_loss(y,dw,t,init)
             loss.backward()
