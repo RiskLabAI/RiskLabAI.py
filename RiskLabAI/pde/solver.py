@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.autograd as autograd
 import numpy as np
 
-
+from RiskLabAI.pde.model import *
+from RiskLabAI.pde.equation import *
 def initialize_weights(m: nn.Module) -> None:
     """
     Initializes the weights of the given module.
