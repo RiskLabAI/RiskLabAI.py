@@ -46,7 +46,7 @@ Each notebook will have one section (`#`) and several subsections (`##`), subsub
 
 ## Dataframes
 
-- No use of pandas. Use `DataFrames` and `TimeArray`.
+- In the Julia programming language: no use of pandas. Use `DataFrames` and `TimeArray`.
 
 ## Figures
 
