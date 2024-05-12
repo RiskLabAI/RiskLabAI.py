@@ -186,6 +186,3 @@ def limitPrice(targetPositionSize, #  target position size
 def getW(x, # divergence between the current market price and the forecast
          m): # bet size 
     return x**2*(1/m**(-2)-1)
-
-
-
