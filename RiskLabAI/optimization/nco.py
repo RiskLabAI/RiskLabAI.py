@@ -55,7 +55,8 @@ def get_optimal_portfolio_weights_nco(
     :return: Optimal portfolio weights using NCO algorithm.
     :rtype: numpy.ndarray
     """
-    correlation = covariance_to_correlation_matrix(pd.DataFrame(covariance))
+    covariance = pd.DataFrame(covariance)
+    correlation = covariance_to_correlation_matrix(covariance)
     if mu is not None:
         mu = pd.Series(mu[:, 0])
     if number_clusters is None:

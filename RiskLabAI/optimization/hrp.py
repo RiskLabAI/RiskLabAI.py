@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
 import yfinance as yf
+import random
 
 
 def inverse_variance_weights(covariance_matrix: pd.DataFrame) -> np.ndarray:
@@ -56,7 +57,7 @@ def quasi_diagonal(linkage_matrix: np.ndarray) -> list:
         j = dataframe.values - num_items
         sorted_items[i] = linkage_matrix[j, 0]
         dataframe = pd.Series(linkage_matrix[j, 1], index=i + 1)
-        sorted_items = sorted_items.append(dataframe)
+        sorted_items = sorted_items._append(dataframe)
         sorted_items = sorted_items.sort_index()
         sorted_items.index = range(sorted_items.shape[0])
 
@@ -166,7 +167,7 @@ def random_data(
     data = pd.DataFrame(data, columns=range(1, data.shape[1] + 1))
     return data, columns_correlated
 
-def random_data(
+def random_data2(
         number_observations: int,
         length_sample: int,
         size_uncorrelated: int,
@@ -197,22 +198,22 @@ def random_data(
     """
     # Generate random uncorrelated data
     data1 = np.random.normal(mu_uncorrelated, sigma_uncorrelated, size=(number_observations, size_uncorrelated))
-    
+
     # Create correlation between the variables
     columns = [random.randint(0, size_uncorrelated - 1) for i in range(size_correlated)]  # randomly select columns
     data2 = data1[:, columns] + np.random.normal(0, sigma_uncorrelated * sigma_correlated, size=(number_observations, len(columns)))  # correlated data
-    
+
     # Merge data
     data = np.append(data1, data2, axis=1)
-    
+
     # Add common random shock
     points = np.random.randint(length_sample, number_observations - 1, size=2)  # select random observations
     data[np.ix_(points, [columns[0], size_uncorrelated])] = np.array([[-0.5, -0.5], [2, 2]])
-    
+
     # Add specific random shock
     points = np.random.randint(length_sample, number_observations - 1, size=2)  # select random observations
     data[points, columns[-1]] = np.array([-0.5, 2])
-    
+
     return data, columns
 
 
@@ -232,7 +233,7 @@ def hrp(cov: np.ndarray, corr: np.ndarray) -> pd.Series:
     distance = distance_corr(corr_df)
     link = sch.linkage(distance, "single")
     sorted_items = quasi_diagonal(link)
-    sorted_items = corr.index[sorted_items].tolist()
+    sorted_items = corr_df.index[sorted_items].tolist()
     hrp_portfolio = recursive_bisection(cov_df, sorted_items)
     
     return hrp_portfolio.sort_index()
@@ -279,7 +280,7 @@ def hrp_mc(
     pointers = range(length_sample, number_observations, test_size)  # pointers for in-sample and out-sample
     
     while iteration_counter < number_iterations:
-        data, columns = random_data(number_observations, length_sample, size_uncorrelated, size_correlated, mu_uncorrelated, sigma_uncorrelated, sigma_correlated)
+        data, columns = random_data2(number_observations, length_sample, size_uncorrelated, size_correlated, mu_uncorrelated, sigma_uncorrelated, sigma_correlated)
         
         returns = {i.__name__: pd.Series() for i in methods}  # initialize returns
         
@@ -292,7 +293,7 @@ def hrp_mc(
             for func in methods:
                 weight = func(cov=cov_, corr=corr_)  # call methods
                 ret = pd.Series(out_sample @ (weight.transpose()))  # return
-                returns[func.__name__] = returns[func.__name__].append(ret)  # update returns
+                returns[func.__name__] = returns[func.__name__]._append(ret)  # update returns
         
         for func in methods:
             ret = returns[func.__name__].reset_index(drop=True)  # return column of each method
@@ -308,76 +309,76 @@ def hrp_mc(
     print(pd.concat([std_results, var_results, var_results / var_results["hrp"] - 1], axis=1))
 
 
-def distance_corr(corr: pd.DataFrame) -> np.ndarray:
-    """
-    Calculate the distance based on the correlation matrix.
-    
-    :param corr: Correlation matrix.
-    :type corr: pandas.DataFrame
-    :return: Distance matrix.
-    :rtype: numpy.ndarray
-    
-    The distance is computed based on the formula:
-
-    .. math:: \text{distance} = \sqrt{2 \cdot (1 - \text{corr})}
-    """
-    return np.sqrt(2 * (1 - corr))
-
-
-def quasi_diagonal(link: np.ndarray) -> list:
-    """
-    Sort the items based on the linkage matrix.
-    
-    :param link: Linkage matrix.
-    :type link: numpy.ndarray
-    :return: Sorted items.
-    :rtype: list
-    """
-    sorted_items = [link[-1, 0], link[-1, 1]]
-    
-    num_items = link[-1, -2]
-    
-    while sorted_items[-1] >= num_items:
-        index = int(sorted_items[-1] - num_items)
-        sorted_items.extend([link[index, 0], link[index, 1]])
-    
-    return sorted_items
-
-
-def recursive_bisection(cov: pd.DataFrame, sorted_items: list) -> pd.Series:
-    """
-    Recursive bisection algorithm to calculate portfolio weights.
-    
-    :param cov: Covariance matrix.
-    :type cov: pandas.DataFrame
-    :param sorted_items: Sorted items.
-    :type sorted_items: list
-    :return: Pandas series containing weights of the hierarchical portfolio.
-    :rtype: pandas.Series
-    """
-    if len(sorted_items) > 1:
-        cluster = [sorted_items]
-        while len(cluster) > 0:
-            cluster_ = cluster.pop()
-            if len(cluster_) > 1:
-                var_covar = cov.loc[cluster_, cluster_]
-                e_val, e_vec = np.linalg.eigh(var_covar)
-                index = e_val.argsort()[::-1]
-                e_val, e_vec = e_val[index], e_vec[:, index]
-                w = np.zeros((len(cluster_)))
-                w[-1] = 1
-                cluster0, cluster1 = [], []
-                for i in range(len(cluster_) - 1):
-                    d = np.sqrt((w * e_vec[:, i]).T @ e_val[i] @ (w * e_vec[:, i]))
-                    u = ((w * e_vec[:, i]) / d).reshape(-1, 1)
-                    cluster0.append(cluster_[np.dot(var_covar, u).flatten() <= 0])
-                    cluster1.append(cluster_[np.dot(var_covar, u).flatten() > 0])
-                cluster.extend([sorted(cluster0), sorted(cluster1)])
-            else:
-                break
-    else:
-        cluster = [sorted_items]
-    
-    weights = pd.Series(1, index=[i for i in cluster[0]])
-    
-    return weights
+# def distance_corr(corr: pd.DataFrame) -> np.ndarray:
+#     """
+#     Calculate the distance based on the correlation matrix.
+#
+#     :param corr: Correlation matrix.
+#     :type corr: pandas.DataFrame
+#     :return: Distance matrix.
+#     :rtype: numpy.ndarray
+#
+#     The distance is computed based on the formula:
+#
+#     .. math:: \text{distance} = \sqrt{2 \cdot (1 - \text{corr})}
+#     """
+#     return np.sqrt(2 * (1 - corr))
+#
+#
+# def quasi_diagonal(link: np.ndarray) -> list:
+#     """
+#     Sort the items based on the linkage matrix.
+#
+#     :param link: Linkage matrix.
+#     :type link: numpy.ndarray
+#     :return: Sorted items.
+#     :rtype: list
+#     """
+#     sorted_items = [link[-1, 0], link[-1, 1]]
+#
+#     num_items = link[-1, -2]
+#
+#     while sorted_items[-1] >= num_items:
+#         index = int(sorted_items[-1] - num_items)
+#         sorted_items.extend([link[index, 0], link[index, 1]])
+#
+#     return sorted_items
+#
+#
+# def recursive_bisection(cov: pd.DataFrame, sorted_items: list) -> pd.Series:
+#     """
+#     Recursive bisection algorithm to calculate portfolio weights.
+#
+#     :param cov: Covariance matrix.
+#     :type cov: pandas.DataFrame
+#     :param sorted_items: Sorted items.
+#     :type sorted_items: list
+#     :return: Pandas series containing weights of the hierarchical portfolio.
+#     :rtype: pandas.Series
+#     """
+#     if len(sorted_items) > 1:
+#         cluster = [sorted_items]
+#         while len(cluster) > 0:
+#             cluster_ = cluster.pop()
+#             if len(cluster_) > 1:
+#                 var_covar = cov.loc[cluster_, cluster_]
+#                 e_val, e_vec = np.linalg.eigh(var_covar)
+#                 index = e_val.argsort()[::-1]
+#                 e_val, e_vec = e_val[index], e_vec[:, index]
+#                 w = np.zeros((len(cluster_)))
+#                 w[-1] = 1
+#                 cluster0, cluster1 = [], []
+#                 for i in range(len(cluster_) - 1):
+#                     d = np.sqrt((w * e_vec[:, i]).T @ e_val[i] @ (w * e_vec[:, i]))
+#                     u = ((w * e_vec[:, i]) / d).reshape(-1, 1)
+#                     cluster0.append(cluster_[np.dot(var_covar, u).flatten() <= 0])
+#                     cluster1.append(cluster_[np.dot(var_covar, u).flatten() > 0])
+#                 cluster.extend([sorted(cluster0), sorted(cluster1)])
+#             else:
+#                 break
+#     else:
+#         cluster = [sorted_items]
+#
+#     weights = pd.Series(1, index=[i for i in cluster[0]])
+#
+#     return weights
