@@ -5,9 +5,9 @@ from RiskLabAI.data.structures.base import AbstractBar
 from RiskLabAI.utils.constants import *
 
 
-class CommonBar(AbstractBar):
+class StandardBar(AbstractBar):
     """
-    Concrete class of BasicBars logic. It represents Tick, Volume and Dollar bars.
+    Concrete class of StandardBar logic. It represents Tick, Volume and Dollar bars.
     The type of bar is defined by the bar_type parameter.
     """
 

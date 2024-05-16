@@ -5,9 +5,9 @@ from .run_bar import *
 from .data_structures_lopez import *
 from .filtering_lopez import *
 from .hedging import *
-from .imbalance_bar_old import *
+from .imbalance_bar import *
 from .information_driven_bar import *
-from .run_bar_old import *
+from .run_bar import *
 from .standard_bars_lopez import *
 from .standard_bars import *
 from .time_bar import *
