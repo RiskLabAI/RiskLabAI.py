@@ -14,9 +14,9 @@ CUMULATIVE_VOLUME = "Cumulative Volume"
 CUMULATIVE_BUY_VOLUME = "Cumulative Buy Volume"
 CUMULATIVE_SELL_VOLUME = "Cumulative Sell Volume"
 
-CUMULATIVE_θ = "Cumulative θ"
-CUMULATIVE_BUY_θ = "Cumulative Buy θ"
-CUMULATIVE_SELL_θ = "Cumulative Sell θ"
+CUMULATIVE_THETA = "Cumulative θ"
+CUMULATIVE_BUY_THETA = "Cumulative Buy θ"
+CUMULATIVE_SELL_THETA = "Cumulative Sell θ"
 
 EXPECTED_IMBALANCE = "expected_imbalance"
 EXPECTED_TICKS_NUMBER = "exp_num_ticks"
@@ -40,4 +40,3 @@ PREVIOUS_TICK_IMBALANCES_SELL_LIST = "List of previous (sell) tick imbalances"
 PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST = "List of previous bars buy ticks proportion"
 
 N_PREVIOUS_BARS_FOR_EXPECTED_N_TICKS_ESTIMATION = "Window size for E[T]"
-

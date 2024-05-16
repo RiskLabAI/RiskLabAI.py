@@ -2,10 +2,10 @@ from typing import Union
 
 import numpy as np
 
-from RiskLabAI.data.structures.abstract_bars import AbstractBars
+from RiskLabAI.data.structures.base import AbstractBar
 
 
-class StandardBars(AbstractBars):
+class StandardBar(AbstractBar):
     """
     Concrete class that contains the properties which are shared between all various type of standard bars (dollar, volume, tick).
     """
@@ -21,7 +21,7 @@ class StandardBars(AbstractBars):
         :param threshold: threshold that used to sampling process
         """
 
-        AbstractBars.__init__(self, bar_type)
+        AbstractBar.__init__(self, bar_type)
         self.threshold = threshold
 
     def construct_bars_from_data(self, data: Union[list, tuple, np.ndarray]) -> list:
