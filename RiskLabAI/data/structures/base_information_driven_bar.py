@@ -29,8 +29,8 @@ class AbstractInformationDrivenBar(AbstractBar, ABC):
             window_size_for_expected_n_ticks_estimation: int,
             window_size_for_expected_imbalance_estimation: int,
             initial_estimate_of_expected_n_ticks_in_bar: int,
-            expected_ticks_number_bounds: Tuple[float, float],
-            analyse_thresholds: bool
+            expected_ticks_number_bounds: Tuple[float, float] = None,
+            analyse_thresholds: bool = False
     ):
         """
         AbstractInformationDrivenBars constructor function

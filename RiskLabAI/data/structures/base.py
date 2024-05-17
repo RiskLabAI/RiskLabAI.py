@@ -140,13 +140,14 @@ class AbstractBar(ABC):
             self.close_price = price
         return bars_list
 
-    def to_df(self, bars: list) -> pd.DataFrame:
+    @staticmethod
+    def to_df(bars: list) -> pd.DataFrame:
         """
         Convert the list of bars to pandas DataFrame
         :param bars: list of bars
         :return: pandas DataFrame
         """
-        self._validate_bars(bars)
+        AbstractBar._validate_bars(bars)
         columns = [
             "date_time",
             "tick_index",
@@ -163,9 +164,10 @@ class AbstractBar(ABC):
         ]
         return pd.DataFrame(bars, columns=columns)
 
-    def _validate_bars(self, bars: list) -> None:
+    @staticmethod
+    def _validate_bars(bars: list) -> None:
         """
-        Validate the bars list
+        Validate the list of bars
         :param bars: list of bars
         :return:
         """

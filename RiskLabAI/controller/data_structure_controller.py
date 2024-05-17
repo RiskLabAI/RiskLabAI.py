@@ -1,11 +1,11 @@
 import csv
 from math import floor
-from typing import Iterable, Optional, Generator, Union
+from typing import Optional, Generator, Union
 
 import pandas as pd
 
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
-from RiskLabAI.data.structures.abstract_bars import AbstractBars
+from RiskLabAI.data.structures.base import AbstractBar
 from RiskLabAI.utils.constants import (
     DATE_TIME, TICK_NUMBER, OPEN_PRICE, HIGH_PRICE,
     LOW_PRICE, CLOSE_PRICE, CUMULATIVE_VOLUME,
@@ -48,7 +48,7 @@ class Controller:
 
     def run_on_batches(
             self,
-            initialized_bars: AbstractBars,
+            initialized_bars: AbstractBar,
             input_data: Union[str, pd.DataFrame],
             batch_size: int,
             output_path: Optional[str] = None
@@ -64,6 +64,7 @@ class Controller:
         """
         save_to_csv = output_path is not None
 
+        add_header = False
         if save_to_csv:
             with open(output_path, 'w'):
                 pass
@@ -105,7 +106,7 @@ class Controller:
 
     @staticmethod
     def construct_bars_from_batch(
-            bars: AbstractBars,
+            bars: AbstractBar,
             data: pd.DataFrame
     ) -> list:
         """
