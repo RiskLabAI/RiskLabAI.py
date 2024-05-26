@@ -53,21 +53,17 @@ class RunBar(AbstractInformationDrivenBar):
             CUMULATIVE_BUY_THETA: 0,
             CUMULATIVE_SELL_THETA: 0,
 
-            EXPECTED_BUY_IMBALANCE: np.ndarray([]),
-            EXPECTED_SELL_IMBALANCE: np.ndarray([]),
-            EXPECTED_BUY_TICKS_PROPORTION: np.ndarray([]),
+            EXPECTED_BUY_IMBALANCE: np.nan,
+            EXPECTED_SELL_IMBALANCE: np.nan,
+            EXPECTED_BUY_TICKS_PROPORTION: np.nan,
 
             BUY_TICKS_NUMBER: 0,
 
             # Previous bars number of ticks and previous tick imbalances
-            PREVIOUS_BARS_N_TICKS_LIST: [],
             PREVIOUS_TICK_IMBALANCES_BUY_LIST: [],
             PREVIOUS_TICK_IMBALANCES_SELL_LIST: [],
             PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST: []
         }
-
-    def _pre_process_data(self, data: Union[list, tuple, np.ndarray]) -> None:
-        self.len_data = len(data)
 
     def _bar_construction_condition(
             self,
@@ -86,7 +82,6 @@ class RunBar(AbstractInformationDrivenBar):
                 self.run_bars_statistics[CUMULATIVE_BUY_THETA],
                 self.run_bars_statistics[CUMULATIVE_SELL_THETA]
             )
-
             condition_is_met = max_theta > threshold
             return condition_is_met
         else:
@@ -104,8 +99,8 @@ class RunBar(AbstractInformationDrivenBar):
             self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST].append(-imbalance)
             self.run_bars_statistics[CUMULATIVE_SELL_THETA] += -imbalance
 
-        warm_up = (self.run_bars_statistics[EXPECTED_BUY_IMBALANCE].size == 0 or
-                   self.run_bars_statistics[EXPECTED_SELL_IMBALANCE].size == 0)
+        warm_up = np.isnan([self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
+                            self.run_bars_statistics[EXPECTED_SELL_IMBALANCE]]).any()
 
         # initialize expected imbalance first time, when initial_estimate_of_expected_n_ticks_in_bar passed
         if self.len_data == 0 and warm_up:
@@ -120,8 +115,8 @@ class RunBar(AbstractInformationDrivenBar):
                 warm_up
             )
 
-            if (self.run_bars_statistics[EXPECTED_BUY_IMBALANCE].size > 0 and
-                    self.run_bars_statistics[EXPECTED_SELL_IMBALANCE].size > 0):
+            if not np.isnan([self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
+                             self.run_bars_statistics[EXPECTED_SELL_IMBALANCE]]).any():
                 self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION] = \
                     self.run_bars_statistics[BUY_TICKS_NUMBER] / self.base_statistics[CUMULATIVE_TICKS]
 
@@ -142,6 +137,11 @@ class RunBar(AbstractInformationDrivenBar):
         return threshold, None
 
     def _after_construction_process(self, date_time, price, volume, tick_rule, other_data: Any) -> None:
+        self.len_data = 0
+
+        self.information_driven_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
+            self.base_statistics[CUMULATIVE_TICKS])
+
         self.run_bars_statistics[PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST].append(
             self.run_bars_statistics[BUY_TICKS_NUMBER] / self.base_statistics[CUMULATIVE_TICKS])
 

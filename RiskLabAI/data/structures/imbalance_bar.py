@@ -45,13 +45,13 @@ class ImbalanceBar(AbstractInformationDrivenBar):
 
         self.imbalance_bars_statistics = {
             CUMULATIVE_THETA: 0,
-            EXPECTED_IMBALANCE: np.ndarray([]),
+            EXPECTED_IMBALANCE: np.nan,
             PREVIOUS_BARS_N_TICKS_LIST: [],
             PREVIOUS_TICK_IMBALANCES_LIST: [],
         }
 
     def _bar_construction_condition(self, threshold):
-        if not self.imbalance_bars_statistics[EXPECTED_IMBALANCE].size == 0:
+        if not np.isnan(self.imbalance_bars_statistics[EXPECTED_IMBALANCE]):
             cumulative_theta = self.imbalance_bars_statistics[CUMULATIVE_THETA]
             condition_is_met = np.abs(cumulative_theta) > threshold
 
@@ -67,7 +67,7 @@ class ImbalanceBar(AbstractInformationDrivenBar):
         self.imbalance_bars_statistics[CUMULATIVE_THETA] += imbalance
 
         # initialize expected imbalance first time, where expected imbalance estimation is nan
-        if self.imbalance_bars_statistics[EXPECTED_IMBALANCE].size == 0:
+        if np.isnan(self.imbalance_bars_statistics[EXPECTED_IMBALANCE]):
             self.imbalance_bars_statistics[EXPECTED_IMBALANCE] = self._ewma_expected_imbalance(
                 self.imbalance_bars_statistics[PREVIOUS_TICK_IMBALANCES_LIST],
                 self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW],
@@ -75,18 +75,18 @@ class ImbalanceBar(AbstractInformationDrivenBar):
             )
 
         if self.analyse_thresholds is not None:
-            self.imbalance_bars_statistics['timestamp'] = date_time
+            self.imbalance_bars_statistics[TIMESTAMP] = date_time
             self.analyse_thresholds.append(dict(self.imbalance_bars_statistics))
 
         # is construction condition met to construct next bar or not
         expected_ticks_number = self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER]
-        expected_imbalance = self.imbalance_bars_statistics[EXPECTED_IMBALANCE]
+        expected_imbalance = 2 * self.imbalance_bars_statistics[EXPECTED_IMBALANCE] - 1
         threshold = expected_ticks_number * np.abs(expected_imbalance)
 
-        return threshold
+        return threshold, None
 
     def _after_construction_process(self, date_time, price, volume, tick_rule, other_data: Any) -> None:
-        self.imbalance_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
+        self.information_driven_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
             self.base_statistics[CUMULATIVE_TICKS])
 
         # update expected number of ticks based on formed bars

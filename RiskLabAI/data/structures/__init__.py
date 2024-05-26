@@ -2,13 +2,9 @@ from .base import *
 from .imbalance_bar import *
 from .base_information_driven_bar import *
 from .run_bar import *
-from .data_structures_lopez import *
-from .filtering_lopez import *
 from .hedging import *
 from .imbalance_bar import *
 from .information_driven_bar import *
 from .run_bar import *
-from .standard_bars_lopez import *
-from .standard_bars import *
 from .time_bar import *
 from .utilities_lopez import *

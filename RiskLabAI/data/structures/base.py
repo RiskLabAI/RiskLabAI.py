@@ -149,18 +149,18 @@ class AbstractBar(ABC):
         """
         AbstractBar._validate_bars(bars)
         columns = [
-            "date_time",
-            "tick_index",
-            "open",
-            "high",
-            "low",
-            "close",
-            "cumulative_volume",
-            "cumulative_buy_volume",
-            "cumulative_sell_volume",
-            "cumulative_ticks",
-            "cumulative_dollar_value",
-            "threshold"
+            DATE_TIME,
+            TICK_NUMBER,
+            OPEN_PRICE,
+            HIGH_PRICE,
+            LOW_PRICE,
+            CLOSE_PRICE,
+            CUMULATIVE_VOLUME,
+            CUMULATIVE_BUY_VOLUME,
+            CUMULATIVE_SELL_VOLUME,
+            CUMULATIVE_TICKS,
+            CUMULATIVE_DOLLAR,
+            THRESHOLD
         ]
         return pd.DataFrame(bars, columns=columns)
 

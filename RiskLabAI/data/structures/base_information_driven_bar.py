@@ -3,7 +3,7 @@ A base class for the various bar types. Includes the logic shared between classe
 duplicated code.
 """
 from abc import ABC
-from typing import Union, Tuple
+from typing import Union, Tuple, Any
 import numpy as np
 
 from RiskLabAI.utils.ewma import ewma
@@ -47,11 +47,12 @@ class AbstractInformationDrivenBar(AbstractBar, ABC):
         """
         assert num_ticks_type in ["expected", "fixed"], ("Invalid num_ticks_type. "
                                                          "Accepted values are: expected, fixed")
-        assert bar_type in ["volume_imbalance", "dollar_imbalance", "tick_imbalance"], ("Invalid bar_type. "
-                                                                                        "Accepted values are: "
-                                                                                        "volume_imbalance, "
-                                                                                        "dollar_imbalance, "
-                                                                                        "tick_imbalance")
+        assert bar_type in ["volume_imbalance", "dollar_imbalance", "tick_imbalance",
+                            "volume_run", "dollar_run", "tick_run"], ("Invalid bar_type. "
+                                                                      "Accepted values are: "
+                                                                      "volume_imbalance, "
+                                                                      "dollar_imbalance, "
+                                                                      "tick_imbalance")
         super().__init__(bar_type)
 
         self.information_driven_bars_statistics = {
@@ -78,7 +79,7 @@ class AbstractInformationDrivenBar(AbstractBar, ABC):
         self.num_ticks_type = num_ticks_type
         self.window_size_for_expected_n_ticks_estimation = window_size_for_expected_n_ticks_estimation
 
-    def _ewma_expected_imbalance(self, array: list, window: int, warm_up: bool = False) -> np.ndarray:
+    def _ewma_expected_imbalance(self, array: list, window: int, warm_up: bool = False) -> float:
         """
         Calculates expected imbalance (2P[b_t=1]-1) using EWMA as defined on page 29 of Advances in Financial Machine
          Learning.
@@ -125,11 +126,6 @@ class AbstractInformationDrivenBar(AbstractBar, ABC):
             raise ValueError('Unknown imbalance metric, possible values are tick/dollar/volume imbalance/run')
 
         return imbalance
-
-    def update_base_fields(self, price: float, tick_rule: int, volume: float):
-        super().update_base_fields(price, tick_rule, volume)
-        self.information_driven_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
-            self.base_statistics[CUMULATIVE_TICKS])
 
     def _expected_number_of_ticks(self) -> Union[float, int]:
         """
