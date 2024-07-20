@@ -2,6 +2,8 @@ from .kfold import KFold
 from .walk_forward import WalkForward
 from .purged_kfold import PurgedKFold
 from .combinatorial_purged import CombinatorialPurged
+from .bagged_combinatorial_purged import BaggedCombinatorialPurged
+from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
 from .cross_validator_interface import CrossValidator
 
 class CrossValidatorFactory:
@@ -41,6 +43,12 @@ class CrossValidatorFactory:
 
         elif validator_type == 'combinatorialpurged':
             return CombinatorialPurged(**kwargs)
+        
+        elif validator_type == 'baggedcombinatorialpurged':
+            return BaggedCombinatorialPurged(**kwargs)
+        
+        elif validator_type == 'adaptivecombinatorialpurged':
+            return AdaptiveCombinatorialPurged(**kwargs)
 
         else:
             raise ValueError(f"Invalid validator_type: {validator_type}")
