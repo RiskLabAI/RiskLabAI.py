@@ -9,7 +9,7 @@ from sklearn.exceptions import ConvergenceWarning
 from joblib_progress import joblib_progress
 from sklearn.base import clone
 
-from combinatorial_purged import CombinatorialPurged
+from .combinatorial_purged import CombinatorialPurged
 
 class AdaptiveCombinatorialPurged(CombinatorialPurged):
     def __init__(
