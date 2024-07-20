@@ -5,3 +5,5 @@ from .cross_validator_interface import *
 from .kfold import *
 from .purged_kfold import *
 from .walk_forward import *
+from .adaptive_combinatorial_purged import *
+from .bagged_combinatorial_purged import *
