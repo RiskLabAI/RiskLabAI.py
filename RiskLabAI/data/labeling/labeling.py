@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np 
-from scipy import stats
-from statsmodels.stats import stattools
 import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
 
 def cusum_filter_events_dynamic_threshold(
         prices: pd.Series,
@@ -190,11 +189,6 @@ def triple_barrier(
         output.loc[location, 'profit_taking'] = df[df > profit_taking[location]].index.min()
 
     return output
-
-import pandas as pd
-import numpy as np
-from multiprocessing import cpu_count
-from concurrent.futures import ProcessPoolExecutor
 
 def get_barrier_touch_time(close: pd.Series, 
                           time_events: pd.DatetimeIndex, 
