@@ -10,3 +10,4 @@ from .feature_importance_strategy import *
 from .generate_synthetic_data import *
 from .orthogonal_features import *
 from .weighted_tau import *
+from . import swefi
