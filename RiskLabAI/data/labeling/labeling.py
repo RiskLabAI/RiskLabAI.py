@@ -1,7 +1,11 @@
 import pandas as pd
 import numpy as np 
 import multiprocessing as mp
+from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor
+import datetime
+import time
+import sys
 
 def cusum_filter_events_dynamic_threshold(
         prices: pd.Series,
@@ -157,18 +161,10 @@ def triple_barrier(
     profit_taking_stop_loss: list[float, float],
     molecule: list
 ) -> pd.DataFrame:
-    """
-    Implements the triple-barrier method.
+    # Filter molecule to ensure all timestamps exist in events
+    molecule = [m for m in molecule if m in events.index]
 
-    :param close: A pandas Series of close prices.
-    :param events: A pandas DataFrame with the timestamp of the vertical barrier and the unit width of the horizontal barriers.
-    :param profit_taking_stop_loss: A list of two non-negative float values to set the width of the upper and lower barrier.
-    :param molecule: A list with the subset of event indices.
-    :return: A pandas DataFrame with the vertical barrier and two horizontal barriers.
-
-    References:
-    - De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons. (Methodology: Page 45)
-    """
+    # Continue with the existing logic
     events_filtered = events.loc[molecule]
     output = events_filtered[['End Time']].copy(deep=True)
 
@@ -267,46 +263,39 @@ def get_labels(events: pd.DataFrame,
 def meta_events(
     close: pd.Series,
     time_events: pd.DatetimeIndex,
-    ptsl: list,
+    ptsl: List[float],
     target: pd.Series,
     return_min: float,
     num_threads: int,
     timestamp: pd.Series = False,
     side: pd.Series = None
 ) -> pd.DataFrame:
-    """
-    Expand events to incorporate meta-labeling.
-
-    :param close: A dataframe of prices and dates.
-    :param time_events: A vector of timestamps.
-    :param ptsl: A list of two non-negative float values that multiply the target.
-    :param target: A dataframe of targets, expressed in terms of absolute returns.
-    :param return_min: The minimum target return required for running a triple barrier search.
-    :param num_threads: The number of threads.
-    :param timestamp: A vector containing the timestamps of the vertical barriers (False when disabled).
-    :param side: If not None, the function understands that meta-labeling is in play.
-    :return: A dataframe with timestamp of the vertical barrier and unit width of the horizontal barriers.
-    """
+    # Filter target by time_events and return_min
     target = target.loc[time_events]
     target = target[target > return_min]
 
+    # Ensure timestamp is correctly initialized
     if timestamp is False:
         timestamp = pd.Series(pd.NaT, index=time_events)
+    else:
+        timestamp = timestamp.loc[time_events]
 
     if side is None:
         side_position, profit_loss = pd.Series(1., index=target.index), [ptsl[0], ptsl[0]]
     else:
         side_position, profit_loss = side.loc[target.index], ptsl[:2]
 
-    events = pd.concat({'End Time': timestamp, 'Base Width': target, 'Side': side_position}, axis=1).dropna(subset=['Base Width'])
+    # Include 'target' and 'timestamp' in the events DataFrame
+    events = pd.concat({'End Time': timestamp, 'Base Width': target, 'Side': side_position, 'target': target, 'timestamp': timestamp}, axis=1).dropna(subset=['Base Width'])
+
     if num_threads > 1:
-        with ProcessPoolExecutor(num_threads) as executor:
+        with ProcessPoolExecutor(max_workers=num_threads) as executor:
             df0 = list(executor.map(
                 triple_barrier,
                 [close] * num_threads,
                 [events] * num_threads,
                 [profit_loss] * num_threads,
-                list(np.array_split(time_events, num_threads))
+                np.array_split(time_events, num_threads)
             ))
     else:
         df0 = list(map(
@@ -314,7 +303,7 @@ def meta_events(
             [close] * num_threads,
             [events] * num_threads,
             [profit_loss] * num_threads,
-            list(np.array_split(time_events, num_threads))
+            np.array_split(time_events, num_threads)
         ))        
     df0 = pd.concat(df0, axis=0)
 
@@ -322,14 +311,9 @@ def meta_events(
 
     if side is None:
         events = events.drop('Side', axis=1)
+    
+    # Return events including the 'target' and 'timestamp' columns
     return events
-        
-import numpy as np
-import pandas as pd
-import multiprocessing as mp
-import datetime
-import time
-import sys
 
 def meta_labeling(
     events: pd.DataFrame,
