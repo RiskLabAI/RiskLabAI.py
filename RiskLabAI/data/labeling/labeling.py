@@ -6,6 +6,8 @@ from concurrent.futures import ProcessPoolExecutor
 import datetime
 import time
 import sys
+from typing import List
+
 
 def cusum_filter_events_dynamic_threshold(
         prices: pd.Series,
