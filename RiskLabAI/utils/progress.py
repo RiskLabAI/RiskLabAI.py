@@ -9,7 +9,7 @@ def progress_bar(
     start_time: float, 
     bar_length: int = 20
 ) -> NoReturn:
-    """
+    r"""
     Display a terminal-style progress bar with completion percentage and estimated remaining time.
 
     :param current_progress: Current value indicating the progress made.

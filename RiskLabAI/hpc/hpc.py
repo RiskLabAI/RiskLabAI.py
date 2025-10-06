@@ -120,7 +120,7 @@ def nested_partitions(
     num_threads: int,
     upper_triangle: bool = False
 ) -> list:
-    """
+    r"""
     Generate nested partitions for parallel computation.
 
     :param num_atoms: Number of atoms.

@@ -5,7 +5,7 @@ def symmetric_cusum_filter(
     input_data: pd.DataFrame,
     threshold: float
 ) -> pd.DatetimeIndex:
-    """
+    r"""
     Implementation of the symmetric CUSUM filter.
 
     This method is used to detect changes in a time series data.

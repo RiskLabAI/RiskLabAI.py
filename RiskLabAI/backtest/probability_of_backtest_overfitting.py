@@ -79,7 +79,7 @@ def probability_of_backtest_overfitting(
     metric: Callable = None, 
     n_jobs: int = 1
 ) -> Tuple[float, np.ndarray]:
-    """
+    r"""
     Computes the Probability Of Backtest Overfitting.
 
     For instance, if \(S=16\), we will form 12,780 combinations.

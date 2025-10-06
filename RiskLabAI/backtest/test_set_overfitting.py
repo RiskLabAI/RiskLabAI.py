@@ -7,7 +7,7 @@ def expected_max_sharpe_ratio(
         mean_sharpe_ratio: float,
         std_sharpe_ratio: float
 ) -> float:
-    """
+    r"""
     Calculate the expected maximum Sharpe Ratio.
 
     Uses the formula:
@@ -123,7 +123,7 @@ def estimated_sharpe_ratio_z_statistics(
         skew: float = 0,
         kurt: int = 3
 ) -> float:
-    """
+    r"""
     Calculate z statistics for the estimated Sharpe Ratios.
 
     Uses the formula:
@@ -173,7 +173,7 @@ def theta_for_type2_error(
         skew: float = 0,
         kurt: int = 3
 ) -> float:
-    """
+    r"""
     Calculate θ parameter for type II error probability.
 
     .. math::

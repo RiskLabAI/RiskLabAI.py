@@ -220,7 +220,7 @@ def fractional_difference(
     degree: float,
     threshold: float = 0.01
 ) -> pd.DataFrame:
-    """
+    r"""
     Calculate the fractionally differentiated series using the fixed-width window method.
 
     :param series: DataFrame of dates and prices.
@@ -253,7 +253,7 @@ def fractional_difference(
 def minimum_adf_degree(
     input_series: pd.DataFrame
 ) -> pd.DataFrame:
-    """
+    r"""
     Find the minimum degree value that passes the ADF test.
 
     :param input_series: DataFrame of input series.

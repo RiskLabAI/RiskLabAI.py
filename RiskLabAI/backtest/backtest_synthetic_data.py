@@ -13,7 +13,7 @@ def synthetic_back_testing(
     stop_loss_range: np.ndarray = np.linspace(0.5, 10, 20),
     seed: int = 0
 ) -> list[tuple[float, float, float, float, float]]:
-    """
+    r"""
     Perform backtesting on synthetic price data generated using the Ornstein-Uhlenbeck process.
 
     The Ornstein-Uhlenbeck process is given by:

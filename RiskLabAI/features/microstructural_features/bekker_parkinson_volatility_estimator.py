@@ -7,7 +7,7 @@ def sigma_estimates(
     beta: pd.Series,
     gamma: pd.Series
 ) -> pd.Series:
-    """
+    r"""
     Compute Bekker-Parkinson volatility σ estimates.
 
     This function calculates the Bekker-Parkinson volatility estimates based on the provided

@@ -17,7 +17,7 @@ class PurgedKFold(CrossValidator):
         embargo_fraction: float = 0,
         continous_test_times: bool = False,
     ) -> pd.Series:
-        """
+        r"""
         Purge observations in the training set with embargo.
 
         Finds the training set indices based on the information on each record

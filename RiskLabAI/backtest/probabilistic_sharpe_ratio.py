@@ -10,7 +10,7 @@ def probabilistic_sharpe_ratio(
         kurtosis_of_returns: float = 3,
         return_test_statistic: bool = False,
 ) -> float:
-    """
+    r"""
     Calculates the Probabilistic Sharpe Ratio (PSR) based on observed and benchmark Sharpe ratios.
 
     The PSR provides a means to test whether a track record would have achieved an observed 
@@ -50,7 +50,7 @@ def probabilistic_sharpe_ratio(
 def benchmark_sharpe_ratio(
         sharpe_ratio_estimates: list
 ) -> float:
-    """
+    r"""
     Calculates the Benchmark Sharpe Ratio based on Sharpe ratio estimates.
 
     The benchmark Sharpe ratio is computed using:

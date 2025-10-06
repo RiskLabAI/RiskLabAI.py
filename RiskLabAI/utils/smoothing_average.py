@@ -6,7 +6,7 @@ def compute_exponential_weighted_moving_average(
     input_series: np.ndarray, 
     window_length: int
 ) -> np.ndarray:
-    """
+    r"""
     Compute the exponential weighted moving average (EWMA) of a time series array.
 
     The EWMA is calculated using the formula:
