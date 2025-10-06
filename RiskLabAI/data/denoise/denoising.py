@@ -12,7 +12,7 @@ def marcenko_pastur_pdf(
         q: float,
         num_points: int
     ) -> pd.Series:
-    """
+    r"""
     Computes the Marcenko-Pastur probability density function (pdf).
 
     :param variance: Variance of the observations

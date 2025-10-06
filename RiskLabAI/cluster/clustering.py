@@ -9,7 +9,7 @@ from typing import Tuple
 def covariance_to_correlation(
         covariance: np.ndarray
 ) -> np.ndarray:
-    """
+    r"""
     Derive the correlation matrix from a covariance matrix.
 
     .. math::

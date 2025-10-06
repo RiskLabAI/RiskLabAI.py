@@ -5,7 +5,7 @@ def calculate_weighted_tau(
     feature_importances: np.ndarray,
     principal_component_ranks: np.ndarray
 ) -> float:
-    """
+    r"""
     Calculate the weighted Kendall's tau (τ) using feature importances and principal component ranks.
 
     Kendall's tau is a measure of correlation between two rankings. The weighted version of

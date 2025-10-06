@@ -6,7 +6,7 @@ def pca_weights(
     risk_distribution: Optional[np.ndarray] = None,
     risk_target: float = 1.0
 ) -> np.ndarray:
-    """
+    r"""
     Calculates hedging weights using covariance, risk distribution, and risk target.
 
     The function uses Principal Component Analysis (PCA) to determine the weights.

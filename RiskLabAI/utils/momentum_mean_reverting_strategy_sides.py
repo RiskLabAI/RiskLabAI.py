@@ -8,7 +8,7 @@ def determine_strategy_side(
     exponential : bool = False,
     mean_reversion: bool = False
 ) -> pd.Series:
-    """
+    r"""
     Determines the trading side (long or short) based on moving average crossovers and 
     the nature of the strategy (momentum or mean reversion).
 

@@ -6,7 +6,7 @@ def bagging_classifier_accuracy(
         p: float,
         k: int = 2
 ) -> float:
-    """
+    r"""
     Calculate the accuracy of a bagging classifier.
 
     The function calculates the accuracy of a bagging classifier based on the given

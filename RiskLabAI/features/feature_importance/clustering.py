@@ -236,7 +236,7 @@ def random_block_correlation(
 
 
 def cov_to_corr(covariance: np.ndarray) -> np.ndarray:
-    """
+    r"""
     Convert a covariance matrix to a correlation matrix.
 
     :param covariance: Covariance matrix.

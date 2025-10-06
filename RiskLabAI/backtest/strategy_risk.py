@@ -8,7 +8,7 @@ def sharpe_ratio_trials(
         p: float,
         n_run: int
 ) -> tuple[float, float, float]:
-    """
+    r"""
     Simulate trials to calculate the mean, standard deviation, and Sharpe ratio.
 
     The Sharpe ratio is calculated as follows:
@@ -35,7 +35,7 @@ def sharpe_ratio_trials(
 
 
 def target_sharpe_ratio_symbolic() -> sympy.Add:
-    """
+    r"""
     Calculate the target Sharpe ratio using symbolic operations.
 
     The Sharpe ratio is calculated using the following formula:
@@ -68,7 +68,7 @@ def implied_precision(
         frequency: float,
         target_sharpe_ratio: float
 ) -> float:
-    """
+    r"""
     Calculate the implied precision for given parameters.
 
     The implied precision is calculated as follows:
@@ -108,7 +108,7 @@ def bin_frequency(
         precision: float,
         target_sharpe_ratio: float
 ) -> float:
-    """
+    r"""
     Calculate the number of bets per year needed to achieve a target Sharpe ratio with a certain precision.
 
     The frequency of bets is calculated as follows:
@@ -145,7 +145,7 @@ def binomial_sharpe_ratio(
         frequency: float,
         probability: float
 ) -> float:
-    """
+    r"""
     Calculate the Sharpe Ratio for a binary outcome.
 
     The Sharpe ratio is calculated as follows:
