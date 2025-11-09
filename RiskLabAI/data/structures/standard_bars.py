@@ -1,66 +1,81 @@
-from typing import Union
+"""
+Implements Standard Bars (Tick, Volume, Dollar).
+"""
 
+from typing import Union, List, Any, Iterable
 import numpy as np
-
-from RiskLabAI.data.structures.abstract_bars import AbstractBars
-
+from RiskLabAI.data.structures.abstract_bars import AbstractBars, TickData
 
 class StandardBars(AbstractBars):
     """
-    Concrete class that contains the properties which are shared between all various type of standard bars (dollar, volume, tick).
+    Concrete class for Standard Bars (Tick, Volume, Dollar).
+
+    Generates a new bar whenever a cumulative threshold of ticks,
+    volume, or dollars is reached.
     """
 
-    def __init__(
-            self,
-            bar_type: str,
-            threshold: float = 50000,
-    ):
+    def __init__(self, bar_type: str, threshold: float = 50000):
         """
-        StandardBars constructor function
-        :param bar_type: type of bar. e.g. dollar_standard_bars, tick_standard_bars etc.
-        :param threshold: threshold that used to sampling process
-        """
+        StandardBars constructor.
 
-        AbstractBars.__init__(self, bar_type)
+        Parameters
+        ----------
+        bar_type : str
+            Type of bar. Must be one of:
+            `CUMULATIVE_TICKS`, `CUMULATIVE_VOLUME`, `CUMULATIVE_DOLLAR`.
+        threshold : float, default=50000
+            The threshold value to trigger bar construction.
+        """
+        super().__init__(bar_type)
         self.threshold = threshold
 
-    def construct_bars_from_data(self, data: Union[list, tuple, np.ndarray]) -> list:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
         """
-        The function is used to construct bars from input ticks data.
-        :param data: tabular data that contains date_time, price, and volume columns
-        :return: constructed bars
-        """
+        Constructs standard bars from input tick data.
 
+        Parameters
+        ----------
+        data : Iterable[TickData]
+            An iterable (list, tuple, generator) of tick data.
+            Each tick is (date_time, price, volume).
+
+        Returns
+        -------
+        List[List[Any]]
+            A list of the constructed standard bars.
+        """
         bars_list = []
         for tick_data in data:
             self.tick_counter += 1
 
-            date_time, price, volume = tuple(tick_data)
+            # Unpack data
+            date_time, price, volume = tick_data[0], tick_data[1], tick_data[2]
+            
+            # Update common fields
             tick_rule = self._tick_rule(price)
             self.update_base_fields(price, tick_rule, volume)
+            self.close_price = price # Update close price continuously
 
-            # is construction condition met to construct next bar or not
-            threshold = self.threshold
-            is_construction_condition_met = self._bar_construction_condition(threshold)
-            if is_construction_condition_met:
+            # Check if bar construction condition is met
+            if self._bar_construction_condition(self.threshold):
                 next_bar = self._construct_next_bar(
                     date_time,
                     self.tick_counter,
-                    price,
+                    self.close_price,
                     self.high_price,
                     self.low_price,
-                    threshold,
+                    self.threshold,
                 )
-
                 bars_list.append(next_bar)
+                
+                # Reset cached fields for the next bar
                 self._reset_cached_fields()
 
         return bars_list
 
-    def _bar_construction_condition(self, threshold) -> bool:
+    def _bar_construction_condition(self, threshold: float) -> bool:
         """
-        Compute the condition of whether next bar should sample with current and previous tick datas or not.
-        :return: whether next bar should form with current and previous tick datas or not.
+        Check if the cumulative value of the `bar_type` has
+        exceeded the threshold.
         """
-
         return self.base_statistics[self.bar_type] >= threshold

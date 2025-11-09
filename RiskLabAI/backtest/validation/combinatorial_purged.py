@@ -1,117 +1,133 @@
-from copy import deepcopy
-from typing import Generator, Optional, Tuple, Union, Dict, List, Any
-from itertools import combinations
-import pandas as pd
-import numpy as np
-from collections import ChainMap, defaultdict
-from joblib import Parallel, delayed
-from math import comb
+"""
+Implements Combinatorial Purged Cross-Validation (CPCV) as described by
+Marcos Lopez de Prado.
+"""
+
 import warnings
+from collections import ChainMap, defaultdict
+from copy import deepcopy
+from itertools import combinations
+from math import comb
+from typing import (
+    Any, Dict, Generator, List, Optional, Tuple, Union
+)
+
+import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.exceptions import ConvergenceWarning
 
 from .purged_kfold import PurgedKFold
 
+# For type hinting sklearn-like estimators
+Estimator = Any
+
 class CombinatorialPurged(PurgedKFold):
     """
-    Combinatorial Purged Cross-Validation (CPCV) implementation based on Marcos Lopez de Prado's method.
+    Combinatorial Purged Cross-Validation (CPCV).
 
-    This class provides a cross-validation scheme that aims to address the main drawback of the Walk Forward
-    and traditional Cross-Validation methods by testing multiple paths. Given a number of backtest paths,
-    CPCV generates the precise number of combinations of training/testing sets needed to generate those paths,
-    while purging training observations that might contain leaked information.
+    This method generates multiple backtest paths by creating all possible
+    combinations of train/test splits, given `n_splits` groups and
+    `n_test_groups` for the test set size.
+
+    It inherits from `PurgedKFold` to ensure that all generated training
+    sets are properly purged and embargoed against their corresponding
+    test set.
 
     Parameters
     ----------
     n_splits : int
-        Number of splits/groups to partition the data into.
+        Total number of groups to partition the data into.
     n_test_groups : int
-        Size of the testing set in terms of groups.
-    times : Union[pd.Series, Dict[str, pd.Series]]
-        The timestamp series associated with the labels.
-    embargo : float
-        The embargo rate for purging.
+        The number of groups to use for testing in each combination.
+        e.g., n_splits=8, n_test_groups=2 -> C(8, 2) = 28 splits.
+    times : pd.Series or Dict[str, pd.Series]
+        A Series where the index is the observation start time and
+        the value is the observation end time.
+    embargo : float, default=0
+        The embargo fraction (e.g., 0.01 for 1%).
     """
-
 
     @staticmethod
     def _path_locations(
         n_splits: int,
-        combinations_: List[Tuple[int]]
+        combinations_list: List[Tuple[int, ...]]
     ) -> Dict[int, List[Tuple[int, int]]]:
         """
-        Generate a labeled path matrix and return path locations for N choose K.
-
-        This method generates a matrix where each entry corresponds to a specific combination of
-        training/testing sets, and helps in mapping these combinations to specific backtest paths.
+        Generate a labeled path matrix to map splits to backtest paths.
 
         Parameters
         ----------
         n_splits : int
-            Number of splits/groups to partition the data into.
-        combinations_ : list
-            List of combinations for training/testing sets.
+            Total number of groups.
+        combinations_list : List[Tuple[int, ...]]
+            The list of all C(n_splits, n_test_groups) combinations.
 
         Returns
         -------
-        dict
-            A dictionary mapping each backtest path to its corresponding train/test combination.
+        Dict[int, List[Tuple[int, int]]]
+            A dictionary mapping each path ID (int) to a list of its
+            coordinates (group, split_num) in the path matrix.
         """
-
+        n_combinations = len(combinations_list)
+        
         # Initialize a zero matrix
-        matrix = np.zeros((n_splits, len(combinations_)), dtype=int)
+        matrix = np.zeros((n_splits, n_combinations), dtype=int)
 
-        # Set appropriate entries to 1 and label path numbers in the same loop
-        for col, indices in enumerate(combinations_):
-            matrix[indices, col] = 1
+        # Populate matrix: 1 if group `i` is in combination `j`
+        for j, indices in enumerate(combinations_list):
+            matrix[indices, j] = 1
 
         # Label path numbers
-        def label_path(row):
-            counter = iter(range(1, row.sum() + 1))
-            return [next(counter) if x == 1 else 0 for x in row]
+        def label_path_row(row: np.ndarray) -> np.ndarray:
+            """Assigns a path number to each test split in a group."""
+            path_counter = 1
+            labeled_row = np.zeros_like(row)
+            for i, val in enumerate(row):
+                if val == 1:
+                    labeled_row[i] = path_counter
+                    path_counter += 1
+            return labeled_row
 
-        path_numbers = np.array(list(map(label_path, matrix)))
+        path_numbers = np.apply_along_axis(label_path_row, 1, matrix)
 
-        # Extract path locations using loops
-        def map_to_location(coord):
-            i, j = coord
-            value = path_numbers[i, j]
-            locations[value].append((i, j))
-
-        rows, cols = path_numbers.shape
+        # Extract path locations
         locations = defaultdict(list)
-        list(map(map_to_location, [(x, y) for x in range(rows) for y in range(cols) if path_numbers[x, y] != 0]))
+        for group_idx in range(n_splits):
+            for split_idx in range(n_combinations):
+                path_id = path_numbers[group_idx, split_idx]
+                if path_id != 0:
+                    locations[path_id].append((group_idx, split_idx))
 
         return dict(locations)
 
-
     @staticmethod
     def _combinatorial_splits(
-        combinations_: List[Tuple[int]],
-        split_segments: np.ndarray
+        combinations_list: List[Tuple[int, ...]],
+        split_segments: List[np.ndarray]
     ) -> Generator[np.ndarray, None, None]:
         """
-        Generate combinatorial test sets based on the number of test groups (n_test_groups).
-
-        This method creates test sets by considering all possible combinations of group splits, allowing
-        for the creation of multiple test paths, as described in the CPCV methodology.
+        Generate combinatorial test sets.
 
         Parameters
         ----------
-        combinations_ : list
-            List of combinations for training/testing sets.
-        split_segments : np.ndarray
-            Array of data split segments.
+        combinations_list : List[Tuple[int, ...]]
+            List of all C(n_splits, n_test_groups) combinations.
+        split_segments : List[np.ndarray]
+            List of index arrays, one for each of the `n_splits` groups.
 
-        Returns
+        Yields
         -------
-        Generator[np.ndarray]
-            A generator yielding the combinatorial test sets.
+        Generator[np.ndarray, None, None]
+            A generator yielding the concatenated test set indices for
+            each combination.
         """
-
-        for test_groups in combinations_:
-            test_sets = [split for i, split in enumerate(split_segments) if i in test_groups]
+        for test_groups in combinations_list:
+            test_sets = [
+                split for i, split in enumerate(split_segments) 
+                if i in test_groups
+            ]
             yield np.concatenate(test_sets)
-
 
     def __init__(
         self,
@@ -119,7 +135,7 @@ class CombinatorialPurged(PurgedKFold):
         n_test_groups: int,
         times: Union[pd.Series, Dict[str, pd.Series]],
         embargo: float = 0
-    ):
+    ) -> None:
         """
         Initialize the CombinatorialPurged class.
 
@@ -129,13 +145,16 @@ class CombinatorialPurged(PurgedKFold):
             Number of splits/groups to partition the data into.
         n_test_groups : int
             Size of the testing set in terms of groups.
-        times : Union[pd.Series, Dict[str, pd.Series]]
+        times : pd.Series or Dict[str, pd.Series]
             The timestamp series associated with the labels.
-        embargo : float
+        embargo : float, default=0
             The embargo rate for purging.
         """
-
         super().__init__(n_splits, times, embargo)
+        if n_test_groups >= n_splits:
+            raise ValueError(
+                "n_test_groups must be strictly less than n_splits"
+            )
         self.n_test_groups = n_test_groups
 
     def get_n_splits(
@@ -145,222 +164,262 @@ class CombinatorialPurged(PurgedKFold):
         groups: Optional[np.ndarray] = None
     ) -> int:
         """
-        Return number of splits.
+        Return the total number of combinatorial splits.
 
-        :param data: Dataset or dictionary of datasets.
-        :type data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]]
+        This is C(n_splits, n_test_groups).
 
-        :param labels: Labels or dictionary of labels.
-        :type labels: Optional[Union[pd.Series, Dict[str, pd.Series]]]
+        Parameters
+        ----------
+        data : pd.DataFrame or dict, optional
+            Dataset or dictionary of datasets.
+        labels : pd.Series or dict, optional
+            Labels or dictionary of labels.
+        groups : np.ndarray, optional
+            Group labels for the samples.
 
-        :param groups: Group labels for the samples.
-        :type groups: Optional[np.ndarray]
-
-        :return: Number of splits.
-        :rtype: int
+        Returns
+        -------
+        int
+            The total number of splits, C(n_splits, n_test_groups).
         """
         return comb(self.n_splits, self.n_test_groups)
 
+    def _get_split_segments(self, single_data: pd.DataFrame) -> List[np.ndarray]:
+        """Helper to get the base K-Fold segments."""
+        indices = np.arange(single_data.shape[0])
+        return np.array_split(indices, self.n_splits)
+
     def _single_split(
         self,
-        single_times: np.ndarray,
-        single_data: np.ndarray,
+        single_times: pd.Series,
+        single_data: pd.DataFrame,
     ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
         """
-        Splits data into train and test indices based on the defined combinatorial splits.
+        Split a single dataset into C(n, k) purged train-test indices.
 
-        This function is used to generate multiple train-test splits based on the combinatorial
-        cross-validation method. It ensures that each train-test split is properly purged and
-        embargoed to prevent data leakage.
+        Parameters
+        ----------
+        single_times : pd.Series
+            The 'times' (info range) Series for this dataset.
+        single_data : pd.DataFrame
+            Input dataset.
 
-        :param single_times: Timestamp series associated with the labels.
-        :param single_data: The input data to be split.
-
-        :return: Generator that yields tuples of (train indices, test indices).
-
-        .. note:: The function validates the input, and uses combinatorial cross-validation method to
-                produce the train-test splits.
+        Yields
+        -------
+        Generator[Tuple[np.ndarray, np.ndarray], None, None]
+            A generator of (train_indices, test_indices) for all
+            C(n_splits, n_test_groups) combinations.
         """
-
         self._validate_input(single_times, single_data)
 
-        indices = np.arange(single_data.shape[0])
-        split_segments = np.array_split(indices, self.n_splits)
-        combinations_ = list(combinations(range(self.n_splits), self.n_test_groups))
+        split_segments = self._get_split_segments(single_data)
+        combinations_list = list(
+            combinations(range(self.n_splits), self.n_test_groups)
+        )
 
-        all_combinatorial_splits = list(
-            CombinatorialPurged._combinatorial_splits(combinations_, split_segments)
+        all_combinatorial_splits = self._combinatorial_splits(
+            combinations_list, split_segments
         )
 
         for test_indices in all_combinatorial_splits:
-            train_indices = self._get_train_indices(test_indices, single_times)
+            # Purge against the *non-contiguous* test set
+            train_indices = self._get_train_indices(
+                test_indices, single_times, continous_test_times=False
+            )
             yield train_indices, test_indices
-
 
     def _combinations_and_path_locations_and_split_segments(
         self,
         data: pd.DataFrame
-    ) -> Tuple[List[Tuple[int, ...]], Dict[str, np.ndarray], List[np.ndarray]]:
+    ) -> Tuple[List[Tuple[int, ...]], Dict[int, List[Tuple[int, int]]], List[np.ndarray]]:
         """
-        Generate combinations, path locations, and split segments for the data.
+        Helper to compute all necessary components for CPCV.
 
-        This function is a helper that computes necessary components for combinatorial cross-validation.
+        Parameters
+        ----------
+        data : pd.DataFrame
+            Input dataset.
 
-        :param data: The input dataframe to generate combinations, path locations, and split segments.
-
-        :return: Tuple containing combinations, path locations, and split segments.
-
-        .. math::
-        \\text{combinations} = \\binom{n}{k}
+        Returns
+        -------
+        Tuple[List, Dict, List]
+            - combinations_list: List of all C(n, k) combinations.
+            - locations: The path location dictionary from `_path_locations`.
+            - split_segments: List of index arrays for each of the `n_splits` groups.
         """
+        combinations_list = list(
+            combinations(range(self.n_splits), self.n_test_groups)
+        )
+        locations = self._path_locations(self.n_splits, combinations_list)
+        split_segments = self._get_split_segments(data)
 
-        combinations_ = list(combinations(range(self.n_splits), self.n_test_groups))
-        locations = CombinatorialPurged._path_locations(self.n_splits, combinations_)
-
-        indices = np.arange(data.shape[0])
-        split_segments = np.array_split(indices, self.n_splits)
-
-        return combinations_, locations, split_segments
-
+        return combinations_list, locations, split_segments
 
     def _single_backtest_paths(
             self,
             single_times: pd.Series,
             single_data: pd.DataFrame,
-    ) -> Dict[str, List[Dict[str, List[np.ndarray]]]]:
+    ) -> Dict[str, List[Dict[str, np.ndarray]]]:
         """
-        Generate the backtest paths for given input data.
+        Generate all combinatorial backtest paths for a single dataset.
 
-        This function creates multiple backtest paths based on combinatorial splits, where
-        each path represents a sequence of train-test splits. It ensures that data leakage
-        is prevented by purging and applying embargo to the train-test splits.
+        Parameters
+        ----------
+        single_times : pd.Series
+            The 'times' (info range) Series for this dataset.
+        single_data : pd.DataFrame
+            Input dataset.
 
-        :param single_times: Timestamp series associated with the data.
-        :param single_data: Input data on which the backtest paths are based.
-
-        :return: A dictionary where each key is a backtest path name, and the value is
-                a list of dictionaries with train and test index arrays.
-
-        .. note:: This function relies on combinatorial cross-validation for backtesting to
-                generate multiple paths of train-test splits.
+        Returns
+        -------
+        Dict[str, List[Dict[str, np.ndarray]]]
+            A dictionary where each key is a "Path {id}" and the value
+            is the list of (Train, Test) splits for that path.
         """
-
         self._validate_input(single_times, single_data)
 
         paths = {}
-        combinations_, locations, split_segments = self._combinations_and_path_locations_and_split_segments(single_data)
+        combinations_list, locations, split_segments = \
+            self._combinations_and_path_locations_and_split_segments(single_data)
+        
         all_combinatorial_splits = list(
-            CombinatorialPurged._combinatorial_splits(combinations_, split_segments)
+            self._combinatorial_splits(combinations_list, split_segments)
         )
 
         for path_num, locs in locations.items():
             path_data = []
-
-            for (G, S) in locs:
-                # Use all_combinatorial_splits[S] to determine potential training indices
-                # Now, we derive the actual training set after purge and embargo
-                train_indices = self._get_train_indices(all_combinatorial_splits[S], single_times)
+            for (group_idx, split_idx) in locs:
+                # Get the full test set for this *combination*
+                combinatorial_test_indices = all_combinatorial_splits[split_idx]
+                
+                # Get the train set purged against this *combination*
+                train_indices = self._get_train_indices(
+                    combinatorial_test_indices, 
+                    single_times, 
+                    continous_test_times=False
+                )
+                
+                # The test set for this *path segment* is just one group
+                test_indices_segment = split_segments[group_idx]
 
                 path_data.append({
-                    "Train": np.array(train_indices),
-                    "Test": split_segments[G],
+                    "Train": train_indices,
+                    "Test": test_indices_segment,
                 })
-
-            paths[f"Path {path_num}"] = np.array(path_data)
+            
+            # This path is complete
+            paths[f"Path {path_num}"] = path_data
 
         return paths
 
-
     def _single_backtest_predictions(
         self,
-        single_estimator: Any,
+        single_estimator: Estimator,
         single_times: pd.Series,
         single_data: pd.DataFrame,
         single_labels: pd.Series,
-        single_weights: np.ndarray,
+        single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1
     ) -> Dict[str, np.ndarray]:
         """
-        Generate predictions for a single backtest using combinatorial splits.
+        Obtain backtest predictions for all CPCV paths.
 
-        This method calculates predictions across various paths created by combinatorial splits
-        of the data. For each combinatorial split, a separate estimator is trained and then used
-        to predict on the corresponding test set.
+        Parameters
+        ----------
+        single_estimator : Estimator
+            A scikit-learn-like estimator.
+        single_times : pd.Series
+            The 'times' (info range) Series for this dataset.
+        single_data : pd.DataFrame
+            Data for the single dataset.
+        single_labels : pd.Series
+            Labels for the single dataset.
+        single_weights : np.ndarray, optional
+            Sample weights. Defaults to equal weights.
+        predict_probability : bool, default=False
+            If True, call `predict_proba()` instead of `predict()`.
+        n_jobs : int, default=1
+            The number of jobs to run in parallel.
 
-        :param single_estimator: The machine learning model or estimator to be trained.
-        :param single_times: Timestamps corresponding to the data points.
-        :param single_data: Input data on which the model is trained and predictions are made.
-        :param single_labels: Labels corresponding to the input data.
-        :param single_weights: Weights for each data point.
-        :param predict_probability: If True, predict the probability of forecasts.
-        :type predict_probability: bool
-        :param n_jobs: Number of CPU cores to use for parallelization. Default is 1.
-
-        :return: A dictionary where keys are path names and values are arrays of predictions.
-
-        .. note:: This function relies on internal methods (e.g., `_get_train_indices`)
-                to manage data splits and training.
-
-        .. note:: Parallelization is used to speed up the training of models for different splits.
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are "Path {id}" and values are
+            the contiguous arrays of out-of-sample predictions for each path.
         """
-
         self._validate_input(single_times, single_data)
 
         if single_weights is None:
-            single_weights = np.ones((len(single_data),))
+            single_weights = np.ones(len(single_data))
 
-        paths_predictions = {}
-        combinations_, locations, split_segments = self._combinations_and_path_locations_and_split_segments(single_data)
+        combinations_list, locations, split_segments = \
+            self._combinations_and_path_locations_and_split_segments(single_data)
 
         def train_single_estimator(
-            single_estimator_,
-            combinatorial_test_indices
-        ):
-            combinatorial_train_indices = self._get_train_indices(combinatorial_test_indices, single_times)
+            estimator_: Estimator,
+            combinatorial_test_indices: np.ndarray
+        ) -> Estimator:
+            """Train one estimator for one C(n,k) split."""
+            train_indices = self._get_train_indices(
+                combinatorial_test_indices,
+                single_times,
+                continous_test_times=False
+            )
 
-            X_train = single_data.iloc[combinatorial_train_indices]
-            y_train = single_labels.iloc[combinatorial_train_indices]
-            weights_train = single_weights[combinatorial_train_indices]
+            X_train = single_data.iloc[train_indices]
+            y_train = single_labels.iloc[train_indices]
+            weights_train = single_weights[train_indices]
 
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', category=ConvergenceWarning)
                 try:
-                    single_estimator_.fit(X_train, y_train, sample_weight=weights_train)
-
+                    estimator_.fit(X_train, y_train, sample_weight=weights_train)
                 except TypeError:
-                    single_estimator_.fit(X_train, y_train)
+                    estimator_.fit(X_train, y_train)
 
-            return single_estimator_
+            return estimator_
 
+        # 1. Train all C(n, k) estimators in parallel
         combinatorial_trained_estimators = Parallel(n_jobs=n_jobs)(
-            delayed(train_single_estimator)(deepcopy(single_estimator), combinatorial_test_indices)
-            for combinatorial_test_indices in CombinatorialPurged._combinatorial_splits(combinations_, split_segments))
-
+            delayed(train_single_estimator)(
+                deepcopy(single_estimator), test_indices
+            )
+            for test_indices in self._combinatorial_splits(
+                combinations_list, split_segments
+            )
+        )
 
         def get_path_data(
-            path_num,
-            locs
-        ):
-            path_data = []
+            path_num: int,
+            locs: List[Tuple[int, int]]
+        ) -> Dict[str, np.ndarray]:
+            """Assemble predictions for one path."""
+            path_predictions = []
 
-            for (G, S) in locs:
-                test_indices = split_segments[G]
-                X_test = single_data.iloc[test_indices]
+            for (group_idx, split_idx) in locs:
+                # Get the test segment for this path
+                test_indices_segment = split_segments[group_idx]
+                X_test = single_data.iloc[test_indices_segment]
+                
+                # Get the estimator trained for this split
+                estimator = combinatorial_trained_estimators[split_idx]
 
                 if predict_probability:
-                    predictions = combinatorial_trained_estimators[S].predict_proba(X_test)
-
+                    preds = estimator.predict_proba(X_test)
                 else:
-                    predictions = combinatorial_trained_estimators[S].predict(X_test)
+                    preds = estimator.predict(X_test)
 
-                path_data.extend(predictions)
+                path_predictions.append(preds)
+            
+            return {f"Path {path_num}": np.concatenate(path_predictions)}
 
-            path_data = {f"Path {path_num}" : np.array(path_data)}
-
-            return path_data
-
-        paths_predictions = Parallel(n_jobs=n_jobs)(delayed(get_path_data)(path_num, locs) for path_num, locs in locations.items())
-        paths_predictions = dict(ChainMap(*reversed(paths_predictions)))
-
+        # 2. Assemble predictions for all paths in parallel
+        path_results = Parallel(n_jobs=n_jobs)(
+            delayed(get_path_data)(path_num, locs)
+            for path_num, locs in locations.items()
+        )
+        
+        # Combine list of dicts into one dict
+        paths_predictions = dict(ChainMap(*reversed(path_results)))
         return paths_predictions

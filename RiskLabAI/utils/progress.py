@@ -1,53 +1,65 @@
+"""
+Provides a simple terminal-style progress bar.
+"""
+
 import sys
 import time
-from typing import NoReturn
-
+from typing import Optional
 
 def progress_bar(
-    current_progress: int, 
-    total_progress: int, 
-    start_time: float, 
-    bar_length: int = 20
-) -> NoReturn:
+    current_progress: int,
+    total_progress: int,
+    start_time: float,
+    bar_length: int = 20,
+) -> None:
     r"""
-    Display a terminal-style progress bar with completion percentage and estimated remaining time.
+    Display a terminal-style progress bar.
 
-    :param current_progress: Current value indicating the progress made.
-    :param total_progress: Total value representing the completion of the task.
-    :param start_time: The time at which the task started, typically acquired via time.time().
-    :param bar_length: Length of the progress bar in terminal characters, default is 20.
-    
-    The displayed progress bar uses the formula:
+    Shows completion percentage and estimated time remaining.
 
-    .. math::
-        \text{percentage} = \frac{\text{current\_progress}}{\text{total\_progress}}
-
-    The estimated remaining time is calculated based on elapsed time and progress made:
-
-    .. math::
-        \text{remaining\_time} = \frac{\text{elapsed\_time} \times (\text{total\_progress} - \text{current\_progress})}{\text{current\_progress}}
-
-    :return: None
+    Parameters
+    ----------
+    current_progress : int
+        Current iteration number (e.g., `i`).
+    total_progress : int
+        Total number of items to process.
+    start_time : float
+        The time the task started (from `time.time()`).
+    bar_length : int, default=20
+        Length of the progress bar in characters.
     """
-
+    if total_progress == 0:
+        return
+        
     percentage = current_progress / total_progress
-    arrow = '-' * int(round(percentage * bar_length) - 1) + '>'
-    spaces = ' ' * (bar_length - len(arrow))
-
-    elapsed_time = time.time() - start_time
     
+    # Handle the very first iteration
+    if percentage == 0:
+        arrow = ""
+    else:
+        arrow = "-" * int(round(percentage * bar_length) - 1) + ">"
+    
+    spaces = " " * (bar_length - len(arrow))
+    elapsed_time_sec = time.time() - start_time
+
+    # Calculate remaining time
     if current_progress == 0:
-        remaining_time = "Calculating..."
+        remaining_time_str = "Calculating..."
     else:
-        remaining_time = int(
-            (elapsed_time / current_progress) * (total_progress - current_progress) / 60
-        )
+        remaining_time_min = (
+            (elapsed_time_sec / current_progress)
+            * (total_progress - current_progress)
+        ) / 60
+        remaining_time_str = f"{remaining_time_min:.0f} minutes remaining"
 
-    if current_progress == total_progress:
-        sys.stdout.write("\rCompleted: [{0}] 100% - Task completed!\n".format('-' * bar_length))
+    # Assemble and print the bar
+    sys.stdout.write(
+        f"\rCompleted: [{arrow + spaces}] {percentage*100:.0f}% - {remaining_time_str}."
+    )
     
-    else:
-        sys.stdout.write("\rCompleted: [{0}] {1}% - {2} minutes remaining.".format(
-            arrow + spaces, int(round(percentage * 100)), remaining_time))
+    if current_progress == total_progress:
+        sys.stdout.write(
+            f"\rCompleted: [{'-' * bar_length}] 100% - Task completed!          \n"
+        )
     
     sys.stdout.flush()

@@ -1,3 +1,58 @@
 [build-system]
-requires = ['setuptools>=42']
-build-backend = 'setuptools.build_meta'
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RiskLabAI"
+version = "0.0.93"
+authors = [
+    { name = "RiskLab", email = "arian@risklab.ai" },
+]
+description = "Financial AI using Python, based on 'Advances in Financial Machine Learning' and 'Machine Learning for Asset Managers'."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = [
+    "finance",
+    "machine learning",
+    "quantitative finance",
+    "fintech",
+    "de prado",
+    "backtesting",
+]
+
+# --- DEPENDENCIES ---
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn",
+    "statsmodels",
+    "numba",
+    "torch",
+    "plotly",
+    "ta",
+    "quantecon",
+    "joblib",
+    "yfinance",
+    "memory_profiler",
+    "matplotlib",
+]
+
+[project.urls]
+Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
+"Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
+Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/releases"
+
+[options]
+packages = ["find:"]

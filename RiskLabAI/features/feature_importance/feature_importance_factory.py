@@ -1,49 +1,69 @@
-# from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
+"""
+Factory class for creating feature importance strategy objects.
+"""
 
-from typing import Optional
-import pandas as pd
-
+from typing import Any, Dict, List, Type
+from .feature_importance_strategy import FeatureImportanceStrategy
+from .feature_importance_mdi import FeatureImportanceMDI
+from .clustered_feature_importance_mdi import ClusteredFeatureImportanceMDI
+from .feature_importance_mda import FeatureImportanceMDA
+from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
+from .feature_importance_sfi import FeatureImportanceSFI
 
 class FeatureImportanceFactory:
     """
-    Factory class for building and fetching feature importance computation results.
-
-    Usage:
-
-    .. code-block:: python
-
-        factory = FeatureImportanceFactory()
-        factory.build(my_feature_importance_strategy_instance)
-        results = factory.get_results()
-
+    Factory class to create feature importance strategy instances.
     """
-    def __init__(self) -> None:
-        """Initialize the FeatureImportanceFactory class."""
-        self._results: Optional[pd.DataFrame] = None
 
-    def build(
-        self, 
-        feature_importance_strategy: FeatureImportanceStrategy
-    ) -> 'FeatureImportanceFactory':
+    @staticmethod
+    def create_feature_importance(
+        strategy_type: str, **kwargs: Any
+    ) -> FeatureImportanceStrategy:
         """
-        Build the feature importance based on the provided strategy.
+        Factory method to create and return an instance of a feature
+        importance strategy.
 
-        :param feature_importance_strategy: An instance of a strategy 
-            inheriting from FeatureImportanceStrategy.
+        Parameters
+        ----------
+        strategy_type : str
+            Type of strategy to create. Options include:
+            'MDI', 'ClusteredMDI', 'MDA', 'ClusteredMDA', 'SFI'.
+        **kwargs : Any
+            Keyword arguments to be passed to the strategy's
+            constructor (e.g., `classifier`, `clusters`, `n_splits`).
+
+        Returns
+        -------
+        FeatureImportanceStrategy
+            An instance of the specified strategy.
+
+        Raises
+        ------
+        ValueError
+            If an invalid `strategy_type` is provided.
+        """
         
-        :return: Current instance of the FeatureImportanceFactory.
-        """
-        self._results = feature_importance_strategy.compute()
-        return self
-
-    def get_results(self) -> pd.DataFrame:
-        """
-        Fetch the computed feature importance results.
-
-        :return: Dataframe containing the feature importance results.
-        """
-        if self._results is None:
-            raise ValueError("Feature importance not yet computed.")
+        strategies: Dict[str, Type[FeatureImportanceStrategy]] = {
+            "MDI": FeatureImportanceMDI,
+            "ClusteredMDI": ClusteredFeatureImportanceMDI,
+            "MDA": FeatureImportanceMDA,
+            "ClusteredMDA": ClusteredFeatureImportanceMDA,
+            "SFI": FeatureImportanceSFI,
+        }
         
-        return self._results
+        strategy_class = strategies.get(strategy_type)
+        
+        if strategy_class:
+            # Pass only the relevant arguments to the constructor
+            # This uses introspection to be robust
+            import inspect
+            sig = inspect.signature(strategy_class.__init__)
+            valid_kwargs = {
+                k: v for k, v in kwargs.items() if k in sig.parameters
+            }
+            return strategy_class(**valid_kwargs)
+        
+        raise ValueError(
+            f"Invalid strategy_type: {strategy_type}. "
+            f"Valid types are: {list(strategies.keys())}"
+        )

@@ -1,53 +1,67 @@
-import pandas as pd
+"""
+Determines strategy side (long/short) based on moving average crossovers.
+"""
 
+import pandas as pd
 
 def determine_strategy_side(
     prices: pd.Series,
     fast_window: int = 20,
     slow_window: int = 50,
-    exponential : bool = False,
-    mean_reversion: bool = False
+    exponential: bool = False,
+    mean_reversion: bool = False,
 ) -> pd.Series:
     r"""
-    Determines the trading side (long or short) based on moving average crossovers and 
-    the nature of the strategy (momentum or mean reversion).
-
-    This function computes the fast and slow moving averages of the provided price series. 
-    The trading side is decided based on the relationship between these averages and 
-    the chosen strategy type (momentum or mean reversion).
+    Determines the trading side based on moving average crossovers.
 
     .. math::
         \text{Momentum:}
         \begin{cases}
-        1 & \text{if } \text{fast\_moving\_average} \geq \text{slow\_moving\_average} \\
+        1 & \text{if } MA_{fast} \geq MA_{slow} \\
         -1 & \text{otherwise}
         \end{cases}
 
         \text{Mean Reversion:}
         \begin{cases}
-        1 & \text{if } \text{fast\_moving\_average} < \text{slow\_moving\_average} \\
+        1 & \text{if } MA_{fast} < MA_{slow} \\
         -1 & \text{otherwise}
         \end{cases}
 
-    :param prices: Series containing the prices.
-    :param fast_window: Window size for the fast moving average.
-    :param slow_window: Window size for the slow moving average.
-    :param exponential: If True, compute exponential moving averages. Otherwise, compute simple moving averages.
-    :param mean_reversion: If True, strategy is mean reverting. If False, strategy is momentum-based.
-    :return: Series containing strategy sides.
+    Parameters
+    ----------
+    prices : pd.Series
+        Time series of prices.
+    fast_window : int, default=20
+        Window size for the fast moving average.
+    slow_window : int, default=50
+        Window size for the slow moving average.
+    exponential : bool, default=False
+        If True, use Exponential Moving Averages (EWMA).
+        If False, use Simple Moving Averages (SMA).
+    mean_reversion : bool, default=False
+        If True, strategy is mean-reverting (short fast > slow).
+        If False, strategy is momentum-based (long fast > slow).
+
+    Returns
+    -------
+    pd.Series
+        A Series of sides (1 for long, -1 for short).
     """
-    # Check for invalid window sizes
     if fast_window >= slow_window:
-        raise ValueError("The fast window should be smaller than the slow window.")
+        raise ValueError("fast_window must be smaller than slow_window.")
 
     if exponential:
-        fast_moving_average = prices.ewm(span=fast_window, adjust=False, min_periods=1).mean()
-        slow_moving_average = prices.ewm(span=slow_window, adjust=False, min_periods=1).mean()
+        fast_ma = prices.ewm(span=fast_window, adjust=False, min_periods=1).mean()
+        slow_ma = prices.ewm(span=slow_window, adjust=False, min_periods=1).mean()
     else:
-        fast_moving_average = prices.rolling(window=fast_window, min_periods=1).mean()
-        slow_moving_average = prices.rolling(window=slow_window, min_periods=1).mean()
+        fast_ma = prices.rolling(window=fast_window, min_periods=1).mean()
+        slow_ma = prices.rolling(window=slow_window, min_periods=1).mean()
 
+    # Create signal: 1 if fast > slow, -1 if fast < slow
+    signal = (fast_ma >= slow_ma).astype(int) * 2 - 1
+    
     if mean_reversion:
-        return (fast_moving_average < slow_moving_average).astype(int) * 2 - 1
-    else:
-        return (fast_moving_average >= slow_moving_average).astype(int) * 2 - 1
+        # Invert the signal for mean reversion
+        return -signal
+    
+    return signal

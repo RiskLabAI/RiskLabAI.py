@@ -1,206 +1,269 @@
-from RiskLabAI.data.structures.abstract_information_driven_bars import *
+"""
+Abstract base class for Run Bars (Fixed and Expected).
+"""
+
+from abc import abstractmethod
+from typing import Union, List, Any, Iterable, Optional
+import numpy as np
+
+from RiskLabAI.data.structures.abstract_information_driven_bars import (
+    AbstractInformationDrivenBars, TickData
+)
+# Assuming ewma is in utils
+try:
+    from RiskLabAI.utils.ewma import ewma 
+except ImportError:
+    # Fallback if ewma is not in utils (as seen in older files)
+    def ewma(array: np.ndarray, window: int) -> np.ndarray:
+        """Placeholder EWMA function."""
+        if array.size == 0:
+            return np.array([np.nan])
+        return pd.Series(array).ewm(span=window).mean().values
+
 from RiskLabAI.utils.constants import *
 
 
 class AbstractRunBars(AbstractInformationDrivenBars):
     """
-    Abstract class that contains the run properties which are shared between the subtypes.
-    This class subtypes are as follows:
-        1- ExpectedRunBars
-        2- FixedRunBars
+    Abstract class for Run Bars (Fixed and Expected).
 
-    The class implements run bars sampling logic as explained on page 31,32 of Advances in Financial Machine Learning.
+    Implements the bar sampling logic based on cumulative buy or sell
+    imbalance (runs) exceeding a dynamic threshold.
+
+    Threshold = E[T] * max(P[buy] * E[theta_buy], (1-P[buy]) * E[theta_sell])
+
+    Reference:
+        Pages 31-32, Advances in Financial Machine Learning.
     """
 
     def __init__(
         self,
         bar_type: str,
-        window_size_for_expected_n_ticks_estimation: int,
+        window_size_for_expected_n_ticks_estimation: Optional[int],
         window_size_for_expected_imbalance_estimation: int,
         initial_estimate_of_expected_n_ticks_in_bar: int,
-        analyse_thresholds: bool
+        analyse_thresholds: bool,
     ):
         """
-        AbstractRunBars constructor function
-        :param bar_type: type of bar. e.g. expected_dollar_run_bars, fixed_tick_run_bars etc.
-        :param window_size_for_expected_n_ticks_estimation: window size used to estimate number of ticks expectation
-        :param initial_estimate_of_expected_n_ticks_in_bar: initial estimate of number of ticks expectation window size
-        :param window_size_for_expected_imbalance_estimation: window size used to estimate imbalance expectation
-        :param analyse_thresholds: whether return thresholds values (θ, number of ticks expectation, imbalance expectation) in a tabular format
+        Constructor.
+
+        Parameters
+        ----------
+        bar_type : str
+            e.g., 'dollar_run', 'tick_run'.
+        window_size_for_expected_n_ticks_estimation : int, optional
+            Window size for EWMA of E[T]. (None for FixedRunBars).
+        window_size_for_expected_imbalance_estimation : int
+            Window size for EWMA of E[theta].
+        initial_estimate_of_expected_n_ticks_in_bar : int
+            Initial guess for E[T].
+        analyse_thresholds : bool
+            If True, store threshold data for analysis.
         """
         super().__init__(
             bar_type,
             window_size_for_expected_n_ticks_estimation,
             initial_estimate_of_expected_n_ticks_in_bar,
-            window_size_for_expected_imbalance_estimation
+            window_size_for_expected_imbalance_estimation,
         )
 
         self.run_bars_statistics = {
-            CUMULATIVE_BUY_θ: 0,
-            CUMULATIVE_SELL_θ: 0,
-
+            CUMULATIVE_BUY_θ: 0.0,
+            CUMULATIVE_SELL_θ: 0.0,
             EXPECTED_BUY_IMBALANCE: np.nan,
             EXPECTED_SELL_IMBALANCE: np.nan,
             EXPECTED_BUY_TICKS_PROPORTION: np.nan,
-
             BUY_TICKS_NUMBER: 0,
-
-            # Previous bars number of ticks and previous tick imbalances
             PREVIOUS_BARS_N_TICKS_LIST: [],
             PREVIOUS_TICK_IMBALANCES_BUY_LIST: [],
             PREVIOUS_TICK_IMBALANCES_SELL_LIST: [],
-            PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST: []
+            PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST: [],
         }
 
-        if analyse_thresholds:
-            self.analyse_thresholds = []
-        else:
-            self.analyse_thresholds = None
+        self.analyse_thresholds = [] if analyse_thresholds else None
 
-    def construct_bars_from_data(self, data: Union[list, tuple, np.ndarray]) -> list:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
         """
-        The function is used to construct bars from input ticks data.
-        :param data: tabular data that contains date_time, price, and volume columns
-        :return: constructed bars
+        Constructs run bars from input tick data.
+
+        Parameters
+        ----------
+        data : Iterable[TickData]
+            An iterable (list, tuple, generator) of tick data.
+            Each tick is (date_time, price, volume).
+
+        Returns
+        -------
+        List[List[Any]]
+            A list of the constructed run bars.
         """
         bars_list = []
         for tick_data in data:
             self.tick_counter += 1
 
-            date_time, price, volume = tuple(tick_data)
+            date_time, price, volume = tick_data[0], tick_data[1], tick_data[2]
+            
+            # Update common fields
             tick_rule = self._tick_rule(price)
             self.update_base_fields(price, tick_rule, volume)
+            self.close_price = price
 
-            # imbalance calculations
+            # Calculate imbalance
             imbalance = self._imbalance_at_tick(price, tick_rule, volume)
 
             if imbalance > 0:
-                self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST].append(imbalance)
+                self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST].append(
+                    imbalance
+                )
                 self.run_bars_statistics[CUMULATIVE_BUY_θ] += imbalance
                 self.run_bars_statistics[BUY_TICKS_NUMBER] += 1
-
             elif imbalance < 0:
-                self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST].append(-imbalance)
+                self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST].append(
+                    -imbalance
+                )
                 self.run_bars_statistics[CUMULATIVE_SELL_θ] += -imbalance
 
-            warm_up = np.isnan([self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
-                                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE]]).any()
-
-            # initialize expected imbalance first time, when initial_estimate_of_expected_n_ticks_in_bar passed
-            if len(bars_list) == 0 and warm_up:
-
-                self.run_bars_statistics[EXPECTED_BUY_IMBALANCE] = self._ewma_expected_imbalance(
+            # Warm-up E[theta_buy], E[theta_sell], and P[buy]
+            warm_up_stats = [
+                self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
+                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE],
+                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION]
+            ]
+            
+            if np.isnan(warm_up_stats).any():
+                self.run_bars_statistics[
+                    EXPECTED_BUY_IMBALANCE
+                ] = self._ewma_expected_imbalance(
                     self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
                     self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW],
-                    warm_up
+                    warm_up=True
                 )
-                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] = self._ewma_expected_imbalance(
+                self.run_bars_statistics[
+                    EXPECTED_SELL_IMBALANCE
+                ] = self._ewma_expected_imbalance(
                     self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
                     self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW],
-                    warm_up
+                    warm_up=True
                 )
-
-                if not np.isnan([self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
-                                 self.run_bars_statistics[EXPECTED_SELL_IMBALANCE]]).any():
-                    self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION] = \
-                        self.run_bars_statistics[BUY_TICKS_NUMBER] / self.base_statistics[CUMULATIVE_TICKS]
+                
+                # Update P[buy]
+                if self.base_statistics[CUMULATIVE_TICKS] > 0:
+                    self.run_bars_statistics[
+                        EXPECTED_BUY_TICKS_PROPORTION
+                    ] = (
+                        self.run_bars_statistics[BUY_TICKS_NUMBER]
+                        / self.base_statistics[CUMULATIVE_TICKS]
+                    )
 
             if self.analyse_thresholds is not None:
-                self.run_bars_statistics[TIMESTAMP] = date_time
-                self.analyse_thresholds.append(dict(self.run_bars_statistics))
+                stats = {
+                    **self.base_statistics,
+                    **self.information_driven_bars_statistics,
+                    **self.run_bars_statistics,
+                    'timestamp': date_time
+                }
+                self.analyse_thresholds.append(stats)
+            
+            # Calculate threshold and check condition
+            threshold = self._calculate_run_threshold()
 
-            # is construction condition met to construct next bar or not
-
-            max_proportion = max(
-                self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW] *
-                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION],
-
-                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] *
-                (1 - self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION])
-            )
-            threshold = self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER] * max_proportion
-            is_construction_condition_met = self._bar_construction_condition(threshold)
-            if is_construction_condition_met:
+            if self._bar_construction_condition(threshold):
                 next_bar = self._construct_next_bar(
                     date_time,
                     self.tick_counter,
-                    price,
+                    self.close_price,
                     self.high_price,
                     self.low_price,
-                    threshold
+                    threshold,
                 )
-
                 bars_list.append(next_bar)
 
-                self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(self.base_statistics[CUMULATIVE_TICKS])
-                self.run_bars_statistics[PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST].append(
-                    self.run_bars_statistics[BUY_TICKS_NUMBER] / self.base_statistics[CUMULATIVE_TICKS])
+                # Store T and P[buy] for E[T] and E[P[buy]] updates
+                self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
+                    self.base_statistics[CUMULATIVE_TICKS]
+                )
+                self.run_bars_statistics[
+                    PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
+                ].append(
+                    self.run_bars_statistics[BUY_TICKS_NUMBER]
+                    / self.base_statistics[CUMULATIVE_TICKS]
+                )
 
-                # update expected number of ticks based on formed bars
-                self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER] = self._expected_number_of_ticks()
+                # Update E[T]
+                self.information_driven_bars_statistics[
+                    EXPECTED_TICKS_NUMBER
+                ] = self._expected_number_of_ticks()
 
-                # update buy ticks proportions
-                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION] = ewma(
-                    np.array(self.run_bars_statistics[PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST][
-                             -self.window_size_for_expected_n_ticks_estimation:],
-                             dtype=float),
-                    self.window_size_for_expected_n_ticks_estimation)[-1]
+                # Update E[P[buy]]
+                self.run_bars_statistics[
+                    EXPECTED_BUY_TICKS_PROPORTION
+                ] = ewma(
+                    np.array(
+                        self.run_bars_statistics[
+                            PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
+                        ][
+                            -self.window_size_for_expected_n_ticks_estimation:
+                        ],
+                        dtype=float,
+                    ),
+                    self.window_size_for_expected_n_ticks_estimation,
+                )[-1]
 
-                # update expected imbalance (ewma)
-                self.run_bars_statistics[EXPECTED_BUY_IMBALANCE] = self._ewma_expected_imbalance(
+                # Update E[theta_buy] and E[theta_sell]
+                self.run_bars_statistics[
+                    EXPECTED_BUY_IMBALANCE
+                ] = self._ewma_expected_imbalance(
                     self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
                     self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
                 )
-                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] = self._ewma_expected_imbalance(
+                self.run_bars_statistics[
+                    EXPECTED_SELL_IMBALANCE
+                ] = self._ewma_expected_imbalance(
                     self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
                     self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
                 )
 
-                # reset cached fields
+                # Reset cached fields
                 self._reset_cached_fields()
 
         return bars_list
 
-    def _bar_construction_condition(
-            self,
-            threshold
-    ):
-        """
-        Compute the condition of whether next bar should sample with current and previous tick datas or not.
-        :return: whether next bar should form with current and previous tick datas or not.
-        """
+    def _calculate_run_threshold(self) -> float:
+        """Helper function to calculate the dynamic run threshold."""
+        e_t = self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER]
+        e_p_buy = self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION]
+        e_theta_buy = self.run_bars_statistics[EXPECTED_BUY_IMBALANCE]
+        e_theta_sell = self.run_bars_statistics[EXPECTED_SELL_IMBALANCE]
 
-        max_proportion = max(
-            self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW] *
-            self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION],
+        if np.isnan([e_t, e_p_buy, e_theta_buy, e_theta_sell]).any():
+            return np.inf
 
-            self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] *
-            (1 - self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION])
-        )
+        # Threshold = E[T] * max(P[buy] * E[theta_buy], (1-P[buy]) * E[theta_sell])
+        buy_threshold = e_p_buy * e_theta_buy
+        sell_threshold = (1 - e_p_buy) * e_theta_sell
+        
+        return e_t * max(buy_threshold, sell_threshold)
 
-        if not np.isnan(max_proportion):
-            max_θ = max(
-                self.run_bars_statistics[CUMULATIVE_BUY_θ],
-                self.run_bars_statistics[CUMULATIVE_SELL_θ]
-            )
 
-            condition_is_met = max_θ > threshold
-            return condition_is_met
-        else:
+    def _bar_construction_condition(self, threshold: float) -> bool:
+        """Check if cumulative buy or sell run exceeds the threshold."""
+        if np.isinf(threshold) or np.isnan(threshold):
             return False
+            
+        max_theta = max(
+            self.run_bars_statistics[CUMULATIVE_BUY_θ],
+            self.run_bars_statistics[CUMULATIVE_SELL_θ],
+        )
+        return max_theta >= threshold
 
     def _reset_cached_fields(self):
-        """
-        This function are used (directly or override) by all concrete or abstract subtypes. The function is used to reset cached fields in bars construction process when next bar is sampled.
-        :return:
-        """
+        """Reset base fields and cumulative run counters."""
         super()._reset_cached_fields()
-        self.run_bars_statistics[CUMULATIVE_BUY_θ] = 0
-        self.run_bars_statistics[CUMULATIVE_SELL_θ] = 0
+        self.run_bars_statistics[CUMULATIVE_BUY_θ] = 0.0
+        self.run_bars_statistics[CUMULATIVE_SELL_θ] = 0.0
         self.run_bars_statistics[BUY_TICKS_NUMBER] = 0
 
     @abstractmethod
-    def _expected_number_of_ticks(self) -> Union[float, int]:
-        """
-        Calculate number of ticks expectation when new imbalance bar is sampled.
-        """
+    def _expected_number_of_ticks(self) -> float:
+        """Calculate E[T] when a new bar is sampled."""
+        pass

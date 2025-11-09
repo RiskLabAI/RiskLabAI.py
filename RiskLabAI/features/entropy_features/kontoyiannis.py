@@ -1,68 +1,112 @@
-from collections import Counter
-from math import log2
-from typing import Dict, Tuple
+"""
+Implements the Kontoyiannis Entropy estimator (LZ-based).
+"""
 
+from math import log2
+from typing import Tuple, Optional, Dict
 
 def longest_match_length(
-    message: str,
-    i: int,
-    n: int
+    message: str, i: int, n: int
 ) -> Tuple[int, str]:
     """
-    Calculate the length of the longest match.
+    Find the length of the longest match for the substring starting at `i`.
 
-    :param message: Input encoded message
-    :type message: str
-    :param i: Index value
-    :type i: int
-    :param n: Length parameter
-    :type n: int
-    :return: Tuple containing matched length and substring
-    :rtype: tuple
+    This function searches for the longest match of `message[i:i+l]`
+    within the preceding window `message[max(0, i-n):i]`.
+
+    Parameters
+    ----------
+    message : str
+        Input string.
+    i : int
+        The starting index of the substring to match.
+    n : int
+        The length of the look-back window.
+
+    Returns
+    -------
+    Tuple[int, str]
+        - The length of the longest match (L_i) + 1.
+        - The matched substring.
     """
     longest_match = ""
+    # Iterate through possible lengths `l`
     for l in range(1, n + 1):
-        pattern = message[i:i + l + 1]
-        for j in range(i - n + 1, i + 1):
-            candidate = message[j:j + l + 1]
+        pattern = message[i : i + l]
+        
+        # Stop if pattern goes beyond message length
+        if i + l > len(message):
+            break
+            
+        found = False
+        # Look back in the window [max(0, i-n), i-1]
+        for j in range(max(0, i - n), i):
+            candidate = message[j : j + l]
             if pattern == candidate:
                 longest_match = pattern
+                found = True
                 break
+        
+        # If pattern of length `l` was not found, the
+        # longest match was of length `l-1`.
+        if not found:
+            break
 
     return len(longest_match) + 1, longest_match
 
 
 def kontoyiannis_entropy(
-    message: str,
-    window: int = None
+    message: str, window: Optional[int] = None
 ) -> float:
-    """
-    Calculate Kontoyiannis Entropy.
+    r"""
+    Calculate Kontoyiannis Entropy (an LZ78-based estimator).
 
-    :param message: Input encoded message
-    :type message: str
-    :param window: Length of expanding window, default is None
-    :type window: int or None
-    :return: Calculated Kontoyiannis Entropy
-    :rtype: float
+    .. math::
+        H_k(n) = \frac{1}{\sum_{i} 1} \sum_{i} \frac{\log_2(n_i)}{L_i(n)}
+
+    Reference:
+        Kontoyiannis, I. (1998). "Pointwise redundancy in Lempel-Ziv
+        parsing."
+
+    Parameters
+    ----------
+    message : str
+        Input string.
+    window : int, optional
+        If None, uses an expanding window (full lookback, n_i = i).
+        If set, uses a rolling window (n_i = window).
+
+    Returns
+    -------
+    float
+        The calculated Kontoyiannis Entropy (H_k).
     """
-    output = {"num": 0, "sum": 0, "sub_string": []}
+    output: Dict[str, Any] = {"num": 0, "sum": 0, "sub_string": []}
     message_length = len(message)
 
     if window is None:
-        points = range(2, message_length // 2 + 2)
+        # Expanding window: n = i
+        points = range(2, message_length)
     else:
-        window = min(window, message_length // 2)
-        points = range(window + 1, message_length - window + 2)
+        # Rolling window: n = window
+        window = min(window, message_length - 1)
+        points = range(window, message_length)
+
+    if not points:
+        return 0.0
 
     for i in points:
         n = i if window is None else window
-        l, sub_string = longest_match_length(message, i, n)
-        output["sum"] += log2(n) / l
+        if n == 0: continue # Avoid log2(0)
+            
+        l_i, sub_string = longest_match_length(message, i, n)
+        
+        output["sum"] += log2(n) / l_i
         output["sub_string"].append(sub_string)
         output["num"] += 1
 
-    output["h"] = output["sum"] / output["num"]
-    output["r"] = 1 - output["h"] / log2(message_length)
+    if output["num"] == 0:
+        return 0.0
 
+    output["h"] = output["sum"] / output["num"]
     return output["h"]

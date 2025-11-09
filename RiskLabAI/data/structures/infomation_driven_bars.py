@@ -1,44 +1,43 @@
+"""
+(DEPRECATED) Functional implementation of Information-Driven Bars.
+
+This logic is superseded by the `ImbalanceBars` and `RunBars` classes.
+Note the typo in the filename ("infomation").
+"""
+
 from typing import Tuple
 import numpy as np
 import pandas as pd
 
-from RiskLabAI.data.structures.utilities_lopez import compute_thresholds, create_ohlcv_dataframe
+# Assuming these helpers are available
+from RiskLabAI.utils.utilities_lopez import (
+    compute_thresholds, create_ohlcv_dataframe
+)
 
 def generate_information_driven_bars(
     tick_data: pd.DataFrame,
     bar_type: str = "volume",
-    initial_expected_ticks: int = 2000
+    initial_expected_ticks: int = 2000,
 ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     """
-    Implements Information-Driven Bars.
+    (DEPRECATED) Implements Information-Driven Bars.
 
-    This function computes the Information-Driven Bars based on tick data and the chosen bar type.
+    Parameters
+    ----------
+    tick_data : pd.DataFrame
+        DataFrame of tick data with 'volume_labeled', 'label', 'dollar_labeled'.
+    bar_type : str, default="volume"
+        Type of bar: "tick", "volume", or "dollar".
+    initial_expected_ticks : int, default=2000
+        The initial value of expected ticks (E[T]).
 
-    :param tick_data: DataFrame of tick data.
-    :type tick_data: pd.DataFrame
-    :param bar_type: Type of the bar. Can be "tick", "volume", or "dollar".
-    :type bar_type: str, default "volume"
-    :param initial_expected_ticks: The initial value of expected ticks.
-    :type initial_expected_ticks: int, default 2000
-
-    :return: Tuple containing the OHLCV DataFrame, absolute thetas, and thresholds.
-    :rtype: Tuple[pd.DataFrame, np.ndarray, np.ndarray]
-
-    .. note:: 
-       Reference:
-       De Prado, M. (2018) Advances in Financial Machine Learning. John Wiley & Sons.
-
-    .. math::
-       E_b = |\bar{x}|
-
-       where:
-       - :math:`E_b` is the expected value of the bars.
-       - :math:`\bar{x}` is the mean of the input data.
-
-    The compute_thresholds function is called to compute times_delta, thetas_absolute, thresholds,
-    times, thetas, and grouping_id.
+    Returns
+    -------
+    Tuple[pd.DataFrame, np.ndarray, np.ndarray]
+        - ohlcv_dataframe: The generated bars.
+        - thetas_absolute: Array of absolute cumulative imbalances.
+        - thresholds: Array of dynamic thresholds.
     """
-
     if bar_type == "volume":
         input_data = tick_data['volume_labeled']
     elif bar_type == "tick":
@@ -48,9 +47,20 @@ def generate_information_driven_bars(
     else:
         raise ValueError("Invalid bar type. Choose 'tick', 'volume', or 'dollar'.")
 
+    # E[b] = |mean(imbalance)|
     bar_expected_value = np.abs(input_data.mean())
-    times_delta, thetas_absolute, thresholds, times, thetas, grouping_id = compute_thresholds(
-        input_data, initial_expected_ticks, bar_expected_value)
+    
+    # Compute thresholds and grouping
+    (
+        times_delta,
+        thetas_absolute,
+        thresholds,
+        times,
+        thetas,
+        grouping_id,
+    ) = compute_thresholds(
+        input_data.values, initial_expected_ticks, bar_expected_value
+    )
 
     tick_grouped = tick_data.reset_index().assign(grouping_id=grouping_id)
     dates = tick_grouped.groupby('grouping_id', as_index=False).first()['dates']

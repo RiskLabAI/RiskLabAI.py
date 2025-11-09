@@ -1,23 +1,28 @@
-from typing import Dict, Union, Tuple, List, Any, Optional, Generator
-import pandas as pd
-import numpy as np
+"""
+Defines the abstract base class (ABC) for all cross-validation strategies
+in the RiskLabAI library.
+"""
+
 from abc import ABC, abstractmethod
+from typing import (
+    Any, Dict, Generator, List, Optional, Tuple, Union
+)
+
+import numpy as np
+import pandas as pd
+
+# For type hinting sklearn-like estimators
+Estimator = Any
 
 class CrossValidator(ABC):
     """
     Abstract Base Class (ABC) for cross-validation strategies.
-    Handles both single data inputs and dictionary inputs.
 
-    :param data: The input data, either as a single DataFrame or a dictionary of DataFrames.
-    :type data: Union[pd.DataFrame, Dict[str, pd.DataFrame]]
-
-    :param labels: The labels corresponding to the data, either as a single Series or a dictionary of Series.
-    :type labels: Optional[Union[pd.Series, Dict[str, pd.Series]]]
-
-    :param groups: Optional group labels for stratified splitting.
-    :type groups: Optional[np.ndarray]
+    This interface defines the common methods required for all cross-validators,
+    ensuring they can handle both single and multiple datasets (passed as dicts)
+    and provide methods for splitting, generating backtest paths, and
+    running backtest predictions.
     """
-
 
     @abstractmethod
     def get_n_splits(
@@ -27,21 +32,23 @@ class CrossValidator(ABC):
         groups: Optional[np.ndarray] = None
     ) -> int:
         """
-        Return number of splits.
+        Return the total number of splits.
 
-        :param data: Dataset or dictionary of datasets.
-        :type data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]]
+        Parameters
+        ----------
+        data : pd.DataFrame or dict, optional
+            Dataset or dictionary of datasets.
+        labels : pd.Series or dict, optional
+            Labels or dictionary of labels.
+        groups : np.ndarray, optional
+            Group labels for the samples.
 
-        :param labels: Labels or dictionary of labels.
-        :type labels: Optional[Union[pd.Series, Dict[str, pd.Series]]]
-
-        :param groups: Group labels for the samples.
-        :type groups: Optional[np.ndarray]
-
-        :return: Number of splits.
-        :rtype: int
+        Returns
+        -------
+        int
+            The total number of splits.
         """
-
+        raise NotImplementedError
 
     @abstractmethod
     def _single_split(
@@ -49,18 +56,22 @@ class CrossValidator(ABC):
         single_data: pd.DataFrame,
     ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
         """
-        Splits a single data set into train-test indices.
+        Split a single dataset into train-test indices.
 
-        This function provides train-test indices to split the data into train/test sets
-        by respecting the time order (if applicable) and the specified number of splits.
+        This function provides train-test indices to split a single dataset
+        into train/test sets.
 
-        :param single_data: Input dataset.
-        :type single_data: pd.DataFrame
+        Parameters
+        ----------
+        single_data : pd.DataFrame
+            Input dataset.
 
-        :return: Generator yielding train-test indices.
-        :rtype: Generator[Tuple[np.ndarray, np.ndarray], None, None]
+        Yields
+        -------
+        Generator[Tuple[np.ndarray, np.ndarray], None, None]
+            A generator where each item is a tuple of (train_indices, test_indices).
         """
-
+        raise NotImplementedError
 
     @abstractmethod
     def split(
@@ -73,46 +84,54 @@ class CrossValidator(ABC):
         Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None]
     ]:
         """
-        Splits data or a dictionary of data into train-test indices.
+        Split data (or dictionary of data) into train-test indices.
 
-        This function returns a generator that yields train-test indices. If a dictionary
-        of data is provided, the generator yields a key followed by the train-test indices.
+        This function returns a generator that yields train-test indices. If a
+        dictionary of data is provided, the generator yields a key followed
+        by the (train_indices, test_indices) tuple.
 
-        :param data: Dataset or dictionary of datasets.
-        :type data: Union[pd.DataFrame, Dict[str, pd.DataFrame]]
-        :param labels: Labels or dictionary of labels.
-        :type labels: Optional[Union[pd.Series, Dict[str, pd.Series]]]
-        :param groups: Group labels for the samples.
-        :type groups: Optional[np.ndarray]
+        Parameters
+        ----------
+        data : pd.DataFrame or dict
+            Dataset or dictionary of datasets.
+        labels : pd.Series or dict, optional
+            Labels or dictionary of labels.
+        groups : np.ndarray, optional
+            Group labels for the samples.
 
-        :return: Generator yielding either train-test indices directly or a key
-                followed by train-test indices.
-        :rtype: Union[
-            Generator[Tuple[np.ndarray, np.ndarray], None, None],
-            Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None]
-        ]
+        Yields
+        -------
+        Generator
+            - If data is a pd.DataFrame: (train_indices, test_indices)
+            - If data is a dict: (key, (train_indices, test_indices))
         """
-
+        raise NotImplementedError
 
     @abstractmethod
     def _single_backtest_paths(
         self,
         single_data: pd.DataFrame
-    ) -> Dict[str, List[Dict[str, List[np.ndarray]]]]:
+    ) -> Dict[str, List[Dict[str, np.ndarray]]]:
         """
-        Generates backtest paths for a single dataset.
+        Generate backtest paths for a single dataset.
 
-        This function creates and returns backtest paths (i.e., combinations of training and test sets)
-        for a single dataset by applying k-fold splitting or any other splitting strategy defined
-        by the `_single_split` function.
+        A "path" is a specific sequence of train/test folds. For simple
+        K-Fold, there is only one path. For combinatorial methods, there
+        can be multiple.
 
-        :param single_data: Input dataset.
-        :type single_data: pd.DataFrame
+        Parameters
+        ----------
+        single_data : pd.DataFrame
+            Input dataset.
 
-        :return: Dictionary of backtest paths.
-        :rtype: Dict[str, List[Dict[str, List[np.ndarray]]]]
+        Returns
+        -------
+        Dict[str, List[Dict[str, np.ndarray]]]
+            A dictionary where keys are path identifiers (e.g., "Path 1")
+            and values are lists of splits. Each split is a dictionary
+            with "Train" and "Test" keys holding their respective indices.
         """
-
+        raise NotImplementedError
 
     @abstractmethod
     def backtest_paths(
@@ -120,62 +139,66 @@ class CrossValidator(ABC):
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
     ) -> Union[
         Dict[str, List[Dict[str, np.ndarray]]],
-        Dict[str, Dict[str, List[Dict[str, List[np.ndarray]]]]]
+        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]]
     ]:
         """
-        Generates backtest paths for data.
+        Generate backtest paths for data or a dictionary of data.
 
-        This function returns backtest paths for either a single dataset or a dictionary
-        of datasets. Each backtest path consists of combinations of training and test sets.
+        Parameters
+        ----------
+        data : pd.DataFrame or dict
+            Dataset or dictionary of datasets.
 
-        :param data: Dataset or dictionary of datasets.
-        :type data: Union[pd.DataFrame, Dict[str, pd.DataFrame]]
-        :param labels: Labels or dictionary of labels.
-        :type labels: Union[pd.Series, Dict[str, pd.Series]]
-
-        :return: Dictionary of backtest paths or dictionary of dictionaries for multiple datasets.
-        :rtype: Union[
-            Dict[str, List[Dict[str, np.ndarray]]],
-            Dict[str, Dict[str, List[Dict[str, List[np.ndarray]]]]]
-        ]
+        Returns
+        -------
+        Union[Dict, Dict[str, Dict]]
+            - If data is a pd.DataFrame: A dictionary of backtest paths.
+            - If data is a dict: A nested dictionary, where the first-level
+              key is the dataset key, and the value is its
+              dictionary of backtest paths.
         """
-
+        raise NotImplementedError
 
     @abstractmethod
     def _single_backtest_predictions(
         self,
-        single_estimator: Any,
+        single_estimator: Estimator,
         single_data: pd.DataFrame,
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
+        predict_probability: bool = False,
         n_jobs: int = 1
     ) -> Dict[str, np.ndarray]:
         """
-        Obtain predictions for a single dataset during backtesting.
+        Obtain backtest predictions for a single dataset.
 
-        This function leverages parallel computation to train and predict on different train-test splits
-        of a single dataset using a given estimator. It utilizes the `_single_split` method to generate
-        the train-test splits.
+        Parameters
+        ----------
+        single_estimator : Estimator
+            A scikit-learn-like estimator to be trained and used for predictions.
+        single_data : pd.DataFrame
+            Data for the single dataset.
+        single_labels : pd.Series
+            Labels for the single dataset.
+        single_weights : np.ndarray, optional
+            Sample weights for the observations. Defaults to equal weights.
+        predict_probability : bool, default=False
+            If True, call `predict_proba()` instead of `predict()`.
+        n_jobs : int, default=1
+            The number of jobs to run in parallel.
 
-        :param single_estimator: Estimator or model to be trained and used for predictions.
-        :type single_estimator: Any
-        :param single_data: Data of the single dataset.
-        :type single_data: pd.DataFrame
-        :param single_labels: Labels corresponding to the single dataset.
-        :type single_labels: pd.Series
-        :param single_weights: Weights for the observations in the single dataset.
-                            Defaults to equally weighted if not provided.
-        :type single_weights: np.ndarray, optional
-        :param n_jobs: The number of jobs to run in parallel. Default is 1.
-        :type n_jobs: int, optional
-        :return: Predictions structured in a dictionary for the backtest paths.
-        :rtype: Dict[str, np.ndarray]
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are path identifiers (e.g., "Path 1")
+            and values are the contiguous arrays of out-of-sample predictions.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def backtest_predictions(
         self,
-        estimator: Union[Any, Dict[str, Any]],
+        estimator: Union[Estimator, Dict[str, Estimator]],
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
         labels: Union[pd.Series, Dict[str, pd.Series]],
         sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]] = None,
@@ -185,24 +208,29 @@ class CrossValidator(ABC):
         """
         Generate backtest predictions for single or multiple datasets.
 
-        For each dataset, this function leverages the `_single_backtest_predictions` method to obtain
-        predictions for different train-test splits using the given estimator.
+        Parameters
+        ----------
+        estimator : Estimator or dict
+            Model(s) to be trained. Can be a single estimator or a
+            dictionary of estimators for multiple datasets.
+        data : pd.DataFrame or dict
+            Input data. Can be a single dataset or a dictionary of datasets.
+        labels : pd.Series or dict
+            Target labels. Can be a single series or a dictionary of series.
+        sample_weights : np.ndarray or dict, optional
+            Sample weights. Can be a single array or a dictionary of arrays.
+            Defaults to None (equal weights).
+        predict_probability : bool, default=False
+            If True, call `predict_proba()` instead of `predict()`.
+        n_jobs : int, default=1
+            The number of jobs to run in parallel.
 
-        :param estimator: Model or estimator to be trained and used for predictions.
-                        Can be a single estimator or a dictionary of estimators for multiple datasets.
-        :type estimator: Union[Any, Dict[str, Any]]
-        :param data: Input data for training and testing. Can be a single dataset or
-                    a dictionary of datasets for multiple datasets.
-        :type data: Union[pd.DataFrame, Dict[str, pd.DataFrame]]
-        :param labels: Target labels for training and testing. Can be a single series or
-                    a dictionary of series for multiple datasets.
-        :type labels: Union[pd.Series, Dict[str, pd.Series]]
-        :param sample_weights: Weights for the observations in the dataset(s).
-                            Can be a single array or a dictionary of arrays for multiple datasets.
-                            Defaults to None, which means equal weights for all observations.
-        :type sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]]
-        :param n_jobs: The number of jobs to run in parallel. Default is 1.
-        :type n_jobs: int, optional
-        :return: Backtest predictions structured in a dictionary (or nested dictionaries for multiple datasets).
-        :rtype: Union[Dict[str, np.ndarray], Dict[str, Dict[str, np.ndarray]]]
+        Returns
+        -------
+        Union[Dict, Dict[str, Dict]]
+            - If data is a pd.DataFrame: A dictionary of predictions.
+            - If data is a dict: A nested dictionary, where the first-level
+              key is the dataset key, and the value is its
+              dictionary of predictions.
         """
+        raise NotImplementedError

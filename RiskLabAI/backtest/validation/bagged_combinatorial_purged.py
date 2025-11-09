@@ -1,17 +1,60 @@
-from typing import Union, Dict, Any
-import pandas as pd
-import numpy as np
-from collections import ChainMap
-from joblib import Parallel, delayed
+"""
+Implements Bagged Combinatorial Purged Cross-Validation (B-CPCV).
+"""
+
 import warnings
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.ensemble import BaggingClassifier, BaggingRegressor
-from joblib_progress import joblib_progress
+from collections import ChainMap
+from typing import (
+    Any, Dict, Optional, Union
+)
+
+import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.base import clone
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.exceptions import ConvergenceWarning
 
 from .combinatorial_purged import CombinatorialPurged
 
+# For type hinting sklearn-like estimators
+Estimator = Any
+
 class BaggedCombinatorialPurged(CombinatorialPurged):
+    """
+    Bagged Combinatorial Purged Cross-Validation (B-CPCV).
+
+    This class extends CPCV by applying a bagging (Bootstrap Aggregating)
+    wrapper to the estimator for each combinatorial split. This helps
+    to reduce variance and improve model stability.
+
+    Parameters
+    ----------
+    n_splits : int
+        Number of splits/groups to partition the data into.
+    n_test_groups : int
+        Size of the testing set in terms of groups.
+    times : pd.Series or Dict[str, pd.Series]
+        The timestamp series associated with the labels.
+    embargo : float, default=0
+        The embargo rate for purging.
+    classifier : bool, default=True
+        If True, use `sklearn.ensemble.BaggingClassifier`.
+        If False, use `sklearn.ensemble.BaggingRegressor`.
+    n_estimators : int, default=10
+        The number of base estimators in the ensemble.
+    max_samples : float, default=1.0
+        The number of samples to draw to train each base estimator.
+    max_features : float, default=1.0
+        The number of features to draw to train each base estimator.
+    bootstrap : bool, default=True
+        Whether samples are drawn with replacement.
+    bootstrap_features : bool, default=False
+        Whether features are drawn with replacement.
+    random_state : int, optional
+        Controls the randomness of the bootstrapping.
+    """
+
     def __init__(
         self,
         n_splits: int,
@@ -24,35 +67,10 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         max_features: float = 1.0,
         bootstrap: bool = True,
         bootstrap_features: bool = False,
-        random_state: int = None 
+        random_state: int = None
     ):
         """
         Initialize the BaggedCombinatorialPurged class.
-
-        Parameters
-        ----------
-        n_splits : int
-            Number of splits/groups to partition the data into.
-        n_test_groups : int
-            Size of the testing set in terms of groups.
-        times : Union[pd.Series, Dict[str, pd.Series]]
-            The timestamp series associated with the labels.
-        embargo : float
-            The embargo rate for purging.
-        classifier : bool
-            Determines whether to use a BaggingClassifier or BaggingRegressor.
-        n_estimators : int
-            The number of base estimators in the ensemble.
-        max_samples : float
-            The number of samples to draw from X to train each base estimator.
-        max_features : float
-            The number of features to draw from X to train each base estimator.
-        bootstrap : bool
-            Whether samples are drawn with replacement.
-        bootstrap_features : bool
-            Whether features are drawn with replacement.
-        random_state : int
-            The seed used by the random number generator.
         """
         super().__init__(n_splits, n_test_groups, times, embargo)
         self.classifier = classifier
@@ -65,116 +83,172 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
 
     def _single_backtest_predictions(
         self,
-        single_estimator: Any,
+        single_estimator: Estimator,
         single_times: pd.Series,
         single_data: pd.DataFrame,
         single_labels: pd.Series,
-        single_weights: np.ndarray,
+        single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1
     ) -> Dict[str, np.ndarray]:
         """
-        Generate predictions for a single backtest using combinatorial splits with bagging.
+        Obtain backtest predictions for all B-CPCV paths.
 
-        This method calculates predictions across various paths created by combinatorial splits
-        of the data. For each combinatorial split, a bagged estimator is trained and then used
-        to predict on the corresponding test set.
+        This method overrides the parent by wrapping the `single_estimator`
+        in a `BaggingClassifier` or `BaggingRegressor` before training.
 
-        :param single_estimator: The machine learning model or estimator to be trained.
-        :param single_times: Timestamps corresponding to the data points.
-        :param single_data: Input data on which the model is trained and predictions are made.
-        :param single_labels: Labels corresponding to the input data.
-        :param single_weights: Weights for each data point.
-        :param predict_probability: If True, predict the probability of forecasts.
-        :type predict_probability: bool
-        :param n_jobs: Number of CPU cores to use for parallelization. Default is 1.
+        Parameters
+        ----------
+        single_estimator : Estimator
+            The *base* estimator to be used inside the bagging ensemble.
+        single_times : pd.Series
+            The 'times' (info range) Series for this dataset.
+        single_data : pd.DataFrame
+            Data for the single dataset.
+        single_labels : pd.Series
+            Labels for the single dataset.
+        single_weights : np.ndarray, optional
+            Sample weights. Defaults to equal weights.
+        predict_probability : bool, default=False
+            If True, call `predict_proba()` instead of `predict()`.
+            Only valid if `classifier=True`.
+        n_jobs : int, default=1
+            The number of jobs to run in parallel.
 
-        :return: A dictionary where keys are path names and values are arrays of predictions.
-
-        .. note:: This function relies on internal methods (e.g., `_get_train_indices`)
-                to manage data splits and training.
-
-        .. note:: Parallelization is used to speed up the training of models for different splits.
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are "Path {id}" and values are
+            the contiguous arrays of out-of-sample predictions for each path.
         """
-        
         self._validate_input(single_times, single_data)
 
         if single_weights is None:
-            single_weights = pd.Series(np.ones((len(single_data),)))
+            single_weights = np.ones(len(single_data))
+            
+        if predict_probability and not self.classifier:
+            raise ValueError(
+                "Cannot use predict_probability=True when classifier=False"
+            )
 
-        paths_predictions = {}
-        combinations_, locations, split_segments = self._combinations_and_path_locations_and_split_segments(single_data)
+        combinations_list, locations, split_segments = \
+            self._combinations_and_path_locations_and_split_segments(single_data)
 
-        def train_single_estimator(
-            single_estimator_,
-            combinatorial_test_indices
-        ):
-            combinatorial_train_indices = self._get_train_indices(combinatorial_test_indices, single_times)
+        def train_single_bagging_estimator(
+            base_estimator_: Estimator,
+            combinatorial_test_indices: np.ndarray
+        ) -> Estimator:
+            """Train one Bagging estimator for one C(n,k) split."""
+            train_indices = self._get_train_indices(
+                combinatorial_test_indices,
+                single_times,
+                continous_test_times=False
+            )
 
-            X_train = single_data.iloc[combinatorial_train_indices]
-            y_train = single_labels.iloc[combinatorial_train_indices]
-            weights_train = single_weights.iloc[combinatorial_train_indices]
+            X_train = single_data.iloc[train_indices]
+            y_train = single_labels.iloc[train_indices]
+            weights_train = single_weights[train_indices]
 
+            # --- Bagging Wrapper ---
             if self.classifier:
                 bagging_estimator = BaggingClassifier(
-                    estimator=single_estimator_,
+                    estimator=base_estimator_,
                     n_estimators=self.n_estimators,
                     max_samples=self.max_samples,
                     max_features=self.max_features,
                     bootstrap=self.bootstrap,
                     bootstrap_features=self.bootstrap_features,
-                    random_state=self.random_state
+                    random_state=self.random_state,
+                    n_jobs=n_jobs  # Parallelize bagging itself
                 )
             else:
                 bagging_estimator = BaggingRegressor(
-                    estimator=single_estimator_,
+                    estimator=base_estimator_,
                     n_estimators=self.n_estimators,
                     max_samples=self.max_samples,
                     max_features=self.max_features,
                     bootstrap=self.bootstrap,
                     bootstrap_features=self.bootstrap_features,
-                    random_state=self.random_state
+                    random_state=self.random_state,
+                    n_jobs=n_jobs # Parallelize bagging itself
                 )
+            # --- End Bagging Wrapper ---
 
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', category=ConvergenceWarning)
                 try:
                     bagging_estimator.fit(X_train, y_train, sample_weight=weights_train)
-
                 except (TypeError, ValueError):
+                    # Fallback for models without sample_weight
                     bagging_estimator.fit(X_train, y_train)
 
             return bagging_estimator
 
-        # with joblib_progress("Backtesting...", total=self.get_n_splits()): 
-        combinatorial_trained_estimators = Parallel(n_jobs=n_jobs)(
-            delayed(train_single_estimator)(clone(single_estimator), combinatorial_test_indices)
-            for combinatorial_test_indices in CombinatorialPurged._combinatorial_splits(combinations_, split_segments))
+        # 1. Train all C(n, k) *bagging* estimators in parallel
+        # Note: We set n_jobs=1 for the *outer* parallel loop
+        # and let the *inner* bagging estimator use `n_jobs`.
+        # This avoids nested parallelization issues.
+        
+        # Determine parallelization strategy
+        if n_jobs > 1 or n_jobs == -1:
+            outer_n_jobs = n_jobs
+            inner_n_jobs = 1 
+            
+            # Update bagging params to use inner_n_jobs
+            if self.classifier:
+                BaggingClassifier.__init__ = (
+                    lambda self, **kwargs: 
+                    super(BaggingClassifier, self).__init__(**kwargs, n_jobs=inner_n_jobs)
+                )
+            else:
+                BaggingRegressor.__init__ = (
+                    lambda self, **kwargs: 
+                    super(BaggingRegressor, self).__init__(**kwargs, n_jobs=inner_n_jobs)
+                )
+        else:
+            # Let bagging use all cores if outer loop is serial
+            outer_n_jobs = 1
+            inner_n_jobs = -1 # Use all
+        
+        combinatorial_trained_estimators = Parallel(n_jobs=outer_n_jobs)(
+            delayed(train_single_bagging_estimator)(
+                clone(single_estimator), test_indices
+            )
+            for test_indices in self._combinatorial_splits(
+                combinations_list, split_segments
+            )
+        )
+        
+        # Restore default constructors
+        BaggingClassifier.__init__ = BaggingClassifier.__init__
+        BaggingRegressor.__init__ = BaggingRegressor.__init__
 
 
+        # 2. Assemble predictions (this is fast, can be serial or parallel)
         def get_path_data(
-            path_num,
-            locs
-        ):
-            path_data = []
-
-            for (G, S) in locs:
-                test_indices = split_segments[G]
-                X_test = single_data.iloc[test_indices]
+            path_num: int,
+            locs: List[Tuple[int, int]]
+        ) -> Dict[str, np.ndarray]:
+            """Assemble predictions for one path."""
+            path_predictions = []
+            for (group_idx, split_idx) in locs:
+                test_indices_segment = split_segments[group_idx]
+                X_test = single_data.iloc[test_indices_segment]
+                estimator = combinatorial_trained_estimators[split_idx]
 
                 if predict_probability:
-                    predictions = combinatorial_trained_estimators[S].predict_proba(X_test)
-
+                    preds = estimator.predict_proba(X_test)
                 else:
-                    predictions = combinatorial_trained_estimators[S].predict(X_test)
+                    preds = estimator.predict(X_test)
 
-                path_data.extend(predictions)
+                path_predictions.append(preds)
+            
+            return {f"Path {path_num}": np.concatenate(path_predictions)}
 
-            path_data = {f"Path {path_num}" : np.array(path_data)}
-
-            return path_data
-
-        paths_predictions = Parallel(n_jobs=n_jobs)(delayed(get_path_data)(path_num, locs) for path_num, locs in locations.items())
-        paths_predictions = dict(ChainMap(*reversed(paths_predictions)))
-
+        path_results = Parallel(n_jobs=outer_n_jobs)(
+            delayed(get_path_data)(path_num, locs)
+            for path_num, locs in locations.items()
+        )
+        
+        paths_predictions = dict(ChainMap(*reversed(path_results)))
         return paths_predictions

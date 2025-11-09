@@ -1,7 +1,13 @@
-import numpy as np
-from random import gauss
-from itertools import product
+"""
+Performs backtesting on synthetic price data generated using the
+Ornstein-Uhlenbeck (OU) process.
+"""
 
+from itertools import product
+from random import gauss
+from typing import List, Tuple
+
+import numpy as np
 
 def synthetic_back_testing(
     forecast: float,
@@ -11,50 +17,80 @@ def synthetic_back_testing(
     maximum_holding_period: int = 100,
     profit_taking_range: np.ndarray = np.linspace(0.5, 10, 20),
     stop_loss_range: np.ndarray = np.linspace(0.5, 10, 20),
-    seed: int = 0
-) -> list[tuple[float, float, float, float, float]]:
+    seed: int = 0,
+) -> List[Tuple[float, float, float, float, float]]:
     r"""
-    Perform backtesting on synthetic price data generated using the Ornstein-Uhlenbeck process.
+    Perform backtesting on synthetic price data from an OU process.
 
-    The Ornstein-Uhlenbeck process is given by:
-    .. math:: P_t = (1 - \\rho) * F + \\rho * P_{t-1} + \\sigma * Z_t
+    This function simulates multiple price paths based on the
+    Ornstein-Uhlenbeck (OU) process and tests a grid of
+    profit-taking (PT) and stop-loss (SL) levels.
 
-    where:
+    The OU process is given by:
+    .. math::
+        P_t = (1 - \rho) F + \rho P_{t-1} + \sigma Z_t
+
+    Where:
     - \(P_t\) is the price at time t
-    - \(F\) is the forecast price
-    - \(\\rho\) is the autoregression coefficient
-    - \(\\sigma\) is the standard deviation of noise
-    - \(Z_t\) is a random noise with mean 0 and standard deviation 1
+    - \(F\) is the forecast price (long-term mean)
+    - \(\rho\) is the autoregression coefficient
+    - \(\sigma\) is the standard deviation of noise
+    - \(Z_t \sim N(0, 1)\) is standard normal noise
 
-    Args:
-        forecast (float): The forecasted price.
-        half_life (float): The half-life time needed to reach half.
-        sigma (float): The standard deviation of the noise.
-        n_iteration (int): Number of iterations. Defaults to 100000.
-        maximum_holding_period (int): Maximum holding period. Defaults to 100.
-        profit_taking_range (np.ndarray): Profit taking range. Defaults to np.linspace(0.5, 10, 20).
-        stop_loss_range (np.ndarray): Stop loss range. Defaults to np.linspace(0.5, 10, 20).
-        seed (int): Initial seed value. Defaults to 0.
+    Parameters
+    ----------
+    forecast : float
+        The forecasted price (long-term mean F).
+    half_life : float
+        The half-life of the mean-reversion process.
+    sigma : float
+        The standard deviation of the noise (\(\sigma\)).
+    n_iteration : int, default=100000
+        Number of price paths to simulate for each PT/SL combination.
+    maximum_holding_period : int, default=100
+        Maximum number of steps to hold the position.
+    profit_taking_range : np.ndarray, default=np.linspace(0.5, 10, 20)
+        An array of profit-taking levels to test.
+    stop_loss_range : np.ndarray, default=np.linspace(0.5, 10, 20)
+        An array of stop-loss levels to test.
+    seed : int, default=0
+        The initial price for all simulations.
 
-    Returns:
-        list[tuple[float, float, float, float, float]]: List of tuples containing profit taking, stop loss, mean,
-        standard deviation, and Sharpe ratio.
+    Returns
+    -------
+    List[Tuple[float, float, float, float, float]]
+        A list of tuples. Each tuple contains:
+        (profit_taking, stop_loss, mean_return, std_return, sharpe_ratio)
     """
-    rho = 2 ** (-1. / half_life)  # compute ρ coefficient from half-life
-    back_test = []
+    # compute ρ coefficient from half-life
+    rho = 2 ** (-1.0 / half_life)
+    back_test_results = []
 
     for profit_taking, stop_loss in product(profit_taking_range, stop_loss_range):
-        stop_prices = []
-        for iteration in range(n_iteration):
-            price, holding_period = seed, 0  # initial price
+        stop_returns = []
+        for _ in range(n_iteration):
+            price, holding_period = float(seed), 0  # initial price
             while True:
-                price = (1 - rho) * forecast + rho * price + sigma * gauss(0, 1)  # update price using O_U process
-                gain = price - seed  # compute gain
+                # Update price using O-U process
+                price = (1 - rho) * forecast + rho * price + sigma * gauss(0, 1)
+                gain = price - seed  # compute gain from initial seed price
                 holding_period += 1
-                if gain > profit_taking or gain < -stop_loss or holding_period > maximum_holding_period:  # check stop condition
-                    stop_prices.append(gain)
-                    break
-        mean, std = np.mean(stop_prices), np.std(stop_prices)  # compute mean and std of samples
-        back_test.append((profit_taking, stop_loss, mean, std, mean / std))  # add mean, std, and Sharpe ratio to backTest data
 
-    return back_test
+                # Check stop conditions
+                if (
+                    gain > profit_taking
+                    or gain < -stop_loss
+                    or holding_period > maximum_holding_period
+                ):
+                    stop_returns.append(gain)
+                    break
+        
+        mean_return = np.mean(stop_returns)
+        std_return = np.std(stop_returns)
+        sharpe_ratio = mean_return / std_return if std_return > 0 else 0.0
+        
+        back_test_results.append(
+            (profit_taking, stop_loss, mean_return, std_return, sharpe_ratio)
+        )
+
+    return back_test_results

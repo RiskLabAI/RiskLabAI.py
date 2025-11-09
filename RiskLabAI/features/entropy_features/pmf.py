@@ -1,28 +1,45 @@
-from collections import Counter
-from math import log2
-from typing import Dict, Tuple
+"""
+Implements the Probability Mass Function (PMF) calculation.
+"""
 
+from collections import Counter
+from typing import Dict
 
 def probability_mass_function(
-    message: str,
-    approximate_word_length: int
+    message: str, approximate_word_length: int
 ) -> Dict[str, float]:
     """
-    Calculate Probability Mass Function.
+    Calculate the Probability Mass Function (PMF) of n-grams.
 
-    :param message: Input encoded message
-    :type message: str
-    :param approximate_word_length: Approximation of word length
-    :type approximate_word_length: int
-    :return: Probability Mass Function
-    :rtype: dict
+    Parameters
+    ----------
+    message : str
+        Input string.
+    approximate_word_length : int
+        The length of the "words" or n-grams to analyze (e.g., 1, 2, 3).
+
+    Returns
+    -------
+    Dict[str, float]
+        A dictionary mapping each n-gram to its probability.
     """
-    library = Counter(message[i:i + approximate_word_length]
-                     for i in range(len(message) - approximate_word_length + 1))
+    if not message or len(message) < approximate_word_length:
+        return {}
+        
+    # Find all n-grams (words)
+    library = Counter(
+        message[i : i + approximate_word_length]
+        for i in range(len(message) - approximate_word_length + 1)
+    )
 
-    denominator = float(len(message) - approximate_word_length)
-    probability_mass_function_ = {key: len(library[key]) / denominator
-                                 for key in library}
+    # The total number of n-grams
+    num_windows = float(len(message) - approximate_word_length + 1)
+    if num_windows == 0:
+        return {}
 
-    return probability_mass_function_
+    # Calculate probability for each n-gram
+    pmf = {
+        key: count / num_windows for key, count in library.items()
+    }
 
+    return pmf

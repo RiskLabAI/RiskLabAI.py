@@ -1,76 +1,104 @@
-# from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
+"""
+Computes Clustered Mean Decrease Impurity (MDI) feature importance.
+"""
+
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from typing import Dict, List
-
+from sklearn.ensemble import BaseEnsemble
+from typing import Dict, List, Any
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
+    """
+    Computes Clustered MDI feature importance.
+
+    Aggregates MDI importance for pre-defined clusters of features.
+    """
 
     def __init__(
-            self,
-            classifier: RandomForestClassifier,
-            clusters: Dict[str, List[str]],
-            x: pd.DataFrame,
-            y: pd.Series
+        self,
+        classifier: BaseEnsemble,
+        clusters: Dict[str, List[str]],
     ):
         """
-        Initialize the ClusteredFeatureImportanceMDI class.
+        Initialize the strategy.
 
-        :param classifier: The Random Forest classifier.
-        :param clusters: A dictionary where the keys are the cluster names 
-                         and the values are lists of features in each cluster.
-        :param x: The features DataFrame.
-        :param y: The target Series.
+        Parameters
+        ----------
+        classifier : BaseEnsemble
+            An *untrained* scikit-learn ensemble model.
+        clusters : Dict[str, List[str]]
+            Dictionary mapping cluster names to lists of feature names.
         """
+        if not hasattr(classifier, 'estimators_'):
+            raise TypeError("Classifier must be an ensemble (e.g., RandomForest).")
         self.classifier = classifier
         self.clusters = clusters
-        classifier.fit(x, y)
 
-    def group_mean_std(
-            self,
-            dataframe: pd.DataFrame,
-            clusters: Dict[str, List[str]]
+    def _group_mean_std(
+        self, dataframe: pd.DataFrame, clusters: Dict[str, List[str]]
     ) -> pd.DataFrame:
         """
-        Calculate the mean and standard deviation for clusters.
-
-        :param dataframe: A DataFrame of importances.
-        :param clusters: A dictionary of cluster definitions.
-        
-        :return: A DataFrame with mean and standard deviation for each cluster.
-
-        Using Central Limit Theorem for standard deviation:
-
-        .. math::
-
-            \\text{{StandardDeviation}} = \\text{{std}} \\times n^{-0.5}
-
+        Calculate the mean and standard deviation for cluster importances.
         """
         output = pd.DataFrame(columns=["Mean", "StandardDeviation"])
 
         for cluster_name, feature_names in clusters.items():
+            # Sum importance for all features in the cluster
             cluster_data = dataframe[feature_names].sum(axis=1)
-            output.loc["C_" + str(cluster_name), "Mean"] = cluster_data.mean()
-            output.loc["C_" + str(cluster_name), "StandardDeviation"] = (
-                cluster_data.std() * (cluster_data.shape[0] ** -0.5)
+            
+            cluster_mean = cluster_data.mean()
+            cluster_std = cluster_data.std()
+            
+            output.loc[f"C_{cluster_name}", "Mean"] = cluster_mean
+            output.loc[f"C_{cluster_name}", "StandardDeviation"] = (
+                cluster_std * (cluster_data.shape[0] ** -0.5)
             )
-
         return output
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
-        Compute aggregated feature importances for clusters.
+        Compute Clustered MDI feature importance.
 
-        :return: A DataFrame with aggregated importances for clusters.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The feature data.
+        y : pd.Series
+            The target data.
+        **kwargs : Any
+            Keyword arguments for the classifier's `fit` method
+            (e.g., `sample_weight`).
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with "Mean" and "StandardDeviation" of importance
+            for each *cluster*.
         """
-        importances_dict = {i: tree.feature_importances_ for i, tree in enumerate(self.classifier.estimators_)}
+        train_sample_weights = kwargs.get('sample_weight')
+        
+        # Fit the classifier
+        self.classifier.fit(x, y, sample_weight=train_sample_weights)
+        
+        # Get importance from each tree
+        importances_dict = {
+            i: tree.feature_importances_
+            for i, tree in enumerate(self.classifier.estimators_)
+        }
         importances_df = pd.DataFrame.from_dict(importances_dict, orient="index")
-        importances_df.columns = self.classifier.feature_names_in_
-        importances_df.replace(0, np.nan, inplace=True)  # because max_features=1
+        
+        if hasattr(self.classifier, 'feature_names_in_'):
+             importances_df.columns = self.classifier.feature_names_in_
+        else:
+             importances_df.columns = x.columns
 
-        aggregated_importances = self.group_mean_std(importances_df, self.clusters)
+        # Replace 0 with NaN
+        importances_df.replace(0, np.nan, inplace=True)
+
+        # Group by cluster
+        aggregated_importances = self._group_mean_std(importances_df, self.clusters)
+        
+        # Normalize
         aggregated_importances /= aggregated_importances["Mean"].sum()
-
         return aggregated_importances

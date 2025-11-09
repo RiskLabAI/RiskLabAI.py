@@ -1,124 +1,248 @@
+"""
+Calculates various backtest statistics like holding period,
+concentration, and drawdowns.
+"""
+
+from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 
 def bet_timing(target_positions: pd.Series) -> pd.Index:
     """
-    Determine the timing of bets when positions flatten or flip.
+    Determine the timestamps of bets, defined as when positions
+    are closed (return to zero) or flipped (sign change).
 
-    :param target_positions: Series of target positions.
-    :return: Index of bet timing.
+    Parameters
+    ----------
+    target_positions : pd.Series
+        Time series of target positions.
+
+    Returns
+    -------
+    pd.Index
+        A DatetimeIndex of timestamps when bets are timed.
+
+    Example
+    -------
+    >>> dates = pd.to_datetime(['2020-01-01', '2020-01-02', '2020-01-03', \
+                                '2020-01-04', '2020-01-05', '2020-01-06'])
+    >>> positions = pd.Series([0, 1, 1, 0, -1, 0], index=dates)
+    >>> bet_timing(positions)
+    DatetimeIndex(['2020-01-04', '2020-01-05', '2020-01-06'], \
+dtype='datetime64[ns]', freq=None)
     """
+    # 1. Bets at points where position returns to 0
     zero_positions = target_positions[target_positions == 0].index
 
-    lagged_non_zero_positions = target_positions.shift(1)
-    lagged_non_zero_positions = lagged_non_zero_positions[lagged_non_zero_positions != 0].index
+    # 2. Bets at points where position flips sign
+    # Find timestamps where t=0 and t-1 != 0
+    lagged_non_zero = target_positions.shift(1)
+    lagged_non_zero = lagged_non_zero[lagged_non_zero != 0].index
+    bets = zero_positions.intersection(lagged_non_zero)
 
-    bets = zero_positions.intersection(lagged_non_zero_positions)
-    zero_positions = target_positions.iloc[1:] * target_positions.iloc[:-1].values
-    bets = bets.union(zero_positions[zero_positions < 0].index).sort_values()
+    # Find timestamps where sign flips, e.g., 1 to -1
+    sign_flips = target_positions.iloc[1:] * target_positions.iloc[:-1].values
+    bets = bets.union(sign_flips[sign_flips < 0].index).sort_values()
 
+    # 3. Add last timestamp if not already included
     if target_positions.index[-1] not in bets:
-        bets = bets.append(target_positions.index[-1:])
+        bets = bets.append(pd.Index([target_positions.index[-1]]))
 
     return bets
 
-def calculate_holding_period(target_positions: pd.Series) -> tuple:
+def calculate_holding_period(
+    target_positions: pd.Series,
+) -> Tuple[pd.DataFrame, float]:
     """
-    Derive average holding period (in days) using the average entry time pairing algorithm.
+    Derive the average holding period in days.
 
-    :param target_positions: Series of target positions.
-    :return: Tuple containing holding period DataFrame and mean holding period.
+    Uses the average entry time pairing algorithm.
+
+    Parameters
+    ----------
+    target_positions : pd.Series
+        Time series of target positions.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, float]
+        - hold_period_df: DataFrame with holding time ('dT') and
+                          weight ('w') for each bet.
+        - mean_holding_period: The weighted-average holding period in days.
     """
-    hold_period, time_entry = pd.DataFrame(columns=['dT', 'w']), 0.0
-    position_difference = target_positions.diff()
-    time_difference = (target_positions.index - target_positions.index[0]) / np.timedelta64(1, 'D')
+    hold_period_data = []
+    time_entry = 0.0  # Average entry time
+    position_diff = target_positions.diff()
+    # Time difference in fractional days
+    time_diff = (
+        target_positions.index - target_positions.index[0]
+    ) / np.timedelta64(1, "D")
 
     for i in range(1, target_positions.shape[0]):
-        if position_difference.iloc[i] * target_positions.iloc[i - 1] >= 0:
-            if target_positions.iloc[i] != 0:
-                time_entry = (time_entry * target_positions.iloc[i - 1] + time_difference[i] * position_difference.iloc[i]) / target_positions.iloc[i]
-        else:
-            if target_positions.iloc[i] * target_positions.iloc[i - 1] < 0:
-                hold_period.loc[target_positions.index[i], ['dT', 'w']] = (time_difference[i] - time_entry, abs(target_positions.iloc[i - 1]))
-                time_entry = time_difference[i]
-            else:
-                hold_period.loc[target_positions.index[i], ['dT', 'w']] = (time_difference[i] - time_entry, abs(position_difference.iloc[i]))
+        current_pos = target_positions.iloc[i]
+        prev_pos = target_positions.iloc[i - 1]
+        diff = position_diff.iloc[i]
 
-    if hold_period['w'].sum() > 0:
-        mean_holding_period = (hold_period['dT'] * hold_period['w']).sum() / hold_period['w'].sum()
+        if diff * prev_pos >= 0:  # Position increase or flat
+            if current_pos != 0:
+                # Update average entry time
+                time_entry = (
+                    time_entry * prev_pos + time_diff[i] * diff
+                ) / current_pos
+        else:  # Position decrease or flip
+            if current_pos * prev_pos < 0:  # Position flip
+                # Close old position
+                hold_period_data.append(
+                    {
+                        "index": target_positions.index[i],
+                        "dT": time_diff[i] - time_entry,
+                        "w": abs(prev_pos),
+                    }
+                )
+                time_entry = time_diff[i]  # Reset entry time
+            else:  # Position decrease (but not flip)
+                hold_period_data.append(
+                    {
+                        "index": target_positions.index[i],
+                        "dT": time_diff[i] - time_entry,
+                        "w": abs(diff),
+                    }
+                )
+    
+    if not hold_period_data:
+        return pd.DataFrame(columns=['dT', 'w']), np.nan
+        
+    hold_period_df = pd.DataFrame(hold_period_data).set_index('index')
+    
+    if hold_period_df["w"].sum() > 0:
+        mean_holding_period = (
+            (hold_period_df["dT"] * hold_period_df["w"]).sum()
+            / hold_period_df["w"].sum()
+        )
     else:
         mean_holding_period = np.nan
 
-    return hold_period, mean_holding_period
-
-def calculate_hhi_concentration(returns: pd.Series) -> tuple:
-    """
-    Calculate the HHI concentration measures.
-
-    :param returns: Series of returns.
-    :return: Tuple containing positive returns HHI, negative returns HHI, and time-concentrated HHI.
-    """
-    returns_hhi_positive = calculate_hhi(returns[returns >= 0])
-    returns_hhi_negative = calculate_hhi(returns[returns < 0])
-    time_concentrated_hhi = calculate_hhi(returns.groupby(pd.Grouper(freq='M')).count())
-
-    return returns_hhi_positive, returns_hhi_negative, time_concentrated_hhi
+    return hold_period_df, mean_holding_period
 
 def calculate_hhi(bet_returns: pd.Series) -> float:
     """
-    Calculate the Herfindahl-Hirschman Index (HHI) concentration measure.
+    Calculate the Herfindahl-Hirschman Index (HHI) for concentration.
 
-    :param bet_returns: Series of bet returns.
-    :return: Calculated HHI value.
+    HHI is normalized to be between 0 and 1.
+    - 0 indicates a perfectly diversified portfolio.
+    - 1 indicates a fully concentrated portfolio.
+
+    Parameters
+    ----------
+    bet_returns : pd.Series
+        Series of returns for each bet.
+
+    Returns
+    -------
+    float
+        The normalized HHI value, or np.nan if undefined.
     """
     if bet_returns.shape[0] <= 2:
         return np.nan
 
-    weight = bet_returns / bet_returns.sum()
-    hhi_ = (weight ** 2).sum()
-    hhi_ = (hhi_ - bet_returns.shape[0] ** -1) / (1.0 - bet_returns.shape[0] ** -1)
+    total_return = bet_returns.sum()
+    if total_return == 0:
+        return np.nan
 
-    return hhi_
+    weights = bet_returns / total_return
+    hhi = (weights**2).sum()
+    
+    # Normalize HHI
+    n = bet_returns.shape[0]
+    hhi_normalized = (hhi - 1.0 / n) / (1.0 - 1.0 / n)
 
-def compute_drawdowns_time_under_water(series: pd.Series, dollars: bool = False) -> tuple:
+    return hhi_normalized
+
+def calculate_hhi_concentration(returns: pd.Series) -> Tuple[float, float, float]:
     """
-    Compute series of drawdowns and the time under water associated with them.
+    Calculate HHI concentration for positive, negative, and monthly returns.
 
-    :param series: Series of returns or dollar performance.
-    :param dollars: Whether the input series represents returns or dollar performance.
-    :return: Tuple containing drawdown series, time under water series, and drawdown analysis DataFrame.
+    Parameters
+    ----------
+    returns : pd.Series
+        Time series of returns.
+
+    Returns
+    -------
+    Tuple[float, float, float]
+        - hhi_positive: HHI for positive returns.
+        - hhi_negative: HHI for negative returns.
+        - hhi_time: HHI for time-based (monthly) concentration.
     """
-    series_df = series.to_frame('PnL').reset_index(names='Datetime')
-    series_df['HWM'] = series.expanding().max().values
+    hhi_positive = calculate_hhi(returns[returns >= 0])
+    hhi_negative = calculate_hhi(returns[returns < 0])
+    
+    # Calculate time concentration (by month)
+    time_concentration = returns.groupby(pd.Grouper(freq="M")).count()
+    hhi_time = calculate_hhi(time_concentration)
 
-    def process_groups(group):
-        if len(group) <= 1:
-            return None
+    return hhi_positive, hhi_negative, hhi_time
 
-        result = pd.Series()
-        result.loc['Start'] = group['Datetime'].iloc[0]
-        result.loc['Stop'] = group['Datetime'].iloc[-1]
-        result.loc['HWM'] = group['HWM'].iloc[0]
-        result.loc['Min'] = group['PnL'].min()
-        result.loc['Min. Time'] = group['Datetime'][group['PnL'] == group['PnL'].min()].iloc[0]
+def compute_drawdowns_time_under_water(
+    pnl_series: pd.Series, dollars: bool = False
+) -> Tuple[pd.Series, pd.Series]:
+    """
+    Compute series of drawdowns and the time under water.
 
-        return result
+    Parameters
+    ----------
+    pnl_series : pd.Series
+        Time series of returns or dollar PnL.
+    dollars : bool, default=False
+        If True, treat `pnl_series` as dollar PnL.
+        If False, treat as returns (e.g., 1.01, 0.99) and
+        calculate drawdowns as percentages.
 
-    groups = series_df.groupby('HWM')
-    drawdown_analysis = pd.DataFrame()
+    Returns
+    -------
+    Tuple[pd.Series, pd.Series]
+        - drawdown: pd.Series indexed by start date, showing max drawdown.
+        - time_under_water: pd.Series indexed by start date, showing
+                            duration of drawdown in fractional years.
+    """
+    series_df = pnl_series.to_frame("PnL")
+    series_df["HWM"] = series_df["PnL"].expanding().max()
 
-    for _, group in groups:
-        drawdown_analysis = drawdown_analysis.append(process_groups(group), ignore_index=True)
+    # Group by High Water Mark (HWM)
+    groups = series_df.groupby("HWM")
+    drawdown_analysis_data = []
 
+    for hwm, group in groups:
+        if len(group) <= 1 or hwm == group["PnL"].min():
+            continue  # Skip groups with no drawdown
+
+        drawdown_analysis_data.append(
+            {
+                "Start": group.index[0],
+                "Stop": group.index[-1],
+                "HWM": hwm,
+                "Min": group["PnL"].min(),
+            }
+        )
+
+    if not drawdown_analysis_data:
+        return pd.Series(dtype=float), pd.Series(dtype=float)
+
+    drawdown_analysis_df = pd.DataFrame(drawdown_analysis_data)
+    drawdown_analysis_df = drawdown_analysis_df.set_index("Start")
+    
     if dollars:
-        drawdown = drawdown_analysis['HWM'] - drawdown_analysis['Min']
+        drawdown = drawdown_analysis_df["HWM"] - drawdown_analysis_df["Min"]
     else:
-        drawdown = 1 - drawdown_analysis['Min'] / drawdown_analysis['HWM']
+        # Percentage drawdown
+        drawdown = 1.0 - (drawdown_analysis_df["Min"] / drawdown_analysis_df["HWM"])
 
-    drawdown.index = drawdown_analysis['Start']
+    # Time under water in fractional years
+    time_under_water = (
+        drawdown_analysis_df["Stop"] - drawdown_analysis_df.index
+    ) / np.timedelta64(1, "Y")
+    
     drawdown.index.name = 'Datetime'
+    time_under_water.index.name = 'Datetime'
 
-    time_under_water = ((drawdown_analysis['Stop'] - drawdown_analysis['Start']) / np.timedelta64(1, 'Y')).values
-    time_under_water = pd.Series(time_under_water, index=drawdown_analysis['Start'])
-
-    return drawdown, time_under_water, drawdown_analysis
+    return drawdown, time_under_water

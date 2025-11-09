@@ -1,88 +1,114 @@
+"""
+Implements the Probability of Backtest Overfitting (PBO) calculation.
+"""
+
+from typing import Tuple, Callable, List, Optional
+from itertools import combinations
 import numpy as np
 from numba import jit
 from joblib import Parallel, delayed
-from typing import Tuple, Callable
-from itertools import combinations
-from joblib import Parallel, delayed
-
 
 @jit(nopython=True)
 def sharpe_ratio(
-    returns: np.ndarray, 
-    risk_free_rate: float = 0.0
+    returns: np.ndarray, risk_free_rate: float = 0.0
 ) -> float:
     """
-    Calculate the Sharpe Ratio for a given set of returns.
+    Calculate the Sharpe Ratio (Numba-optimized).
 
-    :param returns: An array of returns for a portfolio.
-    :param risk_free_rate: The risk-free rate.
-    :return: The calculated Sharpe Ratio.
+    Parameters
+    ----------
+    returns : np.ndarray
+        An array of returns.
+    risk_free_rate : float, default=0.0
+        The risk-free rate.
 
-    .. math::
-
-        \text{Sharpe Ratio} = \frac{\text{Mean Portfolio Return} - \text{Risk-Free Rate}}
-                                  {\text{Standard Deviation of Portfolio Returns}}
+    Returns
+    -------
+    float
+        The calculated Sharpe Ratio.
     """
     excess_returns = returns - risk_free_rate
-    std = np.std(excess_returns)
-    if std != 0:
-        
-        return np.mean(excess_returns) / std
+    std_dev = np.std(excess_returns)
     
-    else:
-        return 0
+    if std_dev == 0.0:
+        return 0.0
+        
+    return np.mean(excess_returns) / std_dev
 
 def performance_evaluation(
     train_partition: np.ndarray,
     test_partition: np.ndarray,
     n_strategies: int,
-    metric: Callable,
-    risk_free_return: float
+    metric: Callable[[np.ndarray, float], float],
+    risk_free_return: float,
 ) -> Tuple[bool, float]:
     """
-    Evaluate the performance of various strategies on given train and test partitions and 
-    compute the logit value to determine if the best in-sample strategy is overfitting.
+    Evaluate strategy performance on train/test splits.
 
-    :param train_partition: Training data partition used for evaluating in-sample performance.
-    :type train_partition: np.ndarray
-    :param test_partition: Testing data partition used for evaluating out-of-sample performance.
-    :type test_partition: np.ndarray
-    :param n_strategies: Number of strategies to evaluate.
-    :type n_strategies: int
-    :param metric: Metric function for evaluating strategy performance. 
-                   The function should accept a data array and risk_free_return as arguments.
-    :type metric: Callable
-    :param risk_free_return: Risk-free return used in the metric function, often used for Sharpe ratio.
-    :type risk_free_return: float
+    This function finds the best strategy on the training partition and
+    then ranks its performance on the test partition.
 
-    :return: Tuple where the first value indicates if the best in-sample strategy is overfitting 
-             (True if overfitting, False otherwise) and the second value is the logit value computed.
-    :rtype: Tuple[bool, float]
+    Parameters
+    ----------
+    train_partition : np.ndarray
+        Training data partition (T_train x N_strategies).
+    test_partition : np.ndarray
+        Testing data partition (T_test x N_strategies).
+    n_strategies : int
+        Number of strategies (N).
+    metric : Callable
+        Metric function (e.g., `sharpe_ratio`).
+    risk_free_return : float
+        Risk-free return for the metric.
+
+    Returns
+    -------
+    Tuple[bool, float]
+        - is_overfit: True if the best in-sample strategy is not
+                      in the top half of out-of-sample strategies.
+        - logit_value: The logit-transformed relative rank.
     """
+    # 1. Find best strategy on training data
+    evaluate_train = [
+        metric(train_partition[:, i], risk_free_return)
+        for i in range(n_strategies)
+    ]
+    best_strategy_idx = np.argmax(evaluate_train)
 
-    evaluate_train = list(map(lambda i: metric(train_partition[:, i], risk_free_return), range(n_strategies)))
-    best_strategy = np.argmax(evaluate_train)
-    
-    evaluate_test = list(map(lambda i: metric(test_partition[:, i], risk_free_return), range(n_strategies)))
-    
-    rank_of_best_is_strategy = np.argsort(evaluate_test).tolist().index(best_strategy) + 1
-    
+    # 2. Evaluate all strategies on test data
+    evaluate_test = [
+        metric(test_partition[:, i], risk_free_return)
+        for i in range(n_strategies)
+    ]
+
+    # 3. Find rank of the best_strategy in the test set
+    # Sort test evaluations and find where best_strategy_idx lands
+    ranks = np.argsort(np.argsort(evaluate_test))
+    rank_of_best_is_strategy = ranks[best_strategy_idx] + 1  # 1-based rank
+
+    # 4. Calculate relative rank (omega_bar) and logit
     w_bar = rank_of_best_is_strategy / (n_strategies + 1)
     logit_value = np.log(w_bar / (1 - w_bar))
-    
+
+    # Overfit if logit is <= 0 (i.e., rank is in bottom half)
     return logit_value <= 0.0, logit_value
 
+
 def probability_of_backtest_overfitting(
-    performances: np.ndarray, 
-    n_partitions: int = 16, 
+    performances: np.ndarray,
+    n_partitions: int = 16,
     risk_free_return: float = 0.0,
-    metric: Callable = None, 
-    n_jobs: int = 1
+    metric: Optional[Callable[[np.ndarray, float], float]] = None,
+    n_jobs: int = 1,
 ) -> Tuple[float, np.ndarray]:
     r"""
-    Computes the Probability Of Backtest Overfitting.
+    Compute the Probability of Backtest Overfitting (PBO).
 
-    For instance, if \(S=16\), we will form 12,780 combinations.
+    PBO is the frequency with which the best in-sample (IS) strategy
+    underperforms relative to the median out-of-sample (OOS) performance.
+
+    It uses combinatorial splits of the data into train/test partitions.
+    Total combinations = C(S, S/2), where S = n_partitions.
 
     .. math::
         \left(\begin{array}{c}
@@ -90,47 +116,62 @@ def probability_of_backtest_overfitting(
         S / 2
         \end{array}\right) = \prod_{i=0}^{S / 2^{-1}} \frac{S-i}{S / 2-i}
 
-    :param performances: Matrix of T×N for T observations on N strategies.
-    :type performances: np.ndarray
-    :param n_partitions: Number of partitions (must be even).
-    :type n_partitions: int
-    :param metric: Metric function for evaluating strategy.
-    :type metric: Callable
-    :param risk_free_return: Risk-free return for calculating Sharpe ratio.
-    :type risk_free_return: float
-    :param n_jobs: Number of parallel jobs.
-    :type n_jobs: int
+    Parameters
+    ----------
+    performances : np.ndarray
+        Matrix of T observations x N strategies.
+    n_partitions : int, default=16
+        Number of partitions (S). Must be even.
+    risk_free_return : float, default=0.0
+        Risk-free return for calculating the metric (e.g., Sharpe ratio).
+    metric : Callable, optional
+        Metric function (e.g., `sharpe_ratio`). Defaults to the
+        Numba-jitted `sharpe_ratio` in this module.
+    n_jobs : int, default=1
+        Number of parallel jobs for `joblib`.
 
-    :return: Tuple containing Probability Of Backtest Overfitting and an array of logit values.
-    :rtype: Tuple[float, List[float]]
+    Returns
+    -------
+    Tuple[float, np.ndarray]
+        - pbo: The Probability of Backtest Overfitting (0 to 1).
+        - logit_values: Array of logit values from all combinations.
     """
-
-    if n_partitions % 2 == 1:
+    if n_partitions % 2 != 0:
         raise ValueError("Number of partitions must be even.")
-    
+
     if metric is None:
         metric = sharpe_ratio
-    
+
     _, n_strategies = performances.shape
     partitions = np.array_split(performances, n_partitions)
-    partition_indices = range(n_partitions)
-    partition_combinations_indices = list(combinations(partition_indices, n_partitions // 2))
+    partition_indices = list(range(n_partitions))
+    
+    # Get all combinations of training partition indices
+    partition_combinations_indices = list(
+        combinations(partition_indices, n_partitions // 2)
+    )
 
     results = Parallel(n_jobs=n_jobs)(
         delayed(performance_evaluation)(
             np.concatenate([partitions[i] for i in train_indices], axis=0),
-            np.concatenate([partitions[i] for i in partition_indices 
-                            if i not in train_indices], axis=0),
-            n_strategies, 
-            metric, 
-            risk_free_return
-        ) 
+            np.concatenate(
+                [
+                    partitions[i]
+                    for i in partition_indices
+                    if i not in train_indices
+                ],
+                axis=0,
+            ),
+            n_strategies,
+            metric,
+            risk_free_return,
+        )
         for train_indices in partition_combinations_indices
     )
 
-    results = np.array(results)  
+    results_arr = np.array(results)
 
-    pbo = results[:, 0].mean(axis=0)
-    logit_values = results[:, 1]
-    
+    pbo = results_arr[:, 0].mean()
+    logit_values = results_arr[:, 1]
+
     return pbo, logit_values
