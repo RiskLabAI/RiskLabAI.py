@@ -1,138 +1,105 @@
 """
-Implements the Probabilistic Sharpe Ratio (PSR) and related metrics
-as described by Marcos Lopez de Prado.
+Tests for probabilistic_sharpe_ratio.py
 """
 
-from typing import List
 import numpy as np
-from scipy import stats as ss
+import pytest
+from scipy.stats import norm
+from .probabilistic_sharpe_ratio import (
+    probabilistic_sharpe_ratio,
+    benchmark_sharpe_ratio,
+)
 
-def probabilistic_sharpe_ratio(
-    observed_sharpe_ratio: float,
-    benchmark_sharpe_ratio: float,
-    number_of_returns: int,
-    skewness_of_returns: float = 0.0,
-    kurtosis_of_returns: float = 3.0,
-    return_test_statistic: bool = False,
-) -> float:
-    r"""
-    Calculate the Probabilistic Sharpe Ratio (PSR).
-
-    The PSR estimates the probability that the observed Sharpe ratio (SR)
-    is greater than a benchmark SR (e.g., the expected maximum SR from
-    multiple trials) given the track record length and return moments.
-
-    The test statistic is:
-    .. math::
-        Z = \frac{(\hat{SR} - SR^*) \sqrt{T-1}}
-                 {\sqrt{1 - S \hat{SR} + \frac{K-1}{4} \hat{SR}^2}}
-
-    PSR = N(Z)
-
-    Where:
-    - \(\hat{SR}\) is the observed Sharpe ratio
-    - \(SR^*\) is the benchmark Sharpe ratio
-    - \(T\) is the number of returns
-    - \(S\) is the skewness of returns
-    - \(K\) is the kurtosis of returns
-
-    Parameters
-    ----------
-    observed_sharpe_ratio : float
-        The observed Sharpe ratio of the strategy.
-    benchmark_sharpe_ratio : float
-        The benchmark Sharpe ratio (e.g., E[max(SR)]).
-    number_of_returns : int
-        The number of return observations (T).
-    skewness_of_returns : float, default=0.0
-        The skewness of the returns (S).
-    kurtosis_of_returns : float, default=3.0
-        The kurtosis of the returns (K). Assumes 3 for normal.
-    return_test_statistic : bool, default=False
-        If True, return the Z-statistic instead of the CDF value (PSR).
-
-    Returns
-    -------
-    float
-        The Probabilistic Sharpe Ratio (if `return_test_statistic` is False)
-        or the Z test statistic (if True).
-
-    Example
-    -------
-    >>> psr = probabilistic_sharpe_ratio(
-    ...     observed_sharpe_ratio=2.5,
-    ...     benchmark_sharpe_ratio=1.0,
-    ...     number_of_returns=252,
-    ...     skewness_of_returns=-0.5,
-    ...     kurtosis_of_returns=4.0
-    ... )
-    >>> print(f"PSR: {psr:.2f}")
-    PSR: 1.00
+def test_probabilistic_sharpe_ratio_normal():
     """
-    denominator = (
-        1
-        - skewness_of_returns * observed_sharpe_ratio
-        + (kurtosis_of_returns - 1) / 4 * observed_sharpe_ratio**2
+    Test PSR with normal parameters (skew=0, kurtosis=3).
+    """
+    # 1. Observed SR matches benchmark -> Z=0, PSR=0.5
+    psr = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=1.0,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=252,
+    )
+    assert np.isclose(psr, 0.5)
+
+    # 2. Observed SR > benchmark -> Z>0, PSR>0.5
+    psr = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=1.5,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=252,
+    )
+    assert psr > 0.5
+
+    # 3. Observed SR < benchmark -> Z<0, PSR<0.5
+    psr = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=0.5,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=252,
+    )
+    assert psr < 0.5
+
+def test_probabilistic_sharpe_ratio_non_normal():
+    """
+    Test PSR with non-normal parameters.
+    """
+    # High skew and kurtosis should adjust the denominator
+    psr_normal = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=2.0,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=100,
+        skewness_of_returns=0.0,
+        kurtosis_of_returns=3.0,
     )
 
-    # Handle cases where denominator is non-positive due to extreme inputs
-    if denominator <= 0:
-        return 0.0 if not return_test_statistic else -np.inf
+    psr_non_normal = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=2.0,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=100,
+        skewness_of_returns=-1.0,  # Negative skew
+        kurtosis_of_returns=5.0,   # High kurtosis
+    )
+    
+    # Denominator (normal) = 1
+    # Denominator (non-normal) = 1 - (-1)*(2) + (5-1)/4 * (2**2) = 1 + 2 + 4 = 7
+    # Z-stat (non-normal) will be lower, so PSR will be lower.
+    assert psr_non_normal < psr_normal
 
-    test_statistic = (
-        (observed_sharpe_ratio - benchmark_sharpe_ratio)
-        * np.sqrt(number_of_returns - 1)
-    ) / np.sqrt(denominator)
-
-    if return_test_statistic:
-        return test_statistic
-
-    return ss.norm.cdf(test_statistic)
-
-
-def benchmark_sharpe_ratio(sharpe_ratio_estimates: List[float]) -> float:
-    r"""
-    Calculate the expected maximum Sharpe Ratio (Benchmark SR).
-
-    This is used as the benchmark SR* in the PSR calculation. It represents
-    the expected maximum SR one would observe from N independent trials.
-
-    .. math::
-        SR^* = \sigma_{SR} \left[ (1 - \gamma) \Phi^{-1}(1 - \frac{1}{N})
-               + \gamma \Phi^{-1}(1 - \frac{1}{N} e^{-1}) \right]
-
-    Where:
-    - \(\sigma_{SR}\) is the standard deviation of SR estimates
-    - \(\gamma\) is the Euler-Mascheroni constant
-    - \(\Phi^{-1}\) is the inverse CDF of a standard normal distribution
-    - \(N\) is the number of SR estimates (trials)
-
-    Parameters
-    ----------
-    sharpe_ratio_estimates : List[float]
-        A list or array of Sharpe ratio estimates from N different trials.
-
-    Returns
-    -------
-    float
-        The Benchmark Sharpe Ratio (E[max(SR)]).
-
-    Example
-    -------
-    >>> sr_list = [0.5, 1.2, -0.3, 0.8, 1.5, 0.9]
-    >>> bsr = benchmark_sharpe_ratio(sr_list)
-    >>> print(f"Benchmark SR: {bsr:.2f}")
-    Benchmark SR: 1.03
+def test_probabilistic_sharpe_ratio_statistic():
     """
-    n_estimates = len(sharpe_ratio_estimates)
-    if n_estimates <= 1:
-        return np.mean(sharpe_ratio_estimates) if n_estimates == 1 else 0.0
+    Test the return_test_statistic flag.
+    """
+    z_stat = probabilistic_sharpe_ratio(
+        observed_sharpe_ratio=1.5,
+        benchmark_sharpe_ratio=1.0,
+        number_of_returns=100,
+        skewness_of_returns=0,
+        kurtosis_of_returns=3,
+        return_test_statistic=True,
+    )
+    # Z = (1.5 - 1.0) * sqrt(99) / sqrt(1) = 0.5 * 9.95 = 4.97
+    assert np.isclose(z_stat, 0.5 * np.sqrt(99))
+    assert np.isclose(norm.cdf(z_stat), 1.0) # Very high prob
 
-    standard_deviation = np.array(sharpe_ratio_estimates).std()
+def test_benchmark_sharpe_ratio():
+    """
+    Test the benchmark Sharpe ratio calculation.
+    """
+    sr_list = [0.5, 1.0, 1.5, 0.8, 1.2]
+    n_estimates = 5
+    std_dev = np.std(sr_list)
+    
+    bsr = benchmark_sharpe_ratio(sr_list)
+    
+    # Manual calculation
+    term1 = (1 - np.euler_gamma) * norm.ppf(1 - 1 / n_estimates)
+    term2 = np.euler_gamma * norm.ppf(1 - 1 / (n_estimates * np.e))
+    expected_bsr = std_dev * (term1 + term2)
+    
+    assert np.isclose(bsr, expected_bsr)
 
-    term1 = (1 - np.euler_gamma) * ss.norm.ppf(1 - 1 / n_estimates)
-    term2 = np.euler_gamma * ss.norm.ppf(1 - 1 / (n_estimates * np.e))
-
-    benchmark_value = standard_deviation * (term1 + term2)
-
-    return benchmark_value
+def test_benchmark_sharpe_ratio_edge_cases():
+    """
+    Test benchmark_sharpe_ratio with 0 or 1 estimate.
+    """
+    assert np.isclose(benchmark_sharpe_ratio([]), 0.0)
+    assert np.isclose(benchmark_sharpe_ratio([1.5]), 1.5)

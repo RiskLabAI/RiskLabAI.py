@@ -1,0 +1,19 @@
+# This is a requirements file for the risklab project
+
+# Core Data Science & ML
+pandas
+numpy
+scikit-learn
+matplotlib
+torch
+torchvision
+torchaudio
+
+# Finance Specific
+yfinance
+ta
+
+# Other utilities
+jupyterlab
+stable-baselines3
+gymnasium
