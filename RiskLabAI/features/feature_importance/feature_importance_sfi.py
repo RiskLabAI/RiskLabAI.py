@@ -1,103 +1,119 @@
-# from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
+"""
+Computes Single Feature Importance (SFI).
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
 from sklearn.model_selection import KFold
-from typing import List, Optional, Union
-
+from typing import List, Optional, Union, Any
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 class FeatureImportanceSFI(FeatureImportanceStrategy):
     """
-    Computes the Single Feature Importance (SFI).
+    Computes Single Feature Importance (SFI).
 
-    The method calculates the importance of each feature by evaluating its performance 
-    individually in the classifier.
-
+    This method calculates the importance of each feature by training
+    and evaluating a model using *only that single feature*.
     """
 
     def __init__(
-            self,
-            classifier: object,
-            x: pd.DataFrame,
-            y: Union[pd.Series, List[Optional[float]]],
-            n_splits: int = 10,
-            score_sample_weights: Optional[List[float]] = None,
-            train_sample_weights: Optional[List[float]] = None,
-            scoring: str = "log_loss"
-    ) -> None:
+        self,
+        classifier: object,
+        n_splits: int = 10,
+        scoring: str = "log_loss",
+    ):
         """
-        Initialize the class with parameters.
+        Initialize the strategy.
 
-        :param classifier: The classifier object.
-        :param x: The feature data.
-        :param y: The target data.
-        :param n_splits: The number of splits for cross-validation.
-        :param score_sample_weights: Sample weights for scoring.
-        :param train_sample_weights: Sample weights for training.
-        :param scoring: Scoring method ("log_loss" or "accuracy").
+        Parameters
+        ----------
+        classifier : object
+            An *untrained* scikit-learn classifier.
+        n_splits : int, default=10
+            Number of splits for cross-validation.
+        scoring : str, default="log_loss"
+            Scoring method ("log_loss" or "accuracy").
         """
         self.classifier = classifier
-        self.features = x
-        self.labels = y
         self.n_splits = n_splits
-        self.score_sample_weights = score_sample_weights
-        self.train_sample_weights = train_sample_weights
         self.scoring = scoring
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
-        Compute the Single Feature Importance.
+        Compute SFI feature importance.
 
-        :return: Feature importances as a dataframe with "FeatureName", "Mean", and "StandardDeviation" columns.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The feature data.
+        y : pd.Series
+            The target data.
+        **kwargs : Any
+            - 'train_sample_weights': Optional sample weights for training.
+            - 'score_sample_weights': Optional sample weights for scoring.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with "FeatureName", "Mean", and "StandardDeviation"
+            of the SFI scores.
         """
-        if self.train_sample_weights is None:
-            self.train_sample_weights = np.ones(self.features.shape[0])
-        if self.score_sample_weights is None:
-            self.score_sample_weights = np.ones(self.features.shape[0])
+        train_sample_weights = kwargs.get('train_sample_weights')
+        score_sample_weights = kwargs.get('score_sample_weights')
+        
+        if train_sample_weights is None:
+            train_sample_weights = np.ones(x.shape[0])
+        if score_sample_weights is None:
+            score_sample_weights = np.ones(x.shape[0])
 
         cv_generator = KFold(n_splits=self.n_splits)
-        feature_names = self.features.columns
+        feature_names = x.columns
         importances = []
 
         for feature_name in feature_names:
             scores = []
+            feature_data = x[[feature_name]]
 
-            for train, test in cv_generator.split(self.features):
-                feature_train, label_train, sample_weights_train = (
-                    self.features.loc[train, [feature_name]],
-                    self.labels.iloc[train],
-                    self.train_sample_weights[train],
+            for train_idx, test_idx in cv_generator.split(feature_data):
+                x_train, y_train, w_train = (
+                    feature_data.iloc[train_idx],
+                    y.iloc[train_idx],
+                    train_sample_weights[train_idx],
+                )
+                x_test, y_test, w_test = (
+                    feature_data.iloc[test_idx],
+                    y.iloc[test_idx],
+                    score_sample_weights[test_idx],
                 )
 
-                feature_test, label_test, sample_weights_test = (
-                    self.features.loc[test, [feature_name]],
-                    self.labels.iloc[test],
-                    self.score_sample_weights[test],
-                )
-
-                self.classifier.fit(feature_train, label_train, sample_weight=sample_weights_train)
+                self.classifier.fit(x_train, y_train, sample_weight=w_train)
 
                 if self.scoring == "log_loss":
-                    prediction_probability = self.classifier.predict_proba(feature_test)
+                    pred_proba = self.classifier.predict_proba(x_test)
                     score = -log_loss(
-                        label_test,
-                        prediction_probability,
-                        sample_weight=sample_weights_test,
+                        y_test,
+                        pred_proba,
+                        sample_weight=w_test,
                         labels=self.classifier.classes_,
                     )
                 elif self.scoring == "accuracy":
-                    prediction = self.classifier.predict(feature_test)
-                    score = accuracy_score(label_test, prediction, sample_weight=sample_weights_test)
+                    pred = self.classifier.predict(x_test)
+                    score = accuracy_score(
+                        y_test, pred, sample_weight=w_test
+                    )
                 else:
                     raise ValueError(f"'{self.scoring}' method not defined.")
 
                 scores.append(score)
 
-            importances.append({
-                "FeatureName": feature_name,
-                "Mean": np.mean(scores),
-                "StandardDeviation": np.std(scores, ddof=1) * len(scores) ** -0.5,
-            })
+            importances.append(
+                {
+                    "FeatureName": feature_name,
+                    "Mean": np.mean(scores),
+                    "StandardDeviation": np.std(scores, ddof=1)
+                    * (len(scores) ** -0.5),
+                }
+            )
 
-        return pd.DataFrame(importances)
+        return pd.DataFrame(importances).set_index("FeatureName")

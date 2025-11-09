@@ -1,94 +1,120 @@
-# from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
+"""
+Computes Mean Decrease Accuracy (MDA) feature importance.
+"""
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss
 from sklearn.model_selection import KFold
-from typing import List, Optional
-
+from typing import List, Optional, Any, Callable
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 class FeatureImportanceMDA(FeatureImportanceStrategy):
     """
-    Computes the feature importance using the Mean Decrease Accuracy (MDA) method.
+    Computes feature importance using Mean Decrease Accuracy (MDA).
 
-    The method shuffles each feature one by one and measures how much the performance 
-    (log loss in this context) decreases due to the shuffling.
-
-    .. math::
-
-        \\text{importance}_{j} = \\frac{\\text{score without shuffling} - \\text{score with shuffling}_{j}}
-        {\\text{score without shuffling}}
-
+    This method shuffles each feature one by one and measures how
+    much the model's performance (e.g., log loss) decreases.
     """
 
-    def __init__(
-            self,
-            classifier: object,
-            x: pd.DataFrame,
-            y: pd.Series,
-            n_splits: int = 10,
-            score_sample_weights: Optional[List[float]] = None,
-            train_sample_weights: Optional[List[float]] = None
-    ) -> None:
+    def __init__(self, classifier: object, n_splits: int = 10):
         """
-        Initialize the class with parameters.
+        Initialize the strategy.
 
-        :param classifier: The classifier object.
-        :param x: The feature data.
-        :param y: The target data.
-        :param n_splits: Number of splits for cross-validation.
-        :param score_sample_weights: Weights for scoring samples.
-        :param train_sample_weights: Weights for training samples.
+        Parameters
+        ----------
+        classifier : object
+            An *untrained* scikit-learn classifier.
+        n_splits : int, default=10
+            Number of splits for cross-validation.
         """
         self.classifier = classifier
-        self.x = x
-        self.y = y
         self.n_splits = n_splits
-        self.score_sample_weights = score_sample_weights
-        self.train_sample_weights = train_sample_weights
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
-        Compute the feature importances.
+        Compute MDA feature importance.
 
-        :return: Feature importances as a dataframe with "Mean" and "StandardDeviation" columns.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The feature data.
+        y : pd.Series
+            The target data.
+        **kwargs : Any
+            - 'train_sample_weights': Optional sample weights for training.
+            - 'score_sample_weights': Optional sample weights for scoring.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with "Mean" and "StandardDeviation" of importance.
         """
-        if self.train_sample_weights is None:
-            self.train_sample_weights = np.ones(self.x.shape[0])
-        if self.score_sample_weights is None:
-            self.score_sample_weights = np.ones(self.x.shape[0])
+        train_weights = kwargs.get('train_sample_weights')
+        score_weights = kwargs.get('score_sample_weights')
+        
+        if train_weights is None:
+            train_weights = np.ones(x.shape[0])
+        if score_weights is None:
+            score_weights = np.ones(x.shape[0])
 
         cv_generator = KFold(n_splits=self.n_splits)
-        initial_scores, shuffled_scores = pd.Series(dtype=float), pd.DataFrame(columns=self.x.columns)
+        baseline_scores = pd.Series(dtype=float)
+        shuffled_scores = pd.DataFrame(columns=x.columns)
 
-        for i, (train, test) in enumerate(cv_generator.split(self.x)):
+        for i, (train_idx, test_idx) in enumerate(cv_generator.split(x)):
             print(f"Fold {i} start ...")
 
-            x_train, y_train, weights_train = self.x.iloc[train, :], self.y.iloc[train], self.train_sample_weights[train]
-            x_test, y_test, weights_test = self.x.iloc[test, :], self.y.iloc[test], self.score_sample_weights[test]
-
-            fitted_classifier = self.classifier.fit(X=x_train, y=y_train, sample_weight=weights_train)
-            prediction_probability = fitted_classifier.predict_proba(x_test)
-
-            initial_scores.loc[i] = -log_loss(
-                y_test,
-                prediction_probability,
-                labels=self.classifier.classes_,
-                sample_weight=weights_test
+            x_train, y_train, w_train = (
+                x.iloc[train_idx, :],
+                y.iloc[train_idx],
+                train_weights[train_idx],
+            )
+            x_test, y_test, w_test = (
+                x.iloc[test_idx, :],
+                y.iloc[test_idx],
+                score_weights[test_idx],
             )
 
-            for feature in self.x.columns:
+            # Fit classifier and get baseline score
+            fitted_classifier = self.classifier.fit(
+                X=x_train, y=y_train, sample_weight=w_train
+            )
+            pred_proba = fitted_classifier.predict_proba(x_test)
+
+            baseline_scores.loc[i] = -log_loss(
+                y_test,
+                pred_proba,
+                labels=self.classifier.classes_,
+                sample_weight=w_test,
+            )
+
+            # Get scores for each shuffled feature
+            for feature in x.columns:
                 x_test_shuffled = x_test.copy(deep=True)
                 np.random.shuffle(x_test_shuffled[feature].values)
+                
                 shuffled_proba = fitted_classifier.predict_proba(x_test_shuffled)
-                shuffled_scores.loc[i, feature] = -log_loss(y_test, shuffled_proba, labels=self.classifier.classes_)
+                shuffled_scores.loc[i, feature] = -log_loss(
+                    y_test,
+                    shuffled_proba,
+                    labels=self.classifier.classes_,
+                    sample_weight=w_test
+                )
 
-        importances = (-1 * shuffled_scores).add(initial_scores, axis=0)
-        importances /= (-1 * shuffled_scores)
+        # Calculate importance
+        importances = (-1 * shuffled_scores).add(baseline_scores, axis=0)
+        importances /= -1 * shuffled_scores # Normalize by shuffled score
+        
+        # Calculate mean and std dev
+        importances_summary = pd.concat(
+            {
+                "Mean": importances.mean(),
+                "StandardDeviation": (
+                    importances.std() * (importances.shape[0] ** -0.5)
+                ),
+            },
+            axis=1,
+        )
 
-        importances = pd.concat({
-            "Mean": importances.mean(),
-            "StandardDeviation": importances.std() * importances.shape[0]**-0.5
-        }, axis=1)
-
-        return importances
+        return importances_summary

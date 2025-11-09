@@ -1,87 +1,144 @@
+"""
+Implements the core logic for the (G)SADF (Generalized) Supreme
+Augmented Dickey-Fuller test for structural breaks.
+
+Reference:
+    De Prado, M. (2018) Advances in financial machine learning.
+    John Wiley & Sons, Chapter 17.
+"""
+
 import numpy as np
 import pandas as pd
+from typing import List, Union, Tuple, Dict, Any
 
 def lag_dataframe(
-    market_data: pd.DataFrame,
-    lags: int
+    market_data: pd.DataFrame, lags: Union[int, List[int]]
 ) -> pd.DataFrame:
     """
-    Apply lags to DataFrame.
+    Apply lags to a DataFrame.
 
-    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    Methodology: Snippet 17.3
+    Reference:
+        Snippet 17.3, Page 253.
 
-    :param market_data: Data of price or log price.
-    :param lags: Arrays of lag or integer that shows number of lags.
-    :return: DataFrame with lagged data.
+    Parameters
+    ----------
+    market_data : pd.DataFrame
+        DataFrame of price or log price.
+    lags : Union[int, List[int]]
+        An integer number of lags (e.g., 3 creates lags 0, 1, 2, 3)
+        or a specific list of lags to create.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with lagged columns, e.g., 'price_0', 'price_1', ...
     """
-    lagged_data = pd.DataFrame()
-
+    lagged_parts = []
+    
     if isinstance(lags, int):
-        lags = range(lags + 1)
+        lags_list = range(lags + 1)
     else:
-        lags = [int(lag) for lag in lags]
+        lags_list = [int(lag) for lag in lags]
 
-    for lag in lags:
-        temp_data = pd.DataFrame(market_data.shift(lag).copy(deep=True))
-        temp_data.columns = [f'{i}_{lag}' for i in temp_data.columns]
-        lagged_data = lagged_data.join(temp_data, how='outer')
+    for lag in lags_list:
+        temp_data = market_data.shift(lag).copy()
+        temp_data.columns = [f"{col}_{lag}" for col in temp_data.columns]
+        lagged_parts.append(temp_data)
 
-    return lagged_data
+    return pd.concat(lagged_parts, axis=1)
 
 
 def prepare_data(
-    series: pd.DataFrame,
-    constant: str,
-    lags: int
-) -> (np.ndarray, np.ndarray):
+    series: pd.DataFrame, constant: str, lags: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Prepare the datasets.
+    Prepare the y and X matrices for ADF regression.
 
-    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    Methodology: Snippet 17.2
+    Reference:
+        Snippet 17.2, Page 252.
 
-    :param series: Data of price or log price.
-    :param constant: String that must be "nc" or "ct" or "ctt".
-    :param lags: Arrays of lag or integer that shows number of lags.
-    :return: Tuple of y and x arrays.
+    Parameters
+    ----------
+    series : pd.DataFrame
+        A single-column DataFrame of price or log price.
+    constant : str
+        The type of trend to include:
+        - 'nc': No constant or trend.
+        - 'c': Constant only.
+        - 'ct': Constant and linear trend.
+        - 'ctt': Constant, linear, and quadratic trend.
+    lags : int
+        The number of lags to include in the regression.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        - y: The dependent variable (differenced series).
+        - X: The matrix of independent variables (lagged level,
+             lagged diffs, and trend components).
     """
-    series_ = series.diff().dropna()
-    x = lag_dataframe(series_, lags).dropna()
-    x.iloc[:, 0] = series.values[-x.shape[0]-1:-1, 0]
-    y = series_.iloc[-x.shape[0]:].values
+    # 1. Create lagged differenced series
+    series_diff = series.diff().dropna()
+    x = lag_dataframe(series_diff, lags).dropna()
+    
+    # 2. Replace lag 0 of diffs with lag 1 of levels
+    x.iloc[:, 0] = series.values[-x.shape[0] - 1 : -1, 0]
+    y = series_diff.iloc[-x.shape[0] :].values
 
-    if constant != 'nc':
-        x = np.append(x, np.ones((x.shape[0], 1)), axis=1)
+    x_arr = x.to_numpy()
 
-    if constant[:2] == 'ct':
-        trend = np.arange(x.shape[0]).reshape(-1, 1)
-        x = np.append(x, trend, axis=1)
+    # 3. Add trend components
+    if constant != "nc":
+        # Add constant
+        x_arr = np.append(x_arr, np.ones((x_arr.shape[0], 1)), axis=1)
 
-    if constant == 'ctt':
-        x = np.append(x, trend**2, axis=1)
+    if constant[:2] == "ct":
+        # Add linear trend
+        trend = np.arange(x_arr.shape[0]).reshape(-1, 1)
+        x_arr = np.append(x_arr, trend, axis=1)
 
-    return y, x
+    if constant == "ctt":
+        # Add quadratic trend
+        x_arr = np.append(x_arr, trend**2, axis=1)
+
+    return y, x_arr
 
 
 def compute_beta(
-    y: np.ndarray,
-    x: np.ndarray
-) -> (np.ndarray, np.ndarray):
+    y: np.ndarray, x: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Fit the ADF specification.
+    Fit the ADF specification using OLS.
 
-    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    Methodology: Snippet 17.4
+    Reference:
+        Snippet 17.4, Page 253.
 
-    :param y: Dependent variable.
-    :param x: Matrix of independent variable.
-    :return: Tuple of beta_mean and beta_variance.
+    Parameters
+    ----------
+    y : np.ndarray
+        Dependent variable.
+    x : np.ndarray
+        Matrix of independent variables.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        - beta_mean: The OLS coefficient estimates.
+        - beta_variance: The OLS covariance matrix.
     """
-    x_inverse = np.linalg.inv(np.dot(x.T, x))
-    beta_mean = x_inverse * np.dot(x.T, y)
-    epsilon = y - np.dot(x, beta_mean)
-    beta_variance = np.dot(epsilon.T, epsilon) / (x.shape[0] - x.shape[1]) * x_inverse
+    # (X'X)^-1
+    x_inv = np.linalg.inv(x.T @ x)
+    
+    # beta = (X'X)^-1 @ (X'y)
+    beta_mean = x_inv @ (x.T @ y)
+    
+    # epsilon = y - X @ beta
+    epsilon = y - (x @ beta_mean)
+    
+    # V[beta] = (e'e / (T-K)) * (X'X)^-1
+    beta_variance = (
+        (epsilon.T @ epsilon) / (x.shape[0] - x.shape[1])
+    ) * x_inv
 
     return beta_mean, beta_variance
 
@@ -90,31 +147,63 @@ def adf(
     log_price: pd.DataFrame,
     min_sample_length: int,
     constant: str,
-    lags: int
-) -> dict:
+    lags: int,
+) -> Dict[str, Any]:
     """
-    SADF's inner loop.
+    Run the ADF test over expanding windows (SADF's inner loop).
 
-    Reference: De Prado, M. (2018) Advances in financial machine learning. John Wiley & Sons.
-    Methodology: Snippet 17.1
+    This function computes the ADF statistic for all possible
+    start dates, finding the maximum (Supremum) ADF statistic.
 
-    :param log_price: Pandas DataFrame of log price.
-    :param min_sample_length: Minimum sample length.
-    :param constant: String that must be "nc" or "ct" or "ctt".
-    :param lags: Arrays of lag or integer that shows number of lags.
-    :return: Dictionary with Time and gsadf values.
+    Reference:
+        Snippet 17.1, Page 251.
+
+    Parameters
+    ----------
+    log_price : pd.DataFrame
+        DataFrame of log prices.
+    min_sample_length : int
+        Minimum sample length for the regression.
+    constant : str
+        Trend component ('nc', 'c', 'ct', 'ctt').
+    lags : int
+        Number of lags to include.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary containing:
+        - 'Time': The timestamp of the end of the series.
+        - 'gsadf': The BSADF statistic (the supremum ADF).
     """
+    # 1. Prepare the full X, y matrices
     y, x = prepare_data(log_price, constant=constant, lags=lags)
-    start_points, bsadf, all_adf = range(0, y.shape[0] + lags - min_sample_length + 1), -np.inf, []
+    
+    # 2. Define all possible start points
+    start_points = range(0, y.shape[0] + lags - min_sample_length + 1)
+    bsadf = -np.inf  # Supremum ADF
+    all_adf = []
 
+    # 3. Loop over all expanding windows
     for start in start_points:
-        y_, x_ = y[start:], x[start:]
-        beta_mean_, beta_std_ = compute_beta(y_, x_)
-        beta_mean_, beta_std_ = beta_mean_[0, 0], beta_std_[0, 0] ** 0.5
-        all_adf.append(beta_mean_ / beta_std_)
+        y_window, x_window = y[start:], x[start:]
+        
+        # 4. Compute ADF regression for this window
+        beta_mean, beta_variance = compute_beta(y_window, x_window)
+        
+        # 5. Get t-statistic for the first coefficient (the level)
+        beta_mean_level = beta_mean[0, 0]
+        beta_std_level = beta_variance[0, 0] ** 0.5
+        
+        if beta_std_level == 0:
+            t_stat = -np.inf # Avoid division by zero
+        else:
+            t_stat = beta_mean_level / beta_std_level
+            
+        all_adf.append(t_stat)
 
-        if all_adf[-1] > bsadf:
-            bsadf = all_adf[-1]
+        if t_stat > bsadf:
+            bsadf = t_stat # Update supremum
 
-    out = {'Time': log_price.index[-1], 'gsadf': bsadf}
+    out = {"Time": log_price.index[-1], "gsadf": bsadf}
     return out

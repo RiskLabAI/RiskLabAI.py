@@ -1,100 +1,138 @@
 """
-A base class for the various bar types. Includes the logic shared between classes, to minimise the amount of
-duplicated code.
+Abstract base class for Information-Driven Bars (Imbalance and Run bars).
 """
 
-from abc import ABC, abstractmethod
-from typing import Tuple, Union, Generator, Iterable, Optional
-
+from abc import abstractmethod
+from typing import Union, List, Optional
 import numpy as np
-import pandas as pd
 
-from RiskLabAI.utils.ewma import ewma
+# Assuming ewma is in utils.
+try:
+    from RiskLabAI.utils.ewma import ewma 
+except ImportError:
+    # Fallback if ewma is not in utils (as seen in older files)
+    def ewma(array: np.ndarray, window: int) -> np.ndarray:
+        """Placeholder EWMA function."""
+        if array.size == 0:
+            return np.array([np.nan])
+        return pd.Series(array).ewm(span=window).mean().values
+
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import *
 
-
 class AbstractInformationDrivenBars(AbstractBars):
     """
-    Abstract class that contains the information driven properties which are shared between the subtypes.
-    This class subtypes are as follows:
-        1- AbstractImbalanceBars
-        2- AbstractRunBars
+    Abstract class for Information-Driven Bars (Imbalance and Run).
 
-    The class implements imbalance bars sampling logic as explained on page 29,30,31,32 of Advances in Financial Machine Learning.
+    Implements the shared logic for bars that sample based on
+    dynamic thresholds derived from tick imbalances.
+
+    Reference:
+        Pages 29-32, Advances in Financial Machine Learning.
     """
 
     def __init__(
-            self,
-            bar_type: str,
-            window_size_for_expected_n_ticks_estimation:int,
-            initial_estimate_of_expected_n_ticks_in_bar: int,
-            window_size_for_expected_imbalance_estimation: int
+        self,
+        bar_type: str,
+        window_size_for_expected_n_ticks_estimation: Optional[int],
+        initial_estimate_of_expected_n_ticks_in_bar: int,
+        window_size_for_expected_imbalance_estimation: int,
     ):
         """
-        AbstractInformationDrivenBars constructor function
-        :param bar_type: type of bar. e.g. expected_dollar_imbalance_bars, fixed_tick_run_bars etc.
-        :param window_size_for_expected_n_ticks_estimation: window size used to estimate number of ticks expectation
-        :param initial_estimate_of_expected_n_ticks_in_bar: initial estimate of number of ticks expectation window size
-        :param window_size_for_expected_imbalance_estimation: window size used to estimate imbalance expectation
-        """
+        Constructor.
 
+        Parameters
+        ----------
+        bar_type : str
+            e.g., 'dollar_imbalance', 'tick_run', etc.
+        window_size_for_expected_n_ticks_estimation : int, optional
+            Window size for EWMA of E[T]. (None for Fixed bars).
+        initial_estimate_of_expected_n_ticks_in_bar : int
+            Initial guess for E[T].
+        window_size_for_expected_imbalance_estimation : int
+            Window size for EWMA of E[b].
+        """
         super().__init__(bar_type)
         self.information_driven_bars_statistics = {
-            EXPECTED_TICKS_NUMBER: initial_estimate_of_expected_n_ticks_in_bar,
+            EXPECTED_TICKS_NUMBER: float(
+                initial_estimate_of_expected_n_ticks_in_bar
+            ),
             EXPECTED_IMBALANCE_WINDOW: window_size_for_expected_imbalance_estimation,
         }
+        self.window_size_for_expected_n_ticks_estimation = (
+            window_size_for_expected_n_ticks_estimation
+        )
 
-        self.window_size_for_expected_n_ticks_estimation = window_size_for_expected_n_ticks_estimation
-
-    def _ewma_expected_imbalance(self, array: list, window: int, warm_up: bool = False) -> np.ndarray:
+    def _ewma_expected_imbalance(
+        self, array: list, window: int, warm_up: bool = False
+    ) -> float:
         """
-        Calculates expected imbalance (2P[b_t=1]-1) using EWMA as defined on page 29 of Advances in Financial Machine Learning.
-        :param array: imbalances list
-        :param window: EWMA window for expectation calculation
-        :param warm_up: whether warm up period passed or not
-        :return: expected_imbalance: 2P[b_t=1]-1 which approximated using EWMA expectation
-        """
+        Calculate the EWMA of the expected imbalance.
 
-        if len(array) < self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER] and warm_up:
-            ewma_window = np.nan
+        Parameters
+        ----------
+        array : list
+            List of observed imbalances.
+        window : int
+            EWMA window.
+        warm_up : bool, default=False
+            If True, wait for `E[T]` ticks before calculating.
+
+        Returns
+        -------
+        float
+            The EWMA of the expected imbalance.
+        """
+        if warm_up:
+            expected_ticks = self.information_driven_bars_statistics[
+                EXPECTED_TICKS_NUMBER
+            ]
+            if np.isnan(expected_ticks) or len(array) < expected_ticks:
+                return np.nan
+
+        ewma_window = int(min(len(array), window))
+        if ewma_window == 0:
+            return np.nan
+
+        return ewma(
+            np.array(array[-ewma_window:], dtype=float), window=ewma_window
+        )[-1]
+
+    def _imbalance_at_tick(
+        self, price: float, signed_tick: int, volume: float
+    ) -> float:
+        """
+        Calculate the imbalance (theta) for the current tick.
+
+        Parameters
+        ----------
+        price : float
+            Current tick price.
+        signed_tick : int
+            Current tick rule (1, -1, 0).
+        volume : float
+            Current tick volume.
+
+        Returns
+        -------
+        float
+            The calculated imbalance.
+        """
+        if self.bar_type in ("tick_imbalance", "tick_run"):
+            imbalance = float(signed_tick)
+        elif self.bar_type in ("dollar_imbalance", "dollar_run"):
+            imbalance = float(signed_tick * volume * price)
+        elif self.bar_type in ("volume_imbalance", "volume_run"):
+            imbalance = float(signed_tick * volume)
         else:
-            ewma_window = int(min(len(array), window))
-
-        if np.isnan(ewma_window):
-            expected_imbalance = np.nan
-        else:
-            expected_imbalance = ewma(
-                np.array(array[-ewma_window:], dtype=float),
-                window=ewma_window
-            )[-1]
-
-        return expected_imbalance
-
-    def _imbalance_at_tick(self, price: float, signed_tick: int, volume: float) -> float:
-        """
-        Calculate the imbalance at tick t (current tick) (θ_t) using tick data as defined on page 29 of Advances in Financial Machine Learning
-        :param price: price of tick
-        :param signed_tick: tick rule of current tick computed before
-        :param volume: volume of current tick
-        :return: imbalance: imbalance of current tick
-        """
-        if self.bar_type == 'tick_imbalance' or self.bar_type == 'tick_run':
-            imbalance = signed_tick
-
-        elif self.bar_type == 'dollar_imbalance' or self.bar_type == 'dollar_run':
-            imbalance = signed_tick * volume * price
-
-        elif self.bar_type == 'volume_imbalance' or self.bar_type == 'volume_run':
-            imbalance = signed_tick * volume
-
-        else:
-            raise ValueError('Unknown imbalance metric, possible values are tick/dollar/volume imbalance/run')
+            raise ValueError(f"Unknown bar_type for imbalance: {self.bar_type}")
 
         return imbalance
 
     @abstractmethod
-    def _expected_number_of_ticks(self) -> Union[float, int]:
+    def _expected_number_of_ticks(self) -> float:
         """
-        Calculate number of ticks expectation when new imbalance bar is sampled.
+        Abstract method to update the expected number of ticks (E[T]).
+        This is implemented differently for "fixed" vs. "expected" bars.
         """
+        pass

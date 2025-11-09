@@ -1,93 +1,125 @@
+"""
+High-Performance Computing (HPC) utilities for parallel processing.
+
+Provides a set of functions to parallelize operations, especially
+on pandas objects, using Python's multiprocessing.
+"""
+
 import multiprocessing as mp
 import pandas as pd
 import numpy as np
 import datetime as dt
 import time
-
+from typing import List, Dict, Any, Callable, Tuple, Union
 
 def report_progress(
-    job_number: int,
-    total_jobs: int,
-    start_time: float,
-    task: str
+    job_number: int, total_jobs: int, start_time: float, task: str
 ) -> None:
     """
-    Report the progress of a computing task.
+    Report the progress of a computing task to the console.
 
-    :param job_number: The current job number.
-    :type job_number: int
-    :param total_jobs: The total number of jobs.
-    :type total_jobs: int
-    :param start_time: The start time of the computation.
-    :type start_time: float
-    :param task: The task being performed.
-    :type task: str
-    :return: None
+    Parameters
+    ----------
+    job_number : int
+        The current job number (e.g., `i` in a loop).
+    total_jobs : int
+        The total number of jobs.
+    start_time : float
+        The time the process started (e.g., `time.time()`).
+    task : str
+        A description of the task being performed.
     """
-    progress = [float(job_number) / total_jobs, (time.time() - start_time) / 60.]   # compute remaining time
-    progress.append(progress[1] * (1 / progress[0] - 1))  # append remaining time
-    timestamp = str(dt.datetime.fromtimestamp(time.time()))  # local time
-    message = f"{timestamp} {round(progress[0] * 100, 2)}% {task} done after {round(progress[1], 2)} minutes. " \
-              f"Remaining {round(progress[2], 2)} minutes."  # create message
+    progress = job_number / total_jobs
+    elapsed_time_min = (time.time() - start_time) / 60.0
+    remaining_time_min = elapsed_time_min * (1 / progress - 1)
+    
+    timestamp = str(dt.datetime.fromtimestamp(time.time()))
+    message = (
+        f"{timestamp} {progress*100:.2f}% {task} done after "
+        f"{elapsed_time_min:.2f} minutes. Remaining {remaining_time_min:.2f} minutes."
+    )
+    
     if job_number < total_jobs:
         print(message, end='\r')
     else:
         print(message)
 
 
-def process_jobs(
-    jobs: list,
-    task: str = None,
-    num_threads: int = 24
-) -> list:
+def expand_call(kargs: Dict[str, Any]) -> Any:
     """
-    Process multiple jobs in parallel.
+    Wrapper function to expand keyword arguments for a callback.
 
-    :param jobs: A list of jobs to be processed.
-    :type jobs: list
-    :param task: The task being performed.
-    :type task: str
-    :param num_threads: Number of threads to be used.
-    :type num_threads: int
-    :return: Outputs of the jobs.
-    :rtype: list
+    This is used by `process_jobs` to unpack a dictionary of arguments
+    and call the target function.
+
+    Parameters
+    ----------
+    kargs : dict
+        A dictionary of arguments, which *must* include a 'func' key
+        mapping to the function to be called.
+
+    Returns
+    -------
+    Any
+        The output of the callback function.
+    """
+    func = kargs.pop('func')
+    return func(**kargs)
+
+
+def process_jobs(
+    jobs: List[Dict[str, Any]], task: Optional[str] = None, num_threads: int = 24
+) -> List[Any]:
+    """
+    Process a list of jobs in parallel using multiprocessing.
+
+    Parameters
+    ----------
+    jobs : List[Dict[str, Any]]
+        A list of job dictionaries. Each dict must contain a 'func' key
+        and all arguments required by that function.
+    task : str, optional
+        A name for the task, used for progress reporting. If None,
+        the function name from the first job is used.
+    num_threads : int, default=24
+        The number of parallel processes to spawn.
+
+    Returns
+    -------
+    List[Any]
+        A list containing the results from all jobs.
     """
     if task is None:
-        task = jobs[0]['func'].__name__  # initial func
-    pool = mp.Pool(processes=num_threads)  # thread pool
-    outputs, output, time0 = pool.imap_unordered(expand_call, jobs), [], time.time()  # initial task to processors
+        task = jobs[0]['func'].__name__
 
-    # Process asynchronous output, report progress
-    for i, out_ in enumerate(outputs):
-        output.append(out_)
-        report_progress(i, len(jobs), time0, task)
-    pool.close()
-    pool.join()  # this is needed to prevent memory leaks
-    return output
+    with mp.Pool(processes=num_threads) as pool:
+        outputs = []
+        start_time = time.time()
+        
+        # Use imap_unordered for efficient processing
+        imap_results = pool.imap_unordered(expand_call, jobs)
+        
+        # Process results as they complete
+        for i, result in enumerate(imap_results, 1):
+            outputs.append(result)
+            report_progress(i, len(jobs), start_time, task)
+            
+    return outputs
 
 
-def expand_call(kargs: dict):
+def process_jobs_sequential(jobs: List[Dict[str, Any]]) -> List[Any]:
     """
-    Expand the arguments of a callback function, kargs['func'].
+    Run jobs sequentially (single-thread). Useful for debugging.
 
-    :param kargs: Arguments for the callback function.
-    :type kargs: dict
-    :return: Output of the callback function.
-    """
-    func = kargs['func']
-    del kargs['func']
-    output = func(**kargs)
-    return output
+    Parameters
+    ----------
+    jobs : List[Dict[str, Any]]
+        A list of job dictionaries.
 
-
-def process_jobs_sequential(jobs: list) -> list:
-    """
-    Single-thread execution, for debugging.
-
-    :param jobs: A list of jobs to be processed.
-    :type jobs: list
-    :return: Outputs of the jobs.
-    :rtype: list
+    Returns
+    -------
+    List[Any]
+        A list containing the results from all jobs.
     """
     output = []
     for job in jobs:
@@ -96,93 +128,131 @@ def process_jobs_sequential(jobs: list) -> list:
     return output
 
 
-def linear_partitions(
-    num_atoms: int,
-    num_threads: int
-) -> list:
+def linear_partitions(num_atoms: int, num_threads: int) -> np.ndarray:
     """
-    Generate linear partitions for parallel computation.
+    Generate linear partitions (indices) for parallel computation.
 
-    :param num_atoms: Number of atoms.
-    :type num_atoms: int
-    :param num_threads: Number of threads.
-    :type num_threads: int
-    :return: The partitions.
-    :rtype: list
+    Splits `num_atoms` into `num_threads` (or fewer) roughly equal parts.
+
+    Parameters
+    ----------
+    num_atoms : int
+        The total number of items to split.
+    num_threads : int
+        The desired number of partitions (threads).
+
+    Returns
+    -------
+    np.ndarray
+        An array of partition boundary indices.
     """
-    partitions = np.linspace(0, num_atoms, min(num_threads, num_atoms) + 1)  # split [0...nAtoms) into partitions
-    partitions = np.ceil(partitions).astype(int)  # integerize(!) number
+    n_parts = min(num_threads, num_atoms)
+    partitions = np.linspace(0, num_atoms, n_parts + 1)
+    partitions = np.ceil(partitions).astype(int)
     return partitions
 
 
 def nested_partitions(
-    num_atoms: int,
-    num_threads: int,
-    upper_triangle: bool = False
-) -> list:
+    num_atoms: int, num_threads: int, upper_triangle: bool = False
+) -> np.ndarray:
     r"""
-    Generate nested partitions for parallel computation.
+    Generate nested partitions, useful for tasks with nested loops.
 
-    :param num_atoms: Number of atoms.
-    :type num_atoms: int
-    :param num_threads: Number of threads.
-    :type num_threads: int
-    :param upper_triangle: Whether to generate partitions for the upper triangle.
-    :type upper_triangle: bool
-    :return: The partitions.
-    :rtype: list
-
-    The formula for partition size is given by:
+    The formula is designed to create partitions of varying sizes,
+    which can be more efficient for tasks where work is not
+    distributed linearly (e.g., matrix operations).
 
     .. math::
+       p_i = \frac{-1 + \sqrt{1 + 4(p_{i-1}^2 + p_{i-1} + N(N+1)/K)}}{2}
 
-       partitions = \frac{-1 + \sqrt{1 + 4 \cdot (partitions[-1]^2 + partitions[-1] + \frac{n_atoms \cdot (n_atoms + 1)}{n_threads})}}{2}
+    Parameters
+    ----------
+    num_atoms : int
+        Number of atoms (N).
+    num_threads : int
+        Number of threads (K).
+    upper_triangle : bool, default=False
+        If True, sort partitions to be heaviest first.
+
+    Returns
+    -------
+    np.ndarray
+        An array of partition boundary indices.
     """
-    partitions, n_threads_ = [0], min(num_threads, num_atoms)
-    for num in range(n_threads_):
-        partitions_value = 1 + 4 * (partitions[-1] ** 2 + partitions[-1] + num_atoms * (num_atoms + 1.) / n_threads_)
-        partitions_value = (-1 + partitions_value ** .5) / 2.
-        partitions.append(partitions_value)
+    partitions = [0]
+    n_threads_ = min(num_threads, num_atoms)
+    
+    for _ in range(n_threads_):
+        last_part = partitions[-1]
+        part_size = 1 + 4 * (
+            last_part**2 + last_part + num_atoms * (num_atoms + 1.0) / n_threads_
+        )
+        part_val = (-1 + part_size**0.5) / 2.0
+        partitions.append(part_val)
+        
     partitions = np.round(partitions).astype(int)
-    if upper_triangle:  # the first rows are the heaviest
+    
+    if upper_triangle:  # The first rows are the heaviest
         partitions = np.cumsum(np.diff(partitions)[::-1])
         partitions = np.append(np.array([0]), partitions)
+        
     return partitions
 
 
 def mp_pandas_obj(
-    function,
-    pandas_object: tuple,
+    func: Callable[..., pd.Series],
+    pandas_object: Tuple[str, pd.Index],
     num_threads: int = 2,
     mp_batches: int = 1,
     linear_partition: bool = True,
-    **kwargs
-) -> pd.DataFrame or pd.Series:
+    **kwargs: Any
+) -> Union[pd.DataFrame, pd.Series]:
     """
-    Parallelize jobs and return a DataFrame or Series.
+    Parallelize a function call on a pandas object (DataFrame/Series).
 
-    :param function: The function to be parallelized.
-    :param pandas_object: A tuple containing the name of the argument used to pass the molecule and a list of atoms
-                          that will be grouped into molecules.
-    :type pandas_object: tuple
-    :param num_threads: Number of threads to be used.
-    :type num_threads: int
-    :param mp_batches: Number of batches for multiprocessing.
-    :type mp_batches: int
-    :param linear_partition: Whether to use linear partitioning or nested partitioning.
-    :type linear_partition: bool
-    :param kwargs: Other arguments needed by the function.
-    :return: The result of the function parallelized.
-    :rtype: DataFrame or Series
+    This function splits the `pandas_object` index into partitions and
+    calls `func` on each partition in parallel.
+
+    Parameters
+    ----------
+    func : Callable
+        The function to be parallelized. It must accept a pandas
+        object as its first argument.
+    pandas_object : Tuple[str, pd.Index]
+        A tuple where:
+        - [0] (str): The name of the argument in `func` that
+                     receives the partition (e.g., 'molecule').
+        - [1] (pd.Index): The index to be partitioned.
+    num_threads : int, default=2
+        Number of parallel processes.
+    mp_batches : int, default=1
+        Number of batches to split the jobs into.
+    linear_partition : bool, default=True
+        If True, use `linear_partitions`.
+        If False, use `nested_partitions`.
+    **kwargs : Any
+        Other keyword arguments to be passed to `func`.
+
+    Returns
+    -------
+    Union[pd.DataFrame, pd.Series]
+        The concatenated results from all parallel calls.
     """
     if linear_partition:
-        parts = linear_partitions(len(pandas_object[1]), num_threads * mp_batches)
+        parts = linear_partitions(
+            len(pandas_object[1]), num_threads * mp_batches
+        )
     else:
-        parts = nested_partitions(len(pandas_object[1]), num_threads * mp_batches)
+        parts = nested_partitions(
+            len(pandas_object[1]), num_threads * mp_batches
+        )
 
     jobs = []
     for i in range(1, len(parts)):
-        job = {pandas_object[0]: pandas_object[1][parts[i - 1]:parts[i]], 'func': function}
+        job = {
+            pandas_object[0]: pandas_object[1][parts[i - 1] : parts[i]],
+            "func": func,
+        }
         job.update(kwargs)
         jobs.append(job)
 
@@ -192,13 +262,10 @@ def mp_pandas_obj(
         out = process_jobs(jobs, num_threads=num_threads)
 
     if isinstance(out[0], pd.DataFrame):
-        result = pd.DataFrame()
+        result_df = pd.concat(out)
     elif isinstance(out[0], pd.Series):
-        result = pd.Series()
+        result_df = pd.concat(out)
     else:
         return out
 
-    for i in out:
-        result = result.append(i)
-    result = result.sort_index()
-    return result
+    return result_df.sort_index()

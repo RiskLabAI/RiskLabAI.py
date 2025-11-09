@@ -1,185 +1,203 @@
+"""
+Implements sample weighting techniques for financial machine learning,
+focusing on uniqueness (concurrency) and time decay.
+
+Reference:
+    De Prado, M. (2018) Advances in financial machine learning.
+    John Wiley & Sons, Chapter 4.
+"""
+
 import numpy as np
 import pandas as pd
-#from typing import List, Series, DataFrame
+from typing import Optional
 
 def expand_label_for_meta_labeling(
     close_index: pd.Index,
     timestamp: pd.Series,
-    molecule: pd.Index
+    molecule: pd.Index,
 ) -> pd.Series:
     """
-    Expand labels for meta-labeling.
+    Compute the number of concurrent events for each timestamp.
 
-    This function expands labels to incorporate meta-labeling by taking
-    an event Index, a Series with the return and label of each period,
-    and an Index specifying the molecules to apply the function to. It then returns a Series with the count
-    of events spanning a bar for each molecule.
+    This function expands the event start/end times (`timestamp`)
+    to a full series indicating how many events are active
+    at each point in time.
 
-    :param event_index: Index of events.
-    :param return_label_dataframe: Series containing returns and labels of each period.
-    :param molecule_index: Index specifying molecules to apply the function on.
-    :return: Series with the count of events spanning a bar for each molecule.
+    Reference:
+        Based on Snippet 4.1, Page 60 (label concurrency).
+
+    Parameters
+    ----------
+    close_index : pd.Index
+        The master index of all timestamps (e.g., from price bars).
+    timestamp : pd.Series
+        Series where index is event start time, value is event end time.
+    molecule : pd.Index
+        The subset of event start times to process.
+
+    Returns
+    -------
+    pd.Series
+        A Series indexed by `close_index` where each value is the
+        count of active events at that timestamp.
     """
-    timestamp = timestamp.fillna(close_index[-1])
-    timestamp = timestamp[timestamp >= molecule[0]]
-    timestamp = timestamp.loc[:timestamp[molecule].max()]
-    iloc = close_index.searchsorted(np.array([timestamp.index[0], timestamp.max()]))
-    count = pd.Series(0, index=close_index[iloc[0]:iloc[1] + 1])
+    # Filter events that are relevant to this molecule
+    ts = timestamp.fillna(close_index[-1])
+    ts = ts[ts.index.isin(molecule)]
+    ts = ts[ts > molecule[0]]
+    
+    if ts.empty:
+        return pd.Series(0, index=molecule)
 
-    for t_in, t_out in timestamp.items():
+    # Find min/max index locations
+    iloc_min = close_index.searchsorted(ts.index[0])
+    iloc_max = close_index.searchsorted(ts.max())
+    
+    # Create a count series over the relevant time span
+    count = pd.Series(0, index=close_index[iloc_min : iloc_max + 1])
+
+    for t_in, t_out in ts.items():
         count.loc[t_in:t_out] += 1
 
-    return count.loc[molecule[0]:timestamp[molecule].max()]
+    return count.loc[molecule[0] : ts.max()]
 
-def calculate_sample_weight(
-    timestamp: pd.DataFrame,
-    concurrency_events: pd.DataFrame,
-    molecule: pd.Index
+
+def calculate_average_uniqueness(
+    index_matrix: pd.DataFrame,
 ) -> pd.Series:
     """
-    Calculate sample weight using triple barrier method.
+    Calculate the average uniqueness of each event.
 
-    :param timestamp: DataFrame of events start and end for labelling.
-    :param concurrency_events: Data frame of concurrent events for each event.
-    :param molecule: Index that function must apply on it.
-    :return: Series of sample weights.
+    Uniqueness is calculated as 1/c_t, averaged over the
+    duration of the event.
+
+    Reference:
+        Snippet 4.2, Page 62.
+
+    Parameters
+    ----------
+    index_matrix : pd.DataFrame
+        An indicator matrix (T x N) where T is timestamps
+        and N is the number of events.
+
+    Returns
+    -------
+    pd.Series
+        A Series of average uniqueness for each event (column).
     """
-    weight = pd.Series(index=molecule)
-
-    for t_in, t_out in timestamp.loc[weight.index].items():
-        weight.loc[t_in] = (1. / concurrency_events.loc[t_in:t_out]).mean()
-
-    return weight
-
-def create_index_matgrix(
-    bar_index: pd.Index,
-    timestamp: pd.DataFrame
-) -> pd.DataFrame:
-    """
-    Create an indicator matrix.
-
-    :param bar_index: Index of all data.
-    :param timestamp: DataFrame with starting and ending times of events.
-    :return: Indicator matrix.
-    """
-    ind_matrix = pd.DataFrame(0, index=bar_index, columns=range(timestamp.shape[0]))
-
-    for row in timestamp.itertuples():
-        t0 = int(row.date)
-        t1 = int(row.timestamp)
-        ind_matrix.loc[t0:t1, row.Index] = 1
-
-    return ind_matrix
-
-def calculate_average_uniqueness(index_matrix: pd.DataFrame) -> pd.Series:
-    """
-    Calculate average uniqueness from indicator matrix.
-
-    :param index_matrix: Indicator matrix.
-    :return: Series of average uniqueness values.
-    """
-    concurrency = index_matrix.sum(axis=1)
-    uniqueness = index_matrix.div(concurrency, axis=0)
+    concurrency = index_matrix.sum(axis=1) # c_t
+    uniqueness = index_matrix.div(concurrency, axis=0) # 1/c_t
+    
+    # Average uniqueness for each event
     average_uniqueness = uniqueness[uniqueness > 0].mean()
-
     return average_uniqueness
 
-def perform_sequential_bootstrap(
-    index_matrix: pd.DataFrame,
-    sample_length: int
-) -> list:
-    """
-    Perform sequential bootstrap to generate a sample.
-
-    :param index_matrix: Matrix of indicators for events.
-    :param sample_length: Number of samples.
-    :return: List of indices representing the sample.
-    """
-    if sample_length is None:
-        sample_length = index_matrix.shape[1]
-
-    phi = []
-
-    while len(phi) < sample_length:
-        average_uniqueness = pd.Series(dtype=np.float64)
-
-        for i in index_matrix:
-            index_matrix_ = index_matrix[phi + [i]]
-            average_uniqueness.loc[i] = calculate_average_uniqueness(index_matrix_).iloc[-1]
-
-        prob = average_uniqueness / average_uniqueness.sum()
-        phi += [np.random.choice(index_matrix.columns, p=prob)]
-
-    return phi
-
-def calculate_sample_weight_absolute_return(
-    timestamp: pd.DataFrame,
-    concurrency_events: pd.DataFrame,
-    returns: pd.DataFrame,
-    molecule: pd.Index
-) -> pd.Series:
-    """
-    Calculate sample weight using absolute returns.
-
-    :param timestamp: DataFrame for events.
-    :param concurrency_events: DataFrame that contains number of concurrent events for each event.
-    :param returns: DataFrame that contains returns.
-    :param molecule: Index for the calculation.
-    :return: Series of sample weights.
-    """
-    return_ = np.log(returns).diff()
-    weight = pd.Series(index=molecule)
-
-    for t_in, t_out in timestamp.loc[weight.index].iteritems():
-        weight.loc[t_in] = (return_.loc[t_in:t_out] / concurrency_events.loc[t_in:t_out]).sum()
-
-    return weight.abs()
 
 def sample_weight_absolute_return_meta_labeling(
-    timestamp: pd.Series,
-    price: pd.Series,
-    molecule: pd.Index
+    timestamp: pd.Series, price: pd.Series, molecule: pd.Index
 ) -> pd.Series:
     """
-    Calculate sample weights using absolute returns.
+    Calculate sample weights based on absolute log-return attribution.
 
-    :param event_timestamps: Series containing event timestamps.
-    :param price_series: Series containing prices.
-    :param molecule_index: Index for the calculation.
-    :return: Series of sample weights.
+    The weight of a sample is proportional to the sum of the absolute
+    log-returns that occurred during the event, divided by the
+    concurrency of those returns.
+
+    w_i = sum_{t=t_i,0}^{t_i,1} [ |r_t| / c_t ]
+
+    Weights are then normalized to sum to the number of samples.
+
+    Reference:
+        Based on Snippet 4.10, Page 70.
+
+    Parameters
+    ----------
+    timestamp : pd.Series
+        Series where index is event start time, value is event end time.
+    price : pd.Series
+        Series of prices.
+    molecule : pd.Index
+        The subset of event start times to process.
+
+    Returns
+    -------
+    pd.Series
+        A Series of sample weights, normalized to sum to N.
     """
-    concurrency_events = expand_label_for_meta_labeling(price.index, timestamp, molecule)
+    # 1. Compute concurrency
+    concurrency_events = expand_label_for_meta_labeling(
+        price.index, timestamp, molecule
+    )
+    
+    # 2. Compute absolute log returns
+    log_return = np.log(price).diff().abs()
+    
+    # Align returns and concurrency
+    log_return, concurrency_events = log_return.align(
+        concurrency_events, join="right", fill_value=0
+    )
 
-    return_ = np.log(price).diff()
     weight = pd.Series(index=molecule, dtype=float)
 
+    # 3. Calculate weighted returns
     for t_in, t_out in timestamp.loc[weight.index].items():
-        weight.loc[t_in] = (return_.loc[t_in:t_out] / concurrency_events.loc[t_in:t_out]).sum()
+        if t_out not in log_return.index:
+             t_out = log_return.index[log_return.index.searchsorted(t_out) - 1]
+             
+        # r_t / c_t
+        weighted_return = log_return.loc[t_in:t_out] / \
+                          concurrency_events.loc[t_in:t_out]
+        
+        weight.loc[t_in] = weighted_return.sum()
 
     weight = weight.abs()
+    
+    # 4. Normalize
+    weight *= len(weight) / weight.sum()
+    return weight
 
-    return weight * len(weight) / weight.sum()
 
 def calculate_time_decay(
-    weight: pd.Series,
-    clf_last_weight: float = 1.0
+    weight: pd.Series, clf_last_weight: float = 1.0
 ) -> pd.Series:
     """
-    Calculate time decay on weight.
+    Apply a time-decay factor to sample weights.
 
-    :param weight: Weight computed for each event.
-    :param clf_last_weight: Weight of oldest observation.
-    :return: Series of weights after applying time decay.
+    This function applies a linearly decaying weight, where the
+    most recent observation has weight 1.0 and the oldest
+    has weight `clf_last_weight`.
+
+    Reference:
+        Snippet 4.11, Page 71.
+
+    Parameters
+    ----------
+    weight : pd.Series
+        The original sample weights (e.g., from uniqueness).
+    clf_last_weight : float, default=1.0
+        The weight to assign to the oldest observation.
+        If 1.0, all weights are 1 (no decay).
+        If 0.0, weights decay linearly to 0.
+
+    Returns
+    -------
+    pd.Series
+        The new weights with time decay applied.
     """
     clf_weight = weight.sort_index().cumsum()
+    
+    if clf_last_weight < 0 or clf_last_weight > 1:
+        raise ValueError("clf_last_weight must be between 0 and 1")
 
-    if clf_last_weight >= 0:
-        slope = (1. - clf_last_weight) / clf_weight.iloc[-1]
+    # Calculate slope
+    if clf_last_weight == 1.0:
+        slope = 0.0
+        const = 1.0
     else:
-        slope = 1. / ((clf_last_weight + 1) * clf_weight.iloc[-1])
-
-    const = 1. - slope * clf_weight.iloc[-1]
+        slope = (1.0 - clf_last_weight) / clf_weight.iloc[-1]
+        const = 1.0 - slope * clf_weight.iloc[-1]
+        
     clf_weight = const + slope * clf_weight
-    clf_weight[clf_weight < 0] = 0
-
+    clf_weight[clf_weight < 0] = 0.0 # Should not happen if clf_last_weight >= 0
+    
     return clf_weight

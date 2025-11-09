@@ -1,80 +1,131 @@
+"""
+Implements the Corwin and Schultz (2012) bid-ask spread estimator.
+
+Reference:
+    Corwin, S. A., & Schultz, P. (2012). A simple way to estimate
+    bid-ask spreads from daily high and low prices.
+    The Journal of Finance, 67(2), 719-760.
+"""
+
 import numpy as np
 import pandas as pd
 
 def beta_estimates(
-    high_prices: pd.Series,
-    low_prices: pd.Series,
-    window_span: int
+    high_prices: pd.Series, low_prices: pd.Series, window_span: int
 ) -> pd.Series:
-    """
-    Estimate β using Corwin and Schultz methodology.
+    r"""
+    Estimate \(\beta\) (sum of squared high-low log-ratios).
 
-    :param high_prices: High prices vector.
-    :param low_prices: Low prices vector.
-    :param window_span: Rolling window span.
-    :return: Estimated β vector.
+    .. math::
+        \beta_t = \sum_{j=t-1}^{t} [\ln(H_j / L_j)]^2
 
-    .. note:: Reference: Corwin, S. A., & Schultz, P. (2012). A simple way to estimate bid-ask spreads from daily high and low prices. The Journal of Finance, 67(2), 719-760.
+    This is then averaged over the `window_span`.
+
+    Parameters
+    ----------
+    high_prices : pd.Series
+        Time series of high prices.
+    low_prices : pd.Series
+        Time series of low prices.
+    window_span : int
+        Rolling window span for averaging.
+
+    Returns
+    -------
+    pd.Series
+        The estimated \(\beta\) vector.
     """
-    log_ratios = np.log(high_prices / low_prices) ** 2
-    beta = log_ratios.rolling(window=2).sum()
+    log_ratios_sq = np.log(high_prices / low_prices) ** 2
+    
+    # Sum of current and previous day's squared log-ratio
+    beta = log_ratios_sq.rolling(window=2).sum()
+    
+    # Average over the window span
     beta = beta.rolling(window=window_span).mean()
     return beta
 
-def gamma_estimates(
-    high_prices: pd.Series,
-    low_prices: pd.Series
-) -> pd.Series:
-    """
-    Estimate γ using Corwin and Schultz methodology.
 
-    :param high_prices: High prices vector.
-    :param low_prices: Low prices vector.
-    :return: Estimated γ vector.
+def gamma_estimates(high_prices: pd.Series, low_prices: pd.Series) -> pd.Series:
+    r"""
+    Estimate \(\gamma\) (squared log-ratio of two-day high/low).
 
-    .. note:: Reference: Corwin, S. A., & Schultz, P. (2012). A simple way to estimate bid-ask spreads from daily high and low prices. The Journal of Finance, 67(2), 719-760.
+    .. math::
+        \gamma_t = [\ln(\max(H_t, H_{t-1}) / \min(L_t, L_{t-1}))]^2
+
+    Parameters
+    ----------
+    high_prices : pd.Series
+        Time series of high prices.
+    low_prices : pd.Series
+        Time series of low prices.
+
+    Returns
+    -------
+    pd.Series
+        The estimated \(\gamma\) vector.
     """
     high_prices_max = high_prices.rolling(window=2).max()
     low_prices_min = low_prices.rolling(window=2).min()
-    gamma = np.log(high_prices_max / low_prices_min)**2
+    gamma = np.log(high_prices_max / low_prices_min) ** 2
     return gamma
 
-def alpha_estimates(
-    beta: pd.Series,
-    gamma: pd.Series
-) -> pd.Series:
-    """
-    Estimate α using Corwin and Schultz methodology.
 
-    :param beta: β Estimates vector.
-    :param gamma: γ Estimates vector.
-    :return: Estimated α vector.
+def alpha_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
+    r"""
+    Estimate \(\alpha\) from \(\beta\) and \(\gamma\).
 
-    .. note:: Reference: Corwin, S. A., & Schultz, P. (2012). A simple way to estimate bid-ask spreads from daily high and low prices. The Journal of Finance, 67(2), 719-760.
+    .. math::
+        \alpha = \frac{\sqrt{2\beta} - \sqrt{\beta}}{3 - 2\sqrt{2}}
+                 - \sqrt{\frac{\gamma}{3 - 2\sqrt{2}}}
+
+    Parameters
+    ----------
+    beta : pd.Series
+        \(\beta\) estimates vector.
+    gamma : pd.Series
+        \(\gamma\) estimates vector.
+
+    Returns
+    -------
+    pd.Series
+        The estimated \(\alpha\) vector, floored at 0.
     """
-    denominator = 3 - 2 * 2**0.5
-    alpha = (2**0.5 - 1) * (beta**0.5) / denominator
-    alpha -= (gamma / denominator)**0.5
-    alpha[alpha < 0] = 0
+    denominator = 3 - 2 * (2**0.5)
+    term1 = ((2**0.s5) - 1) * (beta**0.5) / denominator
+    term2 = (gamma / denominator) ** 0.5
+    
+    alpha = term1 - term2
+    alpha[alpha < 0] = 0.0  # Floor at zero
     return alpha
 
+
 def corwin_schultz_estimator(
-    high_prices: pd.Series,
-    low_prices: pd.Series,
-    window_span: int = 20
+    high_prices: pd.Series, low_prices: pd.Series, window_span: int = 20
 ) -> pd.Series:
-    """
-    Estimate spread using Corwin and Schultz methodology.
+    r"""
+    Estimate the bid-ask spread using the Corwin and Schultz (2012) method.
 
-    :param high_prices: High prices vector.
-    :param low_prices: Low prices vector.
-    :param window_span: Rolling window span, default is 20.
-    :return: Estimated spread vector.
+    .. math::
+        S = \frac{2(e^\alpha - 1)}{1 + e^\alpha}
 
-    .. note:: Reference: Corwin, S. A., & Schultz, P. (2012). A simple way to estimate bid-ask spreads from daily high and low prices. The Journal of Finance, 67(2), 719-760.
+    Parameters
+    ----------
+    high_prices : pd.Series
+        Time series of high prices.
+    low_prices : pd.Series
+        Time series of low prices.
+    window_span : int, default=20
+        Rolling window span for \(\beta\) estimation.
+
+    Returns
+    -------
+    pd.Series
+        The estimated spread vector.
     """
     beta = beta_estimates(high_prices, low_prices, window_span)
     gamma = gamma_estimates(high_prices, low_prices)
     alpha = alpha_estimates(beta, gamma)
-    spread = 2 * (alpha - 1) / (1 + np.exp(alpha))
+    
+    # Calculate spread
+    spread = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
     return spread

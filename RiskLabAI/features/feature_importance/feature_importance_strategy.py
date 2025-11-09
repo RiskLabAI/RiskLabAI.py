@@ -1,30 +1,37 @@
+"""
+Abstract Base Class for feature importance strategies.
+"""
+
 from abc import ABC, abstractmethod
 import pandas as pd
-
+from typing import Any
 
 class FeatureImportanceStrategy(ABC):
     """
     Abstract Base Class for computing feature importance.
 
-    Derived classes must implement the `compute` method to 
-    provide their own logic for computing feature importance.
+    Derived classes must implement the `compute` method.
     """
 
     @abstractmethod
     def compute(
-            self,
-            *args,
-            **kwargs
+        self, x: pd.DataFrame, y: pd.Series, **kwargs: Any
     ) -> pd.DataFrame:
         """
         Abstract method to compute feature importance.
 
-        :param args: Positional arguments.
-        :param kwargs: Keyword arguments.
-        :return: A pandas DataFrame containing feature importances.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The feature data.
+        y : pd.Series
+            The target data.
+        **kwargs : Any
+            Additional keyword arguments (e.g., sample_weights).
 
-        Note: Derived classes should provide a concrete implementation 
-        of this method with specific parameters and docstrings relevant 
-        to their implementation.
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing feature importances.
         """
         pass

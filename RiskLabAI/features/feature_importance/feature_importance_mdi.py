@@ -1,60 +1,85 @@
-# from feature_importance_strategy import FeatureImportanceStrategy
-from RiskLabAI.features.feature_importance.feature_importance_strategy import FeatureImportanceStrategy
+"""
+Computes Mean Decrease Impurity (MDI) feature importance.
+"""
 
 import pandas as pd
 import numpy as np
-from typing import List, Optional, Union
-
+from typing import List, Optional, Union, Any
+from sklearn.ensemble import BaseEnsemble
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 class FeatureImportanceMDI(FeatureImportanceStrategy):
     """
-    Computes the feature importance using the Mean Decrease Impurity (MDI) method.
+    Computes feature importance using Mean Decrease Impurity (MDI).
 
-    The method calculates the importance of a feature by measuring the average impurity
-    decrease across all the trees in the forest, where impurity is calculated 
-    using metrics like Gini impurity or entropy.
-
-    .. math::
-
-        \\text{importance}_{j} = \\frac{\\text{average impurity decrease for feature j}}{\\text{total impurity decrease}}
-
+    This method is specific to tree-based ensembles (like RandomForest)
+    and measures importance as the average impurity decrease.
     """
 
-    def __init__(
-            self,
-            classifier: object,
-            x: pd.DataFrame,
-            y: Union[pd.Series, List[Optional[float]]]
-    ) -> None:
+    def __init__(self, classifier: BaseEnsemble):
         """
-        Initialize the class with parameters.
+        Initialize the strategy.
 
-        :param classifier: The classifier object.
-        :param x: The feature data.
-        :param y: The target data.
+        Parameters
+        ----------
+        classifier : BaseEnsemble
+            An *untrained* scikit-learn ensemble model (e.g., RandomForestClassifier).
         """
+        if not hasattr(classifier, 'estimators_'):
+            raise TypeError("Classifier must be an ensemble (e.g., RandomForest).")
         self.classifier = classifier
-        classifier.fit(x, y)
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
-        Compute the feature importances.
+        Compute MDI feature importance.
 
-        :return: Feature importances as a dataframe with "Mean" and "StandardDeviation" columns.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The feature data.
+        y : pd.Series
+            The target data.
+        **kwargs : Any
+            Keyword arguments for the classifier's `fit` method
+            (e.g., `sample_weight`).
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with "Mean" and "StandardDeviation" of importance.
         """
-        feature_importances_dict = {i: tree.feature_importances_ for i, tree in enumerate(self.classifier.estimators_)}
-        feature_importances_df = pd.DataFrame.from_dict(feature_importances_dict, orient="index")
-        feature_importances_df.columns = self.classifier.feature_names_in_
+        train_sample_weights = kwargs.get('sample_weight')
+        
+        # Fit the classifier
+        self.classifier.fit(x, y, sample_weight=train_sample_weights)
 
-        # Replace 0 with NaN to avoid inaccuracies in calculations
-        feature_importances_df.replace(0, np.nan, inplace=True)  
+        # Get importance from each tree
+        importances_dict = {
+            i: tree.feature_importances_
+            for i, tree in enumerate(self.classifier.estimators_)
+        }
+        importances_df = pd.DataFrame.from_dict(importances_dict, orient="index")
+        
+        # Ensure correct feature names
+        if hasattr(self.classifier, 'feature_names_in_'):
+             importances_df.columns = self.classifier.feature_names_in_
+        else:
+             importances_df.columns = x.columns
 
-        importances = pd.concat({
-            "Mean": feature_importances_df.mean(),
-            "StandardDeviation": feature_importances_df.std() * (feature_importances_df.shape[0] ** -0.5)
-        }, axis=1)
+        # Replace 0 with NaN (as per user's original code)
+        importances_df.replace(0, np.nan, inplace=True)
 
-        # Normalize importances to sum up to 1
+        importances = pd.concat(
+            {
+                "Mean": importances_df.mean(),
+                "StandardDeviation": (
+                    importances_df.std()
+                    * (importances_df.shape[0] ** -0.5)
+                ),
+            },
+            axis=1,
+        )
+
+        # Normalize
         importances /= importances["Mean"].sum()
-
         return importances

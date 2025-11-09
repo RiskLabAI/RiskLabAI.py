@@ -1,217 +1,324 @@
+"""
+Functions for calculating metrics related to test-set overfitting,
+including the expected maximum Sharpe Ratio and Type I/II errors.
+"""
+
+from typing import List
 import numpy as np
 import pandas as pd
+import scipy.stats as ss
 from scipy.stats import norm
 
 def expected_max_sharpe_ratio(
-        n_trials: int,
-        mean_sharpe_ratio: float,
-        std_sharpe_ratio: float
+    n_trials: int, mean_sharpe_ratio: float, std_sharpe_ratio: float
 ) -> float:
     r"""
-    Calculate the expected maximum Sharpe Ratio.
+    Calculate the expected maximum Sharpe Ratio from N trials.
 
-    Uses the formula:
+    Uses the formula for the expected maximum of N standard normal variables:
     .. math::
-        \text{sharpe\_ratio} = (\text{mean\_sharpe\_ratio} - \gamma) \times \Phi^{-1}(1 - \frac{1}{n\_trials}) + 
-                               \gamma \times \Phi^{-1}(1 - n\_trials \times e^{-1})
+        E[\max(SR)] = \mu + \sigma \left[ (1 - \gamma) \Phi^{-1}(1 - \frac{1}{N}) +
+                       \gamma \Phi^{-1}(1 - (N e)^{-1}) \right]
 
-    where:
-    - \(\gamma\) is the Euler's gamma constant
-    - \(\Phi^{-1}\) is the inverse of the cumulative distribution function of the standard normal distribution
+    Where:
+    - \(\mu\) is the mean_sharpe_ratio
+    - \(\sigma\) is the std_sharpe_ratio
+    - \(\gamma\) is the Euler-Mascheroni constant
+    - \(\Phi^{-1}\) is the inverse CDF of the standard normal distribution
+    - \(N\) is n_trials
 
-    :param n_trials: Number of trials.
-    :param mean_sharpe_ratio: Mean Sharpe Ratio.
-    :param std_sharpe_ratio: Standard deviation of Sharpe Ratios.
+    Parameters
+    ----------
+    n_trials : int
+        Number of trials (e.g., number of strategies tested).
+    mean_sharpe_ratio : float
+        The mean Sharpe Ratio across all trials.
+    std_sharpe_ratio : float
+        The standard deviation of Sharpe Ratios across all trials.
 
-    :return: Expected maximum Sharpe Ratio.
+    Returns
+    -------
+    float
+        The expected maximum Sharpe Ratio.
     """
-    euler_gamma_constant = 0.577215664901532860606512090082402431042159336
+    if n_trials == 0:
+        return 0.0
+    if n_trials == 1:
+        return mean_sharpe_ratio
+        
+    euler_gamma = 0.5772156649
 
-    sharpe_ratio = ((1 - euler_gamma_constant) * norm.ppf(1 - 1.0 / n_trials) +
-                   euler_gamma_constant * norm.ppf(1 - (n_trials * np.e) ** -1))
-    sharpe_ratio = mean_sharpe_ratio + std_sharpe_ratio * sharpe_ratio
+    term1 = (1 - euler_gamma) * norm.ppf(1.0 - 1.0 / n_trials)
+    term2 = euler_gamma * norm.ppf(1.0 - (n_trials * np.e) ** -1)
 
-    return sharpe_ratio
+    expected_max_sr = mean_sharpe_ratio + std_sharpe_ratio * (term1 + term2)
+
+    return expected_max_sr
 
 def generate_max_sharpe_ratios(
-        n_sims: int,
-        n_trials_list: list,
-        std_sharpe_ratio: float,
-        mean_sharpe_ratio: float
+    n_sims: int,
+    n_trials_list: List[int],
+    std_sharpe_ratio: float,
+    mean_sharpe_ratio: float,
 ) -> pd.DataFrame:
     """
-    Generate maximum Sharpe Ratios from simulations.
+    Generate a DataFrame of maximum Sharpe Ratios from simulations.
 
-    :param n_sims: Number of simulations.
-    :param n_trials_list: List of numbers of trials.
-    :param std_sharpe_ratio: Standard deviation of Sharpe Ratios.
-    :param mean_sharpe_ratio: Mean of Sharpe Ratios.
+    Parameters
+    ----------
+    n_sims : int
+        Number of simulations to run for each `n_trials`.
+    n_trials_list : List[int]
+        A list of N-trials (e.g., [10, 50, 100] strategies).
+    std_sharpe_ratio : float
+        The standard deviation of Sharpe Ratios.
+    mean_sharpe_ratio : float
+        The mean of Sharpe Ratios.
 
-    :return: DataFrame containing generated maximum Sharpe Ratios.
+    Returns
+    -------
+    pd.DataFrame
+        A long-format DataFrame with columns ['max_SR', 'n_trials'].
     """
     rng = np.random.default_rng()
-    output = pd.DataFrame()
+    output_list = []
 
     for n_trials in n_trials_list:
-        sharpe_ratio_sim = pd.DataFrame(rng.randn(n_sims, n_trials))
-        sharpe_ratio_sim = sharpe_ratio_sim.sub(sharpe_ratio_sim.mean(axis=1), axis=0)
-        sharpe_ratio_sim = sharpe_ratio_sim.div(sharpe_ratio_sim.std(axis=1), axis=0)
-        sharpe_ratio_sim = mean_sharpe_ratio + sharpe_ratio_sim * std_sharpe_ratio
+        # Generate all simulations for this n_trials
+        sr_sims = rng.normal(
+            loc=0.0, scale=1.0, size=(n_sims, n_trials)
+        )
+        
+        # Normalize (z-score) each simulation row
+        sr_sims = (sr_sims - sr_sims.mean(axis=1, keepdims=True)) / \
+                  sr_sims.std(axis=1, keepdims=True)
+        
+        # Scale by target mean and std
+        sr_sims = mean_sharpe_ratio + sr_sims * std_sharpe_ratio
 
-        output_temp = sharpe_ratio_sim.max(axis=1).to_frame('max_SR')
-        output_temp['n_trials'] = n_trials
-        output = output.append(output_temp, ignore_index=True)
+        # Get max SR for each simulation
+        max_sr = sr_sims.max(axis=1)
+        
+        output_temp = pd.DataFrame({'max_SR': max_sr, 'n_trials': n_trials})
+        output_list.append(output_temp)
 
-    return output
-
-
-import pandas as pd
-from typing import List
+    return pd.concat(output_list, ignore_index=True)
 
 
 def mean_std_error(
-        n_sims0: int,
-        n_sims1: int,
-        n_trials: List[int],
-        std_sharpe_ratio: float = 1,
-        mean_sharpe_ratio: float = 0
+    n_sims0: int,
+    n_sims1: int,
+    n_trials: List[int],
+    std_sharpe_ratio: float = 1.0,
+    mean_sharpe_ratio: float = 0.0,
 ) -> pd.DataFrame:
     """
-    Calculate mean and standard deviation of the predicted errors.
+    Calculate the mean and standard deviation of the estimation error.
 
-    :param n_sims0: Number of max{SR} used to estimate E[max{SR}].
-    :param n_sims1: Number of errors on which std is computed.
-    :param n_trials: List of numbers of trials.
-    :param std_sharpe_ratio: Standard deviation of Sharpe Ratios.
-    :param mean_sharpe_ratio: Mean of Sharpe Ratios.
+    This function compares the analytical E[max{SR}] with the simulated
+    average max{SR} over `n_sims1` repetitions.
 
-    :return: DataFrame containing mean and standard deviation of errors.
+    Parameters
+    ----------
+    n_sims0 : int
+        Number of max{SR} simulations used to estimate E[max{SR}] (inner loop).
+    n_sims1 : int
+        Number of errors on which to compute the std dev (outer loop).
+    n_trials : List[int]
+        List of numbers of trials (e.g., [10, 20, 50]).
+    std_sharpe_ratio : float, default=1.0
+        Standard deviation of Sharpe Ratios.
+    mean_sharpe_ratio : float, default=0.0
+        Mean of Sharpe Ratios.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame indexed by 'nTrials' with columns ['meanErr', 'stdErr'].
     """
-    sharpe_ratio0 = pd.Series({
-        i: expected_max_sharpe_ratio(i, mean_sharpe_ratio, std_sharpe_ratio)
-        for i in n_trials
-    })
-    sharpe_ratio0 = sharpe_ratio0.to_frame('E[max{SR}]')
-    sharpe_ratio0.index.name = 'nTrials'
-    error = pd.DataFrame()
+    # 1. Analytical E[max{SR}]
+    expected_sr = pd.Series(
+        {
+            n: expected_max_sharpe_ratio(n, mean_sharpe_ratio, std_sharpe_ratio)
+            for n in n_trials
+        },
+        name="E[max{SR}]",
+    )
+    expected_sr.index.name = "nTrials"
 
-    for i in range(int(n_sims1)):
-        sharpe_ratio1 = generate_max_sharpe_ratios(
+    error_list = []
+    
+    # 2. Run n_sims1 experiments
+    for _ in range(int(n_sims1)):
+        # 3. Generate simulated max SRs
+        simulated_sr = generate_max_sharpe_ratios(
             n_sims=n_sims0,
             n_trials=n_trials,
             mean_sharpe_ratio=mean_sharpe_ratio,
-            std_sharpe_ratio=std_sharpe_ratio
+            std_sharpe_ratio=std_sharpe_ratio,
         )
-        sharpe_ratio1 = sharpe_ratio1.groupby('nTrials').mean()
-        error_temp = sharpe_ratio0.join(sharpe_ratio1).reset_index()
-        error_temp['error'] = error_temp['max{SR}'] / error_temp['E[max{SR}]'] - 1.0
-        error = error.append(error_temp)
+        # 4. Average simulated max SRs
+        avg_simulated_sr = simulated_sr.groupby("nTrials")["max_SR"].mean()
+        
+        # 5. Calculate error
+        error = avg_simulated_sr / expected_sr - 1.0
+        error_list.append(error.rename('error'))
 
-    output = {
-        'meanErr': error.groupby('nTrials')['error'].mean(),
-        'stdErr': error.groupby('nTrials')['error'].std()
-    }
-    output = pd.DataFrame.from_dict(output, orient='columns')
+    all_errors = pd.concat(error_list, axis=1).T
+
+    # 6. Compute mean and std of errors
+    output = pd.DataFrame({
+        "meanErr": all_errors.mean(),
+        "stdErr": all_errors.std(),
+    })
 
     return output
 
 
 def estimated_sharpe_ratio_z_statistics(
-        sharpe_ratio: float,
-        t: int,
-        true_sharpe_ratio: float = 0,
-        skew: float = 0,
-        kurt: int = 3
+    sharpe_ratio: float,
+    t: int,
+    true_sharpe_ratio: float = 0.0,
+    skew: float = 0.0,
+    kurt: int = 3,
 ) -> float:
     r"""
-    Calculate z statistics for the estimated Sharpe Ratios.
+    Calculate the Z-statistic for an estimated Sharpe Ratio.
 
-    Uses the formula:
+    This is the test statistic used in the Probabilistic Sharpe Ratio.
+
     .. math::
-        z = \frac{(sharpe\_ratio - true\_sharpe\_ratio) \times \sqrt{t - 1}}{\sqrt{1 - skew \times sharpe\_ratio + \frac{kurt - 1}{4} \times sharpe\_ratio^2}}
+        Z = \frac{(\hat{SR} - SR_0) \sqrt{T - 1}}
+                 {\sqrt{1 - S \hat{SR} + \frac{K - 1}{4} \hat{SR}^2}}
 
-    :param sharpe_ratio: Estimated Sharpe Ratio.
-    :param t: Number of observations.
-    :param true_sharpe_ratio: True Sharpe Ratio.
-    :param skew: Skewness of returns.
-    :param kurt: Kurtosis of returns.
+    Parameters
+    ----------
+    sharpe_ratio : float
+        Estimated Sharpe Ratio (\(\hat{SR}\)).
+    t : int
+        Number of observations (T).
+    true_sharpe_ratio : float, default=0.0
+        The null hypothesis Sharpe Ratio (\(SR_0\)).
+    skew : float, default=0.0
+        Skewness of returns (S).
+    kurt : int, default=3
+        Kurtosis of returns (K).
 
-    :return: Calculated z statistics.
+    Returns
+    -------
+    float
+        The calculated Z-statistic.
     """
-    z = (sharpe_ratio - true_sharpe_ratio) * (t - 1)**0.5
-    z /= (1 - skew * sharpe_ratio + (kurt - 1) / 4.0 * sharpe_ratio**2)**0.5
+    denominator = (
+        1 - skew * sharpe_ratio + (kurt - 1) / 4.0 * sharpe_ratio**2
+    )
+    if denominator <= 0:
+        return np.nan
+        
+    z = (sharpe_ratio - true_sharpe_ratio) * np.sqrt(t - 1)
+    z /= np.sqrt(denominator)
 
     return z
 
-import scipy.stats as ss
 
-def strategy_type1_error_probability(
-        z: float,
-        k: int = 1
-) -> float:
-    """
-    Calculate type I error probability of strategies.
+def strategy_type1_error_probability(z: float, k: int = 1) -> float:
+    r"""
+    Calculate the Type I error probability (alpha) for multiple tests.
+
+    This is the probability of at least one false positive (rejecting
+    a true null) when conducting `k` independent tests.
 
     .. math::
-        \\alpha_k = 1 - (1 - \\alpha)^k
+        \alpha_k = 1 - (1 - \alpha)^k
 
-    :param z: Z statistic for the estimated Sharpe Ratios.
-    :param k: Number of tests.
+    Where \(\alpha = N(-z)\) is the Type I error for a single test.
 
-    :return: Calculated type I error probability.
+    Parameters
+    ----------
+    z : float
+        Z-statistic for the significance threshold (e.g., 1.96).
+    k : int, default=1
+        Number of independent tests.
+
+    Returns
+    -------
+    float
+        The family-wise Type I error rate.
     """
-    α = ss.norm.cdf(-z)
-    α_k = 1 - (1 - α)**k
-
-    return α_k
+    alpha_single_test = ss.norm.cdf(-z)
+    alpha_k = 1 - (1 - alpha_single_test) ** k
+    return alpha_k
 
 
 def theta_for_type2_error(
-        sharpe_ratio: float,
-        t: int,
-        true_sharpe_ratio: float = 0,
-        skew: float = 0,
-        kurt: int = 3
+    sharpe_ratio: float,
+    t: int,
+    true_sharpe_ratio: float,
+    skew: float = 0.0,
+    kurt: int = 3,
 ) -> float:
     r"""
-    Calculate θ parameter for type II error probability.
+    Calculate the \(\theta\) parameter for Type II error probability.
 
     .. math::
-        \\theta = \\frac{\\text{true\_sharpe\_ratio} \cdot \\sqrt{t - 1}}{\\sqrt{1 - \\text{skew} \cdot \\text{sharpe\_ratio} + \\frac{\\text{kurt} - 1}{4} \cdot \\text{sharpe\_ratio}^2}}
+        \theta = \frac{SR_{True} \sqrt{T - 1}}
+                      {\sqrt{1 - S \hat{SR} + \frac{K - 1}{4} \hat{SR}^2}}
 
-    :param sharpe_ratio: Estimated Sharpe Ratio.
-    :param t: Number of observations.
-    :param true_sharpe_ratio: True Sharpe Ratio.
-    :param skew: Skewness of returns.
-    :param kurt: Kurtosis of returns.
+    Parameters
+    ----------
+    sharpe_ratio : float
+        The estimated Sharpe Ratio (\(\hat{SR}\)).
+    t : int
+        Number of observations (T).
+    true_sharpe_ratio : float
+        The true Sharpe Ratio (\(SR_{True}\)) (the alternative hypothesis).
+    skew : float, default=0.0
+        Skewness of returns (S).
+    kurt : int, default=3
+        Kurtosis of returns (K).
 
-    :return: Calculated θ parameter.
+    Returns
+    -------
+    float
+        The \(\theta\) parameter.
     """
-    θ = true_sharpe_ratio * (t - 1)**0.5
-    θ /= (1 - skew * sharpe_ratio + (kurt - 1) / 4.0 * sharpe_ratio**2)**0.5
-
-    return θ
+    denominator = (
+        1 - skew * sharpe_ratio + (kurt - 1) / 4.0 * sharpe_ratio**2
+    )
+    if denominator <= 0:
+        return np.nan
+        
+    theta = true_sharpe_ratio * np.sqrt(t - 1)
+    theta /= np.sqrt(denominator)
+    return theta
 
 
 def strategy_type2_error_probability(
-        α_k: float,
-        k: int,
-        θ: float
+    alpha_k: float, k: int, theta: float
 ) -> float:
-    """
-    Calculate type II error probability of strategies.
+    r"""
+    Calculate the Type II error probability (beta) for multiple tests.
+
+    This is the probability of failing to reject a false null hypothesis.
 
     .. math::
-        z = \\text{ss.norm.ppf}((1 - \\alpha_k)^{1.0 / k})
-        \\beta = \\text{ss.norm.cdf}(z - \\theta)
+        Z_{\alpha} = \Phi^{-1}((1 - \alpha_k)^{1/k})
+        \beta = N(Z_{\alpha} - \theta)
 
-    :param α_k: Type I error.
-    :param k: Number of tests.
-    :param θ: Calculated θ parameter.
+    Parameters
+    ----------
+    alpha_k : float
+        The family-wise Type I error rate.
+    k : int
+        Number of independent tests.
+    theta : float
+        The \(\theta\) parameter from `theta_for_type2_error`.
 
-    :return: Calculated type II error probability.
+    Returns
+    -------
+    float
+        The Type II error probability (\(\beta\)).
     """
-    z = ss.norm.ppf((1 - α_k)**(1.0 / k))
-    β = ss.norm.cdf(z - θ)
-
-    return β
+    z_alpha = ss.norm.ppf((1 - alpha_k) ** (1.0 / k))
+    beta = ss.norm.cdf(z_alpha - theta)
+    return beta

@@ -1,12 +1,61 @@
+"""
+RiskLabAI: Financial AI with Python
 
-from . import data
+This library is a Python-based implementation of advanced
+methods for quantitative finance and financial machine learning,
+based on the work of Marcos López de Prado.
+
+Sub-modules
+-----------
+backtest
+    Tools for robust backtesting, including PBO, PSR, and
+    advanced cross-validation (PurgedKFold, CPCV).
+cluster
+    Algorithms for portfolio clustering (ONC).
+controller
+    High-level controllers for bar generation and data processing.
+data
+    Core modules for data processing, including bar generation,
+    labeling, denoising, and synthetic data.
+ensemble
+    Functions related to ensemble methods.
+features
+    Modules for feature generation and importance analysis
+    (MDI, MDA, SFI, structural breaks, entropy, microstructure).
+hpc
+    Utilities for high-performance computing and parallel processing.
+optimization
+    Portfolio optimization algorithms, including HRP and NCO.
+pde
+    Implementation of a Deep BSDE solver for PDEs.
+utils
+    Common helper functions, constants, and plotting utilities.
+"""
+
+# Import all sub-packages to make them available
 from . import backtest
 from . import cluster
 from . import controller
-
+from . import data
 from . import ensemble
 from . import features
 from . import hpc
+from . import optimization
 from . import pde
 from . import utils
-from . import optimization 
+
+__version__ = "0.0.93"
+
+__all__ = [
+    "backtest",
+    "cluster",
+    "controller",
+    "data",
+    "ensemble",
+    "features",
+    "hpc",
+    "optimization",
+    "pde",
+    "utils",
+    "__version__",
+]

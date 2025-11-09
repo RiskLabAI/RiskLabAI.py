@@ -1,61 +1,99 @@
+"""
+Implements a method for feature orthogonalization using PCA.
+
+Reference:
+    De Prado, M. (2018) Advances in financial machine learning.
+"""
+
 import pandas as pd
 import numpy as np
+from typing import Tuple
 
-
-def compute_eigenvectors(
-        dot_product: np.ndarray,
-        explained_variance_threshold: float
+def _compute_eigenvectors(
+    dot_product: np.ndarray, explained_variance_threshold: float
 ) -> pd.DataFrame:
     """
-    Compute eigenvalues and eigenvectors for orthogonal features.
+    Compute eigenvalues and eigenvectors and filter by explained variance.
 
-    :param dot_product: Input dot product matrix.
-    :type dot_product: np.ndarray
-    :param explained_variance_threshold: Threshold for cumulative explained variance.
-    :type explained_variance_threshold: float
-    :return: DataFrame containing eigenvalues, eigenvectors, and cumulative explained variance.
-    :rtype: pd.DataFrame
+    Parameters
+    ----------
+    dot_product : np.ndarray
+        The dot product matrix (e.g., X.T @ X).
+    explained_variance_threshold : float
+        The cumulative variance threshold to filter eigenvectors.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with sorted eigenvalues, eigenvectors, and cumulative variance.
     """
     eigenvalues, eigenvectors = np.linalg.eigh(dot_product)
 
-    eigen_dataframe = pd.DataFrame({
-        "Index": [f"PC {i}" for i in range(1, len(eigenvalues) + 1)],
-        "EigenValue": eigenvalues,
-        "EigenVector": [ev for ev in eigenvectors]
-    })
+    # Sort in descending order
+    indices_sorted = eigenvalues.argsort()[::-1]
+    eigenvalues = eigenvalues[indices_sorted]
+    eigenvectors = eigenvectors[:, indices_sorted]
 
-    eigen_dataframe = eigen_dataframe.sort_values("EigenValue", ascending=False)
+    eigen_dataframe = pd.DataFrame(
+        {
+            "EigenValue": eigenvalues,
+            "EigenVector": [ev for ev in eigenvectors.T],
+        },
+        index=[f"PC_{i+1}" for i in range(len(eigenvalues))],
+    )
 
-    cumulative_variance = np.cumsum(eigen_dataframe["EigenValue"]) / np.sum(eigen_dataframe["EigenValue"])
+    # Calculate cumulative variance
+    cumulative_variance = eigenvalues.cumsum() / eigenvalues.sum()
     eigen_dataframe["CumulativeVariance"] = cumulative_variance
 
+    # Find the index where cumulative variance crosses the threshold
     index = cumulative_variance.searchsorted(explained_variance_threshold)
-
-    eigen_dataframe = eigen_dataframe.iloc[:index + 1, :]
+    
+    # Keep components up to and including the one that crosses the threshold
+    eigen_dataframe = eigen_dataframe.iloc[: index + 1, :]
 
     return eigen_dataframe
 
 
 def orthogonal_features(
-        features: np.ndarray,
-        variance_threshold: float = 0.95
-) -> tuple:
+    features: pd.DataFrame, variance_threshold: float = 0.95
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Compute orthogonal features using eigenvalues and eigenvectors.
+    Compute orthogonal features using PCA.
 
-    :param features: Features matrix.
-    :type features: np.ndarray
-    :param variance_threshold: Threshold for cumulative explained variance, default is 0.95.
-    :type variance_threshold: float
-    :return: Tuple containing orthogonal features and eigenvalues information.
-    :rtype: tuple
+    Parameters
+    ----------
+    features : pd.DataFrame
+        The feature DataFrame.
+    variance_threshold : float, default=0.95
+        Cumulative explained variance threshold to keep.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, pd.DataFrame]
+        - orthogonal_features_df: The transformed (orthogonal) features.
+        - eigen_dataframe: DataFrame with eigenvalues and vectors.
     """
+    # 1. Normalize features (z-score)
     normalized_features = (features - features.mean(axis=0)) / features.std(axis=0)
+    normalized_features = normalized_features.dropna(axis=1) # Drop constant cols
+    
+    # 2. Compute dot product (proportional to covariance)
     dot_product = normalized_features.T @ normalized_features
-    eigen_dataframe = compute_eigenvectors(dot_product, variance_threshold)
+    
+    # 3. Get principal components
+    eigen_dataframe = _compute_eigenvectors(dot_product, variance_threshold)
 
+    # 4. Get transformation matrix (stacking eigenvectors)
     transformation_matrix = np.vstack(eigen_dataframe["EigenVector"].values).T
 
-    orthogonal_features = normalized_features @ transformation_matrix
+    # 5. Transform features
+    orthogonal_features_arr = normalized_features.values @ transformation_matrix
+    
+    orthogonal_features_df = pd.DataFrame(
+        orthogonal_features_arr,
+        index=features.index,
+        columns=eigen_dataframe.index,
+    )
 
-    return orthogonal_features, eigen_dataframe
+    return orthogonal_features_df, eigen_dataframe

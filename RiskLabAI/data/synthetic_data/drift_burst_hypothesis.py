@@ -1,3 +1,10 @@
+"""
+Implements the Drift-Burst Hypothesis (DBH) model for synthetic data.
+
+This model generates drift and volatility parameters for a bubble scenario,
+featuring an "explosion" at the midpoint.
+"""
+
 import numpy as np
 from typing import Tuple
 
@@ -8,54 +15,80 @@ def drift_volatility_burst(
     b_before: float,
     b_after: float,
     alpha: float,
-    beta: float, 
+    beta: float,
     explosion_filter_width: float = 0.1,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Compute the drift and volatility for a burst scenario.
+    r"""
+    Compute the drift and volatility for a DBH burst scenario.
 
-    The drift and volatility are calculated based on:
+    The model defines drift and volatility as a function of time `t`
+    (represented by `steps` from 0 to 1), with an explosion at `t=0.5`.
+
     .. math::
-        drift = \frac{a_{value}}{denominator^\alpha}
-        volatility = \frac{b_{value}}{denominator^\beta}
+        drift(t) = \frac{a(t)}{|t - 0.5|^\alpha}
+        vol(t) = \frac{b(t)}{|t - 0.5|^\beta}
 
-    where:
-    .. math::
-        denominator = |step - 0.5|
+    To prevent division by zero, an `explosion_filter_width` is used
+    to clamp the denominator near `t=0.5`.
 
-    :param bubble_length: The length of the bubble.
-    :param a_before: 'a' value before the mid-point.
-    :param a_after: 'a' value after the mid-point.
-    :param b_before: 'b' value before the mid-point.
-    :param b_after: 'b' value after the mid-point.
-    :param alpha: Exponent for the drift calculation.
-    :param beta: Exponent for the volatility calculation.
-    :param explosion_filter_width: Width of the area around the explosion that denominators won't exceed. 
-    :return: A tuple containing the drift and volatility arrays.
+    Parameters
+    ----------
+    bubble_length : int
+        The number of timesteps in the bubble.
+    a_before : float
+        Drift coefficient 'a' for `t < 0.5`.
+    a_after : float
+        Drift coefficient 'a' for `t > 0.5`.
+    b_before : float
+        Volatility coefficient 'b' for `t < 0.5`.
+    b_after : float
+        Volatility coefficient 'b' for `t > 0.5`.
+    alpha : float
+        Exponent for the drift denominator.
+    beta : float
+        Exponent for the volatility denominator.
+    explosion_filter_width : float, default=0.1
+        Width of the "safe" area around the midpoint (0.5)
+        to prevent division by zero.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        - drifts: The array of drift values.
+        - volatilities: The array of volatility values.
     """
     steps = np.linspace(0, 1, bubble_length)
 
-    # Create two boolean masks identifying the indices where the values are within the specified range
+    # Clamp values near the midpoint to avoid division by zero
     before_mask = (steps >= (0.5 - explosion_filter_width)) & (steps < 0.5)
     after_mask = (steps > 0.5) & (steps <= (0.5 + explosion_filter_width))
 
-    # Replace the values at these indices with 0.5 - explosion_filter_width
-    steps[before_mask] = 0.5 - explosion_filter_width
-    steps[after_mask] = 0.5 + explosion_filter_width
+    steps_filtered = np.copy(steps)
+    steps_filtered[before_mask] = 0.5 - explosion_filter_width
+    steps_filtered[after_mask] = 0.5 + explosion_filter_width
 
+    # Assign 'a' and 'b' parameters based on position
     a_values = np.where(steps <= 0.5, a_before, a_after)
     b_values = np.where(steps <= 0.5, b_before, b_after)
 
-    denominators = np.abs(steps - 0.5)
-    denominators[steps == 0.5] = np.nan  # Set the denominator to NaN for step == 0.5
+    # Calculate denominator, with NaN at the exact midpoint
+    denominators = np.abs(steps_filtered - 0.5)
+    denominators[steps == 0.5] = np.nan
 
-    drifts = a_values / denominators ** alpha
-    volatilities = b_values / denominators ** beta
+    drifts = a_values / (denominators**alpha)
+    volatilities = b_values / (denominators**beta)
 
-    # Fill NaN values with preceding values
+    # Handle the NaN at the midpoint by filling with 0 drift
+    # and the preceding volatility value.
     nan_mask = np.isnan(denominators)
-    if np.sum(nan_mask) > 0:
-        drifts[nan_mask] = 0
-        volatilities[nan_mask] = volatilities[np.where(nan_mask)[0][0] - 1]
+    if np.any(nan_mask):
+        drifts[nan_mask] = 0.0
+        # Find first NaN index and fill with previous value
+        nan_index = np.where(nan_mask)[0][0]
+        if nan_index > 0:
+            volatilities[nan_mask] = volatilities[nan_index - 1]
+        else:
+            # Handle case where midpoint is the first element
+            volatilities[nan_mask] = b_before # Fallback
 
     return drifts, volatilities

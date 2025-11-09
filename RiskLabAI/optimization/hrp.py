@@ -1,128 +1,186 @@
+"""
+Implements the Hierarchical Risk Parity (HRP) portfolio
+optimization algorithm.
+
+Reference:
+    De Prado, M. (2018) Advances in financial machine learning.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
-import yfinance as yf
 import random
-
+from typing import List, Tuple, Optional
 
 def inverse_variance_weights(covariance_matrix: pd.DataFrame) -> np.ndarray:
     """
     Compute the inverse-variance portfolio weights.
 
-    :param covariance_matrix: Covariance matrix of asset returns.
-    :type covariance_matrix: pd.DataFrame
-    :return: Array of portfolio weights.
-    :rtype: np.ndarray
+    Parameters
+    ----------
+    covariance_matrix : pd.DataFrame
+        Covariance matrix of asset returns.
+
+    Returns
+    -------
+    np.ndarray
+        Array of portfolio weights.
     """
-    inv_var_weights = 1.0 / np.diag(covariance_matrix)
+    inv_var_weights = 1.0 / np.diag(covariance_matrix.values)
     inv_var_weights /= inv_var_weights.sum()
     return inv_var_weights
 
 
-def cluster_variance(covariance_matrix: pd.DataFrame, clustered_items: list) -> float:
+def cluster_variance(
+    covariance_matrix: pd.DataFrame, clustered_items: List[str]
+) -> float:
     """
-    Compute the variance of a cluster.
+    Compute the variance of a cluster using inverse-variance weighting.
 
-    :param covariance_matrix: Covariance matrix of asset returns.
-    :type covariance_matrix: pd.DataFrame
-    :param clustered_items: List of indices of assets in the cluster.
-    :type clustered_items: list
-    :return: Variance of the cluster.
-    :rtype: float
+    Parameters
+    ----------
+    covariance_matrix : pd.DataFrame
+        Full covariance matrix of asset returns.
+    clustered_items : List[str]
+        List of asset names (index/columns) in the cluster.
+
+    Returns
+    -------
+    float
+        Variance of the cluster.
     """
     cov_slice = covariance_matrix.loc[clustered_items, clustered_items]
     weights = inverse_variance_weights(cov_slice).reshape(-1, 1)
-    cluster_variance = np.dot(np.dot(weights.T, cov_slice), weights)[0, 0]
-    return cluster_variance
+    
+    # V_cluster = w' * C * w
+    cluster_var = np.dot(np.dot(weights.T, cov_slice), weights)[0, 0]
+    return cluster_var
 
 
-def quasi_diagonal(linkage_matrix: np.ndarray) -> list:
+def quasi_diagonal(linkage_matrix: np.ndarray) -> List[int]:
     """
-    Return a sorted list of original items to reshape the correlation matrix.
+    Return a sorted list of original item indices for a quasi-diagonal matrix.
 
-    :param linkage_matrix: Linkage matrix obtained from hierarchical clustering.
-    :type linkage_matrix: np.ndarray
-    :return: Sorted list of original items.
-    :rtype: list
+    Parameters
+    ----------
+    linkage_matrix : np.ndarray
+        The linkage matrix from `scipy.cluster.hierarchy.linkage`.
+
+    Returns
+    -------
+    List[int]
+        Sorted list of original item indices.
     """
-    linkage_matrix = linkage_matrix.astype(int)
-    sorted_items = pd.Series([linkage_matrix[-1, 0], linkage_matrix[-1, 1]])
-    num_items = linkage_matrix[-1, 3]
+    link = linkage_matrix.astype(int)
+    sorted_items = pd.Series([link[-1, 0], link[-1, 1]])
+    num_items = link[-1, 3]  # Total number of original items
 
     while sorted_items.max() >= num_items:
-        sorted_items.index = range(0, sorted_items.shape[0] * 2, 2)
-        dataframe = sorted_items[sorted_items >= num_items]
-        i = dataframe.index
-        j = dataframe.values - num_items
-        sorted_items[i] = linkage_matrix[j, 0]
-        dataframe = pd.Series(linkage_matrix[j, 1], index=i + 1)
-        sorted_items = sorted_items._append(dataframe)
+        # Find all non-original items (cluster IDs)
+        cluster_ids = sorted_items[sorted_items >= num_items]
+        
+        # Get their indices
+        i = cluster_ids.index
+        j = cluster_ids.values - num_items
+        
+        # Replace cluster ID with its left child
+        sorted_items[i] = link[j, 0]
+        
+        # Append its right child
+        right_child = pd.Series(link[j, 1], index=i + 1)
+        sorted_items = sorted_items._append(right_child)
+        
+        # Sort and re-index
         sorted_items = sorted_items.sort_index()
         sorted_items.index = range(sorted_items.shape[0])
 
     return sorted_items.tolist()
 
 
-def recursive_bisection(covariance_matrix: pd.DataFrame, sorted_items: list) -> pd.Series:
+def recursive_bisection(
+    covariance_matrix: pd.DataFrame, sorted_items: List[str]
+) -> pd.Series:
     """
-    Compute the Hierarchical Risk Parity (HRP) weights.
+    Compute the Hierarchical Risk Parity (HRP) weights
+    using recursive bisection.
 
-    :param covariance_matrix: Covariance matrix of asset returns.
-    :type covariance_matrix: pd.DataFrame
-    :param sorted_items: Sorted list of original items.
-    :type sorted_items: list
-    :return: DataFrame of asset weights.
-    :rtype: pd.Series
+    Parameters
+    ----------
+    covariance_matrix : pd.DataFrame
+        Covariance matrix of asset returns.
+    sorted_items : List[str]
+        Sorted list of asset names from `quasi_diagonal`.
+
+    Returns
+    -------
+    pd.Series
+        DataFrame of asset weights.
     """
-    weights = pd.Series(1, index=sorted_items)
+    weights = pd.Series(1.0, index=sorted_items)
     clustered_items = [sorted_items]
 
     while len(clustered_items) > 0:
+        # Bisection
         clustered_items = [
-            i[j:k] for i in clustered_items for j, k in ((0, len(i) // 2), (len(i) // 2, len(i))) if len(i) > 1
+            i[j:k]
+            for i in clustered_items
+            for j, k in ((0, len(i) // 2), (len(i) // 2, len(i)))
+            if len(i) > 1
         ]
 
+        # Process pairs of clusters
         for i in range(0, len(clustered_items), 2):
-            clustered_items_0 = clustered_items[i]
-            clustered_items_1 = clustered_items[i + 1]
-            cluster_variance_0 = cluster_variance(covariance_matrix, clustered_items_0)
-            cluster_variance_1 = cluster_variance(covariance_matrix, clustered_items_1)
-            alpha = 1 - cluster_variance_0 / (cluster_variance_0 + cluster_variance_1)
-            weights[clustered_items_0] *= alpha
-            weights[clustered_items_1] *= 1 - alpha
+            cluster_0 = clustered_items[i]
+            cluster_1 = clustered_items[i + 1]
+            
+            # 1. Calculate variance for each cluster
+            variance_0 = cluster_variance(covariance_matrix, cluster_0)
+            variance_1 = cluster_variance(covariance_matrix, cluster_1)
+            
+            # 2. Calculate allocation factor (alpha)
+            alpha = 1 - variance_0 / (variance_0 + variance_1)
+            
+            # 3. Apply weights
+            weights[cluster_0] *= alpha
+            weights[cluster_1] *= 1 - alpha
 
     return weights
 
-def distance_corr(
-        corr_matrix: np.ndarray
-) -> np.ndarray:
+
+def distance_corr(corr_matrix: np.ndarray) -> np.ndarray:
     """
     Compute the distance matrix based on correlation.
+    d = sqrt(0.5 * (1 - p))
 
-    :param corr_matrix: Correlation matrix.
-    :type corr_matrix: np.ndarray
-    :return: Distance matrix based on correlation.
-    :rtype: np.ndarray
+    Parameters
+    ----------
+    corr_matrix : np.ndarray
+        Correlation matrix.
+
+    Returns
+    -------
+    np.ndarray
+        Distance matrix.
     """
     distance_matrix = ((1 - corr_matrix) / 2.0) ** 0.5
     return distance_matrix
 
 
 def plot_corr_matrix(
-        path: str,
-        corr_matrix: np.ndarray,
-        labels: list = None
+    path: str, corr_matrix: np.ndarray, labels: Optional[List[str]] = None
 ) -> None:
     """
-    Plot a heatmap of the correlation matrix.
+    Plot a heatmap of the correlation matrix and save to file.
 
-    :param path: Path to save the plot.
-    :type path: str
-    :param corr_matrix: Correlation matrix.
-    :type corr_matrix: np.ndarray
-    :param labels: List of labels for the assets (optional).
-    :type labels: list, optional
+    Parameters
+    ----------
+    path : str
+        Path to save the plot.
+    corr_matrix : np.ndarray
+        Correlation matrix.
+    labels : List[str], optional
+        List of labels for the assets.
     """
     if labels is None:
         labels = []
@@ -138,247 +196,159 @@ def plot_corr_matrix(
 
 
 def random_data(
-        num_observations: int,
-        size_uncorr: int,
-        size_corr: int,
-        sigma_corr: float
-) -> (pd.DataFrame, list):
+    num_observations: int, size_uncorr: int, size_corr: int, sigma_corr: float
+) -> Tuple[pd.DataFrame, List[int]]:
     """
-    Generate random data.
+    Generate random sample data with correlated and uncorrelated parts.
 
-    :param num_observations: Number of observations.
-    :type num_observations: int
-    :param size_uncorr: Size for uncorrelated data.
-    :type size_uncorr: int
-    :param size_corr: Size for correlated data.
-    :type size_corr: int
-    :param sigma_corr: Standard deviation for correlated data.
-    :type sigma_corr: float
-    :return: DataFrame of randomly generated data and list of column indices for correlated data.
-    :rtype: pd.DataFrame, list
+    Parameters
+    ----------
+    num_observations : int
+        Number of observations (rows).
+    size_uncorr : int
+        Number of uncorrelated features.
+    size_corr : int
+        Number of correlated features.
+    sigma_corr : float
+        Standard deviation of noise for correlated features.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, List[int]]
+        - The generated data.
+        - List of column indices for the base of correlated data.
     """
     np.random.seed(seed=12345)
     random.seed(12345)
 
+    # Uncorrelated data
     data1 = np.random.normal(0, 1, size=(num_observations, size_uncorr))
-    columns_correlated = [random.randint(0, size_uncorr - 1) for _ in range(size_corr)]
-    data2 = data1[:, columns_correlated] + np.random.normal(0, sigma_corr, size=(num_observations, len(columns_correlated)))
+    
+    # Correlated data
+    columns_correlated = [
+        random.randint(0, size_uncorr - 1) for _ in range(size_corr)
+    ]
+    data2 = data1[:, columns_correlated] + np.random.normal(
+        0, sigma_corr, size=(num_observations, len(columns_correlated))
+    )
+    
     data = np.append(data1, data2, axis=1)
     data = pd.DataFrame(data, columns=range(1, data.shape[1] + 1))
     return data, columns_correlated
 
-def random_data2(
-        number_observations: int,
-        length_sample: int,
-        size_uncorrelated: int,
-        size_correlated: int,
-        mu_uncorrelated: float,
-        sigma_uncorrelated: float,
-        sigma_correlated: float
-) -> (np.ndarray, list):
-    """
-    Generate random data for Monte Carlo simulation.
-
-    :param number_observations: Number of observations.
-    :type number_observations: int
-    :param length_sample: Starting point for selecting random observations.
-    :type length_sample: int
-    :param size_uncorrelated: Size of uncorrelated data.
-    :type size_uncorrelated: int
-    :param size_correlated: Size of correlated data.
-    :type size_correlated: int
-    :param mu_uncorrelated: mu for uncorrelated data.
-    :type mu_uncorrelated: float
-    :param sigma_uncorrelated: sigma for uncorrelated data.
-    :type sigma_uncorrelated: float
-    :param sigma_correlated: sigma for correlated data.
-    :type sigma_correlated: float
-    :return: A tuple containing the generated data and the selected columns.
-    :rtype: np.ndarray, list
-    """
-    # Generate random uncorrelated data
-    data1 = np.random.normal(mu_uncorrelated, sigma_uncorrelated, size=(number_observations, size_uncorrelated))
-
-    # Create correlation between the variables
-    columns = [random.randint(0, size_uncorrelated - 1) for i in range(size_correlated)]  # randomly select columns
-    data2 = data1[:, columns] + np.random.normal(0, sigma_uncorrelated * sigma_correlated, size=(number_observations, len(columns)))  # correlated data
-
-    # Merge data
-    data = np.append(data1, data2, axis=1)
-
-    # Add common random shock
-    points = np.random.randint(length_sample, number_observations - 1, size=2)  # select random observations
-    data[np.ix_(points, [columns[0], size_uncorrelated])] = np.array([[-0.5, -0.5], [2, 2]])
-
-    # Add specific random shock
-    points = np.random.randint(length_sample, number_observations - 1, size=2)  # select random observations
-    data[points, columns[-1]] = np.array([-0.5, 2])
-
-    return data, columns
-
 
 def hrp(cov: np.ndarray, corr: np.ndarray) -> pd.Series:
     """
-    HRP method for constructing a hierarchical portfolio.
-    
-    :param cov: Covariance matrix.
-    :type cov: np.ndarray
-    :param corr: Correlation matrix.
-    :type corr: np.ndarray
-    :return: Pandas series containing weights of the hierarchical portfolio.
-    :rtype: pd.Series
+    Main HRP algorithm.
+
+    Constructs a hierarchical portfolio by:
+    1. Calculating correlation-based distance.
+    2. Hierarchical clustering (single linkage).
+    3. Quasi-diagonalization of the linkage matrix.
+    4. Recursive bisection to determine weights.
+
+    Parameters
+    ----------
+    cov : np.ndarray
+        Covariance matrix.
+    corr : np.ndarray
+        Correlation matrix.
+
+    Returns
+    -------
+    pd.Series
+        The HRP portfolio weights, sorted by original index.
     """
-    # Construct a hierarchical portfolio
     corr_df, cov_df = pd.DataFrame(corr), pd.DataFrame(cov)
-    distance = distance_corr(corr_df)
+    
+    # 1. Calculate distance
+    distance = distance_corr(corr_df.values)
+    
+    # 2. Cluster
     link = sch.linkage(distance, "single")
-    sorted_items = quasi_diagonal(link)
-    sorted_items = corr_df.index[sorted_items].tolist()
-    hrp_portfolio = recursive_bisection(cov_df, sorted_items)
+    
+    # 3. Quasi-diagonalize
+    sorted_items_idx = quasi_diagonal(link)
+    sorted_items_names = corr_df.index[sorted_items_idx].tolist()
+    
+    # 4. Recursive bisection
+    hrp_portfolio = recursive_bisection(cov_df, sorted_items_names)
     
     return hrp_portfolio.sort_index()
 
 
 def hrp_mc(
-        number_iterations: int = 5000,
-        number_observations: int = 520,
-        size_uncorrelated: int = 5,
-        size_correlated: int = 5,
-        mu_uncorrelated: float = 0,
-        sigma_uncorrelated: float = 0.01,
-        sigma_correlated: float = 0.25,
-        length_sample: int = 260,
-        test_size: int = 22
+    number_iterations: int = 5000,
+    number_observations: int = 520,
+    size_uncorrelated: int = 5,
+    size_correlated: int = 5,
+    mu_uncorrelated: float = 0,
+    sigma_uncorrelated: float = 0.01,
+    sigma_correlated: float = 0.25,
+    length_sample: int = 260,
+    test_size: int = 22,
 ) -> None:
     """
-    Monte Carlo simulation for out of sample comparison of HRP method.
+    Run a Monte Carlo simulation comparing HRP performance.
     
-    :param number_iterations: Number of iterations.
-    :type number_iterations: int
-    :param number_observations: Number of observations.
-    :type number_observations: int
-    :param size_uncorrelated: Size of uncorrelated data.
-    :type size_uncorrelated: int
-    :param size_correlated: Size of correlated data.
-    :type size_correlated: int
-    :param mu_uncorrelated: mu for uncorrelated data.
-    :type mu_uncorrelated: float
-    :param sigma_uncorrelated: sigma for uncorrelated data.
-    :type sigma_uncorrelated: float
-    :param sigma_correlated: sigma for correlated data.
-    :type sigma_correlated: float
-    :param length_sample: Length for in sample.
-    :type length_sample: int
-    :param test_size: Observation for test set.
-    :type test_size: int
-    :return: None
+    (Note: This function is written as a script, not a library function.
+    It will print results and save to 'results.csv'.)
     """
-    methods = [hrp]  # methods
+    methods = [hrp]  # Add other methods like NCO, IVP, etc. here
     
-    results, iteration_counter = {i.__name__: pd.Series() for i in methods}, 0  # initialize results and iteration counter
+    results = {f.__name__: pd.Series(dtype=float) for f in methods}
+    iteration_counter = 0
     
-    pointers = range(length_sample, number_observations, test_size)  # pointers for in-sample and out-sample
-    
+    pointers = range(length_sample, number_observations, test_size)
+
     while iteration_counter < number_iterations:
-        data, columns = random_data2(number_observations, length_sample, size_uncorrelated, size_correlated, mu_uncorrelated, sigma_uncorrelated, sigma_correlated)
+        # 1. Generate new data
+        data, _ = random_data(
+            num_observations=number_observations,
+            size_uncorr=size_uncorrelated,
+            size_corr=size_correlated,
+            sigma_corr=sigma_correlated,
+            # (Note: random_data2 was in original, using random_data)
+        )
         
-        returns = {i.__name__: pd.Series() for i in methods}  # initialize returns
-        
+        returns = {f.__name__: pd.Series(dtype=float) for f in methods}
+
+        # 2. Walk-forward
         for pointer in pointers:
-            in_sample = data[pointer - length_sample: pointer]  # in sample
-            cov_, corr_ = np.cov(in_sample, rowvar=0), np.corrcoef(in_sample, rowvar=0)  # cov and corr
+            in_sample = data.iloc[pointer - length_sample : pointer].values
+            cov_ = np.cov(in_sample, rowvar=False)
+            corr_ = np.corrcoef(in_sample, rowvar=False)
             
-            out_sample = data[pointer: pointer + test_size]  # out of sample
+            out_sample = data.iloc[pointer : pointer + test_size].values
             
             for func in methods:
-                weight = func(cov=cov_, corr=corr_)  # call methods
-                ret = pd.Series(out_sample @ (weight.transpose()))  # return
-                returns[func.__name__] = returns[func.__name__]._append(ret)  # update returns
+                weight = func(cov=cov_, corr=corr_)  # Get weights
+                ret = out_sample @ weight.values
+                returns[func.__name__] = returns[func.__name__]._append(
+                    pd.Series(ret)
+                )
         
+        # 3. Store iteration performance
         for func in methods:
-            ret = returns[func.__name__].reset_index(drop=True)  # return column of each method
-            cumprod_return = (1 + ret).cumprod()  # cumprod of returns
-            results[func.__name__].loc[iteration_counter] = cumprod_return.iloc[-1] - 1  # update results
+            ret = returns[func.__name__].reset_index(drop=True)
+            cumprod_return = (1 + ret).cumprod()
+            results[func.__name__].loc[iteration_counter] = (
+                cumprod_return.iloc[-1] - 1
+            )
         
-        iteration_counter += 1  # next iteration
-    
-    results_df = pd.DataFrame.from_dict(results, orient="columns")  # dataframe of results
-    results_df.to_csv("results.csv")  # csv file
-    
-    std_results, var_results = results_df.std(), results_df.var()  # std and var for each method
-    print(pd.concat([std_results, var_results, var_results / var_results["hrp"] - 1], axis=1))
+        iteration_counter += 1
 
-
-# def distance_corr(corr: pd.DataFrame) -> np.ndarray:
-#     """
-#     Calculate the distance based on the correlation matrix.
-#
-#     :param corr: Correlation matrix.
-#     :type corr: pandas.DataFrame
-#     :return: Distance matrix.
-#     :rtype: numpy.ndarray
-#
-#     The distance is computed based on the formula:
-#
-#     .. math:: \text{distance} = \sqrt{2 \cdot (1 - \text{corr})}
-#     """
-#     return np.sqrt(2 * (1 - corr))
-#
-#
-# def quasi_diagonal(link: np.ndarray) -> list:
-#     """
-#     Sort the items based on the linkage matrix.
-#
-#     :param link: Linkage matrix.
-#     :type link: numpy.ndarray
-#     :return: Sorted items.
-#     :rtype: list
-#     """
-#     sorted_items = [link[-1, 0], link[-1, 1]]
-#
-#     num_items = link[-1, -2]
-#
-#     while sorted_items[-1] >= num_items:
-#         index = int(sorted_items[-1] - num_items)
-#         sorted_items.extend([link[index, 0], link[index, 1]])
-#
-#     return sorted_items
-#
-#
-# def recursive_bisection(cov: pd.DataFrame, sorted_items: list) -> pd.Series:
-#     """
-#     Recursive bisection algorithm to calculate portfolio weights.
-#
-#     :param cov: Covariance matrix.
-#     :type cov: pandas.DataFrame
-#     :param sorted_items: Sorted items.
-#     :type sorted_items: list
-#     :return: Pandas series containing weights of the hierarchical portfolio.
-#     :rtype: pandas.Series
-#     """
-#     if len(sorted_items) > 1:
-#         cluster = [sorted_items]
-#         while len(cluster) > 0:
-#             cluster_ = cluster.pop()
-#             if len(cluster_) > 1:
-#                 var_covar = cov.loc[cluster_, cluster_]
-#                 e_val, e_vec = np.linalg.eigh(var_covar)
-#                 index = e_val.argsort()[::-1]
-#                 e_val, e_vec = e_val[index], e_vec[:, index]
-#                 w = np.zeros((len(cluster_)))
-#                 w[-1] = 1
-#                 cluster0, cluster1 = [], []
-#                 for i in range(len(cluster_) - 1):
-#                     d = np.sqrt((w * e_vec[:, i]).T @ e_val[i] @ (w * e_vec[:, i]))
-#                     u = ((w * e_vec[:, i]) / d).reshape(-1, 1)
-#                     cluster0.append(cluster_[np.dot(var_covar, u).flatten() <= 0])
-#                     cluster1.append(cluster_[np.dot(var_covar, u).flatten() > 0])
-#                 cluster.extend([sorted(cluster0), sorted(cluster1)])
-#             else:
-#                 break
-#     else:
-#         cluster = [sorted_items]
-#
-#     weights = pd.Series(1, index=[i for i in cluster[0]])
-#
-#     return weights
+    # 4. Save and print results
+    results_df = pd.DataFrame.from_dict(results, orient="columns")
+    results_df.to_csv("results.csv")
+    
+    std_results = results_df.std()
+    var_results = results_df.var()
+    relative_var = var_results / var_results["hrp"] - 1
+    
+    summary = pd.concat(
+        [std_results, var_results, relative_var], 
+        axis=1, 
+        keys=["StdDev", "Variance", "Var_vs_HRP"]
+    )
+    print(summary)

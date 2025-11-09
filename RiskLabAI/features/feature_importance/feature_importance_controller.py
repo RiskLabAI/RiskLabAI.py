@@ -1,59 +1,74 @@
-#from feature_importance_factory import FeatureImportanceFactory
+"""
+Controller class to manage various feature importance strategies.
+"""
 
-from RiskLabAI.features.feature_importance.feature_importance_factory import FeatureImportanceFactory
-
+from typing import Any, Dict
+import pandas as pd
+from .feature_importance_factory import FeatureImportanceFactory
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 class FeatureImportanceController:
     """
-    Controller class to manage various feature importance strategies.
+    Controller class to manage and execute feature importance strategies.
 
-    To use this controller class:
-
-    1. Initialize it with the type of feature importance strategy 
-       you want to use, along with any required parameters for that strategy.
-    2. Call the `calculate_importance` method to perform the 
-       feature importance calculation.
-
-    For example:
-
+    Example
+    -------
     .. code-block:: python
 
-       # Initialize the controller with a 'ClusteredMDA' strategy
-       controller = FeatureImportanceController('ClusteredMDA', 
-                                                classifier=my_classifier, 
-                                                clusters=my_clusters)
+       from sklearn.ensemble import RandomForestClassifier
+       
+       my_classifier = RandomForestClassifier(n_estimators=10)
+       my_clusters = {'cluster_0': ['feat_0', 'feat_1']}
+
+       # Initialize the controller
+       controller = FeatureImportanceController(
+           'ClusteredMDA',
+           classifier=my_classifier, 
+           clusters=my_clusters,
+           n_splits=10
+       )
 
        # Calculate feature importance
        result = controller.calculate_importance(my_x, my_y)
-
     """
 
-    def __init__(
-        self, 
-        strategy_type: str,
-        **kwargs
-    ):
+    def __init__(self, strategy_type: str, **kwargs: Any):
         """
         Initialize the controller with a specific feature importance strategy.
 
-        :param strategy_type: The type of feature importance strategy to use.
-        :param kwargs: Additional arguments to pass to the strategy class.
+        Parameters
+        ----------
+        strategy_type : str
+            The type of strategy to use (e.g., 'MDI', 'ClusteredMDA').
+        **kwargs : Any
+            Configuration arguments to pass to the strategy's
+            constructor (e.g., `classifier`, `clusters`, `n_splits`).
         """
-        self.feature_importance_instance = FeatureImportanceFactory.create_feature_importance(strategy_type, **kwargs)
+        self.strategy_instance: FeatureImportanceStrategy = (
+            FeatureImportanceFactory.create_feature_importance(
+                strategy_type, **kwargs
+            )
+        )
 
     def calculate_importance(
-        self, 
-        x,
-        y,
-        **kwargs
-    ) -> dict:
+        self, x: pd.DataFrame, y: pd.Series, **kwargs: Any
+    ) -> pd.DataFrame:
         """
         Calculate feature importance based on the initialized strategy.
 
-        :param x: Feature data.
-        :param y: Target data.
-        :param kwargs: Additional arguments to pass to the calculation method.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            Feature data.
+        y : pd.Series
+            Target data.
+        **kwargs : Any
+            Additional arguments to pass to the strategy's `compute`
+            method (e.g., `sample_weight`).
         
-        :return: Feature importance results.
+        Returns
+        -------
+        pd.DataFrame
+            Feature importance results.
         """
-        return self.feature_importance_instance.calculate(x, y, **kwargs)
+        return self.strategy_instance.compute(x, y, **kwargs)

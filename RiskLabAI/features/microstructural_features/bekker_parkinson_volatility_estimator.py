@@ -1,60 +1,72 @@
+"""
+Implements the Bekker-Parkinson volatility estimator, which adjusts
+the Parkinson volatility by the Corwin-Schultz spread.
+
+Reference:
+    De Prado, M. (2018) Advances in Financial Machine Learning,
+    page 286, snippet 19.2.
+"""
+
 from math import pi
 import pandas as pd
-from RiskLabAI.features.microstructural_features.corwin_schultz import beta_estimates, gamma_estimates
+from .corwin_schultz import beta_estimates, gamma_estimates
 
-
-def sigma_estimates(
-    beta: pd.Series,
-    gamma: pd.Series
-) -> pd.Series:
+def sigma_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     r"""
-    Compute Bekker-Parkinson volatility σ estimates.
-
-    This function calculates the Bekker-Parkinson volatility estimates based on the provided
-    beta and gamma values. The mathematical formula used is:
+    Compute Bekker-Parkinson volatility \(\sigma\) estimates.
 
     .. math::
-        \sigma = \frac{(2^{0.5} - 1) \cdot (\beta ^ {0.5})}{3 - 2 \cdot (2^{0.5})}
-                + \left(\frac{\gamma}{\left(\frac{8}{\pi}\right)^{0.5} \cdot (3 - 2 \cdot (2^{0.5}))}\right)^{0.5}
+        k_2 = \sqrt{8 / \pi}
+        d = 3 - 2\sqrt{2}
+        \sigma = \frac{(\sqrt{2} - 1) \sqrt{\beta}}{d}
+                 + \sqrt{\frac{\gamma}{k_2^2 d}}
 
-    Negative resulting values are set to 0.
+    Parameters
+    ----------
+    beta : pd.Series
+        \(\beta\) estimates vector from Corwin-Schultz.
+    gamma : pd.Series
+        \(\gamma\) estimates vector from Corwin-Schultz.
 
-    :param beta: β Estimates vector.
-    :param gamma: γ Estimates vector.
-    :return: Bekker-Parkinson volatility σ estimates.
-
-    Reference:
-        De Prado, M. (2018) Advances in Financial Machine Learning, page 286, snippet 19.2.
+    Returns
+    -------
+    pd.Series
+        Bekker-Parkinson volatility \(\sigma\) estimates.
     """
     k2 = (8 / pi) ** 0.5
-    denominator = 3 - 2 * (2 ** 0.5)
+    denominator = 3 - 2 * (2**0.5)
 
-    sigma = (2 ** 0.5 - 1) * (beta ** 0.5) / denominator
-    sigma += (gamma / (k2 ** 2 * denominator)) ** 0.5
-    sigma[sigma < 0] = 0
+    term1 = (2**0.5 - 1) * (beta**0.5) / denominator
+    term2 = (gamma / (k2**2 * denominator)) ** 0.5
+    
+    sigma = term1 + term2
+    sigma[sigma < 0] = 0.0 # Floor at zero
 
     return sigma
 
 
 def bekker_parkinson_volatility_estimates(
-    high_prices: pd.Series,
-    low_prices: pd.Series,
-    window_span: int = 20
+    high_prices: pd.Series, low_prices: pd.Series, window_span: int = 20
 ) -> pd.Series:
     """
-    Compute Bekker-Parkinson volatility estimates based on high and low prices.
+    Compute Bekker-Parkinson volatility estimates from high and low prices.
 
-    Utilizes Corwin and Schultz estimation techniques to calculate the Bekker-Parkinson
-    volatility. The function first determines the beta and gamma values and then
-    uses them to compute the volatility estimates.
+    This function first calculates the Corwin-Schultz \(\beta\) and \(\gamma\)
+    parameters and then uses them to compute the volatility estimates.
 
-    :param high_prices: High prices vector.
-    :param low_prices: Low prices vector.
-    :param window_span: Rolling window span for beta estimation.
-    :return: Bekker-Parkinson volatility estimates.
+    Parameters
+    ----------
+    high_prices : pd.Series
+        Time series of high prices.
+    low_prices : pd.Series
+        Time series of low prices.
+    window_span : int, default=20
+        Rolling window span for \(\beta\) estimation.
 
-    Reference:
-        De Prado, M. (2018) Advances in Financial Machine Learning, page 286, "Corwin and Schultz" section.
+    Returns
+    -------
+    pd.Series
+        Bekker-Parkinson volatility estimates.
     """
     beta = beta_estimates(high_prices, low_prices, window_span)
     gamma = gamma_estimates(high_prices, low_prices)
