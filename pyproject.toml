@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RiskLabAI"
-version = "0.0.93"
+version = "1.0.0"
 authors = [
     { name = "RiskLab", email = "arian@risklab.ai" },
 ]
