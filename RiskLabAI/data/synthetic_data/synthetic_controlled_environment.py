@@ -344,13 +344,12 @@ def generate_prices_from_regimes(
 
     return prices, simulated_regimes_final
 
-
 def parallel_generate_prices(
     number_of_paths: int,
     regimes: Dict[str, RegimeParams],
     transition_matrix: np.ndarray,
     total_time: float,
-    number_of_steps: int,
+    n_steps: int,
     random_state: Optional[int] = None,
     n_jobs: int = 1,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:

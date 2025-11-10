@@ -21,7 +21,6 @@ except ImportError:
             return np.array([np.nan])
         return pd.Series(array).ewm(span=window).mean().values
 
-
 class ExpectedImbalanceBars(AbstractImbalanceBars):
     """
     Concrete class for Imbalance Bars with a dynamic, EWMA-based
@@ -31,9 +30,9 @@ class ExpectedImbalanceBars(AbstractImbalanceBars):
     def __init__(
         self,
         bar_type: str,
-        window_size_for_expected_n_ticks_estimation: int,
-        initial_estimate_of_expected_n_ticks_in_bar: int,
-        window_size_for_expected_imbalance_estimation: int,
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         expected_ticks_number_bounds: Optional[Tuple[float, float]] = None,
         analyse_thresholds: bool = False,
     ):
@@ -106,14 +105,13 @@ class FixedImbalanceBars(AbstractImbalanceBars):
     Concrete class for Imbalance Bars with a fixed (constant)
     Expected Number of Ticks (E[T]).
     """
-
     def __init__(
         self,
         bar_type: str,
-        initial_estimate_of_expected_n_ticks_in_bar: int,
-        window_size_for_expected_imbalance_estimation: int,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         analyse_thresholds: bool = False,
-        window_size_for_expected_n_ticks_estimation: Optional[int] = None, # Not used
+        window_size_for_expected_n_ticks_estimation: Optional[int] = None, 
     ):
         """
         Constructor.

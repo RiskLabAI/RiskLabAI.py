@@ -6,8 +6,14 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+from itertools import combinations  
+
 
 from RiskLabAI.backtest.validation.adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
+
+from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged 
+from itertools import combinations 
+
 
 # Re-use the purged k-fold fixture and add an external feature
 @pytest.fixture

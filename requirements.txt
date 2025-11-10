@@ -4,6 +4,7 @@ numpy
 scikit-learn
 matplotlib
 numba  # Added: dependency for pyod (from error log)
+tqdm   # Added: dependency for progress bars
 
 # Finance Specific
 yfinance
@@ -18,3 +19,4 @@ gymnasium
 
 # Testing
 pytest
+memory-profiler

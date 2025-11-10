@@ -153,7 +153,7 @@ def mean_std_error(
         # 3. Generate simulated max SRs
         simulated_sr = generate_max_sharpe_ratios(
             n_sims=n_sims0,
-            n_trials=n_trials,
+            n_trials_list=n_trials,
             mean_sharpe_ratio=mean_sharpe_ratio,
             std_sharpe_ratio=std_sharpe_ratio,
         )

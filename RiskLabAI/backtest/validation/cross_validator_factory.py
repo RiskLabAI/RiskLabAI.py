@@ -2,8 +2,8 @@
 Factory for creating cross-validator instances.
 """
 
+import inspect
 from typing import Any
-
 from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
 from .bagged_combinatorial_purged import BaggedCombinatorialPurged
 from .combinatorial_purged import CombinatorialPurged
@@ -59,10 +59,14 @@ class CrossValidatorFactory:
         """
         validator_type = validator_type.lower()
         validator_class = CrossValidatorFactory.VALIDATORS.get(validator_type)
-        
+
         if validator_class:
-            return validator_class(**kwargs)
-        
+            sig = inspect.signature(validator_class.__init__)
+            valid_kwargs = {
+                k: v for k, v in kwargs.items() if k in sig.parameters
+            }
+            return validator_class(**valid_kwargs)
+
         raise ValueError(
             f"Invalid validator_type: {validator_type}. "
             f"Valid types are: {list(CrossValidatorFactory.VALIDATORS.keys())}"

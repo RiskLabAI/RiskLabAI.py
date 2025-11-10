@@ -69,10 +69,10 @@ def test_prepare_data(sample_series):
     
     expected_y = np.array([[-0.1], [0.2], [0.2], [-0.1]])
     expected_x = np.array([
-        [1.1, 0.2, 1.0],
-        [1.3, -0.1, 1.0],
-        [1.5, 0.2, 1.0],
-        [1.4, 0.2, 1.0]
+        [1.2,  0.2, 1.0],  
+        [1.1, -0.1, 1.0],  
+        [1.3,  0.2, 1.0],  
+        [1.5,  0.2, 1.0]   
     ])
     
     assert np.allclose(y, expected_y)

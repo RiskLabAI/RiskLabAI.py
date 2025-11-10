@@ -2,12 +2,14 @@
 Tests for optimization/hyper_parameter_tuning.py
 """
 
+from os import pipe
 import pytest
 import pandas as pd
 import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import BaggingClassifier  
 from RiskLabAI.optimization.hyper_parameter_tuning import MyPipeline, clf_hyper_fit
 
 @pytest.fixture
@@ -39,10 +41,9 @@ def test_my_pipeline_fit_sample_weight(mock_data):
     
     pipe.fit(X, y, sample_weight=sample_weight)
     
-    # Check if 'clf__sample_weight' was passed
-    assert 'clf__sample_weight' in pipe.named_steps['clf'].fit_kwargs
+    assert 'sample_weight' in pipe.named_steps['clf'].fit_kwargs 
     assert np.array_equal(
-        pipe.named_steps['clf'].fit_kwargs['clf__sample_weight'],
+        pipe.named_steps['clf'].fit_kwargs['sample_weight'],
         sample_weight
     )
 

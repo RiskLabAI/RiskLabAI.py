@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
+from typing import List 
 
 from RiskLabAI.backtest.validation.bagged_combinatorial_purged import BaggedCombinatorialPurged
 

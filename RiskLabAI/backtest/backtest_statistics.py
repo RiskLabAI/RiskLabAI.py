@@ -240,8 +240,9 @@ def compute_drawdowns_time_under_water(
     # Time under water in fractional years
     time_under_water = (
         drawdown_analysis_df["Stop"] - drawdown_analysis_df.index
-    ) / np.timedelta64(1, "Y")
-    
+    ) / np.timedelta64(1, "D") / 365.25
+
+
     drawdown.index.name = 'Datetime'
     time_under_water.index.name = 'Datetime'
 

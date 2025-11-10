@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Optional, Union, Any
 from sklearn.ensemble import BaseEnsemble
+from sklearn.ensemble import BaseEnsemble  
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 class FeatureImportanceMDI(FeatureImportanceStrategy):
@@ -25,8 +26,9 @@ class FeatureImportanceMDI(FeatureImportanceStrategy):
         classifier : BaseEnsemble
             An *untrained* scikit-learn ensemble model (e.g., RandomForestClassifier).
         """
-        if not hasattr(classifier, 'estimators_'):
+        if not isinstance(classifier, BaseEnsemble):
             raise TypeError("Classifier must be an ensemble (e.g., RandomForest).")
+
         self.classifier = classifier
 
     def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:

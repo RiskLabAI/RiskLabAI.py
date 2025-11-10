@@ -53,32 +53,15 @@ class BarsInitializerController:
 
     @staticmethod
     def initialize_expected_dollar_imbalance_bars(
-        window_size_for_expected_n_ticks_estimation: int = 3,
+        window_size_for_expected_n_ticks_estimation: int = 10000,
         window_size_for_expected_imbalance_estimation: int = 10000,
         initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
         expected_ticks_number_bounds: Optional[Tuple[float, float]] = None,
-        analyze_thresholds: bool = False,
+        analyse_thresholds: bool = False,
+        **kwargs: Any, # Accept extra kwargs but don't use them
     ) -> ExpectedImbalanceBars:
         """
         Initialize expected dollar imbalance bars.
-
-        Parameters
-        ----------
-        window_size_for_expected_n_ticks_estimation : int
-            Window size for E[T] estimation.
-        window_size_for_expected_imbalance_estimation : int
-            Window size for E[theta] estimation.
-        initial_estimate_of_expected_n_ticks_in_bar : int
-            Initial E[T] guess.
-        expected_ticks_number_bounds : Tuple[float, float], optional
-            Bounds for E[T].
-        analyze_thresholds : bool
-            Flag to analyze thresholds.
-
-        Returns
-        -------
-        ExpectedImbalanceBars
-            An instance configured for dollar imbalance.
         """
         return ExpectedImbalanceBars(
             bar_type="dollar_imbalance",
@@ -86,89 +69,177 @@ class BarsInitializerController:
             initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
             window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
             expected_ticks_number_bounds=expected_ticks_number_bounds,
-            analyse_thresholds=analyze_thresholds,
+            analyse_thresholds=analyse_thresholds,
         )
 
     @staticmethod
     def initialize_expected_volume_imbalance_bars(
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> ExpectedImbalanceBars:
         """Initialize expected volume imbalance bars."""
-        return ExpectedImbalanceBars(bar_type="volume_imbalance", **kwargs)
+        return ExpectedImbalanceBars(
+            bar_type="volume_imbalance",
+            window_size_for_expected_n_ticks_estimation=window_size_for_expected_n_ticks_estimation,
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_expected_tick_imbalance_bars(
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> ExpectedImbalanceBars:
         """Initialize expected tick imbalance bars."""
-        return ExpectedImbalanceBars(bar_type="tick_imbalance", **kwargs)
+        return ExpectedImbalanceBars(
+            bar_type="tick_imbalance",
+            window_size_for_expected_n_ticks_estimation=window_size_for_expected_n_ticks_estimation,
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_dollar_imbalance_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedImbalanceBars:
         """Initialize fixed dollar imbalance bars."""
-        return FixedImbalanceBars(bar_type="dollar_imbalance", **kwargs)
+        return FixedImbalanceBars(
+            bar_type="dollar_imbalance",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_volume_imbalance_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedImbalanceBars:
         """Initialize fixed volume imbalance bars."""
-        return FixedImbalanceBars(bar_type="volume_imbalance", **kwargs)
+        return FixedImbalanceBars(
+            bar_type="volume_imbalance",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_tick_imbalance_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedImbalanceBars:
         """Initialize fixed tick imbalance bars."""
-        return FixedImbalanceBars(bar_type="tick_imbalance", **kwargs)
+        return FixedImbalanceBars(
+            bar_type="tick_imbalance",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_expected_dollar_run_bars(
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> ExpectedRunBars:
         """Initialize expected dollar run bars."""
-        return ExpectedRunBars(bar_type="dollar_run", **kwargs)
+        return ExpectedRunBars(
+            bar_type="dollar_run",
+            window_size_for_expected_n_ticks_estimation=window_size_for_expected_n_ticks_estimation,
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_expected_volume_run_bars(
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> ExpectedRunBars:
         """Initialize expected volume run bars."""
-        return ExpectedRunBars(bar_type="volume_run", **kwargs)
+        return ExpectedRunBars(
+            bar_type="volume_run",
+            window_size_for_expected_n_ticks_estimation=window_size_for_expected_n_ticks_estimation,
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_expected_tick_run_bars(
+        window_size_for_expected_n_ticks_estimation: int = 10000,
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> ExpectedRunBars:
         """Initialize expected tick run bars."""
-        return ExpectedRunBars(bar_type="tick_run", **kwargs)
+        return ExpectedRunBars(
+            bar_type="tick_run",
+            window_size_for_expected_n_ticks_estimation=window_size_for_expected_n_ticks_estimation,
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_dollar_run_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedRunBars:
         """Initialize fixed dollar run bars."""
-        return FixedRunBars(bar_type="dollar_run", **kwargs)
+        return FixedRunBars(
+            bar_type="dollar_run",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_volume_run_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedRunBars:
         """Initialize fixed volume run bars."""
-        return FixedRunBars(bar_type="volume_run", **kwargs)
+        return FixedRunBars(
+            bar_type="volume_run",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_fixed_tick_run_bars(
+        initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
+        window_size_for_expected_imbalance_estimation: int = 10000,
         **kwargs: Any,
     ) -> FixedRunBars:
         """Initialize fixed tick run bars."""
-        return FixedRunBars(bar_type="tick_run", **kwargs)
+        return FixedRunBars(
+            bar_type="tick_run",
+            initial_estimate_of_expected_n_ticks_in_bar=initial_estimate_of_expected_n_ticks_in_bar,
+            window_size_for_expected_imbalance_estimation=window_size_for_expected_imbalance_estimation,
+            **kwargs
+        )
 
     @staticmethod
     def initialize_dollar_standard_bars(
         threshold: Union[float, pd.Series] = 70000000,
+        **kwargs: Any,
     ) -> StandardBars:
         """Initialize dollar standard bars."""
         return StandardBars(bar_type=CUMULATIVE_DOLLAR, threshold=threshold)
@@ -176,6 +247,7 @@ class BarsInitializerController:
     @staticmethod
     def initialize_volume_standard_bars(
         threshold: Union[float, pd.Series] = 30000,
+        **kwargs: Any,
     ) -> StandardBars:
         """Initialize volume standard bars."""
         return StandardBars(bar_type=CUMULATIVE_VOLUME, threshold=threshold)
@@ -183,6 +255,7 @@ class BarsInitializerController:
     @staticmethod
     def initialize_tick_standard_bars(
         threshold: Union[float, pd.Series] = 6000,
+        **kwargs: Any,
     ) -> StandardBars:
         """Initialize tick standard bars."""
         return StandardBars(bar_type=CUMULATIVE_TICKS, threshold=threshold)
@@ -191,6 +264,7 @@ class BarsInitializerController:
     def initialize_time_bars(
         resolution_type: str = "D",
         resolution_units: int = 1,
+        **kwargs: Any,
     ) -> TimeBars:
         """Initialize time bars."""
         return TimeBars(
