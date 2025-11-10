@@ -7,6 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
+from RiskLabAI.backtest.validation.bagged_combinatorial_purged import BaggedCombinatorialPurged
+
 # Re-use the purged k-fold fixture
 @pytest.fixture
 def sample_data_with_times():

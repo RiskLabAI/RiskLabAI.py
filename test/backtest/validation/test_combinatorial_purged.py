@@ -8,6 +8,9 @@ import pytest
 from sklearn.linear_model import LogisticRegression
 from math import comb
 
+from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged
+from itertools import combinations
+
 # Re-use the purged k-fold fixture
 @pytest.fixture
 def sample_data_with_times():

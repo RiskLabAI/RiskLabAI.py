@@ -7,6 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+from RiskLabAI.backtest.validation.walk_forward import WalkForward
+
 # Re-use the sample data fixture from test_kfold
 @pytest.fixture
 def sample_data():

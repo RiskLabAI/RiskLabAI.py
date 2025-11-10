@@ -5,6 +5,7 @@ Tests for data/differentiation/differentiation.py
 import numpy as np
 import pandas as pd
 import pytest
+from statsmodels.tsa.stattools import adfuller
 from RiskLabAI.data.differentiation import (
     calculate_weights_std,
     calculate_weights_ffd,

@@ -58,12 +58,12 @@ def test_cov_corr_conversion():
     std = np.array([2.0, 1.0])
     
     # Test cov -> corr
-    corr = _cov_to_corr(cov)
+    corr = cov_to_corr(cov)
     expected_corr = np.array([[1.0, 0.5], [0.5, 1.0]])
     assert np.allclose(corr, expected_corr)
     
     # Test corr -> cov
-    cov_new = _corr_to_cov(corr, std)
+    cov_new = corr_to_cov(corr, std)
     assert np.allclose(cov, cov_new)
 
 def test_denoise_cov(noisy_cov_matrix):

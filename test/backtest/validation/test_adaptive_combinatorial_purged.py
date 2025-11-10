@@ -7,6 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+from RiskLabAI.backtest.validation.adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
+
 # Re-use the purged k-fold fixture and add an external feature
 @pytest.fixture
 def sample_data_with_times_and_feature():
