@@ -5,7 +5,7 @@ Tests for orthogonal_features.py
 import pytest
 import pandas as pd
 import numpy as np
-from .orthogonal_features import orthogonal_features
+from RiskLabAI.features.feature_importance.orthogonal_features import orthogonal_features
 
 @pytest.fixture
 def mock_features():

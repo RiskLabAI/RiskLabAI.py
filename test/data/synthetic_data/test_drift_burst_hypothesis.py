@@ -4,7 +4,7 @@ Tests for data/synthetic_data/drift_burst_hypothesis.py
 
 import numpy as np
 import pytest
-from .drift_burst_hypothesis import drift_volatility_burst
+from RiskLabAI.data.synthetic_data.drift_burst_hypothesis import drift_volatility_burst
 
 def test_drift_volatility_burst_shape():
     """Test the output shape."""

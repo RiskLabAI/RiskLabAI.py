@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
-from .structural_breaks import (
+from RiskLabAI.features.structural_breaks.structural_breaks import (
     lag_dataframe,
     prepare_data,
     compute_beta,

@@ -5,7 +5,7 @@ Tests for data/denoise/denoising.py
 import pytest
 import numpy as np
 import pandas as pd
-from .denoising import (
+from RiskLabAI.data.denoise import (
     marcenko_pastur_pdf,
     cov_to_corr,
     corr_to_cov,

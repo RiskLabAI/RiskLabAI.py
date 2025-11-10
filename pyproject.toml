@@ -31,7 +31,8 @@ keywords = [
     "backtesting",
 ]
 
-# --- DEPENDENCIES ---
+# --- CORE DEPENDENCIES ---
+# These are fast to install and essential for the library's main functions.
 dependencies = [
     "numpy",
     "pandas",
@@ -39,20 +40,42 @@ dependencies = [
     "scikit-learn",
     "statsmodels",
     "numba",
-    "torch",
-    "plotly",
-    "ta",
-    "quantecon",
     "joblib",
+    "ta",
+]
+
+# --- OPTIONAL DEPENDENCIES ---
+# These are installed on-demand by users, e.g., pip install RiskLabAI[pde]
+[project.optional-dependencies]
+# For the PDE (Partial Differential Equation) module
+pde = ["torch"]
+
+# For synthetic data generation (qe.MarkovChain)
+synth = ["quantecon"]
+
+# For plotting utilities (publication_plots.py, update_figure_layout.py)
+plot = ["matplotlib", "plotly"]
+
+# For development, testing, and running notebooks
+dev = [
     "yfinance",
     "memory_profiler",
-    "matplotlib",
+    "jupyterlab",
+    "stable-baselines3",
+    "gymnasium",
+    "torchvision", # Often needed with torch
+    "torchaudio",  # Often needed with torch
 ]
+
+# A convenience extra to install everything for users
+all = [
+    "RiskLabAI[pde]",
+    "RiskLabAI[synth]",
+    "RiskLabAI[plot]",
+]
+
 
 [project.urls]
 Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
 "Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
 Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/releases"
-
-[options]
-packages = ["find:"]

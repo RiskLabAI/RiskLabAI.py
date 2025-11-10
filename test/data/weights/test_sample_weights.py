@@ -5,7 +5,7 @@ Tests for data/weights/sample_weights.py
 import numpy as np
 import pandas as pd
 import pytest
-from .sample_weights import (
+from RiskLabAI.data.weights.sample_weights import (
     expand_label_for_meta_labeling,
     calculate_average_uniqueness,
     sample_weight_absolute_return_meta_labeling,

@@ -3,12 +3,13 @@ Tests for the pde/ module (Deep BSDE Solver)
 """
 
 import pytest
+torch = pytest.importorskip("torch")
 import torch
 import numpy as np
 
 # Import the main components
-from .equation import HJBLQ
-from .solver import FBSDESolver
+from RiskLabAI.pde.equation import HJBLQ
+from RiskLabAI.pde.solver import FBSDESolver
 
 @pytest.fixture
 def pde_config():

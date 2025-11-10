@@ -4,7 +4,7 @@ Tests for ensemble/bagging_classifier_accuracy.py
 
 import pytest
 import numpy as np
-from .bagging_classifier_accuracy import bagging_classifier_accuracy
+from RiskLabAI.ensemble.bagging_classifier_accuracy import bagging_classifier_accuracy
 
 def test_bagging_accuracy():
     """

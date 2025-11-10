@@ -4,7 +4,7 @@ Tests for hedging.py
 
 import numpy as np
 import pytest
-from .hedging import pca_weights
+from RiskLabAI.data.structures.hedging import pca_weights
 
 @pytest.fixture
 def sample_cov_matrix():

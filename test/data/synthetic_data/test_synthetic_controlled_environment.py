@@ -5,7 +5,7 @@ Tests for data/synthetic_data/synthetic_controlled_environment.py
 import numpy as np
 import pandas as pd
 import pytest
-from .synthetic_controlled_environment import (
+from RiskLabAI.data.synthetic_data.synthetic_controlled_environment import (
     align_params_length,
     generate_prices_from_regimes,
     parallel_generate_prices,

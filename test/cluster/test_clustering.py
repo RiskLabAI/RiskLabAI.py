@@ -5,7 +5,7 @@ Tests for cluster/clustering.py
 import numpy as np
 import pandas as pd
 import pytest
-from .test_clustering import (
+from RiskLabAI.cluster.clustering import (
     covariance_to_correlation,
     random_block_correlation,
     cluster_k_means_base,

@@ -5,7 +5,7 @@ Tests for data/labeling/financial_labels.py
 import numpy as np
 import pandas as pd
 import pytest
-from .financial_labels import (
+from RiskLabAI.data.labeling import (
     calculate_t_value_linear_regression,
     find_trend_using_trend_scanning,
 )

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from scipy.stats import norm
-from .bet_sizing import (
+from RiskLabAI.backtest.bet_sizing import (
     probability_bet_size,
     average_bet_sizes,
     strategy_bet_sizing,
