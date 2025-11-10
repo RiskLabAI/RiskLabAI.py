@@ -4,6 +4,7 @@ Tests for probabilistic_sharpe_ratio.py
 
 import numpy as np
 import pytest
+from scipy import stats as ss
 from scipy.stats import norm
 from RiskLabAI.backtest.probabilistic_sharpe_ratio import (
     probabilistic_sharpe_ratio,
@@ -76,9 +77,11 @@ def test_probabilistic_sharpe_ratio_statistic():
         kurtosis_of_returns=3,
         return_test_statistic=True,
     )
-    # Z = (1.5 - 1.0) * sqrt(99) / sqrt(1) = 0.5 * 9.95 = 4.97
-    assert np.isclose(z_stat, 0.5 * np.sqrt(99))
-    assert np.isclose(norm.cdf(z_stat), 1.0) # Very high prob
+    # Z = (1.5 - 1.0) * sqrt(99) / sqrt(1 - 0 + (3-1)/4 * 1.5**2)
+    # Z = 0.5 * 9.9498 / sqrt(1 + 0.5 * 2.25)
+    # Z = 4.9749 / sqrt(2.125) = 4.9749 / 1.4577 = 3.4127...
+    assert np.isclose(z_stat, 3.4127787539671264) 
+    assert np.isclose(ss.norm.cdf(z_stat), 0.99968) 
 
 def test_benchmark_sharpe_ratio():
     """

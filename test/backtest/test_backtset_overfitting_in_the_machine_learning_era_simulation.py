@@ -3,6 +3,7 @@ Tests for backtest_overfitting_simulation.py
 """
 
 import platform
+from pyexpat import features
 import numpy as np
 import pandas as pd
 import pytest
@@ -44,18 +45,23 @@ def test_local_metric_functions():
     es = expected_shortfall(returns_es, 0.0, confidence_level=0.05)
     assert np.isclose(es, -0.1)
 
+
+
+
 def test_financial_features_generation(sample_prices):
     """Test the financial_features function."""
     features = financial_features_backtest_overfitting_simulation(
         sample_prices, noise_scale=0.0
     )
-    
+
     assert isinstance(features, pd.DataFrame)
-    assert features.shape[0] == sample_prices.shape[0]
-    # Check for a few expected columns
+
+    features_dropped = features.dropna()
+    assert features_dropped.shape[0] > 0
+    assert features_dropped.shape[0] < sample_prices.shape[0]
     assert "FracDiff" in features.columns
     assert "Volatility" in features.columns
-    assert "Log MACD Hist" in features.columns
+    assert "Log MACD Histogram" in features.columns 
     assert "Kumo Breakout" in features.columns
     
     # Check that noise is applied

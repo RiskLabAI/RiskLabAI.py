@@ -99,9 +99,10 @@ def test_cluster_k_means_top(block_corr_matrix):
     # ONC should be stable and find the 2 clusters
     assert len(clusters) == 2
     
-    block1 = [str(i) for i in range(5)]
-    block2 = [str(i) for i in range(5, 10)]
-    
+    block1 = list(range(5)) 
+    block2 = list(range(5, 10)) 
+
+
     c0_names = sorted(clusters[0])
     c1_names = sorted(clusters[1])
 

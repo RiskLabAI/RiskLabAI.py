@@ -572,7 +572,10 @@ def varying_embargo_backtest_overfitting_simulation(
 
 def sharpe_ratio(returns, risk_free_rate=0):
     """Calculate the Sharpe ratio of the given returns."""
-    return (returns.mean() - risk_free_rate) / returns.std()
+    std = returns.std()
+    if std == 0:
+        return 0.0
+    return (returns.mean() - risk_free_rate) / std
 
 def sortino_ratio(returns, risk_free_rate=0):
     """Calculate the Sortino ratio of the given returns."""

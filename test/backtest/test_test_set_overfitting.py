@@ -70,7 +70,10 @@ def test_z_statistics_and_errors():
     z = estimated_sharpe_ratio_z_statistics(
         sharpe_ratio=1.96, t=1000, true_sharpe_ratio=0
     )
-    assert np.isclose(z, 1.96 * np.sqrt(999), atol=0.1)
+    # Z = (1.96 - 0) * sqrt(999) / sqrt(1 - 0 + (3-1)/4 * 1.96**2)
+    # Z = 61.95 / sqrt(1 + 0.5 * 3.8416)
+    # Z = 61.95 / sqrt(2.9208) = 36.248...
+    assert np.isclose(z, 36.248321866, atol=1e-5) # <-- CORRECTED VALUE
 
     # 2. Type 1 Error
     # For z=1.96, alpha should be 0.025 (one-sided)
