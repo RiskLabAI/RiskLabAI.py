@@ -51,24 +51,24 @@ def test_binomial_sharpe_ratio():
     # E[R] = 0.6*0.01 + 0.4*(-0.01) = 0.006 - 0.004 = 0.002
     # Stdev = (0.01 - (-0.01)) * sqrt(0.6*0.4) = 0.02 * sqrt(0.24) = 0.009798
     # SR_trade = 0.002 / 0.009798 = 0.2041
-    # SR_annual = 0.2041 * sqrt(252) = 3.24
-    assert np.isclose(sr_high_p, 3.2396, atol=1e-4)
+    # SR_annual = 0.2041 * sqrt(252) = 3.24037...
+    assert np.isclose(sr_high_p, 3.240370349, atol=1e-5) # <-- CORRECTED VALUE
+
 
 def test_implied_precision_and_bin_frequency():
     """Test that implied_precision and bin_frequency are inverses."""
     # Note: implied_precision assumes sl is positive, bin_frequency
     # uses the binomial_sharpe_ratio formula which assumes sl is negative.
     # We must be consistent.
-    
-    # Test bin_frequency with sl=-0.01
+
     freq = bin_frequency(
         stop_loss=-0.01,
         profit_taking=0.01,
         precision=0.6,
-        target_sharpe_ratio=3.2396
+        target_sharpe_ratio=3.2403703492039306 # <-- USE CORRECT SR
     )
-    assert np.isclose(freq, 252, atol=0.1)
-    
+    assert np.isclose(freq, 252, atol=0.01) # <-- TIGHTENED TOLERANCE
+
     # Test implied_precision with sl=0.01 (positive)
     prec = implied_precision(
         stop_loss=0.01, # Positive

@@ -88,7 +88,7 @@ def test_performance_evaluation(sample_performance_matrix):
         train_part, test_part, n_strat, sharpe_ratio, 0.0
     )
     
-    assert is_overfit is True
+    assert is_overfit
     assert logit < 0
 
 def test_probability_of_backtest_overfitting(sample_performance_matrix):

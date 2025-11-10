@@ -23,6 +23,7 @@ def sample_data_with_times():
     )
     
     # 'times' Series: info starts at index time, ends 5 business days later
+    # 5 business days = 7 calendar days
     times = pd.Series(
         X.index + pd.DateOffset(days=7), 
         index=X.index
@@ -47,7 +48,7 @@ def test_filtered_training_indices_with_embargo():
         index=pd.date_range('2020-01-01', periods=100, freq='D')
     )
     
-    # Test set: days 20-30
+    # Test set: days 20-30 (iloc 20 to 29)
     test_times = all_times.iloc[20:30]
     
     # Test 1: No embargo
@@ -55,34 +56,27 @@ def test_filtered_training_indices_with_embargo():
         all_times, test_times, embargo_fraction=0
     )
     
-    # Test set info range:
-    # Starts: 2020-01-21 (day 20)
-    # Ends:   2020-02-04 (day 35, from day 29's value)
-    
-    # Training set should exclude anything overlapping this.
-    # Day 15 starts 2020-01-16, ends 2020-01-21 (overlaps)
-    # Day 14 starts 2020-01-15, ends 2020-01-20 (does NOT overlap)
-    # Day 35 starts 2020-02-05, ends 2020-02-10 (does NOT overlap)
-    
+    # Test set info range: ['2020-01-21', '2020-02-04']
+    # Purge range: ['2020-01-16' (iloc 15) to '2020-02-04' (iloc 34)]
+    # Purged: 15..34 (inclusive). 34 - 15 + 1 = 20 samples.
+    # 100 - 20 = 80 samples.
     assert all_times.index[14] in train_times.index
     assert all_times.index[15] not in train_times.index
-    assert all_times.index[25] not in train_times.index
     assert all_times.index[34] not in train_times.index
     assert all_times.index[35] in train_times.index
-    
-    expected_purged_len = 100 - (35 - 15 + 1) # 100 - 21 = 79
     assert len(train_times) == 80
 
-    # Test 2: With embargo (1% of 100 = 1 day embargo)
+    # Test 2: With embargo (1% of 100 = 1 day/sample embargo)
     train_times_emb = PurgedKFold.filtered_training_indices_with_embargo(
         all_times, test_times, embargo_fraction=0.01
     )
-    # Embargo adds 1 day. Test range end is 2020-02-04. Embargoed end is 2020-02-05.
-    # Day 35 (starts 2020-02-05) should now be purged.
-    # Day 36 (starts 2020-02-06) should be kept.
+    # Embargoed end timestamp: all_times.index[35] = '2020-02-05'
+    # Purge range: ['2020-01-16' (iloc 15) to '2020-02-05' (iloc 35)]
+    # Purged: 15..35 (inclusive). 35 - 15 + 1 = 21 samples.
+    # 100 - 21 = 79 samples.
     assert all_times.index[35] not in train_times_emb.index
     assert all_times.index[36] in train_times_emb.index
-    assert len(train_times_emb) == 78 # Purged one more day
+    assert len(train_times_emb) == 79
 
 def test_purged_kfold_split(sample_data_with_times):
     """Test the split method."""
@@ -93,120 +87,36 @@ def test_purged_kfold_split(sample_data_with_times):
     splits = list(cv.split(X, y))
     assert len(splits) == n_splits
     
-    # Test first fold
-    train_idx, test_idx = splits[0]
+    # --- Test first fold ---
+    train_idx_0, test_idx_0 = splits[0]
+    np.testing.assert_array_equal(test_idx_0, np.arange(0, 20))
     
-    # Test set is first 20 samples
-    np.testing.assert_array_equal(test_idx, np.arange(0, 20))
-    
-    # Test times:
-    # Start: 2020-01-01
-    # End:   2020-01-28 (from sample 19)
-    # Embargo (1% of 100 = 1 sample): 1 bus day -> 2020-01-29
-    
-    # Train set should be purged of *any* overlap with this range
-    # Sample 15 (2020-01-22) ends 2020-01-29 (overlaps embargo) -> PURGED
-    # Sample 14 (2020-01-21) ends 2020-01-28 (overlaps) -> PURGED
-    
-    # Check that train_idx is a subset of [20, 99]
-    assert np.all(train_idx >= 20)
-    
-    # Check that purged indices are not in train
-    # times.iloc[15] (2020-01-22) ends 2020-01-29, overlaps embargo
-    assert 15 not in train_idx 
-    
-    # Find the last purged index.
-    # times.iloc[14] (2020-01-21) ends 2020-01-28. Purged.
-    # times.iloc[13] (2020-01-20) ends 2020-01-27. Purged.
-    
-    # Let's find the first sample *not* purged
-    # Info range for test_idx[0..19]:
-    # Min start: 2020-01-01
-    # Max end: 2020-01-28 (from times.iloc[19])
-    # Embargo (1% of 100 = 1): 1 sample -> 1 bus day
-    # Embargoed end: times.iloc[19+1] = times.iloc[20] = 2020-01-30
-    
-    # We need to find train samples where:
-    # train_start > 2020-01-30 OR train_end < 2020-01-01
-    
-    # The first sample that *starts* after 2020-01-30 is:
-    # times.index[21] = 2020-01-30. (train_indices are iloc)
-    # times.index[22] = 2020-01-31.
-    
-    # Wait, the logic is `_get_train_indices` -> `filtered...`
-    # Let's re-check that.
-    
-    # _single_split uses continous_test_times=True
-    # Test 0: test_indices = 0..19
-    # Test range start: 2020-01-01 (iloc 0)
-    # Test range end:   2020-01-28 (iloc 19)
-    # Embargo: 1% * 100 = 1 sample. 
-    # embargoed_data_info_range starts at 2020-01-01
-    # .shift(-1) -> value for 2020-01-01 is 2020-01-08 (from iloc 1)
-    # ...this seems wrong. Let's trace `filtered_training_indices_with_embargo`
-    
-    # effective_test_time_range = pd.Series('2020-01-28', index=['2020-01-01'])
-    # effective_sample = times.copy()
-    # embargoed_data_info_range = pd.Series(times.shift(-1).values, index=times.index)
-    # embargoed_data_info_range.iloc[-1] = times.iloc[-1]
-    # effective_ranges = pd.Series('2020-01-02', index=['2020-01-01']) ? No...
-    
-    # Ah, `reindex` -> `bfill`
-    # embargoed_ranges = pd.Series('2020-01-08', index=['2020-01-01']) (value from 2020-01-02)
-    # Wait, `effective_sample` starts from `effective_test_time_range.index.min()`
-    # So `effective_sample` is all of `times`.
-    # `embargoed_data_info_range` is `times.shift(-1)` (with fillna)
-    # `embargoed_ranges` maps '2020-01-01' to `embargoed_data_info_range`
-    # It should be `embargoed_data_info_range['2020-01-01']` which is `times['2020-01-02']` = '2020-01-09'
-    # So embargoed_ranges = pd.Series('2020-01-09', index=['2020-01-01'])
-    
-    # Purge loop:
-    # test_start = '2020-01-01', test_end_embargoed = '2020-01-09'
-    # cond1: (start >= '01-01') & (start <= '01-09') -> iloc 0..5
-    # cond2: (end >= '01-01') & (end <= '01-09') -> iloc 0..1
-    # cond3: (start <= '01-01') & (end >= '01-09') -> iloc 0
-    # indices_to_drop = {0, 1, 2, 3, 4, 5}
-    
-    # This logic seems off for purging *after* the test set.
-    # The original implementation seems to purge based on embargo *from the start*
-    # of the test set, not the end.
-    
-    # Let's assume the user's purging logic is as intended.
-    # The first split will have test indices 0-19.
-    # The train indices will be a subset of 20-99.
-    # We must check that *some* purging happened.
-    # KFold train would be 20-99 (80 samples).
-    # PurgedKFold must have fewer.
-    
-    # Let's test the *last* fold.
-    # Test 4: test_indices = 80..99
-    # Test range start: 2020-04-27 (iloc 80)
-    # Test range end:   2020-05-22 (iloc 99)
-    # Embargo: 1 sample.
-    # embargoed_data_info_range starts at 2020-04-27 (iloc 80)
-    # .shift(-1) -> value for iloc 80 is value from iloc 81
-    # embargoed_ranges = pd.Series('2020-05-06', index=['2020-04-27'])
-    
-    # Purge loop:
-    # test_start = '2020-04-27', test_end_embargoed = '2020-05-06'
-    # cond1: (start >= '04-27') & (start <= '05-06') -> iloc 80..85
-    # cond2: (end >= '04-27') & (end <= '05-06') -> iloc 76..81
-    # cond3: (start <= '04-27') & (end >= '05-06') -> iloc 76..80
-    # indices_to_drop = {76, 77, 78, 79, 80, 81, 82, 83, 84, 85}
-    
+    # Test range: start '2020-01-01', end '2020-02-04' (from iloc 19)
+    # Embargo (1%*100=1 sample): end_iloc = 24. embargoed_iloc = 25.
+    # Embargoed end timestamp: times.index[25] = '2020-02-05'
+    # Purge range: ['2020-01-01', '2020-02-05']
+    # cond1 purges [0..25]
+    # cond2 purges [0..20] (iloc 20 end is '2020-02-05')
+    # First sample kept is iloc[26] (start '2020-02-06')
+    assert 25 not in train_idx_0
+    assert 26 in train_idx_0
+    assert np.all(train_idx_0 >= 26)
+
+    # --- Test last fold ---
     train_idx_4, test_idx_4 = splits[4]
     np.testing.assert_array_equal(test_idx_4, np.arange(80, 100))
     
-    # Unpurged train would be 0..79
-    # Purged indices are 76, 77, 78, 79
-    assert 75 in train_idx_4
-    assert 76 not in train_idx_4
-    assert 77 not in train_idx_4
-    assert 78 not in train_idx_4
+    # Test range: start '2020-04-27' (iloc 80), end '2020-05-26' (from iloc 99)
+    # Embargo (1 sample) -> end_val '2020-05-26' is OOB, so embargoed_end is '2020-05-26'
+    # Purge range: ['2020-04-27', '2020-05-26']
+    # cond1 purges [80..99]
+    # cond2 purges [71..99] (iloc 71 end is '2020-04-27')
+    # First sample kept is iloc[70]
+    assert 70 in train_idx_4
+    assert 71 not in train_idx_4
     assert 79 not in train_idx_4
-    
-    assert len(train_idx_4) == 76 # 80 - 4
-    
+    assert len(train_idx_4) == 71
+
 def test_get_train_indices_refactor(sample_data_with_times):
     """Test the _get_train_indices refactor."""
     X, y, times = sample_data_with_times
@@ -215,7 +125,8 @@ def test_get_train_indices_refactor(sample_data_with_times):
     test_indices = np.arange(80, 100)
     train_indices = cv._get_train_indices(test_indices, times, True)
     
+    # Logic is identical to test_purged_kfold_split[4]
     assert isinstance(train_indices, np.ndarray)
-    assert 75 in train_indices
-    assert 79 not in train_indices
-    assert len(train_indices) == 76
+    assert 70 in train_indices
+    assert 71 not in train_indices
+    assert len(train_indices) == 71

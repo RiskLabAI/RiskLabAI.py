@@ -117,23 +117,21 @@ class PurgedKFold(CrossValidator):
         if embargo_length == 0:
             embargoed_ranges = effective_test_time_range
         else:
-            # Apply embargo
-            effective_sample = data_info_range.loc[
-                effective_test_time_range.index.min():
-            ].copy().drop_duplicates()
-            
-            embargoed_values = effective_sample.shift(-embargo_length).fillna(
-                effective_sample.values[-1]
+            embargoed_values = []
+            for end_val in effective_test_time_range.values:
+                end_iloc = data_info_range.index.searchsorted(end_val, side='left')
+
+                if end_iloc >= len(data_info_range):
+                    embargoed_values.append(end_val)
+                else:
+                    embargoed_iloc = min(end_iloc + embargo_length, len(data_info_range) - 1)
+                    embargoed_values.append(data_info_range.index[embargoed_iloc])
+
+            embargoed_ranges = pd.Series(
+                embargoed_values, 
+                index=effective_test_time_range.index
             )
-            embargoed_data_info_range = pd.Series(
-                embargoed_values.values, 
-                index=effective_sample.index
-            )
-            
-            # Map test start times to their corresponding embargoed end times
-            embargoed_ranges = embargoed_data_info_range.reindex(
-                effective_test_time_range.index, method='bfill'
-            )
+            # === END OF FIX ===
 
         # Purge
         for test_start, test_end_embargoed in embargoed_ranges.items():

@@ -8,7 +8,6 @@ import pytest
 from sklearn.linear_model import LogisticRegression
 from itertools import combinations  
 
-
 from RiskLabAI.backtest.validation.adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
 
 from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged 

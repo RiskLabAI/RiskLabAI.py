@@ -9,6 +9,8 @@ from typing import (
     Any, Dict, Generator, List, Optional, Tuple, Union
 )
 
+from itertools import combinations
+
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed

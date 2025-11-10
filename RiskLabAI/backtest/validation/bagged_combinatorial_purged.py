@@ -15,6 +15,8 @@ from sklearn.base import clone
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
 from sklearn.exceptions import ConvergenceWarning
 
+from typing import List, Tuple
+
 from .combinatorial_purged import CombinatorialPurged
 
 # For type hinting sklearn-like estimators

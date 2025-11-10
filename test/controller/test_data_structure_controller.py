@@ -81,5 +81,4 @@ def test_controller_handle_input_command(mock_tick_data):
     
     assert isinstance(bars_df, pd.DataFrame)
     assert not bars_df.empty
-    assert "Cumulative Dollar Value" in bars_df.columns
-    assert bars_df["cum_dollar"].min() >= 10000
+    assert bars_df["Cumulative Dollar Value"].min() >= 10000
