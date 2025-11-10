@@ -196,6 +196,10 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 ] = self._expected_number_of_ticks()
 
                 # Update E[P[buy]]
+                # Determine window size, fall back to imbalance window if None
+                window = self.window_size_for_expected_n_ticks_estimation or \
+                        self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
+
                 self.run_bars_statistics[
                     EXPECTED_BUY_TICKS_PROPORTION
                 ] = ewma(
@@ -203,35 +207,12 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                         self.run_bars_statistics[
                             PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
                         ][
-                            -self.window_size_for_expected_n_ticks_estimation:
+                            -window:  # <--- FIXED
                         ],
                         dtype=float,
                     ),
-                    self.window_size_for_expected_n_ticks_estimation,
+                    window,  # <--- FIXED
                 )[-1]
-
-                # Hamid: This is most likely wrong and needs to be removed....
-                # # Determine window size, fall back to imbalance window if None
-                # window = self.window_size_for_expected_n_ticks_estimation or \
-                #         self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
-
-                # if self.base_statistics[CUMULATIVE_TICKS] > 0: # Avoid divide by zero
-                #     self.run_bars_statistics[
-                #         PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
-                #     ].append(
-                #         self.run_bars_statistics[BUY_TICKS_NUMBER]
-                #         / self.base_statistics[CUMULATIVE_TICKS]
-                #     ) = ewma(
-                #     np.array(
-                #         self.run_bars_statistics[
-                #             PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
-                #         ][
-                #             -window: # <-- Use safe window
-                #         ],
-                #         dtype=float,
-                #     ),
-                #     window, # <-- Use safe window
-                # )[-1]
 
                 # Update E[theta_buy] and E[theta_sell]
                 self.run_bars_statistics[

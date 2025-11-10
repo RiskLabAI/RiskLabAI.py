@@ -237,7 +237,7 @@ def random_data(
     return data, columns_correlated
 
 
-def hrp(cov: np.ndarray, corr: np.ndarray) -> pd.Series:
+def hrp(cov: pd.DataFrame, corr: pd.DataFrame) -> pd.Series:
     """
     Main HRP algorithm.
 
@@ -259,8 +259,8 @@ def hrp(cov: np.ndarray, corr: np.ndarray) -> pd.Series:
     pd.Series
         The HRP portfolio weights, sorted by original index.
     """
-    corr_df, cov_df = pd.DataFrame(corr), pd.DataFrame(cov)
-    
+    corr_df, cov_df = corr, cov
+
     # 1. Calculate distance
     distance = distance_corr(corr_df.values)
     

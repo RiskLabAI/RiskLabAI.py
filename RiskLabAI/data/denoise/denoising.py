@@ -183,7 +183,8 @@ def denoised_corr(
         The denoised correlation matrix.
     """
     # 1. Get the eigenvalues and eigenvectors for signal
-    eigenvalues_signal = np.diag(eigenvalues)[:num_facts, :num_facts]
+    eigenvalues_1d = np.diag(eigenvalues) 
+    eigenvalues_signal = np.diag(eigenvalues_1d[:num_facts]) 
     eigenvectors_signal = eigenvectors[:, :num_facts]
     
     # 2. Reconstruct the signal-only correlation matrix
@@ -220,7 +221,6 @@ def corr_to_cov(corr: np.ndarray, std: np.ndarray) -> np.ndarray:
     """Convert correlation matrix to covariance matrix."""
     return corr * np.outer(std, std)
 
-
 def denoise_cov(
     cov0: np.ndarray, q: float, bandwidth: float = 0.01
 ) -> np.ndarray:
@@ -241,7 +241,8 @@ def denoise_cov(
     np.ndarray
         The de-noised covariance matrix.
     """
-    corr0 = _cov_to_corr(cov0)
+
+    corr0 = cov_to_corr(cov0)
     
     eigenvalues, eigenvectors = np.linalg.eigh(corr0)
     eigenvalues_diag = np.diag(eigenvalues)
@@ -256,7 +257,7 @@ def denoise_cov(
     corr1 = denoised_corr(eigenvalues_diag, eigenvectors, n_facts0)
     
     # Convert back to covariance
-    cov1 = _corr_to_cov(corr1, np.diag(cov0) ** 0.5)
+    cov1 = corr_to_cov(corr1, np.diag(cov0) ** 0.5)
     return cov1
 
 

@@ -70,7 +70,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
 
         cv_generator = KFold(n_splits=self.n_splits)
         baseline_scores = pd.Series(dtype=float)
-        shuffled_scores = pd.DataFrame(columns=self.clusters.keys())
+        shuffled_scores = pd.DataFrame(columns=self.clusters.keys(), dtype=float)   
 
         for i, (train_idx, test_idx) in enumerate(cv_generator.split(X=x)):
             print(f"Fold {i} start ...")

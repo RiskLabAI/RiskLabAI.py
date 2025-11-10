@@ -30,8 +30,9 @@ class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
         clusters : Dict[str, List[str]]
             Dictionary mapping cluster names to lists of feature names.
         """
-        if not hasattr(classifier, 'estimators_'):
+        if not isinstance(classifier, BaseEnsemble):
             raise TypeError("Classifier must be an ensemble (e.g., RandomForest).")
+
         self.classifier = classifier
         self.clusters = clusters
 

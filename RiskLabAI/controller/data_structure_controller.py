@@ -5,12 +5,11 @@ This class reads data in batches from CSVs or DataFrames and
 uses the BarsInitializerController to construct bars based on
 a specified method.
 """
-
 import csv
+import pandas as pd
+import numpy as np
 from math import floor
 from typing import Iterable, Optional, Generator, Union, Dict, Any, List
-
-import pandas as pd
 
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
 from RiskLabAI.data.structures.abstract_bars import AbstractBars

@@ -99,6 +99,10 @@ def calculate_number_of_bins(
         ) ** (1 / 3.0)
         bins = round(z / 6.0 + 2.0 / (3 * z) + 1.0 / 3)
     else:
+        if np.isclose(correlation, 1.0) or np.isclose(correlation, -1.0):
+            # Handle perfect correlation case by setting to almost 1
+            correlation = np.sign(correlation) * (1.0 - 1e-10)
+
         # Bivariate formula
         bins = round(
             (2**-0.5)

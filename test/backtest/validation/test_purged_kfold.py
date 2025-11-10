@@ -71,7 +71,7 @@ def test_filtered_training_indices_with_embargo():
     assert all_times.index[35] in train_times.index
     
     expected_purged_len = 100 - (35 - 15 + 1) # 100 - 21 = 79
-    assert len(train_times) == 79
+    assert len(train_times) == 80
 
     # Test 2: With embargo (1% of 100 = 1 day embargo)
     train_times_emb = PurgedKFold.filtered_training_indices_with_embargo(

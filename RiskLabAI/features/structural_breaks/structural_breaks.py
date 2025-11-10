@@ -205,5 +205,9 @@ def adf(
         if t_stat > bsadf:
             bsadf = t_stat # Update supremum
 
-    out = {"Time": log_price.index[-1], "gsadf": bsadf}
+    last_time = log_price.index[-1]
+    if hasattr(last_time, 'item'):
+        last_time = last_time.item()  # Call .item() only if it exists
+    out = {"Time": last_time, "gsadf": bsadf}
+
     return out

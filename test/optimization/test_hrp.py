@@ -58,10 +58,7 @@ def test_cluster_variance(mock_cov_matrix):
 
 def test_hrp(mock_cov_matrix):
     """Test the full HRP algorithm."""
-    cov = mock_cov_matrix.values
-    corr = mock_cov_matrix.values # Since stds are 1
-    
-    weights = hrp(cov, corr)
+    weights = hrp(mock_cov_matrix, mock_cov_matrix)
     
     assert isinstance(weights, pd.Series)
     assert weights.shape == (4,)

@@ -159,7 +159,7 @@ def clf_hyper_fit(
         bag_pipe = MyPipeline(best_estimator.steps)
         
         bag_clf = BaggingClassifier(
-            base_estimator=bag_pipe,
+            estimator=bag_pipe,
             n_estimators=int(bagging[0]),
             max_samples=float(bagging[1]) if bagging[1] > 0 else 1.0,
             max_features=float(bagging[2]),

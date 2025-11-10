@@ -349,9 +349,8 @@ class KFold(CrossValidator):
             return multiple_paths_predictions
 
         # Handle single dataset case
-        if not isinstance(estimator, Any) or \
-           not isinstance(data, pd.DataFrame) or \
-           not isinstance(labels, pd.Series):
+        if not (isinstance(data, pd.DataFrame) and 
+                isinstance(labels, pd.Series)):
             raise ValueError(
                 "If data is a DataFrame, estimator must be a single estimator "
                 "and labels must be a single Series."
