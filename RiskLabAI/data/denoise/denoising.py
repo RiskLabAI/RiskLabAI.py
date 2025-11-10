@@ -185,6 +185,7 @@ def denoised_corr(
     # 1. Get the eigenvalues and eigenvectors for signal
     eigenvalues_1d = np.diag(eigenvalues) 
     eigenvalues_signal = np.diag(eigenvalues_1d[:num_facts]) 
+
     eigenvectors_signal = eigenvectors[:, :num_facts]
     
     # 2. Reconstruct the signal-only correlation matrix

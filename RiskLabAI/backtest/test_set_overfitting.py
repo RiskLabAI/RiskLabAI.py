@@ -158,8 +158,8 @@ def mean_std_error(
             std_sharpe_ratio=std_sharpe_ratio,
         )
         # 4. Average simulated max SRs
-        avg_simulated_sr = simulated_sr.groupby("nTrials")["max_SR"].mean()
-        
+        avg_simulated_sr = simulated_sr.groupby("n_trials")["max_SR"].mean()
+
         # 5. Calculate error
         error = avg_simulated_sr / expected_sr - 1.0
         error_list.append(error.rename('error'))
