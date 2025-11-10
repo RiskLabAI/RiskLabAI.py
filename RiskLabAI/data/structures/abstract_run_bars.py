@@ -7,9 +7,10 @@ from typing import Union, List, Any, Iterable, Optional
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
-    AbstractInformationDrivenBars, TickData
+    AbstractInformationDrivenBars
 )
-# Assuming ewma is in utils
+from RiskLabAI.data.structures.abstract_bars import TickData
+
 try:
     from RiskLabAI.utils.ewma import ewma 
 except ImportError:

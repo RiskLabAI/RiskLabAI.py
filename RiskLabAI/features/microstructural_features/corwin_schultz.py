@@ -91,7 +91,7 @@ def alpha_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
         The estimated \(\alpha\) vector, floored at 0.
     """
     denominator = 3 - 2 * (2**0.5)
-    term1 = ((2**0.s5) - 1) * (beta**0.5) / denominator
+    term1 = ((2**0.5) - 1) * (beta**0.5) / denominator
     term2 = (gamma / denominator) ** 0.5
     
     alpha = term1 - term2
