@@ -41,7 +41,7 @@ from . import ensemble
 from . import features
 from . import hpc
 from . import optimization
-from . import pde
+# from . import pde # Temporarily disabled to prevent torch crash
 from . import utils
 
 __version__ = "0.0.93"

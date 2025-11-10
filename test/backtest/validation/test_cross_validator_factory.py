@@ -13,7 +13,7 @@ from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurg
 from RiskLabAI.backtest.validation.cross_validator_factory import CrossValidatorFactory
 from RiskLabAI.backtest.validation.kfold import KFold
 from RiskLabAI.backtest.validation.purged_kfold import PurgedKFold
-from RiskLabAI.backtest.validation.test_walk_forward import WalkForward
+from RiskLabAI.backtest.validation.walk_forward import WalkForward
 
 @pytest.fixture
 def dummy_args():

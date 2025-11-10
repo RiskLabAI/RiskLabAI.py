@@ -7,8 +7,9 @@ from typing import Union, List, Any, Iterable, Optional
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
-    AbstractInformationDrivenBars, TickData
+    AbstractInformationDrivenBars
 )
+from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.utils.constants import *
 
 

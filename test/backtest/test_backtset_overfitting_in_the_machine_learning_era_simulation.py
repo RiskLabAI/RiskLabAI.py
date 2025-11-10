@@ -2,6 +2,7 @@
 Tests for backtest_overfitting_simulation.py
 """
 
+import platform
 import numpy as np
 import pandas as pd
 import pytest

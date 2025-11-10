@@ -207,7 +207,7 @@ def denoised_corr(
     return corr1
 
 
-def _cov_to_corr(cov: np.ndarray) -> np.ndarray:
+def cov_to_corr(cov: np.ndarray) -> np.ndarray:
     """Convert covariance matrix to correlation matrix."""
     std = np.sqrt(np.diag(cov))
     corr = cov / np.outer(std, std)
@@ -216,7 +216,7 @@ def _cov_to_corr(cov: np.ndarray) -> np.ndarray:
     return corr
 
 
-def _corr_to_cov(corr: np.ndarray, std: np.ndarray) -> np.ndarray:
+def corr_to_cov(corr: np.ndarray, std: np.ndarray) -> np.ndarray:
     """Convert correlation matrix to covariance matrix."""
     return corr * np.outer(std, std)
 
