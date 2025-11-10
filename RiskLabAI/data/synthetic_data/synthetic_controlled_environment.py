@@ -388,7 +388,7 @@ def parallel_generate_prices(
             regimes,
             transition_matrix,
             total_time,
-            number_of_steps,
+            n_steps,
             seed,
         )
         for seed in random_states

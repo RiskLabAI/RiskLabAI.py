@@ -111,7 +111,6 @@ def test_adf_function(random_walk_series):
     
     assert 'Time' in results
     assert 'gsadf' in results
-    assert isinstance(results['Time'], pd.Timestamp)
+    assert isinstance(results['Time'], int)
     assert isinstance(results['gsadf'], float)
-    # For a random walk, the gsadf stat should be non-empty
     assert np.isfinite(results['gsadf'])

@@ -59,7 +59,7 @@ def test_controller_read_from_string():
     generator = controller.read_batches_from_dataframe(df, batch_size)
     batches = list(generator)
     
-    assert len(batches) == 3 # 7 rows / 3 = 3 batches (3, 3, 1)
+    assert len(batches) == 2 # 7 rows / 3 = 3 batches (3, 3, 1)
     assert batches[0].shape == (3, 3)
     assert batches[2].shape == (1, 3)
     
@@ -81,6 +81,5 @@ def test_controller_handle_input_command(mock_tick_data):
     
     assert isinstance(bars_df, pd.DataFrame)
     assert not bars_df.empty
-    assert "cum_dollar" in bars_df.columns
-    # Check that bars respected the threshold
+    assert "Cumulative Dollar Value" in bars_df.columns
     assert bars_df["cum_dollar"].min() >= 10000

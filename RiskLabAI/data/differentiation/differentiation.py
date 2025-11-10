@@ -65,14 +65,14 @@ def calculate_weights_ffd(degree: float, threshold: float = 1e-5) -> np.ndarray:
     """
     weights = [1.0]
     k = 1
-    while abs(weights[-1]) >= threshold:
+    while True:
         weight = -weights[-1] / k * (degree - k + 1)
+        if abs(weight) < threshold:
+            break
         weights.append(weight)
         k += 1
-    
-    # Reverse for dot product and drop w_0 (which is 1)
-    return np.array(weights[::-1]).reshape(-1, 1)
 
+    return np.array(weights[::-1]).reshape(-1, 1)
 
 def fractional_difference_std(
     series: pd.DataFrame,

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
+import scipy.spatial.distance as scd  
 import random
 from typing import List, Tuple, Optional
 
@@ -263,9 +264,11 @@ def hrp(cov: pd.DataFrame, corr: pd.DataFrame) -> pd.Series:
 
     # 1. Calculate distance
     distance = distance_corr(corr_df.values)
-    
+
+    dist_condensed = scd.squareform(distance, force='tovector')
+
     # 2. Cluster
-    link = sch.linkage(distance, "single")
+    link = sch.linkage(dist_condensed, "single")
     
     # 3. Quasi-diagonalize
     sorted_items_idx = quasi_diagonal(link)
