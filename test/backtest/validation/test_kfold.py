@@ -7,6 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+from RiskLabAI.backtest.validation.kfold import KFold
+
 # Use a fixed sample dataset for all tests
 @pytest.fixture
 def sample_data():

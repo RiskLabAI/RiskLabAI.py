@@ -7,6 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+from RiskLabAI.backtest.validation.purged_kfold import PurgedKFold
+
 @pytest.fixture
 def sample_data_with_times():
     """Fixture for sample data with a 'times' series."""

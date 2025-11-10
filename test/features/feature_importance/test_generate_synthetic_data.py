@@ -3,6 +3,7 @@ Tests for generate_synthetic_data.py
 """
 
 import pytest
+import pandas as pd
 from RiskLabAI.features.feature_importance.generate_synthetic_data import get_test_dataset
 
 def test_get_test_dataset():
