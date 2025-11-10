@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from .feature_importance_controller import FeatureImportanceController
+from RiskLabAI.features.feature_importance.feature_importance_controller import FeatureImportanceController
 
 @pytest.fixture
 def mock_data():

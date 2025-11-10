@@ -3,7 +3,6 @@
 ```
 📁 RiskLabAI.py/
 ├── 📁 data/
-│   └── 📄 all.py
 ├── 📁 docs/
 │   └── 📄 delete
 ├── 📁 RiskLabAI/
@@ -55,16 +54,12 @@
 │   │   │   ├── 📄 abstract_imbalance_bars.py
 │   │   │   ├── 📄 abstract_information_driven_bars.py
 │   │   │   ├── 📄 abstract_run_bars.py
-│   │   │   ├── 📄 data_structures_lopez.py
-│   │   │   ├── 📄 filtering_lopez.py
 │   │   │   ├── 📄 hedging.py
 │   │   │   ├── 📄 imbalance_bars.py
 │   │   │   ├── 📄 infomation_driven_bars.py
 │   │   │   ├── 📄 run_bars.py
 │   │   │   ├── 📄 standard_bars.py
-│   │   │   ├── 📄 standard_bars_lopez.py
-│   │   │   ├── 📄 time_bars.py
-│   │   │   └── 📄 utilities_lopez.py
+│   │   │   └── 📄 time_bars.py
 │   │   ├── 📁 synthetic_data/
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 drift_burst_hypothesis.py
@@ -96,7 +91,6 @@
 │   │   │   ├── 📄 feature_importance_mdi.py
 │   │   │   ├── 📄 feature_importance_sfi.py
 │   │   │   ├── 📄 feature_importance_strategy.py
-│   │   │   ├── 📄 FeatureImportance.ipynb
 │   │   │   ├── 📄 generate_synthetic_data.py
 │   │   │   ├── 📄 orthogonal_features.py
 │   │   │   └── 📄 weighted_tau.py
@@ -107,8 +101,7 @@
 │   │   ├── 📁 structural_breaks/
 │   │   │   ├── 📄 __init__.py
 │   │   │   └── 📄 structural_breaks.py
-│   │   ├── 📄 __init__.py
-│   │   └── 📄 test.ipynb
+│   │   └── 📄 __init__.py
 │   ├── 📁 hpc/
 │   │   ├── 📄 __init__.py
 │   │   └── 📄 hpc.py
@@ -128,16 +121,92 @@
 │   │   ├── 📄 ewma.py
 │   │   ├── 📄 momentum_mean_reverting_strategy_sides.py
 │   │   ├── 📄 progress.py
+│   │   ├── 📄 publication_plots.py
 │   │   ├── 📄 smoothing_average.py
-│   │   └── 📄 update_figure_layout.py
+│   │   ├── 📄 update_figure_layout.py
+│   │   └── 📄 utilities_lopez.py
 │   └── 📄 __init__.py
 ├── 📁 test/
-│   └── 📄 delete
+│   ├── 📁 backtest/
+│   │   ├── 📁 validation/
+│   │   │   ├── 📄 test_adaptive_combinatorial_purged.py
+│   │   │   ├── 📄 test_bagged_combinatorial_purged.py
+│   │   │   ├── 📄 test_combinatorial_purged.py
+│   │   │   ├── 📄 test_cross_validator_controller.py
+│   │   │   ├── 📄 test_cross_validator_factory.py
+│   │   │   ├── 📄 test_kfold.py
+│   │   │   ├── 📄 test_purged_kfold.py
+│   │   │   └── 📄 test_walk_forward.py
+│   │   ├── 📄 test_backtest_statistics.py
+│   │   ├── 📄 test_backtest_synthetic_data.py
+│   │   ├── 📄 test_backtset_overfitting_in_the_machine_learning_era_simulation.py
+│   │   ├── 📄 test_bet_sizing.py
+│   │   ├── 📄 test_probabilistic_sharpe_ratio.py
+│   │   ├── 📄 test_probability_of_backtest_overfitting.py
+│   │   ├── 📄 test_strategy_risk.py
+│   │   └── 📄 test_test_set_overfitting.py
+│   ├── 📁 cluster/
+│   │   └── 📄 test_clustering.py
+│   ├── 📁 controller/
+│   │   ├── 📄 test_bars_initializer.py
+│   │   └── 📄 test_data_structure_controller.py
+│   ├── 📁 data/
+│   │   ├── 📁 denoise/
+│   │   │   └── 📄 test_denoising.py
+│   │   ├── 📁 differentiation/
+│   │   │   └── 📄 test_differentiation.py
+│   │   ├── 📁 distance/
+│   │   │   └── 📄 test_distance_metric.py
+│   │   ├── 📁 labeling/
+│   │   │   ├── 📄 test_financial_labels.py
+│   │   │   └── 📄 test_labeling.py
+│   │   ├── 📁 structures/
+│   │   │   ├── 📄 test_hedging.py
+│   │   │   ├── 📄 test_imbalance_bars.py
+│   │   │   ├── 📄 test_run_bars.py
+│   │   │   ├── 📄 test_standard_bars.py
+│   │   │   ├── 📄 test_standard_bars_lopez.py
+│   │   │   └── 📄 test_time_bars.py
+│   │   ├── 📁 synthetic_data/
+│   │   │   ├── 📄 test_drift_burst_hypothesis.py
+│   │   │   └── 📄 test_synthetic_controlled_environment.py
+│   │   └── 📁 weights/
+│   │       └── 📄 test_sample_weights.py
+│   ├── 📁 ensemble/
+│   │   └── 📄 test_bagging_classifier_accuracy.py
+│   ├── 📁 features/
+│   │   ├── 📁 entropy_features/
+│   │   │   └── 📄 test_entropy.py
+│   │   ├── 📁 feature_importance/
+│   │   │   ├── 📄 test_feature_importance.py
+│   │   │   ├── 📄 test_generate_synthetic_data.py
+│   │   │   ├── 📄 test_orthogonal_features.py
+│   │   │   └── 📄 test_weighted_tau.py
+│   │   ├── 📁 microstructural_features/
+│   │   │   └── 📄 test_microstructure.py
+│   │   └── 📁 structural_breaks/
+│   │       └── 📄 test_structural_breaks.py
+│   ├── 📁 hpc/
+│   │   └── 📄 test_hpc.py
+│   ├── 📁 optimization/
+│   │   ├── 📄 test_hrp.py
+│   │   ├── 📄 test_hyper_parameter_tuning.py
+│   │   └── 📄 test_nco.py
+│   ├── 📁 pde/
+│   │   └── 📄 test_pde_solver.py
+│   └── 📁 utils/
+│       ├── 📄 test_ewma.py
+│       ├── 📄 test_momentum_mean_reverting_strategy_sides.py
+│       └── 📄 test_progress.py
 ├── 📄 .gitignore
 ├── 📄 .pypirc
+├── 📄 DOCUMENTATION.md
+├── 📄 documenter.py
+├── 📄 INSTALLATION.md
 ├── 📄 LICENSE
 ├── 📄 pyproject.toml
 ├── 📄 README.md
+├── 📄 requirements.txt
 ├── 📄 setup.cfg
 ├── 📄 STRUCTURE.md
 ├── 📄 style_guide.md

@@ -4,7 +4,7 @@ Tests for probability_of_backtest_overfitting.py
 
 import numpy as np
 import pytest
-from .probability_of_backtest_overfitting import (
+from RiskLabAI.backtest.probability_of_backtest_overfitting import (
     sharpe_ratio,
     performance_evaluation,
     probability_of_backtest_overfitting,

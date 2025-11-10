@@ -5,7 +5,7 @@ Tests for data/labeling/labeling.py
 import numpy as np
 import pandas as pd
 import pytest
-from .labeling import (
+from RiskLabAI.data.labeling import (
     symmetric_cusum_filter,
     cusum_filter_events_dynamic_threshold,
     daily_volatility_with_log_returns,

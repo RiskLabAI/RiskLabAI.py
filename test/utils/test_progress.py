@@ -4,7 +4,7 @@ Tests for utils/progress.py
 
 import pytest
 import time
-from .progress import progress_bar
+from RiskLabAI.utils.progress import progress_bar
 
 def test_progress_bar_start(capsys):
     """Test the progress bar at the start (0%)."""

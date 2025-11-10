@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from .hyper_parameter_tuning import MyPipeline, clf_hyper_fit
+from RiskLabAI.optimization.hyper_parameter_tuning import MyPipeline, clf_hyper_fit
 
 @pytest.fixture
 def mock_data():

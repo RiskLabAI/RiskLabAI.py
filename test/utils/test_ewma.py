@@ -5,7 +5,7 @@ Tests for utils/ewma.py
 import pytest
 import numpy as np
 import pandas as pd
-from .ewma import ewma
+from RiskLabAI.utils.ewma import ewma
 
 def test_ewma_vs_pandas():
     """

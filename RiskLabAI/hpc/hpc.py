@@ -11,6 +11,7 @@ import numpy as np
 import datetime as dt
 import time
 from typing import List, Dict, Any, Callable, Tuple, Union
+from typing import Optional
 
 def report_progress(
     job_number: int, total_jobs: int, start_time: float, task: str

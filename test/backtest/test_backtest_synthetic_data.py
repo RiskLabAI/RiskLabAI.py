@@ -4,7 +4,7 @@ Tests for backtest_synthetic_data.py
 
 import numpy as np
 import pytest
-from .backtest_synthetic_data import synthetic_back_testing
+from RiskLabAI.backtest.backtest_synthetic_data import synthetic_back_testing
 
 def test_synthetic_back_testing_structure():
     """

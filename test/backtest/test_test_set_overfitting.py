@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from scipy.stats import norm
-from .test_set_overfitting import (
+from RiskLabAI.backtest.test_set_overfitting import (
     expected_max_sharpe_ratio,
     generate_max_sharpe_ratios,
     mean_std_error,

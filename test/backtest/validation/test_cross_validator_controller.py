@@ -5,9 +5,10 @@ Tests for CrossValidatorController.
 import pandas as pd
 import pytest
 
-from .combinatorial_purged import CombinatorialPurged
-from .cross_validator_controller import CrossValidatorController
-from .kfold import KFold
+
+from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged
+from RiskLabAI.backtest.validation.cross_validator_controller import CrossValidatorController
+from RiskLabAI.backtest.validation.kfold import KFold
 
 @pytest.fixture
 def dummy_args():

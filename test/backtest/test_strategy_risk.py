@@ -4,7 +4,7 @@ Tests for strategy_risk.py
 
 import numpy as np
 import pytest
-from .strategy_risk import (
+from RiskLabAI.backtest.strategy_risk import (
     sharpe_ratio_trials,
     implied_precision,
     bin_frequency,

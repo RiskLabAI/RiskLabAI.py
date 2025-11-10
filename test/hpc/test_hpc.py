@@ -5,7 +5,7 @@ Tests for hpc/hpc.py
 import pytest
 import pandas as pd
 import numpy as np
-from .hpc import (
+from RiskLabAI.hpc.hpc import (
     linear_partitions,
     nested_partitions,
     process_jobs_sequential,

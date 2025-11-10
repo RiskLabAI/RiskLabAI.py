@@ -4,11 +4,11 @@ Tests for modules in features/entropy_features/
 
 import pytest
 import numpy as np
-from .shannon import shannon_entropy
-from .lempel_ziv import lempel_ziv_entropy
-from .pmf import probability_mass_function
-from .plug_in import plug_in_entropy_estimator
-from .kontoyiannis import kontoyiannis_entropy
+from RiskLabAI.features.entropy_features.shannon import shannon_entropy
+from RiskLabAI.features.entropy_features.lempel_ziv import lempel_ziv_entropy
+from RiskLabAI.features.entropy_features.pmf import probability_mass_function
+from RiskLabAI.features.entropy_features.plug_in import plug_in_entropy_estimator
+from RiskLabAI.features.entropy_features.kontoyiannis import kontoyiannis_entropy
 
 # --- Test Data ---
 MSG_LOW = "AAAAAAAAAA"

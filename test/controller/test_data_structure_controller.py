@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 import numpy as np
 import io
-from .data_structure_controller import Controller
+from RiskLabAI.controller.data_structure_controller import Controller
 
 @pytest.fixture
 def mock_tick_data():

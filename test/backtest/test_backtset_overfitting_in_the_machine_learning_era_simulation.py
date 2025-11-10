@@ -5,7 +5,7 @@ Tests for backtest_overfitting_simulation.py
 import numpy as np
 import pandas as pd
 import pytest
-from .backtest_overfitting_in_the_machine_learning_era_simulation import (
+from RiskLabAI.backtest.backtest_overfitting_in_the_machine_learning_era_simulation import (
     sharpe_ratio,
     sortino_ratio,
     expected_shortfall,

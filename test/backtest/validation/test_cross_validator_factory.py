@@ -7,13 +7,13 @@ import pandas as pd
 import pytest
 
 # Import all validator classes
-from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
-from .bagged_combinatorial_purged import BaggedCombinatorialPurged
-from .combinatorial_purged import CombinatorialPurged
-from .cross_validator_factory import CrossValidatorFactory
-from .kfold import KFold
-from .purged_kfold import PurgedKFold
-from .test_walk_forward import WalkForward
+from RiskLabAI.backtest.validation.adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
+from RiskLabAI.backtest.validation.bagged_combinatorial_purged import BaggedCombinatorialPurged
+from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged
+from RiskLabAI.backtest.validation.cross_validator_factory import CrossValidatorFactory
+from RiskLabAI.backtest.validation.kfold import KFold
+from RiskLabAI.backtest.validation.purged_kfold import PurgedKFold
+from RiskLabAI.backtest.validation.test_walk_forward import WalkForward
 
 @pytest.fixture
 def dummy_args():

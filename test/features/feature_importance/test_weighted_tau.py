@@ -4,7 +4,7 @@ Tests for weighted_tau.py
 
 import pytest
 import numpy as np
-from .weighted_tau import calculate_weighted_tau
+from RiskLabAI.features.feature_importance.weighted_tau import calculate_weighted_tau
 
 def test_weighted_tau():
     """Test the weighted tau calculation."""
