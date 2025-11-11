@@ -60,7 +60,7 @@ from .probabilistic_sharpe_ratio import (
     probabilistic_sharpe_ratio,
     benchmark_sharpe_ratio,
 )
-from .backtest_overfitting_in_the_machine_learning_era_simulation import (
+from .backtest_overfitting_simulation import (
     # This file contains many functions, exporting the main ones
     overall_backtest_overfitting_simulation,
     temporal_backtest_overfitting_simulation,

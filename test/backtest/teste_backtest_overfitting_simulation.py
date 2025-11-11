@@ -7,7 +7,7 @@ from pyexpat import features
 import numpy as np
 import pandas as pd
 import pytest
-from RiskLabAI.backtest.backtest_overfitting_in_the_machine_learning_era_simulation import (
+from RiskLabAI.backtest.backtest_overfitting_simulation import (
     sharpe_ratio,
     sortino_ratio,
     expected_shortfall,
