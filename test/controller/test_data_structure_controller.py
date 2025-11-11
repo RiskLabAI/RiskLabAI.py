@@ -30,7 +30,7 @@ def test_controller_read_from_dataframe(mock_tick_data):
     controller = Controller()
     batch_size = 20
     
-    generator = controller.read_batches_from_dataframe(mock_tick_data, batch_size)
+    generator = Controller.read_batches_from_dataframe(mock_tick_data, batch_size)
     
     batches = list(generator)
     
@@ -56,7 +56,8 @@ def test_controller_read_from_string():
     
     # A simpler test: create a dummy DataFrame and use read_batches_from_dataframe
     df = pd.read_csv(io.StringIO(csv_data), parse_dates=[0])
-    generator = controller.read_batches_from_dataframe(df, batch_size)
+    generator = Controller.read_batches_from_dataframe(df, batch_size)
+
     batches = list(generator)
     
     assert len(batches) == 3 # 7 rows / 3 = 3 batches (3, 3, 1)

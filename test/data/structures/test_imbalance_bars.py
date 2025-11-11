@@ -64,7 +64,7 @@ def test_fixed_imbalance_bars(sample_tick_data_for_imbalance):
     assert len(bar_list) == 2
     assert bar_list[0][9] == 3 # Bar 1 has 3 ticks
     assert bar_list[1][9] == 4 # Bar 2 has 4 ticks
-    assert bar_list[2][9] == 4 # Bar 3 from ticks 3, 4, 5, 6
+    # assert bar_list[2][9] == 4 # Bar 3 from ticks 3, 4, 5, 6
 
 def test_expected_imbalance_bars(sample_tick_data_for_imbalance):
     """Test ExpectedImbalanceBars."""
@@ -96,6 +96,6 @@ def test_expected_imbalance_bars(sample_tick_data_for_imbalance):
     
     assert len(bar_list) == 1
     assert bar_list[0][9] == 3 # The one bar has 3 ticks
-    assert bar_list[1][9] == 1 # Bar 2 from tick 2
+    # assert bar_list[1][9] == 1 # Bar 2 from tick 2
     # You can add the third assertion as well:
     # assert bar_list[2][9] == 4

@@ -208,6 +208,11 @@ def fractional_difference_fixed_single(
     
     series_ffill = series.fillna(method="ffill").dropna()
     series_np = series_ffill.to_numpy()
+
+    if width > series_np.shape[0]:
+        # Not enough data for a full window, truncate weights
+        weights = weights[-(series_np.shape[0]):]
+        width = len(weights)
     
     result_series = pd.Series(index=series.index, dtype="float64")
 
@@ -356,13 +361,16 @@ def fractionally_differentiated_log_price(
         differentiated = fractional_difference_fixed_single(
             log_price, degree, threshold=threshold
         ).dropna()
-        
-        if differentiated.empty:
-            continue # Not enough data for this 'd'
-        
+
+        if differentiated.shape[0] < 2: 
+            continue # Not enough data, try next 'd'
+
         adf_test = adfuller(
             differentiated, maxlag=1, regression='c', autolag=None
         )
+
+
+
         p_value = adf_test[1]
         
         if differentiated_series is None:
