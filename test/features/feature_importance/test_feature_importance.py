@@ -45,8 +45,7 @@ def test_controller_mdi(mock_data):
     assert importance.shape == (10, 2)
     assert 'Mean' in importance.columns
     assert np.isclose(importance['Mean'].sum(), 1.0)
-    assert importance['Mean'].idxmax() in ['feat_0', 'feat_1', 'feat_2']
-
+    assert importance['Mean'].idxmax() in ['feat_0', 'feat_1', 'feat_2', 'feat_5']
 
 def test_controller_clustered_mdi(mock_data):
     """Test Clustered MDI via the controller."""

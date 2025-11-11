@@ -64,11 +64,11 @@ def cusum_filter_events_dynamic_threshold(
 
         if shift_negative < -thresh_val:
             shift_negative = 0.0
-            shift_positive = 0.0 # Reset positive shift
+            # shift_positive = 0.0 # Reset positive shift
             time_events.append(index)
         elif shift_positive > thresh_val:
             shift_positive = 0.0
-            shift_negative = 0.0 # Reset negative shift
+            # shift_negative = 0.0 # Reset negative shift
             time_events.append(index)
 
     return pd.DatetimeIndex(time_events)
