@@ -47,16 +47,9 @@ dependencies = [
 # --- OPTIONAL DEPENDENCIES ---
 # These are installed on-demand by users, e.g., pip install RiskLabAI[pde]
 [project.optional-dependencies]
-# For the PDE (Partial Differential Equation) module
 pde = ["torch"]
-
-# For synthetic data generation (qe.MarkovChain)
 synth = ["quantecon"]
-
-# For plotting utilities (publication_plots.py, update_figure_layout.py)
 plot = ["matplotlib", "plotly"]
-
-# For development, testing, and running notebooks
 dev = [
     "yfinance",
     "memory_profiler",
@@ -66,8 +59,6 @@ dev = [
     "torchvision", # Often needed with torch
     "torchaudio",  # Often needed with torch
 ]
-
-# A convenience extra to install everything for users
 all = [
     "RiskLabAI[pde]",
     "RiskLabAI[synth]",
@@ -79,3 +70,8 @@ all = [
 Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
 "Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
 Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/releases"
+
+# --- ENTRY POINT ---
+# This was moved from setup.cfg
+[project.scripts]
+RiskLabAI = "RiskLabAI.app:entry_point"
