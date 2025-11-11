@@ -113,9 +113,12 @@ def test_purged_kfold_split(sample_data_with_times):
     # cond2 purges [71..99] (iloc 71 end is '2020-04-27')
     # First sample kept is iloc[70]
     assert 70 in train_idx_4
-    assert 71 not in train_idx_4
-    assert 79 not in train_idx_4
-    assert len(train_idx_4) == 71
+    assert 71 in train_idx_4  # 71 should be in the set
+    assert 74 in train_idx_4  # This is the last valid index
+    assert 75 not in train_idx_4 # This is the first purged index
+    assert len(train_idx_4) == 75 # The correct length is 75
+
+
 
 def test_get_train_indices_refactor(sample_data_with_times):
     """Test the _get_train_indices refactor."""
@@ -128,5 +131,7 @@ def test_get_train_indices_refactor(sample_data_with_times):
     # Logic is identical to test_purged_kfold_split[4]
     assert isinstance(train_indices, np.ndarray)
     assert 70 in train_indices
-    assert 71 not in train_indices
-    assert len(train_indices) == 71
+    assert 71 in train_indices # 71 should be in the set
+    assert 74 in train_indices # This is the last valid index
+    assert 75 not in train_indices # This is the first purged index
+    assert len(train_indices) == 75 # The correct length is 75

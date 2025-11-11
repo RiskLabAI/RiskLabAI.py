@@ -205,9 +205,10 @@ def denoised_corr(
         corr1 = corr1 + corr2
         
     # 6. Rescale to be a valid correlation matrix
-    np.fill_diagonal(corr1, 1.0)
+    diag_inv_sqrt = 1. / np.sqrt(np.diag(corr1))
+    corr1 = np.diag(diag_inv_sqrt) @ corr1 @ np.diag(diag_inv_sqrt)
+    np.fill_diagonal(corr1, 1.0) # Clean up numerical errors
     return corr1
-
 
 def cov_to_corr(cov: np.ndarray) -> np.ndarray:
     """Convert covariance matrix to correlation matrix."""

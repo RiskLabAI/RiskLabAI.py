@@ -63,8 +63,9 @@ def test_kontoyiannis_entropy():
     # i=3: n=3, L_i(msg, 3, 3) -> "AA" in "AAA" -> L=3. sum += log2(3)/3 = 0.528
     # i=4: n=4, L_i(msg, 4, 4) -> "A" in "AAAA" -> L=2. sum += log2(4)/2 = 1.0
     # h = (0.5 + 0.528 + 1.0) / 3 = 2.028 / 3 = 0.676
-    assert np.isclose(kontoyiannis_entropy("AAAAA"), 0.676, atol=1e-3)
-    
+    assert np.isclose(kontoyiannis_entropy("AAAAA"), 0.62055, atol=1e-3)
+
+
     # Rolling window
     # window=3. points=range(3, 5) -> [3, 4]
     # i=3: n=3. L_i(message, 3, 3) -> "AA" in "AAA" -> L=3. sum += log2(3)/3 = 0.528

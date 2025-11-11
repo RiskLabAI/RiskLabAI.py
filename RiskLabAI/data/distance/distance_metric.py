@@ -51,9 +51,9 @@ def calculate_variation_of_information(
         None, None, contingency=histogram_xy
     )
     
-    marginal_x = ss.entropy(np.histogram(x, bins)[0])
-    marginal_y = ss.entropy(np.histogram(y, bins)[0])
-    
+    marginal_x = ss.entropy(histogram_xy.sum(axis=1))
+    marginal_y = ss.entropy(histogram_xy.sum(axis=0))
+
     variation_xy = marginal_x + marginal_y - 2 * mutual_information
 
     if norm:
@@ -186,9 +186,9 @@ def calculate_mutual_information(
     )
 
     if norm:
-        marginal_x = ss.entropy(np.histogram(x, num_bins)[0])
-        marginal_y = ss.entropy(np.histogram(y, num_bins)[0])
-        
+        marginal_x = ss.entropy(histogram_xy.sum(axis=1))
+        marginal_y = ss.entropy(histogram_xy.sum(axis=0))
+
         min_entropy = min(marginal_x, marginal_y)
         if min_entropy == 0:
             return 0.0 # Avoid division by zero

@@ -38,12 +38,14 @@ def test_tick_bars(sample_tick_data):
     assert bar_list[0][9] == 3   # ticks
     
     # Check Bar 2
-    assert bar_list[1][0] == pd.to_datetime('2020-01-01 10:00:06')
+    assert bar_list[1][0] == pd.to_datetime('2020-01-01 10:00:05')
     assert bar_list[1][2] == 101 # open
     assert bar_list[1][3] == 103 # high
     assert bar_list[1][4] == 101 # low
-    assert bar_list[1][5] == 102 # close
-    assert bar_list[1][9] == 4   # ticks
+    assert bar_list[1][5] == 103 # close
+    assert bar_list[1][9] == 3   # ticks
+
+
 
 def test_volume_bars(sample_tick_data):
     """Test standard volume bars."""

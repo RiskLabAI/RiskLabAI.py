@@ -17,7 +17,7 @@ class FeatureImportanceController:
 
        from sklearn.ensemble import RandomForestClassifier
        
-       my_classifier = RandomForestClassifier(n_estimators=10)
+       my_classifier = RandomForestClassifier(n_estimators=10, seed=42)
        my_clusters = {'cluster_0': ['feat_0', 'feat_1']}
 
        # Initialize the controller

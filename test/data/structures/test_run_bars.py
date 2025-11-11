@@ -62,5 +62,4 @@ def test_fixed_run_bars(sample_tick_data_for_run):
     bar_list = bars.construct_bars_from_data(sample_tick_data_for_run)
     
     assert len(bar_list) == 1
-    assert bar_list[0][9] == 4 # Ticks in bar 1 (0, 1, 2, 3)
-    assert bar_list[1][9] == 3 # Ticks in bar 2 (4, 5, 6)
+    assert bar_list[0][9] == 7 # Bar 1 forms at tick 6 (7 total ticks)

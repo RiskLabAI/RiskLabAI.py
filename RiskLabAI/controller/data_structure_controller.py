@@ -141,32 +141,16 @@ class Controller:
             ):
                 yield batch
 
-    @staticmethod
-    def read_batches_from_dataframe(
-        input_data: pd.DataFrame,
-        batch_size: int
-    ) -> Generator[pd.DataFrame, None, None]:
-        """
-        Reads data in batches from a DataFrame.
 
-        Parameters
-        ----------
-        input_data : pd.DataFrame
-            DataFrame to read from.
-        batch_size : int
-            Size of each batch.
-
-        Yields
-        -------
-        Generator[pd.DataFrame, None, None]
-            A generator yielding batches of data.
-        """
-        n_rows = input_data.shape[0]
-        n_batches = max(1, floor(n_rows / batch_size))
-
-        if n_batches == 1:
-            yield input_data
-        else:
-        	# Use np.array_split for efficient, view-based splitting
-            for batch_indices in np.array_split(range(n_rows), n_batches):
-                yield input_data.iloc[batch_indices]
+@staticmethod
+def read_batches_from_dataframe(
+    input_data: pd.DataFrame,
+    batch_size: int
+) -> Generator[pd.DataFrame, None, None]:
+    """
+    Reads data in batches from a DataFrame.
+    """
+    n_rows = input_data.shape[0]
+    for start_row in range(0, n_rows, batch_size):
+        end_row = min(start_row + batch_size, n_rows)
+        yield input_data.iloc[start_row:end_row]

@@ -172,7 +172,7 @@ def fractional_difference_fixed(
             
         series_np = series_ffill.to_numpy()
 
-        for iloc in range(width, series_np.shape[0]):
+        for iloc in range(width - 1, series_np.shape[0]):
             window_data = series_np[iloc - width + 1 : iloc + 1]
 
             result_df.loc[series_ffill.index[iloc], name] = np.dot(
@@ -211,7 +211,7 @@ def fractional_difference_fixed_single(
     
     result_series = pd.Series(index=series.index, dtype="float64")
 
-    for iloc in range(width, series_np.shape[0]):
+    for iloc in range(width - 1, series_np.shape[0]):
         window_data = series_np[iloc - width + 1 : iloc + 1]
 
         result_series.loc[series_ffill.index[iloc]] = np.dot(
