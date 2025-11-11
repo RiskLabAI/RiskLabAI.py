@@ -36,7 +36,7 @@ dtype='datetime64[ns]', freq=None)
 
     # 2. Bets at points where position flips sign
     # Find timestamps where t=0 and t-1 != 0
-    lagged_non_zero = target_positions.shift(1)
+    lagged_non_zero = target_positions.shift(1).fillna(0)
     lagged_non_zero = lagged_non_zero[lagged_non_zero != 0].index
     bets = zero_positions.intersection(lagged_non_zero)
 

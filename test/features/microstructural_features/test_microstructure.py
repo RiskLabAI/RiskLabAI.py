@@ -51,7 +51,7 @@ def test_corwin_schultz(sample_hl_prices):
     # L_min(roll=2)
     # t1: min(9.9, 10.1) = 9.9
     # gamma[t1] = log(10.3/9.9)^2 = 0.00158
-    assert np.isclose(gamma.iloc[1], 0.00158, atol=1e-5)
+    assert np.isclose(gamma.iloc[1], 0.00156888, atol=1e-5)
 
     # 3. Alpha
     alpha = alpha_estimates(beta, gamma)

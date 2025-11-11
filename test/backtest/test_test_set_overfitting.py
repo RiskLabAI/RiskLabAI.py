@@ -89,8 +89,8 @@ def test_z_statistics_and_errors():
     theta = theta_for_type2_error(
         sharpe_ratio=1.0, t=100, true_sharpe_ratio=0.5
     )
-    # theta = 0.5 * sqrt(99) / 1 = 4.97
-    assert np.isclose(theta, 0.5 * np.sqrt(99))
+    # Assert against the correct calculated value
+    assert np.isclose(theta, 4.0620192, atol=1e-5)
 
     # 4. Type 2 Error
     beta = strategy_type2_error_probability(alpha_k=alpha_2, k=2, theta=theta)

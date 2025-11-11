@@ -579,9 +579,17 @@ def sharpe_ratio(returns, risk_free_rate=0):
 
 def sortino_ratio(returns, risk_free_rate=0):
     """Calculate the Sortino ratio of the given returns."""
-    downside_returns = returns[returns < 0]
+    downside_returns = returns[returns < risk_free_rate]
     expected_return = returns.mean() - risk_free_rate
-    downside_risk = np.sqrt((downside_returns ** 2).mean())
+
+    if downside_returns.empty:
+        return np.inf if expected_return > 0 else 0.0
+
+    downside_risk = downside_returns.std()
+
+    if downside_risk == 0:
+        return np.inf if expected_return > 0 else 0.0
+
     return expected_return / downside_risk
 
 def expected_shortfall(returns, step_risk_free_rate, confidence_level=0.05):

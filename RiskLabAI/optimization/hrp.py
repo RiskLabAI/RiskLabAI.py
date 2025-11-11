@@ -74,29 +74,26 @@ def quasi_diagonal(linkage_matrix: np.ndarray) -> List[int]:
         Sorted list of original item indices.
     """
     link = linkage_matrix.astype(int)
-    sorted_items = pd.Series([link[-1, 0], link[-1, 1]])
     num_items = link[-1, 3]  # Total number of original items
 
-    while sorted_items.max() >= num_items:
-        # Find all non-original items (cluster IDs)
-        cluster_ids = sorted_items[sorted_items >= num_items]
-        
-        # Get their indices
-        i = cluster_ids.index
-        j = cluster_ids.values - num_items
-        
-        # Replace cluster ID with its left child
-        sorted_items[i] = link[j, 0]
-        
-        # Append its right child
-        right_child = pd.Series(link[j, 1], index=i + 1)
-        sorted_items = sorted_items._append(right_child)
-        
-        # Sort and re-index
-        sorted_items = sorted_items.sort_index()
-        sorted_items.index = range(sorted_items.shape[0])
+    # Get the top-level clusters
+    items_to_process = [link[-1, 0], link[-1, 1]]
+    sorted_items = []
 
-    return sorted_items.tolist()
+    while len(items_to_process) > 0:
+        item = items_to_process.pop(0) # Process items recursively (depth-first)
+
+        if item >= num_items:
+            # This is a cluster, add its children to the processing list
+            cluster_id = item - num_items
+            # Add children in their linkage order
+            items_to_process.insert(0, link[cluster_id, 1]) # Right child
+            items_to_process.insert(0, link[cluster_id, 0]) # Left child
+        else:
+            # This is an original item
+            sorted_items.append(item)
+
+    return sorted_items
 
 
 def recursive_bisection(
@@ -143,8 +140,8 @@ def recursive_bisection(
             alpha = 1 - variance_0 / (variance_0 + variance_1)
             
             # 3. Apply weights
-            weights[cluster_0] *= alpha
-            weights[cluster_1] *= 1 - alpha
+            weights[cluster_0] *= (1 - alpha)
+            weights[cluster_1] *= alpha
 
     return weights
 

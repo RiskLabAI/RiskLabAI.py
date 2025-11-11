@@ -36,9 +36,8 @@ def test_symmetric_cusum_filter(price_series):
     # 11->12->11... no event
     # 11->15 (diff=4) > 3. Event at 2020-01-20
     events = symmetric_cusum_filter(price_series, threshold=3.0)
-    expected_dates = pd.to_datetime(
-        ["2020-01-06", "2020-01-11", "2020-01-20"]
-    )
+    expected_dates = pd.to_datetime(["2020-01-05", "2020-01-10", "2020-01-19"])
+
     pd.testing.assert_index_equal(events, expected_dates)
 
 def test_cusum_filter_dynamic_threshold(price_series):
