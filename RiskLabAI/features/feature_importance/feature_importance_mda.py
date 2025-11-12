@@ -102,9 +102,8 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
                     sample_weight=w_test
                 )
 
-        # Calculate importance
-        importances = (-1 * shuffled_scores).add(baseline_scores, axis=0)
-        importances /= -1 * shuffled_scores # Normalize by shuffled score
+        # Calculate importance as the simple drop in score
+        importances = shuffled_scores.rsub(baseline_scores, axis=0)
         
         # Calculate mean and std dev
         importances_summary = pd.concat(

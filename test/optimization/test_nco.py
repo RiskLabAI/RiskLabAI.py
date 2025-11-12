@@ -45,7 +45,7 @@ def test_get_optimal_portfolio_weights_mvo(mock_cov_matrix):
     assert weights[1] > weights[0]
     assert weights[1] > weights[2]
 
-@pytest.mark.filterwarnings("ignore:Warning: RiskLabAI.cluster.clustering")
+@pytest.mark.filterwarnings("ignore:KMeans is known to have a memory leak on Windows with MKL:UserWarning")
 def test_get_optimal_portfolio_weights_nco(mock_cov_matrix):
     """Test the NCO algorithm."""
     # This will use the dummy clusterer, but it should still run.
