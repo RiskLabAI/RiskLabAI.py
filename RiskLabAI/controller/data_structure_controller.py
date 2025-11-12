@@ -142,15 +142,15 @@ class Controller:
                 yield batch
 
 
-@staticmethod
-def read_batches_from_dataframe(
-    input_data: pd.DataFrame,
-    batch_size: int
-) -> Generator[pd.DataFrame, None, None]:
-    """
-    Reads data in batches from a DataFrame.
-    """
-    n_rows = input_data.shape[0]
-    for start_row in range(0, n_rows, batch_size):
-        end_row = min(start_row + batch_size, n_rows)
-        yield input_data.iloc[start_row:end_row]
+    @staticmethod
+    def read_batches_from_dataframe(
+        input_data: pd.DataFrame,
+        batch_size: int
+    ) -> Generator[pd.DataFrame, None, None]:
+        """
+        Reads data in batches from a DataFrame.
+        """
+        n_rows = input_data.shape[0]
+        for start_row in range(0, n_rows, batch_size):
+            end_row = min(start_row + batch_size, n_rows)
+            yield input_data.iloc[start_row:end_row]
