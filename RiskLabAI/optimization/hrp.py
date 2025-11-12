@@ -140,8 +140,8 @@ def recursive_bisection(
             alpha = 1 - variance_0 / (variance_0 + variance_1)
             
             # 3. Apply weights
-            weights[cluster_0] *= (1 - alpha)
-            weights[cluster_1] *= alpha
+            weights[cluster_0] *= alpha
+            weights[cluster_1] *= (1 - alpha)
 
     return weights
 

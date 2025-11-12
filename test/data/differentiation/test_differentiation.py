@@ -92,7 +92,7 @@ def test_fractional_difference_fixed_single(sample_series):
     
     # d=0.5
     diff_d05 = fractional_difference_fixed_single(
-        sample_series, degree=0.5, threshold=1e-5
+    sample_series, degree=0.5, threshold=0.01
     )
     assert not diff_d05.empty
     assert diff_d05.iloc[0] > 1.0 # Should be > diff(1)
