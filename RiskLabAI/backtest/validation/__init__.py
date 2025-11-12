@@ -14,10 +14,10 @@ a CrossValidatorFactory for easy instantiation.
 from .cross_validator_interface import CrossValidator
 from .kfold import KFold
 from .purged_kfold import PurgedKFold
-from .walk_forward import WalkForwardCrossValidator
-from .combinatorial_purged import CombinatorialPurgedKFold
-from .bagged_combinatorial_purged import BaggedCombinatorialPurgedKFold
-from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurgedKFold
+from .walk_forward import WalkForward
+from .combinatorial_purged import CombinatorialPurged
+from .bagged_combinatorial_purged import BaggedCombinatorialPurged
+from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_controller import CrossValidatorController
 
