@@ -1,30 +1,39 @@
 """
-RiskLabAI Backtest Validation Module
+RiskLabAI Cross-Validation Module
 
-This module provides a suite of advanced cross-validation tools
-for financial machine learning, specializing in methods that
-prevent information leakage, such as Purged K-Fold and
-Combinatorial Purged Cross-Validation (CPCV).
+Implements advanced financial cross-validation techniques from
+"Advances in Financial Machine Learning" by de Prado, including:
+- Purged K-Fold (for removing group leakage)
+- Walk-Forward
+- Combinatorial Purged K-Fold (CPSC-V)
+
+This module is built on an AbstractCrossValidator interface and
+a CrossValidatorFactory for easy instantiation.
 """
 
-from .cross_validator_interface import CrossValidator
+from .cross_validator_interface import AbstractCrossValidator
 from .kfold import KFold
-from .walk_forward import WalkForward
 from .purged_kfold import PurgedKFold
-from .combinatorial_purged import CombinatorialPurged
-from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
-from .bagged_combinatorial_purged import BaggedCombinatorialPurged
+from .walk_forward import WalkForwardCrossValidator
+from .combinatorial_purged import CombinatorialPurgedKFold
+from .bagged_combinatorial_purged import BaggedCombinatorialPurgedKFold
+from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurgedKFold
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_controller import CrossValidatorController
 
 __all__ = [
-    "CrossValidator",
+    # Interface
+    "AbstractCrossValidator",
+    
+    # Validators
     "KFold",
-    "WalkForward",
     "PurgedKFold",
-    "CombinatorialPurged",
-    "AdaptiveCombinatorialPurged",
-    "BaggedCombinatorialPurged",
+    "WalkForwardCrossValidator",
+    "CombinatorialPurgedKFold",
+    "BaggedCombinatorialPurgedKFold",
+    "AdaptiveCombinatorialPurgedKFold",
+    
+    # Utilities
     "CrossValidatorFactory",
-    "CrossValidatorController"
+    "CrossValidatorController",
 ]

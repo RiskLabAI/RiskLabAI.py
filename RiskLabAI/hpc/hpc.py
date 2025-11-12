@@ -10,8 +10,69 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import time
-from typing import List, Dict, Any, Callable, Tuple, Union
+from typing import List, Dict, Any, Callable, Tuple, Union, Iterable
 from typing import Optional
+
+def parallel_run(
+    func: Callable[..., Any],
+    iterable: Iterable[Any],
+    num_cpus: int = -1,
+    lin_partition: bool = False,  # <-- RECOMMENDED: Change default to False
+    **kwargs
+) -> List[Any]:
+    """
+    Executes a function in parallel over an iterable.
+
+    Parameters
+    ----------
+    func : Callable
+        The function to be parallelized.
+    iterable : Iterable
+        The iterable to loop over.
+    num_cpus : int, default=-1
+        The number of CPUs to use. -1 means all available CPUs.
+    lin_partition : bool, default=False
+        How to partition the work:
+        - If False (default): Item-by-item. `func` receives one item
+          from `iterable` at a time.
+        - If True: Chunked. `iterable` is split into `num_cpus` chunks
+          (by index). `func` must be designed to receive a list of
+          indices (e.g., [0, 1, 2]) and process them.
+    **kwargs :
+        Additional keyword arguments to be passed to `func`.
+
+    Returns
+    -------
+    List[Any]
+        A list of the results from all parallel executions.
+    """
+    if num_cpus == -1:
+        num_cpus = multiprocessing.cpu_count()
+
+    if lin_partition:
+        # --- Chunked Partitioning ---
+        # func must accept a list of indices
+        num_atoms = num_cpus
+        iterable_partition = np.array_split(range(len(iterable)), num_atoms)
+        jobs = (iterable_partition[i] for i in range(num_atoms))
+
+        results = joblib.Parallel(n_jobs=num_cpus)(
+            joblib.delayed(func)(job, **kwargs) for job in jobs
+        )
+        
+        # Flatten the list of lists
+        return [item for sublist in results for item in sublist]
+
+    else:
+        # --- Item-by-Item Partitioning (Standard) ---
+        # func accepts a single item
+        jobs = (iterable[i] for i in range(len(iterable)))
+
+        results = joblib.Parallel(n_jobs=num_cpus)(
+            joblib.delayed(func)(job, **kwargs) for job in jobs
+        )
+        return results
+
 
 def report_progress(
     job_number: int, total_jobs: int, start_time: float, task: str

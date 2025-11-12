@@ -1,41 +1,49 @@
 """
-RiskLabAI Optimization Module
+RiskLabAI Portfolio Optimization Module
 
-Implements advanced portfolio optimization techniques, including
-Nested Clustered Optimization (NCO) and Hierarchical Risk Parity (HRP).
+Implements advanced portfolio optimization techniques, including:
+- Hierarchical Risk Parity (HRP)
+- Nested Clustered Optimisation (NCO)
+- PCA-Based Hedging
+- Custom Hyper-Parameter Tuning
 """
 
 from .hrp import (
-    inverse_variance_weights,
-    cluster_variance,
-    quasi_diagonal,
-    recursive_bisection,
-    distance_corr,
-    hrp,
+    get_cluster_var,
+    get_quasi_diag,
+    get_rec_bipart,
+    hrp_alloc,
 )
+
 from .nco import (
-    get_optimal_portfolio_weights,
-    get_optimal_portfolio_weights_nco,
+    cluster_kmeans_base,
+    optimal_portfolio,
+    nco_alloc,
 )
+
+from .hedging import (
+    pca_hedge_weights,
+)
+
 from .hyper_parameter_tuning import (
-    MyPipeline,
-    clf_hyper_fit,
+    HyperParameterTuning,
 )
 
 __all__ = [
-    # HRP
-    "inverse_variance_weights",
-    "cluster_variance",
-    "quasi_diagonal",
-    "recursive_bisection",
-    "distance_corr",
-    "hrp",
+    # hrp.py
+    "get_cluster_var",
+    "get_quasi_diag",
+    "get_rec_bipart",
+    "hrp_alloc",
     
-    # NCO
-    "get_optimal_portfolio_weights",
-    "get_optimal_portfolio_weights_nco",
+    # nco.py
+    "cluster_kmeans_base",
+    "optimal_portfolio",
+    "nco_alloc",
     
-    # Tuning
-    "MyPipeline",
-    "clf_hyper_fit",
+    # hedging.py
+    "pca_hedge_weights",
+    
+    # hyper_parameter_tuning.py
+    "HyperParameterTuning",
 ]

@@ -12,6 +12,7 @@ from .hpc import (
     linear_partitions,
     nested_partitions,
     mp_pandas_obj,
+    parallel_run
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "linear_partitions",
     "nested_partitions",
     "mp_pandas_obj",
+    "parallel_run"
 ]

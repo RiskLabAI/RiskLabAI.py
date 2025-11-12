@@ -14,22 +14,22 @@ from .denoising import (
     marcenko_pastur_pdf,
     fit_kde,
     find_max_eval,
+    pca,
     denoised_corr,
+    denoised_corr2,
     cov_to_corr,
     corr_to_cov,
     denoise_cov,
-    optimal_portfolio,
-    optimal_portfolio_denoised,
 )
 
 __all__ = [
     "marcenko_pastur_pdf",
     "fit_kde",
     "find_max_eval",
-    "denoised_corr",
+    "pca",
+    "denoised_corr",      # Constant Residual Eigenvalue method
+    "denoised_corr2",     # Targeted Shrinkage method
     "cov_to_corr",
     "corr_to_cov",
     "denoise_cov",
-    "optimal_portfolio",
-    "optimal_portfolio_denoised",
 ]
