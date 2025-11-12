@@ -3,7 +3,7 @@
 Open your terminal or Anaconda Prompt. This command will create a new, empty environment named `risklab` using a stable Python version (e.g., 3.10).
 
 ```bash
-conda create -n risklab python=3.9 -y
+conda create -n risklab python=3.10 -y
 ```
 
 ### 2\. Activate the Environment
