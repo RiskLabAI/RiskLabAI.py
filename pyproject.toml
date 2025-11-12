@@ -49,7 +49,7 @@ dependencies = [
 [project.optional-dependencies]
 pde = ["torch"]
 synth = ["quantecon"]
-plot = ["matplotlib", "plotly"]
+plot = ["matplotlib", "seaborn" , "plotly"]
 dev = [
     "yfinance",
     "memory_profiler",

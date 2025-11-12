@@ -10,7 +10,7 @@ from RiskLabAI.features.structural_breaks.structural_breaks import (
     lag_dataframe,
     prepare_data,
     compute_beta,
-    adf
+    get_bsadf_statistic
 )
 
 @pytest.fixture

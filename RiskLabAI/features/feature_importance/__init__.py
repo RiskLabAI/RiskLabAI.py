@@ -15,8 +15,6 @@ from RiskLabAI.data.synthetic_data.simulation import (
     simulates_cov_mu,
 )
 
-from RiskLabAI.features.feature_importance
-
 # Core Strategy Pattern
 from .feature_importance_strategy import FeatureImportanceStrategy
 from .feature_importance_factory import FeatureImportanceFactory
