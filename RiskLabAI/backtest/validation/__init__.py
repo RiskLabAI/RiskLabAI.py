@@ -11,7 +11,7 @@ This module is built on an AbstractCrossValidator interface and
 a CrossValidatorFactory for easy instantiation.
 """
 
-from .cross_validator_interface import AbstractCrossValidator
+from .cross_validator_interface import CrossValidator
 from .kfold import KFold
 from .purged_kfold import PurgedKFold
 from .walk_forward import WalkForwardCrossValidator
@@ -23,7 +23,7 @@ from .cross_validator_controller import CrossValidatorController
 
 __all__ = [
     # Interface
-    "AbstractCrossValidator",
+    "CrossValidator",
     
     # Validators
     "KFold",
