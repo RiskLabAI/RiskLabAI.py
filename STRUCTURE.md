@@ -2,9 +2,7 @@
 
 ```
 📁 RiskLabAI.py/
-├── 📁 data/
 ├── 📁 docs/
-│   └── 📄 delete
 ├── 📁 RiskLabAI/
 │   ├── 📁 backtest/
 │   │   ├── 📁 validation/
@@ -19,9 +17,9 @@
 │   │   │   ├── 📄 purged_kfold.py
 │   │   │   └── 📄 walk_forward.py
 │   │   ├── 📄 __init__.py
+│   │   ├── 📄 backtest_overfitting_simulation.py
 │   │   ├── 📄 backtest_statistics.py
 │   │   ├── 📄 backtest_synthetic_data.py
-│   │   ├── 📄 backtset_overfitting_in_the_machine_learning_era_simulation.py
 │   │   ├── 📄 bet_sizing.py
 │   │   ├── 📄 probabilistic_sharpe_ratio.py
 │   │   ├── 📄 probability_of_backtest_overfitting.py
@@ -54,15 +52,14 @@
 │   │   │   ├── 📄 abstract_imbalance_bars.py
 │   │   │   ├── 📄 abstract_information_driven_bars.py
 │   │   │   ├── 📄 abstract_run_bars.py
-│   │   │   ├── 📄 hedging.py
 │   │   │   ├── 📄 imbalance_bars.py
-│   │   │   ├── 📄 infomation_driven_bars.py
 │   │   │   ├── 📄 run_bars.py
 │   │   │   ├── 📄 standard_bars.py
 │   │   │   └── 📄 time_bars.py
 │   │   ├── 📁 synthetic_data/
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 drift_burst_hypothesis.py
+│   │   │   ├── 📄 simulation.py
 │   │   │   └── 📄 synthetic_controlled_environment.py
 │   │   ├── 📁 weights/
 │   │   │   ├── 📄 __init__.py
@@ -107,6 +104,7 @@
 │   │   └── 📄 hpc.py
 │   ├── 📁 optimization/
 │   │   ├── 📄 __init__.py
+│   │   ├── 📄 hedging.py
 │   │   ├── 📄 hrp.py
 │   │   ├── 📄 hyper_parameter_tuning.py
 │   │   └── 📄 nco.py
@@ -139,12 +137,12 @@
 │   │   │   └── 📄 test_walk_forward.py
 │   │   ├── 📄 test_backtest_statistics.py
 │   │   ├── 📄 test_backtest_synthetic_data.py
-│   │   ├── 📄 test_backtset_overfitting_in_the_machine_learning_era_simulation.py
 │   │   ├── 📄 test_bet_sizing.py
 │   │   ├── 📄 test_probabilistic_sharpe_ratio.py
 │   │   ├── 📄 test_probability_of_backtest_overfitting.py
 │   │   ├── 📄 test_strategy_risk.py
-│   │   └── 📄 test_test_set_overfitting.py
+│   │   ├── 📄 test_test_set_overfitting.py
+│   │   └── 📄 teste_backtest_overfitting_simulation.py
 │   ├── 📁 cluster/
 │   │   └── 📄 test_clustering.py
 │   ├── 📁 controller/
@@ -161,11 +159,9 @@
 │   │   │   ├── 📄 test_financial_labels.py
 │   │   │   └── 📄 test_labeling.py
 │   │   ├── 📁 structures/
-│   │   │   ├── 📄 test_hedging.py
 │   │   │   ├── 📄 test_imbalance_bars.py
 │   │   │   ├── 📄 test_run_bars.py
 │   │   │   ├── 📄 test_standard_bars.py
-│   │   │   ├── 📄 test_standard_bars_lopez.py
 │   │   │   └── 📄 test_time_bars.py
 │   │   ├── 📁 synthetic_data/
 │   │   │   ├── 📄 test_drift_burst_hypothesis.py
@@ -189,6 +185,7 @@
 │   ├── 📁 hpc/
 │   │   └── 📄 test_hpc.py
 │   ├── 📁 optimization/
+│   │   ├── 📄 test_hedging.py
 │   │   ├── 📄 test_hrp.py
 │   │   ├── 📄 test_hyper_parameter_tuning.py
 │   │   └── 📄 test_nco.py
@@ -206,8 +203,6 @@
 ├── 📄 LICENSE
 ├── 📄 pyproject.toml
 ├── 📄 README.md
-├── 📄 requirements.txt
-├── 📄 setup.cfg
 ├── 📄 STRUCTURE.md
 ├── 📄 style_guide.md
 └── 📄 tree.py
