@@ -8,32 +8,7 @@ import numpy as np
 from numba import jit
 from joblib import Parallel, delayed
 
-@jit(nopython=True)
-def sharpe_ratio(
-    returns: np.ndarray, risk_free_rate: float = 0.0
-) -> float:
-    """
-    Calculate the Sharpe Ratio (Numba-optimized).
-
-    Parameters
-    ----------
-    returns : np.ndarray
-        An array of returns.
-    risk_free_rate : float, default=0.0
-        The risk-free rate.
-
-    Returns
-    -------
-    float
-        The calculated Sharpe Ratio.
-    """
-    excess_returns = returns - risk_free_rate
-    std_dev = np.std(excess_returns)
-    
-    if std_dev == 0.0:
-        return 0.0
-        
-    return np.mean(excess_returns) / std_dev
+from .backtest_statistics import sharpe_ratio
 
 def performance_evaluation(
     train_partition: np.ndarray,
