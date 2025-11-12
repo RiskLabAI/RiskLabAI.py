@@ -10,12 +10,14 @@ from .structural_breaks import (
     lag_dataframe,
     prepare_data,
     compute_beta,
-    adf,
+    get_expanding_window_adf,
+    get_bsadf_statistic,
 )
 
 __all__ = [
     "lag_dataframe",
     "prepare_data",
     "compute_beta",
-    "adf",
+    "get_expanding_window_adf",
+    "get_bsadf_statistic",
 ]
