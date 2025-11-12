@@ -67,11 +67,15 @@ def get_test_dataset(
         range(n_informative), size=n_redundant, replace=True
     )
     
-    for k, j in enumerate(redundant_indices):
-        informative_col = f"I_{j}"
+    for i, orig_idx in enumerate(redundant_indices):
+        orig_feature_name = f"I_{orig_idx}"
+        new_feature_name = f"R_{i}"
+        
+        # Add noise to the original informative feature
         noise = rng.normal(
-            loc=0.0, scale=sigma_std, size=x_df.shape[0]
-        )
-        x_df[f"R_{k}"] = x_df[informative_col] + noise
+            loc=0.0, scale=sigma_std, size=n_samples
+        ) * x_df[orig_feature_name].std()
+        
+        x_df[new_feature_name] = x_df[orig_feature_name] + noise
 
-    return x_df, y_series
+    return x_df[sorted(x_df.columns)], y_series
