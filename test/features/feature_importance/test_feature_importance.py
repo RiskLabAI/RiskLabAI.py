@@ -71,8 +71,9 @@ def test_controller_mda(mock_data):
     X, y, classifier, _ = mock_data
     
     controller = FeatureImportanceController(
-        "MDA", classifier=classifier, n_splits=3
+        "MDA", classifier=classifier, n_splits=3, random_state=42
     )
+
     importance = controller.calculate_importance(X, y)
 
     assert isinstance(importance, pd.DataFrame)
@@ -87,7 +88,7 @@ def test_controller_clustered_mda(mock_data):
     X, y, classifier, clusters = mock_data
     
     controller = FeatureImportanceController(
-        "ClusteredMDA", classifier=classifier, clusters=clusters, n_splits=3
+        "ClusteredMDA", classifier=classifier, clusters=clusters, n_splits=3, random_state=42
     )
     importance = controller.calculate_importance(X, y)
     
@@ -102,15 +103,17 @@ def test_controller_sfi(mock_data):
     """Test SFI via the controller."""
     X, y, classifier, _ = mock_data
     
+
     controller = FeatureImportanceController(
         "SFI", classifier=classifier, n_splits=3, scoring="accuracy"
     )
     importance = controller.calculate_importance(X, y)
-    
+
     assert isinstance(importance, pd.DataFrame)
-    assert importance.shape == (10, 2)
+    assert importance.shape == (10, 2) # <-- This is correct for SFI
 
     top_5 = set(importance['Mean'].nlargest(5).index)
+
     assert 'feat_0' in top_5
     assert 'feat_1' in top_5
     assert 'feat_2' in top_5
