@@ -11,14 +11,16 @@ from RiskLabAI.features.feature_importance.feature_importance_controller import 
 @pytest.fixture
 def mock_data():
     """Generate mock data for testing."""
+    rng = np.random.default_rng(42)
+
     N = 100
     P = 10
-    X = pd.DataFrame(np.random.normal(0, 1, size=(N, P)),
+    X = pd.DataFrame(rng.normal(0, 1, size=(N, P)), 
                      columns=[f'feat_{i}' for i in range(P)])
-    
+
     # Make features 0, 1, 2 correlated
-    X['feat_1'] = X['feat_0'] + np.random.normal(0, 0.1, N)
-    X['feat_2'] = X['feat_0'] + np.random.normal(0, 0.1, N)
+    X['feat_1'] = X['feat_0'] + rng.normal(0, 0.1, N)  
+    X['feat_2'] = X['feat_0'] + rng.normal(0, 0.1, N)  
     
     # Target depends on feat_0 (and its cluster) and feat_5
     y = pd.Series(np.where(X['feat_0'] + X['feat_5'] > 0, 1, 0))

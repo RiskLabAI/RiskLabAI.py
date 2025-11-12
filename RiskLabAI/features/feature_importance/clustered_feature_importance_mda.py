@@ -109,8 +109,8 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
                     y_test, prob, labels=self.classifier.classes_
                 )
 
-        importances = (-1 * shuffled_scores).add(baseline_scores, axis=0)
-        importances /= -1 * shuffled_scores
+        # Calculate importance as the simple drop in score
+        importances = shuffled_scores.rsub(baseline_scores, axis=0)
 
         # Central Limit Theorem for standard deviation
         importances_summary = pd.concat(
