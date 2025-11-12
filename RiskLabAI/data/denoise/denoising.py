@@ -210,6 +210,26 @@ def denoised_corr(
     np.fill_diagonal(corr1, 1.0) # Clean up numerical errors
     return corr1
 
+# --- Utility Functions ---
+
+def pca(
+    matrix: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Computes the principal component analysis of a Hermitian matrix.
+    Ensures eigenvalues are sorted descending.
+
+    :param matrix: Hermitian matrix (e.g., correlation matrix)
+    :type matrix: np.ndarray
+    :return: (eigenvalues_vector, eigenvectors_matrix)
+    :rtype: Tuple[np.ndarray, np.ndarray]
+    """
+    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
+    indices = eigenvalues.argsort()[::-1] # Sort descending
+    eigenvalues = eigenvalues[indices]
+    eigenvectors = eigenvectors[:, indices]
+    return eigenvalues, eigenvectors
+
 def cov_to_corr(cov: np.ndarray) -> np.ndarray:
     """Convert covariance matrix to correlation matrix."""
     std = np.sqrt(np.diag(cov))

@@ -16,10 +16,10 @@ from .denoising import (
     find_max_eval,
     pca,
     denoised_corr,
-    denoised_corr2,
     cov_to_corr,
     corr_to_cov,
     denoise_cov,
+    optimal_portfolio, 
 )
 
 __all__ = [
@@ -27,9 +27,10 @@ __all__ = [
     "fit_kde",
     "find_max_eval",
     "pca",
-    "denoised_corr",      # Constant Residual Eigenvalue method
-    "denoised_corr2",     # Targeted Shrinkage method
+    "denoised_corr",   
+    "denoised_corr2", 
     "cov_to_corr",
     "corr_to_cov",
     "denoise_cov",
+    "optimal_portfolio",  
 ]
