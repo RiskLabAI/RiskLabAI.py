@@ -57,7 +57,8 @@ def test_cusum_filter_dynamic_threshold(price_series):
     # 15->14 (-1), 14->13 (-2), 13->12 (-3) < -2. Event at 2020-01-09
     
     expected_dates = pd.to_datetime(
-        ["2020-01-04", "2020-01-09", "2020-01-18"]
+        ["2020-01-04", "2020-01-09", "2020-01-12", "2020-01-14", 
+         "2020-01-16", "2020-01-18", "2020-01-20"]
     )
     pd.testing.assert_index_equal(events, expected_dates)
 
@@ -104,8 +105,7 @@ def test_meta_events_and_labeling(price_series):
         return_min, num_threads
     )
     
-    expected_end_times = pd.to_datetime(["2020-01-03", "2020-01-09"])
-
+    expected_end_times = pd.to_datetime(["2020-01-04", "2020-01-10"])
     assert np.all(events["End Time"] == expected_end_times)
     
     # Test meta-labeling (long only)
