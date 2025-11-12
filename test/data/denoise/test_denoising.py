@@ -9,8 +9,7 @@ from RiskLabAI.data.denoise import (
     marcenko_pastur_pdf,
     cov_to_corr,
     corr_to_cov,
-    denoise_cov,
-    optimal_portfolio
+    denoise_cov
 )
 
 @pytest.fixture
