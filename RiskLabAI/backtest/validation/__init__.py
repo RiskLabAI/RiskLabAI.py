@@ -28,10 +28,10 @@ __all__ = [
     # Validators
     "KFold",
     "PurgedKFold",
-    "WalkForwardCrossValidator",
-    "CombinatorialPurgedKFold",
-    "BaggedCombinatorialPurgedKFold",
-    "AdaptiveCombinatorialPurgedKFold",
+    "WalkForward",  # <-- Fix
+    "CombinatorialPurged",  # <-- Fix
+    "BaggedCombinatorialPurged",  # <-- Fix
+    "AdaptiveCombinatorialPurged",  # <-- Fix
     
     # Utilities
     "CrossValidatorFactory",
