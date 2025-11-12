@@ -202,23 +202,17 @@ def fractional_difference_fixed_single(
     # Use .ffill() - fillna(method=) is deprecated
     series_ffill = series.ffill().dropna()
     series_np = series_ffill.to_numpy()
-
-    # 3. Check for sufficient data
-    if width > series_np.shape[0]:
-        # Not enough data for a full window, return empty
-        return pd.Series(index=series.index, dtype="float64").dropna()
-
-    # 4. Apply convolution
-    # 'valid' mode ensures we only get results where the
-    # filter and series fully overlap, matching the original loop's logic.
-    convolved_data = np.convolve(series_np, weights.flatten(), mode='valid')
     
-    # 5. Re-index the results
-    # The first result corresponds to index `width - 1`
-    start_index = series_ffill.index[width - 1]
-    result_index = series_ffill.loc[start_index:].index
-    
-    return pd.Series(convolved_data, index=result_index, name=series.name)
+    result_series = pd.Series(index=series.index, dtype="float64")
+
+    for iloc in range(width - 1, series_np.shape[0]):
+        window_data = series_np[iloc - width + 1 : iloc + 1]
+
+        result_series.loc[series_ffill.index[iloc]] = np.dot(
+            weights.T, window_data
+        )[0]
+
+    return result_series.dropna()
 
 
 def plot_weights(
@@ -367,10 +361,10 @@ def fractionally_differentiated_log_price(
         differentiated = fractional_difference_fixed_single(
             log_price, degree, threshold=threshold
         ).dropna()
-
-        if differentiated.shape[0] < 2: 
-            continue # Not enough data, try next 'd'
-
+        
+        if differentiated.empty:
+            continue # Not enough data for this 'd'
+        
         adf_test = adfuller(
             differentiated, maxlag=1, regression='c', autolag=None
         )
