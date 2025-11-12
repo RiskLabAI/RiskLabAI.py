@@ -85,9 +85,7 @@ def test_denoise_cov(noisy_cov_matrix):
     # and boosts the signal eigenvalues.
     # The smallest denoised eigenvalue should be larger
     # than the smallest original one.
-    assert evals_denoised.min() > evals_orig.min()
-    
-    # The largest denoised eigenvalue should be smaller
+    assert evals_denoised.min() > evals_orig.min()    # The largest denoised eigenvalue should be smaller
     # than the largest original one (as noise variance is removed)
     assert evals_denoised.max() < evals_orig.max()
 
