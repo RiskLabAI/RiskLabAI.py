@@ -100,9 +100,11 @@ def test_compute_beta_bugfix():
     assert np.allclose(my_betas, sm_betas)
     assert np.allclose(my_vcov, sm_vcov)
     
+
+
 def test_adf_function(random_walk_series):
     """Test the main ADF loop."""
-    results = adf(
+    results = get_bsadf_statistic(
         log_price=random_walk_series,
         min_sample_length=20,
         constant='c',
