@@ -17,7 +17,8 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
     much the model's performance (e.g., log loss) decreases.
     """
 
-    def __init__(self, classifier: object, n_splits: int = 10):
+
+    def __init__(self, classifier: object, n_splits: int = 10, random_state: int = 42):
         """
         Initialize the strategy.
 
@@ -30,6 +31,8 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
         """
         self.classifier = classifier
         self.n_splits = n_splits
+        self.random_state = random_state
+
 
     def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
@@ -58,7 +61,8 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
         if score_weights is None:
             score_weights = np.ones(x.shape[0])
 
-        cv_generator = KFold(n_splits=self.n_splits)
+
+        cv_generator = KFold(n_splits=self.n_splits, shuffle=True, random_state=self.random_state)
         baseline_scores = pd.Series(dtype=float)
         shuffled_scores = pd.DataFrame(columns=x.columns, dtype=float)
 
@@ -90,11 +94,13 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
             )
 
             # Get scores for each shuffled feature
+            rng = np.random.default_rng(self.random_state) # <-- ADD SEEDED GENERATOR
             for feature in x.columns:
                 x_test_shuffled = x_test.copy(deep=True)
-                np.random.shuffle(x_test_shuffled[feature].values)
-                
+                rng.shuffle(x_test_shuffled[feature].values) # <-- USE SEEDED SHUFFLE
+
                 shuffled_proba = fitted_classifier.predict_proba(x_test_shuffled)
+                
                 shuffled_scores.loc[i, feature] = -log_loss(
                     y_test,
                     shuffled_proba,

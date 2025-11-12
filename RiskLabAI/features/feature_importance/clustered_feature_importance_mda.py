@@ -18,11 +18,13 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
     and measures the decrease in model performance.
     """
 
+
     def __init__(
         self,
         classifier: object,
         clusters: Dict[str, List[str]],
         n_splits: int = 10,
+        random_state: int = 42, # <-- ADD THIS
     ):
         """
         Initialize the strategy.
@@ -39,6 +41,8 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
         self.classifier = classifier
         self.clusters = clusters
         self.n_splits = n_splits
+        self.random_state = random_state
+
 
     def compute(self, x: pd.DataFrame, y: pd.Series, **kwargs: Any) -> pd.DataFrame:
         """
@@ -68,8 +72,11 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
         if score_weights is None:
             score_weights = np.ones(x.shape[0])
 
-        cv_generator = KFold(n_splits=self.n_splits)
+
+
+        cv_generator = KFold(n_splits=self.n_splits, shuffle=True, random_state=self.random_state)
         baseline_scores = pd.Series(dtype=float)
+
         shuffled_scores = pd.DataFrame(columns=self.clusters.keys(), dtype=float)   
 
         for i, (train_idx, test_idx) in enumerate(cv_generator.split(X=x)):
@@ -98,16 +105,20 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
                 sample_weight=w_test,
             )
 
+
             # Get scores for each shuffled *cluster*
+            rng = np.random.default_rng(self.random_state)
             for cluster_name in shuffled_scores.columns:
                 x_test_shuffled = x_test.copy(deep=True)
                 for feature in self.clusters[cluster_name]:
-                    np.random.shuffle(x_test_shuffled[feature].values)
+                    rng.shuffle(x_test_shuffled[feature].values) # <-- This is correct
                 
                 prob = classifier_fit.predict_proba(x_test_shuffled)
                 shuffled_scores.loc[i, cluster_name] = -log_loss(
-                    y_test, prob, labels=self.classifier.classes_
+                    y_test, prob, labels=self.classifier.classes_,
+                    sample_weight=w_test  
                 )
+
 
         # Calculate importance as the simple drop in score
         importances = shuffled_scores.rsub(baseline_scores, axis=0)
