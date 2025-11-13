@@ -107,7 +107,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
 
 
             # Get scores for each shuffled *cluster*
-            rng = np.random.default_rng(self.random_state)
+            rng = np.random.default_rng(self.random_state + i)
             for cluster_name in shuffled_scores.columns:
                 x_test_shuffled = x_test.copy(deep=True)
                 for feature in self.clusters[cluster_name]:
