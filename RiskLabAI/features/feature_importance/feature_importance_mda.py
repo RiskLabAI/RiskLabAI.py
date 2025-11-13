@@ -94,7 +94,7 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
             )
 
             # Get scores for each shuffled feature
-            rng = np.random.default_rng(self.random_state) # <-- ADD SEEDED GENERATOR
+            rng = np.random.default_rng(self.random_state + i) 
             for feature in x.columns:
                 x_test_shuffled = x_test.copy(deep=True)
                 rng.shuffle(x_test_shuffled[feature].values) # <-- USE SEEDED SHUFFLE

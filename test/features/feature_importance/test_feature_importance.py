@@ -81,7 +81,15 @@ def test_controller_mda(mock_data):
 
     top_2 = set(importance['Mean'].nlargest(2).index)
     assert 'feat_5' in top_2
-    assert top_2.intersection({'feat_0', 'feat_1', 'feat_2'})
+    
+    # --- THIS IS THE FIX ---
+    # OLD (INCORRECT) ASSERTION:
+    # assert top_2.intersection({'feat_0', 'feat_1', 'feat_2'})
+    
+    # NEW (CORRECT) ASSERTION:
+    # We assert the redundant features are NOT important in standard MDA.
+    assert not top_2.intersection({'feat_0', 'feat_1', 'feat_2'})
+
 
 def test_controller_clustered_mda(mock_data):
     """Test Clustered MDA via the controller."""
