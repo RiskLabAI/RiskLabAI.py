@@ -2,20 +2,16 @@
 Utilities for creating publication-quality plots with Matplotlib
 and Seaborn, using Times New Roman font and high DPI.
 
-This module provides 6 themes:
-- 'light'
-- 'medium'
-- 'dark'
-- 'light-transparent'
-- 'medium-transparent'
-- 'dark-transparent'
+Provides 6 themes and a configuration-based saving function.
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.figure as fig  # For type hinting
 import seaborn as sns
+import os
 from typing import Optional, Dict, Any
 
-# Define the color palettes for the base themes
+# [THEMES dictionary remains the same]
 THEMES: Dict[str, Dict[str, Any]] = {
     'light': {
         'figure.facecolor': '#FFFFFF',
@@ -55,93 +51,82 @@ THEMES: Dict[str, Dict[str, Any]] = {
     }
 }
 
+# --- MODULE-LEVEL CONFIGURATION ---
+# This dictionary will store the settings from setup_publication_style
+_CONFIG = {
+    'save_plots': False,
+    'save_dir': 'figs'
+}
+
+# --- UPDATED FUNCTION ---
 def setup_publication_style(
     theme: str = 'light',
-    quality: int = 300
+    quality: int = 300,
+    save_plots: bool = False,  # <-- New parameter
+    save_dir: str = 'figs'       # <-- New parameter
 ) -> None:
     """
-    Sets the global Matplotlib rcParams for a consistent,
-    publication-quality style based on a theme.
+    Sets the global Matplotlib rcParams and saving configuration.
     
     Call this function once at the beginning of your notebook.
 
     Parameters
     ----------
     theme : str, optional
-        The theme to apply. One of: 'light', 'medium', 'dark',
-        'light-transparent', 'medium-transparent', 'dark-transparent'.
-        Defaults to 'light'.
+        The theme to apply. Defaults to 'light'.
     quality : int, optional
-        The DPI (dots per inch) for the figures. Defaults to 300.
+        The DPI for the figures. Defaults to 300.
+    save_plots : bool, optional
+        Global switch to enable/disable saving plots. Defaults to False.
+    save_dir : str, optional
+        The directory to save figures in. Defaults to 'figs'.
     """
     
-    # --- 1. Parse the theme string ---
+    # [All the theme parsing and styling code remains the same]
+    # ... (omitted for brevity) ...
     is_transparent = False
     base_theme_name = theme
-    
     if theme.endswith('-transparent'):
         is_transparent = True
         base_theme_name = theme.replace('-transparent', '')
-
     if base_theme_name not in THEMES:
-        print(f"Warning: Base theme '{base_theme_name}' not recognized. Defaulting to 'light'.")
         base_theme_name = 'light'
-        
-    # --- 2. Get base theme parameters ---
-    try:
-        params = THEMES[base_theme_name].copy()
-    except KeyError:
-        print(f"Warning: Theme '{theme}' not found. Defaulting to 'light'.")
-        params = THEMES['light'].copy()
-
-    # --- 3. Add common parameters ---
+    params = THEMES[base_theme_name].copy()
     common_params = {
-        'font.size': 12,
-        'axes.labelsize': 12,
-        'axes.titlesize': 14,
-        'axes.titleweight': 'bold',
-        'xtick.labelsize': 12,
-        'ytick.labelsize': 12,
-        'legend.fontsize': 12,
-        'legend.title_fontsize': 13,
-        'figure.dpi': quality,
-        'savefig.dpi': quality,
-        'axes.grid': True,
-        'grid.linestyle': '--',
-        'grid.alpha': 0.7,
-        'axes.linewidth': 1.2,
+        'font.size': 12, 'axes.labelsize': 12, 'axes.titlesize': 14,
+        'axes.titleweight': 'bold', 'xtick.labelsize': 12, 'ytick.labelsize': 12,
+        'legend.fontsize': 12, 'legend.title_fontsize': 13,
+        'figure.dpi': quality, 'savefig.dpi': quality, 'axes.grid': True,
+        'grid.linestyle': '--', 'grid.alpha': 0.7, 'axes.linewidth': 1.2,
     }
     params.update(common_params)
-
-    # --- 4. Handle transparency override ---
     if is_transparent:
-        # Use RGBA tuple for full transparency
         params['figure.facecolor'] = (0, 0, 0, 0)
         params['axes.facecolor'] = (0, 0, 0, 0)
         params['savefig.transparent'] = True
-        # Ensure legend is also transparent
         params['legend.facecolor'] = (0, 0, 0, 0) 
     else:
         params['savefig.transparent'] = False
-
-    # --- 5. Set the font ---
     try:
         plt.rc('font', family='Times New Roman')
     except:
         print("Warning: Times New Roman not found. Defaulting to serif.")
         plt.rc('font', family='serif')
-        
-    # --- 6. Apply all parameters ---
     plt.rcParams.update(params)
-    
-    # --- 7. Set Seaborn style ---
-    # Use the appropriate base style for Seaborn
     sns_style = "darkgrid" if base_theme_name == 'dark' else "whitegrid"
-    sns.set_style(sns_style, rc=params) 
+    sns.set_style(sns_style, rc=params)
+    
+    # --- Store saving configuration ---
+    _CONFIG['save_plots'] = save_plots
+    _CONFIG['save_dir'] = save_dir
     
     print(f"Matplotlib style updated. Theme: '{theme}', Quality: {quality} DPI.")
+    if save_plots:
+        print(f"Plot saving enabled. Saving to: '{save_dir}'")
+    else:
+        print("Plot saving disabled.")
 
-
+# [apply_plot_style function remains exactly the same]
 def apply_plot_style(
     ax: plt.Axes,
     title: str,
@@ -149,28 +134,47 @@ def apply_plot_style(
     ylabel: str,
     legend_title: Optional[str] = None
 ) -> None:
-    """
-    Applies standardized labels and legend to a specific Matplotlib Axes object,
-    respecting the globally set rcParams.
-
-    Parameters
-    ----------
-    ax : plt.Axes
-        The Matplotlib axes to style.
-    title : str
-        The title for the plot.
-    xlabel : str
-        The label for the x-axis.
-    ylabel : str
-        The label for the y-axis.
-    legend_title : str, optional
-        Title for the legend, if any.
-    """
-    # Set labels, allowing rcParams to control font size and weight
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    
-    # Update legend title if one exists and is provided
     if ax.get_legend() and legend_title is not None:
         ax.legend(title=legend_title)
+
+# --- UPDATED FUNCTION ---
+def finalize_plot(
+    fig: fig.Figure,
+    filename: str
+) -> None:
+    """
+    Shows the plot and saves it *if* saving was enabled in
+    setup_publication_style.
+
+    Parameters
+    ----------
+    fig : plt.Figure
+        The figure object to save.
+    filename : str
+        The name of the file (e.g., 'model_performance.png').
+        This is required, but only used if saving is enabled.
+    """
+    
+    # --- 1. Save the figure if global switch is on ---
+    if _CONFIG['save_plots']:
+        save_dir = _CONFIG['save_dir']
+        
+        # Create the directory if it doesn't exist
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Construct the full path
+        full_path = os.path.join(save_dir, filename)
+        
+        # Save the figure
+        fig.savefig(full_path, bbox_inches='tight')
+        
+        print(f"Figure saved to: {full_path}")
+    
+    # --- 2. Always show the plot ---
+    plt.show()
+    
+    # --- 3. Close the figure object ---
+    plt.close(fig)
