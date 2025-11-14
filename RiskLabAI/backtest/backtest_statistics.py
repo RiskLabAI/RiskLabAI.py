@@ -1,6 +1,12 @@
 """
 Calculates various backtest statistics like holding period,
 concentration, and drawdowns.
+
+## TODO:
+- [ ] Optimize `calculate_holding_period` with Numba (@jit)
+      to improve performance, similar to the `sharpe_ratio` function.
+- [ ] Add an `annualized_sharpe_ratio` helper function that
+      wraps the Numba `sharpe_ratio` and scales it by sqrt(freq).
 """
 
 from typing import Tuple, Optional

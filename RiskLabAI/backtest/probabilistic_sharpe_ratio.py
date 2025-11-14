@@ -1,6 +1,12 @@
 """
 Implements the Probabilistic Sharpe Ratio (PSR) and related metrics
 as described by Marcos Lopez de Prado.
+
+## TODO:
+- [ ] Add a `compute_psr_curve` helper function (as seen in the
+      original notebook) that iterates `probabilistic_sharpe_ratio`
+      over a range of `observed_sharpe_ratio` values to
+      easily plot the PSR curve.
 """
 
 from typing import List
