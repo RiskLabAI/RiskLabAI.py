@@ -1,3 +1,19 @@
+"""
+Orchestrates complex backtest overfitting and simulation scenarios,
+including PBO, DSR, and hardware performance profiling.
+
+## TODO:
+- [ ] **Refactor Feature Generation:** Move hardcoded parameters in
+      `financial_features_backtest_overfitting_simulation`
+      (e.g., volatility=100, rolling=20, TA-lib windows)
+      to a configuration dictionary or function arguments.
+- [ ] **Refactor Profiling:** Move hardware/performance functions
+      (`get_cpu_info`, `format_cpu_info`,
+      `measure_computational_requirements`, etc.)
+      to a separate `RiskLabAI.utils.profiling` module
+      to reduce this module's responsibilities.
+"""
+
 import platform
 import time
 import numpy as np

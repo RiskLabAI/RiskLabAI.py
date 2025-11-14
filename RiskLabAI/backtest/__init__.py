@@ -16,6 +16,7 @@ from .backtest_statistics import (
     calculate_hhi_concentration,
     calculate_hhi,
     compute_drawdowns_time_under_water,
+    sharpe_ratio as pbo_sharpe_ratio,
 )
 from .backtest_synthetic_data import synthetic_back_testing
 from .bet_sizing import (
@@ -52,7 +53,6 @@ from .test_set_overfitting import (
     strategy_type2_error_probability,
 )
 from .probability_of_backtest_overfitting import (
-    sharpe_ratio as pbo_sharpe_ratio, # aliased
     performance_evaluation,
     probability_of_backtest_overfitting,
 )

@@ -1,5 +1,14 @@
 """
 Implements the Probability of Backtest Overfitting (PBO) calculation.
+
+## TODO:
+- [ ] Add a `get_pbo` wrapper function (as seen in the
+      original notebook) that simplifies the call to
+      `probability_of_backtest_overfitting` and returns
+      only the PBO value.
+- [ ] Add a `pbo_overfitting_plot` helper function to
+      visualize the logit distribution (as seen in the
+      original notebook).
 """
 
 from typing import Tuple, Callable, List, Optional

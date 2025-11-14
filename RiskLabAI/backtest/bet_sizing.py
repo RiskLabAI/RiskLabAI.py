@@ -3,6 +3,14 @@ Functions for calculating bet size based on model probabilities and
 other strategy parameters.
 
 Includes implementations from de Prado (2018).
+
+## TODO:
+- [ ] **HPC Dependency:** The `mpPandasObj` placeholder in
+      `strategy_bet_sizing` and `avgActiveSignals` should be
+      hardened. If `RiskLabAI.hpc` is a core dependency,
+      consider raising an `ImportError` instead of using a
+      placeholder that returns an empty DataFrame, which could
+      fail silently.
 """
 
 from typing import Optional, Any
