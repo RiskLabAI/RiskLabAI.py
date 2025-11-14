@@ -26,16 +26,16 @@ THEMES: Dict[str, Dict[str, Any]] = {
         'legend.edgecolor': '#B0B0B0',
     },
     'medium': {
-        'figure.facecolor': '#E5E5E5',
-        'axes.facecolor': '#E5E5E5',
-        'text.color': '#000000',
-        'axes.labelcolor': '#000000',
-        'axes.edgecolor': '#000000',
-        'xtick.color': '#000000',
-        'ytick.color': '#000000',
-        'grid.color': '#B0B0B0',
-        'legend.facecolor': '#E5E5E5',
-        'legend.edgecolor': '#B0B0B0',
+        'figure.facecolor': '#B0B0B0',  # A more solid, medium grey
+        'axes.facecolor': '#B0B0B0',
+        'text.color': '#FFFFFF',         # White text (like the dark theme)
+        'axes.labelcolor': '#FFFFFF',
+        'axes.edgecolor': '#FFFFFF',
+        'xtick.color': '#FFFFFF',
+        'ytick.color': '#FFFFFF',
+        'grid.color': '#E0E0E0',         # Lighter grid lines on medium bg
+        'legend.facecolor': '#B0B0B0',
+        'legend.edgecolor': '#FFFFFF',
     },
     'dark': {
         'figure.facecolor': '#2E2E2E',
