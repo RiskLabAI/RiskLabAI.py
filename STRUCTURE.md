@@ -198,6 +198,7 @@
 │       └── 📄 test_progress.py
 ├── 📄 .gitignore
 ├── 📄 .pypirc
+├── 📄 desktop.ini
 ├── 📄 DOCUMENTATION.md
 ├── 📄 documenter.py
 ├── 📄 INSTALLATION.md

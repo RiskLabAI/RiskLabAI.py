@@ -8,6 +8,7 @@ including:
 - Progress bar
 - Strategy side determination
 - Plotly figure layout helpers
+- Publication-quality Matplotlib plotting
 """
 
 from .constants import *
@@ -15,6 +16,11 @@ from .ewma import ewma
 from .progress import progress_bar
 from .momentum_mean_reverting_strategy_sides import determine_strategy_side
 from .update_figure_layout import update_figure_layout
+from .publication_plots import (
+    setup_publication_style,
+    apply_plot_style,
+    finalize_plot
+)
 
 # --- Alias for Backward Compatibility ---
 # 'smoothing_average.py' is a duplicate of 'ewma.py'.
@@ -59,7 +65,7 @@ __all__ = [
     
     # ewma
     "ewma",
-    "compute_exponential_weighted_moving_average", # Alias
+    "compute_exponential_weighted_moving_average",  # Alias
     
     # progress
     "progress_bar",
@@ -69,4 +75,9 @@ __all__ = [
     
     # update_figure_layout
     "update_figure_layout",
+
+    # publication_plots
+    "setup_publication_style",
+    "apply_plot_style",
+    "finalize_plot",
 ]
