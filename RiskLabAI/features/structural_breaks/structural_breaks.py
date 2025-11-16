@@ -49,7 +49,7 @@ def lag_dataframe(
 
 
 def prepare_data(
-    log_price: pd.DataFrame, constant: str, lags: int
+    log_price_series: pd.Series, constant: str, lags: int
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prepare the y and X matrices for ADF regression.
@@ -59,8 +59,8 @@ def prepare_data(
 
     Parameters
     ----------
-    log_price : pd.DataFrame
-        DataFrame of log prices.
+    log_price_series : pd.Series  # <-- CHANGED: Accept Series
+        Series of log prices.
     constant : str
         Type of regression constant ('nc', 'c', 'ct', 'ctt').
     lags : int
@@ -72,6 +72,9 @@ def prepare_data(
         - y_df: The dependent variable (delta log price).
         - x_df: The independent variables (lagged level, lagged deltas, constants).
     """
+    # <-- ADDED: Convert univariate series to frame for internal processing
+    log_price = log_price_series.to_frame()
+    
     price_diff = log_price.diff().dropna()
     y_df = price_diff
 
@@ -180,8 +183,8 @@ def get_expanding_window_adf(
     pd.Series
         A Series of ADF t-statistics, indexed by timestamp.
     """
-    log_price_df = log_price.to_frame()
-    y_df, x_df = prepare_data(log_price_df, constant=constant, lags=lags)
+    # <-- CHANGED: Pass Series directly to prepare_data
+    y_df, x_df = prepare_data(log_price, constant=constant, lags=lags)
     
     adf_stats = []
     timestamps = []
@@ -208,7 +211,10 @@ def get_expanding_window_adf(
 
 
 def get_bsadf_statistic(
-    log_price: pd.DataFrame, min_sample_length: int, constant: str, lags: int
+    log_price: pd.Series,  # <-- CHANGED: Accept Series
+    min_sample_length: int, 
+    constant: str, 
+    lags: int
 ) -> Dict[str, Any]:
     """
     Compute the Backward Supremum ADF (BSADF) statistic.
@@ -222,8 +228,8 @@ def get_bsadf_statistic(
 
     Parameters
     ----------
-    log_price : pd.DataFrame
-        DataFrame of log prices.
+    log_price : pd.Series  # <-- CHANGED
+        Series of log prices.
     min_sample_length : int
         Minimum sample length for each ADF test.
     constant : str
@@ -236,13 +242,15 @@ def get_bsadf_statistic(
     Dict[str, Any]
         A dictionary containing:
         - 'Time': The timestamp of the end of the series.
-        - 'gsadf': The BSADF statistic (the supremum ADF).
+        - 'bsadf': The BSADF statistic (the supremum ADF).
     """
     # 1. Prepare the full X, y matrices
+    # <-- CHANGED: Pass Series directly
     y, x = prepare_data(log_price, constant=constant, lags=lags)
     
     # 2. Define all possible start points
-    start_points = range(0, y.shape[0] + lags - min_sample_length + 1)
+    # <-- BUG FIX: Removed '+ lags' from the range
+    start_points = range(0, y.shape[0] - min_sample_length + 1)
     bsadf = -np.inf  # Supremum ADF
     
     y_np, x_np = y.values, x.values
@@ -269,4 +277,4 @@ def get_bsadf_statistic(
         if t_stat > bsadf:
             bsadf = t_stat
 
-    return {"Time": log_price.index[-1], "gsadf": bsadf}
+    return {"Time": log_price.index[-1], "bsadf": bsadf}

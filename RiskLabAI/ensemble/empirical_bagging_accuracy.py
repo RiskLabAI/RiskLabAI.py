@@ -10,7 +10,7 @@ import pandas as pd
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.exceptions import NotFittedError  # <-- ADDED
+from sklearn.exceptions import NotFittedError
 from scipy.stats import norm
 from typing import List, Optional, Tuple, Dict, Any
 
@@ -78,6 +78,9 @@ class BaggingClassifierAccuracy:
         self.estimators_ = None
         self.weights_ = None
         self.c_i_scores_ = None
+        # <-- ADDED: Store class labels
+        self.class_0_ = None
+        self.class_1_ = None
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> 'BaggingClassifierAccuracy':
         """
@@ -97,6 +100,14 @@ class BaggingClassifierAccuracy:
         """
         self.clf.fit(X, y)
         self.estimators_ = self.clf.estimators_
+        
+        # <-- ADDED: Check for binary classification and store classes
+        if len(self.clf.classes_) != 2:
+            raise ValueError("This class only supports binary classification.")
+            
+        self.class_0_ = self.clf.classes_[0]
+        self.class_1_ = self.clf.classes_[1]
+        
         return self
 
     def calculate_c_i(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
@@ -117,7 +128,7 @@ class BaggingClassifierAccuracy:
             Array of c_i scores for each estimator.
         """
         if self.estimators_ is None:
-            raise NotFittedError("Classifier must be fitted first.")
+            raise NotFittedError("Classifier must be fitted first. Call .fit()")
             
         c_i_scores = []
         for tree in self.estimators_:
@@ -152,6 +163,7 @@ class BaggingClassifierAccuracy:
             Dictionary of weight arrays for each scheme.
         """
         if self.c_i_scores_ is None:
+            # calculate_c_i also checks if model is fitted
             self.calculate_c_i(X, y)
             
         c_i = self.c_i_scores_
@@ -197,11 +209,15 @@ class BaggingClassifierAccuracy:
         np.ndarray
             Predicted class labels.
         """
+        # <-- UPDATED: Check fit status first
+        if self.estimators_ is None:
+            raise NotFittedError("Classifier must be fitted first. Call .fit()")
+            
         if self.weights_ is None:
-            raise NotFittedError("Weights must be calculated first.")
+            # <-- UPDATED: More specific error
+            raise NotFittedError("Weights must be calculated first. Call .calculate_weights()")
             
         if weight_scheme not in self.weights_:
-            # <-- FIXED f-string typo here
             raise ValueError(f"Unknown weight_scheme: {weight_scheme}. "
                              f"Must be one of {list(self.weights_.keys())}")
 
@@ -211,18 +227,19 @@ class BaggingClassifierAccuracy:
         # (N_samples, N_estimators)
         tree_preds = np.array([tree.predict(X) for tree in self.estimators_]).T
         
-        # We need to convert labels {0, 1} to {-1, 1} for weighted voting
-        # Assuming binary classification with labels 0 and 1
-        tree_preds_signed = (tree_preds * 2) - 1
+        # <-- UPDATED: Convert labels {class_0, class_1} to {-1, 1}
+        # Map class_1 to 1, and class_0 to -1
+        tree_preds_signed = np.where(tree_preds == self.class_1_, 1, -1)
         
         # Calculate weighted average vote
         # (N_samples, N_estimators) * (N_estimators,) -> (N_samples,)
         weighted_votes = np.dot(tree_preds_signed, weights)
         
-        # Final prediction: sign(weighted_vote)
-        # Convert back to {0, 1}
-        y_pred = (np.sign(weighted_votes) + 1) / 2
-        return y_pred.astype(int)
+        # <-- UPDATED: Convert vote back to {class_0, class_1}
+        # Positive vote -> class_1, Negative or Zero vote -> class_0
+        y_pred = np.where(weighted_votes > 0, self.class_1_, self.class_0_)
+        
+        return y_pred
 
     def evaluate_all_schemes(
         self,
@@ -304,7 +321,9 @@ def calculate_bootstrap_accuracy(
     # Use indices from the original X/y DataFrames/Series
     indices = X.index
     
+    # --- CHANGE: Fixed typo n_bootstraMps -> n_bootstraps ---
     for _ in range(n_bootstraps):
+    # --- END CHANGE ---
         # Sample test set with replacement
         boot_indices = np.random.choice(indices, n_samples, replace=True)
         X_boot = X.loc[boot_indices]
