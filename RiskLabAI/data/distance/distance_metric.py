@@ -102,6 +102,10 @@ def calculate_number_of_bins(
         if np.isclose(correlation, 1.0) or np.isclose(correlation, -1.0):
             # Handle perfect correlation case by setting to almost 1
             correlation = np.sign(correlation) * (1.0 - 1e-10)
+            
+        if (1.0 - correlation**2) == 0:
+            # Handle numerical instability if correlation is still 1
+            return calculate_number_of_bins(num_observations, correlation=None)
 
         # Bivariate formula
         bins = round(
@@ -220,10 +224,13 @@ def calculate_distance(
     np.ndarray
         The resulting distance matrix.
     """
+    # Clip to handle potential floating point errors
+    dependence = np.clip(dependence, -1.0, 1.0)
+    
     if metric == "angular":
-        distance = ((1 - dependence).round(5) / 2.0) ** 0.5
+        distance = ((1 - dependence).round(6) / 2.0) ** 0.5
     elif metric == "absolute_angular":
-        distance = ((1 - np.abs(dependence)).round(5) / 2.0) ** 0.5
+        distance = ((1 - np.abs(dependence)).round(6) / 2.0) ** 0.5
     else:
         raise ValueError(f"Unknown metric: {metric}")
     return distance
@@ -236,6 +243,7 @@ def calculate_kullback_leibler_divergence(
     Calculate Kullback-Leibler (KL) divergence.
 
     D_KL(P || Q) = -sum[ p_i * log(q_i / p_i) ]
+                 =  sum[ p_i * log(p_i / q_i) ]
 
     Parameters
     ----------
@@ -253,18 +261,21 @@ def calculate_kullback_leibler_divergence(
     p = p / np.sum(p)
     q = q / np.sum(q)
     
-    # Avoid log(0)
-    p = p[q > 0]
-    q = q[q > 0]
-    if len(p) == 0:
-        return 0.0
+    # Filter for terms where p > 0 and q > 0
+    # Where p_i = 0, the term is 0.
+    # Where q_i = 0 (and p_i > 0), the term is +inf.
+    mask = (p > 0) & (q > 0)
+    p_filtered = p[mask]
+    q_filtered = q[mask]
+
+    if len(p_filtered) == 0:
+        return 0.0 # No overlapping support
         
-    p = p[p > 0]
-    q = q[p > 0]
-    if len(p) == 0:
-        return 0.0
-    
-    divergence = -np.sum(p * np.log(q / p))
+    # Check if any p_i > 0 corresponds to q_i = 0
+    if np.any(p[q == 0] > 0):
+        return np.inf
+
+    divergence = -np.sum(p_filtered * np.log(q_filtered / p_filtered))
     return divergence
 
 
@@ -289,11 +300,19 @@ def calculate_cross_entropy(p: np.ndarray, q: np.ndarray) -> float:
     p = p / np.sum(p)
     q = q / np.sum(q)
     
-    # Avoid log(0)
-    p = p[q > 0]
-    q = q[q > 0]
-    if len(p) == 0:
+    # Filter for terms where p > 0 and q > 0
+    # Where p_i = 0, the term is 0.
+    # Where q_i = 0 (and p_i > 0), the term is +inf.
+    mask = (p > 0) & (q > 0)
+    p_filtered = p[mask]
+    q_filtered = q[mask]
+    
+    if len(p_filtered) == 0:
         return 0.0
-        
-    entropy = -np.sum(p * np.log(q))
+
+    # Check if any p_i > 0 corresponds to q_i = 0
+    if np.any(p[q == 0] > 0):
+        return np.inf
+
+    entropy = -np.sum(p_filtered * np.log(q_filtered))
     return entropy
