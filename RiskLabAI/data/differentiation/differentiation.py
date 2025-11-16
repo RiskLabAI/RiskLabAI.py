@@ -117,7 +117,7 @@ def fractional_difference_std(
     for name in series.columns:
         # Use .ffill() - fillna(method=) is deprecated
         series_ffill = series[[name]].ffill().dropna()
-        if series_ffill.empty:
+        if series_ffill.empty or series_ffill.shape[0] < skip:
             continue
             
         series_np = series_ffill.to_numpy()
@@ -143,7 +143,8 @@ def fractional_difference_fixed(
     """
     Compute the Fixed-Width Window (FFD) fractionally differentiated series.
 
-    This method is vectorized using np.convolve and is more efficient.
+    This method iterates over columns and applies a fast, convolved
+    FFD calculation to each one.
 
     Reference:
         Snippet 5.3, Page 83.
@@ -195,24 +196,32 @@ def fractional_difference_fixed_single(
         The fractionally differentiated series.
     """
     # 1. Compute weights
-    weights = calculate_weights_ffd(degree, threshold)
+    weights = calculate_weights_ffd(degree, threshold).flatten()
     width = len(weights)
     
-    # 2. Prepare data
-    # Use .ffill() - fillna(method=) is deprecated
+    # 2. Prepare data (drop leading NaNs)
     series_ffill = series.ffill().dropna()
+    
+    if series_ffill.empty or series_ffill.shape[0] < width:
+        # Not enough data to convolve
+        return pd.Series(index=series.index, dtype="float64")
+        
     series_np = series_ffill.to_numpy()
     
-    result_series = pd.Series(index=series.index, dtype="float64")
-
-    for iloc in range(width - 1, series_np.shape[0]):
-        window_data = series_np[iloc - width + 1 : iloc + 1]
-
-        result_series.loc[series_ffill.index[iloc]] = np.dot(
-            weights.T, window_data
-        )[0]
-
-    return result_series.dropna()
+    # 3. Apply convolution
+    # 'valid' mode computes the dot product only where the
+    # window fully overlaps the series.
+    convolved_vals = np.convolve(series_np, weights, mode='valid')
+    
+    # 4. Create result series on the valid index
+    # The result aligns with the *end* of the window
+    result_index = series_ffill.index[width - 1:]
+    valid_results = pd.Series(convolved_vals, index=result_index)
+    
+    # 5. Reindex to original full index
+    # This correctly places NaNs at the start (warm-up)
+    # and in any gaps that were in the original series.
+    return valid_results.reindex(series.index)
 
 
 def plot_weights(
@@ -284,7 +293,7 @@ def find_optimal_ffd_simple(
     results_list = []
     
     # Resample to daily to ensure consistent lags
-    series_daily = np.log(input_series[['close']]).resample('1D').last()
+    series_daily = np.log(input_series[['close']]).resample('1D').last().dropna()
     
     for d in np.linspace(0, 1, 11):
         differentiated = fractional_difference_fixed(
@@ -299,22 +308,29 @@ def find_optimal_ffd_simple(
             differentiated['close']
         )[0, 1]
         
-        adf_result = adfuller(
-            differentiated['close'], maxlag=1, regression='c', autolag=None
-        )
-        
-        results_list.append(
-            {
-                'd': d,
-                'adfStat': adf_result[0],
-                'pVal': adf_result[1],
-                'lags': adf_result[2],
-                'nObs': adf_result[3],
-                '95% conf': adf_result[4]['5%'],
-                'corr': corr
-            }
-        )
+        try:
+            adf_result = adfuller(
+                differentiated['close'], maxlag=1, regression='c', autolag=None
+            )
+            
+            results_list.append(
+                {
+                    'd': d,
+                    'adfStat': adf_result[0],
+                    'pVal': adf_result[1],
+                    'lags': adf_result[2],
+                    'nObs': adf_result[3],
+                    '95% conf': adf_result[4]['5%'],
+                    'corr': corr
+                }
+            )
+        except Exception:
+            # Handle cases where ADF test fails (e.g., insufficient data)
+            continue
     
+    if not results_list:
+        return pd.DataFrame()
+        
     return pd.DataFrame(results_list).set_index('d')
 
 
@@ -365,13 +381,19 @@ def fractionally_differentiated_log_price(
         if differentiated.empty:
             continue # Not enough data for this 'd'
         
-        adf_test = adfuller(
-            differentiated, maxlag=1, regression='c', autolag=None
-        )
-        p_value = adf_test[1]
+        try:
+            adf_test = adfuller(
+                differentiated, maxlag=1, regression='c', autolag=None
+            )
+            p_value = adf_test[1]
+        except Exception:
+            p_value = 1.0 # Failed test, keep going
         
         if differentiated_series is None:
             differentiated_series = differentiated # Store first valid series
-
+    
     # Return the last computed series that passed
+    if differentiated_series is None:
+        raise ValueError("Could not generate any differentiated series.")
+        
     return differentiated

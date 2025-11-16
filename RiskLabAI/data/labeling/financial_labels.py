@@ -28,9 +28,10 @@ def calculate_t_value_linear_regression(prices: pd.Series) -> float:
     -------
     float
         The t-value of the regression slope. Returns np.nan if
-        regression fails (e.g., constant series).
+        regression fails (e.g., constant series or < 2 data points).
     """
-    if prices.empty:
+    # --- SUGGESTION: Explicitly handle insufficient data ---
+    if prices.shape[0] < 2:
         return np.nan
         
     x = np.arange(prices.shape[0])
@@ -40,7 +41,8 @@ def calculate_t_value_linear_regression(prices: pd.Series) -> float:
         return np.nan
         
     if ols.stderr == 0:
-        return np.sign(ols.slope) * np.inf
+        # Handle perfect fit (vertical line, or constant)
+        return np.sign(ols.slope) * np.inf if ols.slope != 0 else 0.0
 
     return ols.slope / ols.stderr
 
@@ -67,7 +69,8 @@ def find_trend_using_trend_scanning(
         Time series of close prices.
     span : Tuple[int, int]
         A tuple of (min_span, max_span) defining the range of
-        window lengths to scan.
+        window lengths to scan. `min_span` must be >= 2.
+        `max_span` is exclusive, as in `range()`.
 
     Returns
     -------
@@ -81,8 +84,17 @@ def find_trend_using_trend_scanning(
     outputs = pd.DataFrame(
         index=molecule, columns=["End Time", "t-Value", "Trend"]
     )
+
+    # --- SUGGESTION: Add robustness check for span ---
+    # Ensure min_span < max_span and min_span is at least 2 for OLS.
+    if span[0] >= span[1] or span[0] < 2:
+        outputs["Trend"] = pd.to_numeric(outputs["Trend"], downcast="signed")
+        return outputs.dropna(subset=["Trend"])
+
     spans = range(*span)
-    max_span_val = max(spans)
+    # Use span[1] - 1 directly. It's safer than max(spans)
+    # which fails on an empty range.
+    max_span_val = span[1] - 1 
 
     for index in molecule:
         t_values = pd.Series(dtype="float64")
@@ -112,12 +124,14 @@ def find_trend_using_trend_scanning(
             continue
 
         # Find the window end that maximized |t_value|
-        best_t_value = t_values.replace([-np.inf, np.inf, np.nan], 0).abs().idxmax()
+        # Use idxmax on the absolute values, but get the original t-value
+        best_t_value_idx = t_values.replace([-np.inf, np.inf, np.nan], 0).abs().idxmax()
+        best_t_value = t_values[best_t_value_idx]
         
         outputs.loc[index] = [
             vertical_barrier_time,
-            t_values[best_t_value],
-            np.sign(t_values[best_t_value]),
+            best_t_value,
+            np.sign(best_t_value),
         ]
 
     outputs["End Time"] = pd.to_datetime(outputs["End Time"])

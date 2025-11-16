@@ -14,11 +14,12 @@ Reference:
 
 import pandas as pd
 import numpy as np
-from scipy.linalg import block_diag
 from scipy.optimize import minimize
-from sklearn.covariance import LedoitWolf
 from sklearn.neighbors import KernelDensity
 from typing import Tuple, Union, Optional, Dict, Any
+
+# --- FIX 5: Removed unused imports for LedoitWolf and block_diag ---
+
 
 def marcenko_pastur_pdf(
     variance: float, q: float, num_points: int = 1000
@@ -50,11 +51,16 @@ def marcenko_pastur_pdf(
     lambda_min = variance * (1 - (1.0 / q) ** 0.5) ** 2
     lambda_max = variance * (1 + (1.0 / q) ** 0.5) ** 2
     
-    eigenvalues = np.linspace(lambda_min, lambda_max, num_points)
+    # --- FIX 1: Add epsilon to prevent division by zero if lambda_min=0 (when q=1) ---
+    e_min = max(lambda_min, 1e-10) 
+    eigenvalues = np.linspace(e_min, lambda_max, num_points)
     
     pdf = (q / (2 * np.pi * variance * eigenvalues)) * (
         (lambda_max - eigenvalues) * (eigenvalues - lambda_min)
     ) ** 0.5
+    
+    # Set PDF to 0 where eigenvalues are outside the valid range (e.g., due to numerical precision)
+    pdf[np.isnan(pdf)] = 0
     
     return pd.Series(pdf.flatten(), index=eigenvalues.flatten())
 
@@ -86,7 +92,9 @@ def fit_kde(
     return kde
 
 
-def _mp_pdf_fit_error(variance: float, q: float, eigenvalues: np.ndarray) -> float:
+def _mp_pdf_fit_error(
+    variance: float, q: float, eigenvalues: np.ndarray, bandwidth: float
+) -> float: # <-- FIX 2: Added bandwidth
     """
     Error function for fitting the MP PDF to observed eigenvalues.
     
@@ -101,16 +109,23 @@ def _mp_pdf_fit_error(variance: float, q: float, eigenvalues: np.ndarray) -> flo
         The T/N ratio.
     eigenvalues : np.ndarray
         The observed eigenvalues.
+    bandwidth : float
+        The KDE bandwidth.
 
     Returns
     -------
     float
         The sum of squared errors.
     """
+    # Ensure eigenvalues is 1D for PDF generation
+    if eigenvalues.ndim == 2:
+        eigenvalues = np.diag(eigenvalues)
+        
     theoretical_pdf = marcenko_pastur_pdf(variance, q, num_points=eigenvalues.shape[0])
     
     # Fit empirical PDF
-    kde = fit_kde(eigenvalues, bandwidth=0.01)
+    # --- FIX 2: Pass bandwidth to fit_kde ---
+    kde = fit_kde(eigenvalues, bandwidth=bandwidth) 
     empirical_pdf = np.exp(kde.score_samples(theoretical_pdf.index.values.reshape(-1, 1)))
     
     # Calculate SSE
@@ -128,7 +143,7 @@ def find_max_eval(
     Parameters
     ----------
     eigenvalues : np.ndarray
-        The diagonal matrix (or vector) of observed eigenvalues.
+        The diagonal matrix (or 1D vector) of observed eigenvalues.
     q : float
         The T/N ratio.
     bandwidth : float
@@ -140,10 +155,15 @@ def find_max_eval(
         - lambda_max: The maximum theoretical eigenvalue.
         - variance: The fitted variance (\(\sigma^2\)).
     """
-    eigenvalues = np.diag(eigenvalues) # Ensure it's a vector
+    # --- FIX 3: Ensure we have a 1D array for fitting ---
+    if eigenvalues.ndim == 2:
+        eigenvalues_1d = np.diag(eigenvalues)
+    else:
+        eigenvalues_1d = eigenvalues
     
     # Minimize the SSE to find the best-fit variance
-    objective_func = lambda *args: _mp_pdf_fit_error(args[0], q, eigenvalues)
+    # --- FIX 2: Pass bandwidth to the objective function ---
+    objective_func = lambda *args: _mp_pdf_fit_error(args[0], q, eigenvalues_1d, bandwidth)
     
     optimizer_result = minimize(
         objective_func,
@@ -167,13 +187,15 @@ def denoised_corr(
     """
     Reconstruct the correlation matrix using only the eigenvalues
     associated with signal (i.e., > lambda_max).
+    
+    Note: Assumes eigenvalues are sorted in descending order.
 
     Parameters
     ----------
     eigenvalues : np.ndarray
-        The diagonal matrix of *all* eigenvalues.
+        The diagonal matrix of *all* eigenvalues (sorted descending).
     eigenvectors : np.ndarray
-        The matrix of eigenvectors.
+        The matrix of eigenvectors (corresponding to descending eigenvalues).
     num_facts : int
         The number of factors (signal eigenvalues) to keep.
 
@@ -183,6 +205,7 @@ def denoised_corr(
         The denoised correlation matrix.
     """
     # 1. Get the eigenvalues and eigenvectors for signal
+    # --- FIX 3: This logic is now correct as eigenvalues are descending ---
     eigenvalues_1d = np.diag(eigenvalues) 
     eigenvalues_signal = np.diag(eigenvalues_1d[:num_facts]) 
 
@@ -193,7 +216,8 @@ def denoised_corr(
     
     # 3. Get the eigenvalues for noise and average them
     if num_facts < eigenvalues.shape[0]:
-        avg_noise_eigenvalue = np.diag(eigenvalues)[num_facts:].mean()
+        # --- FIX 3: Correctly averages the smaller (noise) eigenvalues ---
+        avg_noise_eigenvalue = eigenvalues_1d[num_facts:].mean()
         eigenvectors_noise = eigenvectors[:, num_facts:]
         
         # 4. Reconstruct the noise-only correlation matrix
@@ -233,9 +257,12 @@ def pca(
 def cov_to_corr(cov: np.ndarray) -> np.ndarray:
     """Convert covariance matrix to correlation matrix."""
     std = np.sqrt(np.diag(cov))
+    # Handle division by zero if any std is 0
+    std[std == 0] = 1.0 
     corr = cov / np.outer(std, std)
     corr[corr < -1] = -1.0 # Handle numerical errors
     corr[corr > 1] = 1.0
+    np.fill_diagonal(corr, 1.0) # Ensure diagonal is 1
     return corr
 
 
@@ -266,14 +293,16 @@ def denoise_cov(
 
     corr0 = cov_to_corr(cov0)
     
-    eigenvalues, eigenvectors = np.linalg.eigh(corr0)
-    eigenvalues_diag = np.diag(eigenvalues)
+    # --- FIX 3: Use pca helper to get DESCENDING eigenvalues/vectors ---
+    eigenvalues, eigenvectors = pca(corr0)
+    eigenvalues_diag = np.diag(eigenvalues) # 2D diag matrix (desc)
 
     # Find the noise cutoff
+    # --- FIX 2: Pass bandwidth down to find_max_eval ---
     emax0, var0 = find_max_eval(eigenvalues_diag, q, bandwidth)
     
-    # Identify number of signal factors
-    n_facts0 = eigenvalues.searchsorted(emax0)
+    # --- FIX 3: Correctly find num factors as count of evals > emax0 ---
+    n_facts0 = np.sum(eigenvalues > emax0)
     
     # Denoise the correlation matrix
     corr1 = denoised_corr(eigenvalues_diag, eigenvectors, n_facts0)
@@ -339,7 +368,7 @@ def optimal_portfolio_denoised(
     np.ndarray
         The optimal, denoised portfolio weights.
     """
-    # Denoise the covariance matrix
+    # --- FIX 4: Pass bandwidth to denoise_cov ---
     cov_denoised = denoise_cov(cov, q, bandwidth)
     
     # Compute optimal portfolio on the denoised matrix
