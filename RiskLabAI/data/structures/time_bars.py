@@ -118,22 +118,6 @@ class TimeBars(AbstractBars):
             tick_rule = self._tick_rule(price)
             self.update_base_fields(price, tick_rule, volume)
             self.close_price = price
-
-        # --- Handle the very last bar ---
-        # If the loop ends and we have data for an open bar (open_price is set),
-        # construct it.
-        if self.open_price is not None:
-            bar_end_time = pd.to_datetime(self.current_bar_end_timestamp, unit='s')
-            
-            next_bar = self._construct_next_bar(
-                bar_end_time,
-                self.tick_counter, # Use the last tick counter
-                self.close_price,  # Use the last tick's close price
-                self.high_price,
-                self.low_price,
-                self.current_bar_end_timestamp,
-            )
-            bars_list.append(next_bar)
             
         return bars_list
 

@@ -206,18 +206,6 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 # Reset cached fields
                 self._reset_cached_fields()
 
-        # --- Handle the very last bar ---
-        if self.open_price is not None and date_time is not None:
-            next_bar = self._construct_next_bar(
-                date_time,       # Last known timestamp
-                self.tick_counter,
-                self.close_price,
-                self.high_price,
-                self.low_price,
-                threshold,       # Last calculated threshold
-            )
-            bars_list.append(next_bar)
-
         return bars_list
 
     def _calculate_run_threshold(self) -> float:

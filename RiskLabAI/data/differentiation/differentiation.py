@@ -195,8 +195,10 @@ def fractional_difference_fixed_single(
     pd.Series
         The fractionally differentiated series.
     """
+    
     # 1. Compute weights
-    weights = calculate_weights_ffd(degree, threshold).flatten()
+    # Reverse weights: calculate_weights_ffd returns [w_k, ..., w_0]
+    weights = calculate_weights_ffd(degree, threshold).flatten()[::-1]
     width = len(weights)
     
     # 2. Prepare data (drop leading NaNs)
