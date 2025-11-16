@@ -45,6 +45,10 @@ class StandardBars(AbstractBars):
             A list of the constructed standard bars.
         """
         bars_list = []
+        
+        # Keep track of last timestamp for final bar
+        date_time = None 
+        
         for tick_data in data:
             self.tick_counter += 1
 
@@ -70,6 +74,20 @@ class StandardBars(AbstractBars):
                 
                 # Reset cached fields for the next bar
                 self._reset_cached_fields()
+
+        # --- Handle the very last bar ---
+        # If the loop ends and we have data for an open bar (open_price is set),
+        # construct it using the last available data.
+        if self.open_price is not None and date_time is not None:
+            next_bar = self._construct_next_bar(
+                date_time,       # Last known timestamp
+                self.tick_counter,
+                self.close_price,
+                self.high_price,
+                self.low_price,
+                self.threshold,
+            )
+            bars_list.append(next_bar)
 
         return bars_list
 

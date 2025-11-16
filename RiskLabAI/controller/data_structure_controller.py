@@ -5,10 +5,8 @@ This class reads data in batches from CSVs or DataFrames and
 uses the BarsInitializerController to construct bars based on
 a specified method.
 """
-import csv
 import pandas as pd
 import numpy as np
-from math import floor
 from typing import Iterable, Optional, Generator, Union, Dict, Any, List
 
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
@@ -48,33 +46,23 @@ class Controller:
     ) -> pd.DataFrame:
         """
         Handles the command to initialize a bar generator and process data.
-
-        Parameters
-        ----------
-        method_name : str
-            The name of the bar initialization method to call
-            (e.g., 'dollar_standard_bars').
-        method_arguments : Dict[str, Any]
-            Arguments to pass to the bar initialization method.
-        input_data : Union[str, pd.DataFrame]
-            Input data, either as a DataFrame or a string path to a CSV.
-        output_path : str, optional
-            If provided, the resulting bars DataFrame will be saved
-            to this CSV path.
-        batch_size : int, default=1,000,000
-            The number of ticks to process in each batch.
-
-        Returns
-        -------
-        pd.DataFrame
-            A DataFrame of the constructed bars.
+        (Parameters same as original)
         """
         # 1. Initialize the bar generator
-        bar_generator: AbstractBars = (
-            self.bars_initializer.method_name_to_method[method_name](
-                **method_arguments
-            )
-        )
+        try:
+            initializer_method = self.bars_initializer.method_name_to_method[method_name]
+        except KeyError:
+            print(f"Error: Bar method '{method_name}' not found.")
+            valid_methods = list(self.bars_initializer.method_name_to_method.keys())
+            print(f"Valid methods are: {valid_methods}")
+            return pd.DataFrame(columns=BAR_COLUMNS)
+            
+        try:
+            bar_generator: AbstractBars = initializer_method(**method_arguments)
+        except TypeError as e:
+            print(f"Error initializing bar method '{method_name}' with arguments {method_arguments}.")
+            print(f"TypeError: {e}")
+            return pd.DataFrame(columns=BAR_COLUMNS)
 
         # 2. Get the correct batch generator
         if isinstance(input_data, str):
@@ -88,10 +76,17 @@ class Controller:
         
         # 3. Process data in batches
         print("Processing data in batches...")
-        for data_batch in data_generator:
-            # We assume data is [datetime, price, volume]
-            bars = bar_generator.construct_bars_from_data(data=data_batch.values)
-            all_bars.extend(bars)
+        try:
+            for data_batch in data_generator:
+                # We assume data is [datetime, price, volume]
+                # .values returns a NumPy array, which is an efficient iterable
+                bars = bar_generator.construct_bars_from_data(data=data_batch.values)
+                all_bars.extend(bars)
+        except Exception as e:
+            print(f"Error during bar construction: {e}")
+            print("Returning DataFrame with bars constructed so far.")
+            # Continue to return whatever was processed
+            
         print(f"Done. Constructed {len(all_bars)} bars.")
 
         # 4. Create final DataFrame
@@ -99,8 +94,11 @@ class Controller:
 
         if output_path:
             print(f"Saving bars to {output_path}...")
-            bars_df.to_csv(output_path, index=False)
-            print("Save complete.")
+            try:
+                bars_df.to_csv(output_path, index=False)
+                print("Save complete.")
+            except Exception as e:
+                print(f"Error saving file to {output_path}: {e}")
 
         return bars_df
 
@@ -110,7 +108,7 @@ class Controller:
         batch_size: int
     ) -> Generator[pd.DataFrame, None, None]:
         """
-        Reads data in batches from a CSV file.
+        Reads data in batches from a CSV file efficiently.
 
         Parameters
         ----------
@@ -125,21 +123,21 @@ class Controller:
             A generator yielding batches of data.
         """
         try:
-            with open(input_path, 'r') as f:
-                n_rows = sum(1 for _ in csv.reader(f))
-        except FileNotFoundError:
-            print(f"Error: File not found at {input_path}")
-            return
-            
-        n_batches = max(1, floor(n_rows / batch_size))
-
-        if n_batches == 1:
-            yield pd.read_csv(input_path, parse_dates=[0])
-        else:
+            # Use a generator to read the file in chunks
+            # This is more memory-efficient and avoids reading the file twice.
             for batch in pd.read_csv(
                 input_path, chunksize=batch_size, parse_dates=[0]
             ):
                 yield batch
+        except FileNotFoundError:
+            print(f"Error: File not found at {input_path}")
+            return
+        except pd.errors.ParserError as e:
+            print(f"Error parsing CSV file {input_path}: {e}")
+            return
+        except Exception as e:
+            print(f"An unexpected error occurred while reading {input_path}: {e}")
+            return
 
 
     @staticmethod
@@ -151,6 +149,9 @@ class Controller:
         Reads data in batches from a DataFrame.
         """
         n_rows = input_data.shape[0]
+        if n_rows == 0:
+            return
+            
         for start_row in range(0, n_rows, batch_size):
             end_row = min(start_row + batch_size, n_rows)
             yield input_data.iloc[start_row:end_row]

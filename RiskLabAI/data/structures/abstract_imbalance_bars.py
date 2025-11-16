@@ -34,19 +34,7 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
     ):
         """
         Constructor.
-
-        Parameters
-        ----------
-        bar_type : str
-            e.g., 'dollar_imbalance', 'tick_imbalance'.
-        window_size_for_expected_n_ticks_estimation : int, optional
-            Window size for EWMA of E[T]. (None for FixedImbalanceBars).
-        window_size_for_expected_imbalance_estimation : int
-            Window size for EWMA of E[b].
-        initial_estimate_of_expected_n_ticks_in_bar : int
-            Initial guess for E[T].
-        analyse_thresholds : bool
-            If True, store threshold data for analysis.
+        (Parameters same as original)
         """
         super().__init__(
             bar_type,
@@ -67,19 +55,14 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
     def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
         """
         Constructs imbalance bars from input tick data.
-
-        Parameters
-        ----------
-        data : Iterable[TickData]
-            An iterable (list, tuple, generator) of tick data.
-            Each tick is (date_time, price, volume).
-
-        Returns
-        -------
-        List[List[Any]]
-            A list of the constructed imbalance bars.
+        (Parameters same as original)
         """
         bars_list = []
+        
+        # Keep track of last timestamp and threshold
+        date_time = None
+        threshold = np.inf
+        
         for tick_data in data:
             self.tick_counter += 1
 
@@ -165,6 +148,18 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
 
                 # Reset cached fields
                 self._reset_cached_fields()
+
+        # --- Handle the very last bar ---
+        if self.open_price is not None and date_time is not None:
+            next_bar = self._construct_next_bar(
+                date_time,       # Last known timestamp
+                self.tick_counter,
+                self.close_price,
+                self.high_price,
+                self.low_price,
+                threshold,       # Last calculated threshold
+            )
+            bars_list.append(next_bar)
 
         return bars_list
 
