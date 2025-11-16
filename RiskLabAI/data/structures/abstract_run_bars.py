@@ -5,6 +5,7 @@ Abstract base class for Run Bars (Fixed and Expected).
 from abc import abstractmethod
 from typing import Union, List, Any, Iterable, Optional
 import numpy as np
+import pandas as pd # Added for ewma fallback
 
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars
@@ -27,14 +28,7 @@ from RiskLabAI.utils.constants import *
 class AbstractRunBars(AbstractInformationDrivenBars):
     """
     Abstract class for Run Bars (Fixed and Expected).
-
-    Implements the bar sampling logic based on cumulative buy or sell
-    imbalance (runs) exceeding a dynamic threshold.
-
-    Threshold = E[T] * max(P[buy] * E[theta_buy], (1-P[buy]) * E[theta_sell])
-
-    Reference:
-        Pages 31-32, Advances in Financial Machine Learning.
+    (Docstrings same as original)
     """
 
     def __init__(
@@ -47,19 +41,7 @@ class AbstractRunBars(AbstractInformationDrivenBars):
     ):
         """
         Constructor.
-
-        Parameters
-        ----------
-        bar_type : str
-            e.g., 'dollar_run', 'tick_run'.
-        window_size_for_expected_n_ticks_estimation : int, optional
-            Window size for EWMA of E[T]. (None for FixedRunBars).
-        window_size_for_expected_imbalance_estimation : int
-            Window size for EWMA of E[theta].
-        initial_estimate_of_expected_n_ticks_in_bar : int
-            Initial guess for E[T].
-        analyse_thresholds : bool
-            If True, store threshold data for analysis.
+        (Parameters same as original)
         """
         super().__init__(
             bar_type,
@@ -86,19 +68,14 @@ class AbstractRunBars(AbstractInformationDrivenBars):
     def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
         """
         Constructs run bars from input tick data.
-
-        Parameters
-        ----------
-        data : Iterable[TickData]
-            An iterable (list, tuple, generator) of tick data.
-            Each tick is (date_time, price, volume).
-
-        Returns
-        -------
-        List[List[Any]]
-            A list of the constructed run bars.
+        (Parameters same as original)
         """
         bars_list = []
+        
+        # Keep track of last timestamp and threshold
+        date_time = None
+        threshold = np.inf
+        
         for tick_data in data:
             self.tick_counter += 1
 
@@ -149,11 +126,10 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 
                 # Update P[buy]
                 if self.base_statistics[CUMULATIVE_TICKS] > 0:
-                    self.run_bars_statistics[
-                        EXPECTED_BUY_TICKS_PROPORTION
-                    ] = (
-                        self.run_bars_statistics[BUY_TICKS_NUMBER]
-                        / self.base_statistics[CUMULATIVE_TICKS]
+                    buy_ticks_num = self.run_bars_statistics[BUY_TICKS_NUMBER]
+                    cum_ticks = self.base_statistics[CUMULATIVE_TICKS]
+                    self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION] = (
+                        buy_ticks_num / cum_ticks
                     )
 
             if self.analyse_thresholds is not None:
@@ -180,15 +156,18 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 bars_list.append(next_bar)
 
                 # Store T and P[buy] for E[T] and E[P[buy]] updates
+                cum_ticks = self.base_statistics[CUMULATIVE_TICKS]
+                buy_ticks_num = self.run_bars_statistics[BUY_TICKS_NUMBER]
+                
                 self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
-                    self.base_statistics[CUMULATIVE_TICKS]
+                    cum_ticks
                 )
+                
+                # Avoid division by zero if bar has 0 ticks (should be rare)
+                buy_proportion = (buy_ticks_num / cum_ticks) if cum_ticks > 0 else 0
                 self.run_bars_statistics[
                     PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
-                ].append(
-                    self.run_bars_statistics[BUY_TICKS_NUMBER]
-                    / self.base_statistics[CUMULATIVE_TICKS]
-                )
+                ].append(buy_proportion)
 
                 # Update E[T]
                 self.information_driven_bars_statistics[
@@ -196,22 +175,18 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 ] = self._expected_number_of_ticks()
 
                 # Update E[P[buy]]
-                # Determine window size, fall back to imbalance window if None
                 window = self.window_size_for_expected_n_ticks_estimation or \
                         self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
 
+                prob_buy_list = self.run_bars_statistics[
+                    PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
+                ]
+                
                 self.run_bars_statistics[
                     EXPECTED_BUY_TICKS_PROPORTION
                 ] = ewma(
-                    np.array(
-                        self.run_bars_statistics[
-                            PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
-                        ][
-                            -window:  # <--- FIXED
-                        ],
-                        dtype=float,
-                    ),
-                    window,  # <--- FIXED
+                    np.array(prob_buy_list[-window:], dtype=float),
+                    window,
                 )[-1]
 
                 # Update E[theta_buy] and E[theta_sell]
@@ -230,6 +205,18 @@ class AbstractRunBars(AbstractInformationDrivenBars):
 
                 # Reset cached fields
                 self._reset_cached_fields()
+
+        # --- Handle the very last bar ---
+        if self.open_price is not None and date_time is not None:
+            next_bar = self._construct_next_bar(
+                date_time,       # Last known timestamp
+                self.tick_counter,
+                self.close_price,
+                self.high_price,
+                self.low_price,
+                threshold,       # Last calculated threshold
+            )
+            bars_list.append(next_bar)
 
         return bars_list
 

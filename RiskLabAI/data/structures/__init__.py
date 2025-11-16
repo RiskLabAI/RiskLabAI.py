@@ -14,8 +14,8 @@ from .imbalance_bars import ExpectedImbalanceBars, FixedImbalanceBars
 # Exports from run_bars.py
 from .run_bars import ExpectedRunBars, FixedRunBars
 
-# Export from hedging.py
-from ...optimization.hedging import pca_weights
+# Note: Removed 'pca_weights' from here as it belongs in 'optimization',
+# not 'data.structures'.
 
 
 __all__ = [
@@ -25,5 +25,4 @@ __all__ = [
     "FixedImbalanceBars",
     "ExpectedRunBars",
     "FixedRunBars",
-    "pca_weights",
 ]
