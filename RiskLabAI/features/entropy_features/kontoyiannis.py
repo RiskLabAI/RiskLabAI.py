@@ -3,7 +3,7 @@ Implements the Kontoyiannis Entropy estimator (LZ-based).
 """
 
 from math import log2
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional
 
 def longest_match_length(
     message: str, i: int, n: int
@@ -81,8 +81,9 @@ def kontoyiannis_entropy(
     float
         The calculated Kontoyiannis Entropy (H_k).
     """
-    output: Dict[str, Any] = {"num": 0, "sum": 0, "sub_string": []}
     message_length = len(message)
+    sum_h = 0.0
+    num_points = 0
 
     if window is None:
         # Expanding window: n = i
@@ -99,14 +100,12 @@ def kontoyiannis_entropy(
         n = i if window is None else window
         if n == 0: continue # Avoid log2(0)
             
-        l_i, sub_string = longest_match_length(message, i, n)
+        l_i, _ = longest_match_length(message, i, n)
         
-        output["sum"] += log2(n) / l_i
-        output["sub_string"].append(sub_string)
-        output["num"] += 1
+        sum_h += log2(n) / l_i
+        num_points += 1
 
-    if output["num"] == 0:
+    if num_points == 0:
         return 0.0
 
-    output["h"] = output["sum"] / output["num"]
-    return output["h"]
+    return sum_h / num_points

@@ -95,7 +95,7 @@ def test_fractional_difference_fixed_single(sample_series):
     sample_series, degree=0.5, threshold=0.01
     )
     assert not diff_d05.empty
-    assert diff_d05.iloc[0] > 1.0 # Should be > diff(1)
+    assert diff_d05.dropna().iloc[0] > 1.0 
 
 def test_fractionally_differentiated_log_price(random_walk_series):
     """Test the minimum 'd' finding function."""

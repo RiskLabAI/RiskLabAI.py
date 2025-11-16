@@ -10,6 +10,10 @@ Reference:
 import numpy as np
 import pandas as pd
 
+# Constant 'd' from the paper (denominator)
+_DENOMINATOR = 3 - 2 * (2**0.5)
+
+
 def beta_estimates(
     high_prices: pd.Series, low_prices: pd.Series, window_span: int
 ) -> pd.Series:
@@ -75,8 +79,9 @@ def alpha_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     Estimate \(\alpha\) from \(\beta\) and \(\gamma\).
 
     .. math::
-        \alpha = \frac{\sqrt{2\beta} - \sqrt{\beta}}{3 - 2\sqrt{2}}
-                 - \sqrt{\frac{\gamma}{3 - 2\sqrt{2}}}
+        d = 3 - 2\sqrt{2}
+        \alpha = \frac{(\sqrt{2} - 1)\sqrt{\beta}}{d}
+                 - \sqrt{\frac{\gamma}{d}}
 
     Parameters
     ----------
@@ -90,12 +95,11 @@ def alpha_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     pd.Series
         The estimated \(\alpha\) vector, floored at 0.
     """
-    denominator = 3 - 2 * (2**0.5)
-    term1 = ((2**0.5) - 1) * (beta**0.5) / denominator
-    term2 = (gamma / denominator) ** 0.5
+    term1 = ((2**0.5) - 1) * (beta**0.5) / _DENOMINATOR
+    term2 = (gamma / _DENOMINATOR) ** 0.5
     
-    alpha = term1 - term2
-    alpha[alpha < 0] = 0.0  # Floor at zero
+    # Floor at zero
+    alpha = np.maximum(term1 - term2, 0)
     return alpha
 
 

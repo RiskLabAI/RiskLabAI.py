@@ -2,7 +2,7 @@
 High-Performance Computing (HPC) utilities for parallel processing.
 
 Provides a set of functions to parallelize operations, especially
-on pandas objects, using Python's multiprocessing.
+on pandas objects, using Python's multiprocessing and Joblib.
 """
 
 import multiprocessing as mp
@@ -10,18 +10,18 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import time
-from typing import List, Dict, Any, Callable, Tuple, Union, Iterable
-from typing import Optional
+import joblib  # <-- Added missing import
+from typing import List, Dict, Any, Callable, Tuple, Union, Iterable, Optional
 
 def parallel_run(
     func: Callable[..., Any],
     iterable: Iterable[Any],
     num_cpus: int = -1,
-    lin_partition: bool = False,  # <-- RECOMMENDED: Change default to False
+    lin_partition: bool = False,
     **kwargs
 ) -> List[Any]:
     """
-    Executes a function in parallel over an iterable.
+    Executes a function in parallel over an iterable using Joblib.
 
     Parameters
     ----------
@@ -47,13 +47,20 @@ def parallel_run(
         A list of the results from all parallel executions.
     """
     if num_cpus == -1:
-        num_cpus = multiprocessing.cpu_count()
+        num_cpus = mp.cpu_count()
 
     if lin_partition:
         # --- Chunked Partitioning ---
         # func must accept a list of indices
+        # NOTE: This implies `iterable` must support `len()`.
+        try:
+            iterable_len = len(iterable)
+        except TypeError:
+            iterable = list(iterable)
+            iterable_len = len(iterable)
+            
         num_atoms = num_cpus
-        iterable_partition = np.array_split(range(len(iterable)), num_atoms)
+        iterable_partition = np.array_split(range(iterable_len), num_atoms)
         jobs = (iterable_partition[i] for i in range(num_atoms))
 
         results = joblib.Parallel(n_jobs=num_cpus)(
@@ -66,10 +73,10 @@ def parallel_run(
     else:
         # --- Item-by-Item Partitioning (Standard) ---
         # func accepts a single item
-        jobs = (iterable[i] for i in range(len(iterable)))
-
+        # <-- FIXED: Pass iterable directly. Joblib handles generators
+        # and lists efficiently. The original implementation was buggy.
         results = joblib.Parallel(n_jobs=num_cpus)(
-            joblib.delayed(func)(job, **kwargs) for job in jobs
+            joblib.delayed(func)(job, **kwargs) for job in iterable
         )
         return results
 
@@ -93,9 +100,13 @@ def report_progress(
     """
     progress = job_number / total_jobs
     elapsed_time_min = (time.time() - start_time) / 60.0
-    remaining_time_min = elapsed_time_min * (1 / progress - 1)
     
-    timestamp = str(dt.datetime.fromtimestamp(time.time()))
+    # Avoid division by zero if progress is 0
+    remaining_time_min = 0.0
+    if progress > 0:
+        remaining_time_min = elapsed_time_min * (1 / progress - 1)
+    
+    timestamp = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     message = (
         f"{timestamp} {progress*100:.2f}% {task} done after "
         f"{elapsed_time_min:.2f} minutes. Remaining {remaining_time_min:.2f} minutes."
@@ -104,6 +115,7 @@ def report_progress(
     if job_number < total_jobs:
         print(message, end='\r')
     else:
+        # Print a newline at the end
         print(message)
 
 
@@ -130,7 +142,7 @@ def expand_call(kargs: Dict[str, Any]) -> Any:
 
 
 def process_jobs(
-    jobs: List[Dict[str, Any]], task: Optional[str] = None, num_threads: int = 24
+    jobs: List[Dict[str, Any]], task: Optional[str] = None, num_threads: int = -1
 ) -> List[Any]:
     """
     Process a list of jobs in parallel using multiprocessing.
@@ -143,8 +155,10 @@ def process_jobs(
     task : str, optional
         A name for the task, used for progress reporting. If None,
         the function name from the first job is used.
-    num_threads : int, default=24
+    num_threads : int, default=-1
         The number of parallel processes to spawn.
+        -1 means use all available CPUs.
+        1 means run sequentially (for debugging).
 
     Returns
     -------
@@ -153,6 +167,15 @@ def process_jobs(
     """
     if task is None:
         task = jobs[0]['func'].__name__
+
+    # <-- Handle sequential case for debugging
+    if num_threads == 1:
+        print(f"Running {len(jobs)} jobs sequentially for debugging.")
+        return process_jobs_sequential(jobs)
+
+    # <-- Handle -1 for all CPUs
+    if num_threads == -1:
+        num_threads = mp.cpu_count()
 
     with mp.Pool(processes=num_threads) as pool:
         outputs = []
@@ -184,9 +207,16 @@ def process_jobs_sequential(jobs: List[Dict[str, Any]]) -> List[Any]:
         A list containing the results from all jobs.
     """
     output = []
-    for job in jobs:
+    start_time = time.time()
+    task = "Sequential Processing"
+    if jobs:
+        task = jobs[0].get('func', lambda: None).__name__
+
+    for i, job in enumerate(jobs, 1):
         output_ = expand_call(job)
         output.append(output_)
+        report_progress(i, len(jobs), start_time, task)
+        
     return output
 
 
@@ -209,6 +239,9 @@ def linear_partitions(num_atoms: int, num_threads: int) -> np.ndarray:
         An array of partition boundary indices.
     """
     n_parts = min(num_threads, num_atoms)
+    if n_parts == 0:
+        return np.array([0])
+        
     partitions = np.linspace(0, num_atoms, n_parts + 1)
     partitions = np.ceil(partitions).astype(int)
     return partitions
@@ -244,6 +277,9 @@ def nested_partitions(
     partitions = [0]
     n_threads_ = min(num_threads, num_atoms)
     
+    if n_threads_ == 0:
+        return np.array([0])
+
     for _ in range(n_threads_):
         last_part = partitions[-1]
         part_size = 1 + 4 * (
@@ -264,11 +300,11 @@ def nested_partitions(
 def mp_pandas_obj(
     func: Callable[..., pd.Series],
     pandas_object: Tuple[str, pd.Index],
-    num_threads: int = 2,
+    num_threads: int = -1,
     mp_batches: int = 1,
     linear_partition: bool = True,
     **kwargs: Any
-) -> Union[pd.DataFrame, pd.Series]:
+) -> Union[pd.DataFrame, pd.Series, List[Any]]:
     """
     Parallelize a function call on a pandas object (DataFrame/Series).
 
@@ -285,8 +321,10 @@ def mp_pandas_obj(
         - [0] (str): The name of the argument in `func` that
                      receives the partition (e.g., 'molecule').
         - [1] (pd.Index): The index to be partitioned.
-    num_threads : int, default=2
+    num_threads : int, default=-1
         Number of parallel processes.
+        -1 means use all available CPUs.
+        1 means run sequentially (for debugging).
     mp_batches : int, default=1
         Number of batches to split the jobs into.
     linear_partition : bool, default=True
@@ -297,16 +335,23 @@ def mp_pandas_obj(
 
     Returns
     -------
-    Union[pd.DataFrame, pd.Series]
+    Union[pd.DataFrame, pd.Series, List[Any]]
         The concatenated results from all parallel calls.
+        Returns a List if the output is not a pandas object.
     """
+    # <-- Resolve num_threads here to correctly handle mp_batches
+    if num_threads == -1:
+        num_threads = mp.cpu_count()
+        
+    total_parts = num_threads * mp_batches
+    
     if linear_partition:
         parts = linear_partitions(
-            len(pandas_object[1]), num_threads * mp_batches
+            len(pandas_object[1]), total_parts
         )
     else:
         parts = nested_partitions(
-            len(pandas_object[1]), num_threads * mp_batches
+            len(pandas_object[1]), total_parts
         )
 
     jobs = []
@@ -318,16 +363,17 @@ def mp_pandas_obj(
         job.update(kwargs)
         jobs.append(job)
 
-    if num_threads == 1:
-        out = process_jobs_sequential(jobs)
-    else:
-        out = process_jobs(jobs, num_threads=num_threads)
+    # <-- Pass num_threads to process_jobs, which now handles 1 correctly
+    out = process_jobs(jobs, num_threads=num_threads)
+    
+    if not out:
+        return pd.DataFrame() # Return empty DataFrame if no results
 
     if isinstance(out[0], pd.DataFrame):
         result_df = pd.concat(out)
     elif isinstance(out[0], pd.Series):
         result_df = pd.concat(out)
     else:
-        return out
+        return out # Return list of other objects
 
     return result_df.sort_index()

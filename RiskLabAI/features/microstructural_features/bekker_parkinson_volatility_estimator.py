@@ -9,7 +9,12 @@ Reference:
 
 from math import pi
 import pandas as pd
-from .corwin_schultz import beta_estimates, gamma_estimates
+import numpy as np
+from .corwin_schultz import (
+    beta_estimates, 
+    gamma_estimates, 
+    _DENOMINATOR
+)
 
 def sigma_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     r"""
@@ -34,13 +39,12 @@ def sigma_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
         Bekker-Parkinson volatility \(\sigma\) estimates.
     """
     k2 = (8 / pi) ** 0.5
-    denominator = 3 - 2 * (2**0.5)
 
-    term1 = (2**0.5 - 1) * (beta**0.5) / denominator
-    term2 = (gamma / (k2**2 * denominator)) ** 0.5
+    term1 = (2**0.5 - 1) * (beta**0.5) / _DENOMINATOR
+    term2 = (gamma / (k2**2 * _DENOMINATOR)) ** 0.5
     
-    sigma = term1 + term2
-    sigma[sigma < 0] = 0.0 # Floor at zero
+    # Floor at zero
+    sigma = np.maximum(term1 + term2, 0)
 
     return sigma
 

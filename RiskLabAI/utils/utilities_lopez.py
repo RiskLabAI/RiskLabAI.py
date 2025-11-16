@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import time
 from typing import List, Tuple
-from RiskLabAI.utils.smoothing_average import compute_exponential_weighted_moving_average
-from RiskLabAI.utils.progress import  progress_bar
+from .ewma import ewma  # <-- SUGGESTION 1: Import the correct, jitted ewma
+from .progress import progress_bar
 
 
 def compute_thresholds(
@@ -66,12 +66,19 @@ def compute_thresholds(
             time_deltas.append(time_delta)
             times.append(i)
             previous_time = i
-            expected_ticks = compute_exponential_weighted_moving_average(
-                np.array(time_deltas), window_length=np.int64(len(time_deltas))
+            
+            # --- SUGGESTION 1 (Continued) ---
+            # Call the correct `ewma` function and use the correct `window` parameter.
+            # Note: The logic of recalculating the EWMA over the full history
+            # inside the loop is O(N^2) but may be the intended design.
+            # This change just fixes the function being called.
+            expected_ticks = ewma(
+                np.array(time_deltas), window=len(time_deltas)
             )[-1]
+            
             expected_bar_value = np.abs(
-                compute_exponential_weighted_moving_average(
-                    target_column_values[:i], window_length=np.int64(initial_expected_ticks)
+                ewma(
+                    target_column_values[:i], window=initial_expected_ticks
                 )[-1]
             )
 
@@ -91,16 +98,24 @@ def create_ohlcv_dataframe(
     :return: A DataFrame containing OHLCV data and other relevant information.
     :rtype: pd.DataFrame
     """
+    
+    # --- SUGGESTION 2: Vectorized Approach ---
+    # This is much faster than using .apply()
+    
     ohlc = tick_data_grouped['price'].ohlc()
-    ohlc['volume'] = tick_data_grouped['size'].sum()
-    ohlc['value_of_trades'] = tick_data_grouped.apply(
-        lambda x: (x['price'] * x['size']).sum() / x['size'].sum()
-    )
+    volume = tick_data_grouped['size'].sum()
+    
+    # Calculate VWAP (Value of Trades)
+    value = (tick_data_grouped['price'] * tick_data_grouped['size']).sum()
+    
+    ohlc['volume'] = volume
+    ohlc['value_of_trades'] = value / volume  # This is the VWAP
     ohlc['price_mean'] = tick_data_grouped['price'].mean()
     ohlc['tick_count'] = tick_data_grouped['price'].count()
+    
+    # Handle potential 0-volume bars to avoid NaN
+    ohlc['value_of_trades'] = ohlc['value_of_truths'].fillna(0)
+    
     ohlc['price_mean_log_return'] = np.log(ohlc['price_mean']) - np.log(ohlc['price_mean'].shift(1))
 
     return ohlc
-
-
-

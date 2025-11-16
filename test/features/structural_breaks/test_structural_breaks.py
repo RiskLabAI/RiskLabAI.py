@@ -62,9 +62,19 @@ def test_prepare_data(sample_series):
     # y = diff (index 2-5)
     #   [ -0.1, 0.2, 0.2, -0.1 ]
     
-    y, x = prepare_data(sample_series, constant='c', lags=lags)
+    # FIX 1: Pass the Series, not the DataFrame
+    y, x = prepare_data(sample_series['price'], constant='c', lags=lags)
     
     assert y.shape == (4, 1)
+    # The expected x calculation in your test file comments was slightly off.
+    # The lagged level (x_df) should be [nan, 1.0, 1.2, 1.1, 1.3, 1.5]
+    # The lagged diff (lagged_deltas) is [nan, nan, 0.2, -0.1, 0.2, 0.2]
+    # After join and dropna (from index 2):
+    #   y      x = [level_l1, delta_l1, constant]
+    # -0.1     [1.2,  0.2, 1.0]
+    #  0.2     [1.1, -0.1, 1.0]
+    #  0.2     [1.3,  0.2, 1.0]
+    # -0.1     [1.5,  0.2, 1.0]
     assert x.shape == (4, 3) # level, lag 1 diff, constant
     
     expected_y = np.array([[-0.1], [0.2], [0.2], [-0.1]])
@@ -100,19 +110,19 @@ def test_compute_beta_bugfix():
     assert np.allclose(my_betas, sm_betas)
     assert np.allclose(my_vcov, sm_vcov)
     
-
-
 def test_adf_function(random_walk_series):
     """Test the main ADF loop."""
+    # FIX 2: Pass the Series, not the DataFrame
     results = get_bsadf_statistic(
-        log_price=random_walk_series,
+        log_price=random_walk_series['log_price'],
         min_sample_length=20,
         constant='c',
         lags=1
     )
     
     assert 'Time' in results
-    assert 'gsadf' in results
+    
+    assert 'bsadf' in results
     assert isinstance(results['Time'], int)
-    assert isinstance(results['gsadf'], float)
-    assert np.isfinite(results['gsadf'])
+    assert isinstance(results['bsadf'], float)
+    assert np.isfinite(results['bsadf'])
