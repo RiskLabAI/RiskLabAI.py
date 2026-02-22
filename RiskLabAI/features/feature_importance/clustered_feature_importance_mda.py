@@ -120,7 +120,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
                     continue
                     
                 # Get the underlying numpy array for these columns
-                cluster_data = x_test_shuffled[cluster_cols].values
+                cluster_data = x_test_shuffled[cluster_cols].values.copy()
                 
                 # Shuffle the rows of this array in-place.
                 # This applies the *same* permutation to all features
