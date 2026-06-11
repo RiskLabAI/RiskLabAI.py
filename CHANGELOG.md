@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Fixed
+- `utils.determine_strategy_side`: signal dtype was platform-dependent (int32 on
+  Windows); now always int64.
+- `data.labeling.calculate_t_value_linear_regression`: constant series now returns
+  NaN (0/0 is undefined) as documented, instead of 0.0.
+- `data.differentiation.fractional_difference_std`: result had object dtype; now float.
+- Raw-string docstrings in `denoising`/`bekker_parkinson` (LaTeX `\(` raised
+  SyntaxWarning on Python 3.12).
 - `backtest.bet_sizing`: `avgActiveSignals`/`Signal` silently returned empty results — the module
   imported `mpPandasObj` while `RiskLabAI.hpc` exports `mp_pandas_obj`, so a placeholder returning
   an empty DataFrame always took over. The silent placeholder is removed; the real import is used.
