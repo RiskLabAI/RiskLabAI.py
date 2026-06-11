@@ -58,7 +58,9 @@ def determine_strategy_side(
         slow_ma = prices.rolling(window=slow_window, min_periods=1).mean()
 
     # Create signal: 1 if fast > slow, -1 if fast < slow
-    signal = (fast_ma >= slow_ma).astype(int) * 2 - 1
+    # Explicit int64: plain `int` maps to int32 on Windows, which makes the
+    # returned dtype platform-dependent.
+    signal = (fast_ma >= slow_ma).astype("int64") * 2 - 1
     
     if mean_reversion:
         # Invert the signal for mean reversion
