@@ -111,7 +111,7 @@ def fractional_difference_std(
     weights_cumsum_abs /= weights_cumsum_abs[-1]
     skip = np.searchsorted(weights_cumsum_abs, threshold)
     
-    result_df = pd.DataFrame(index=series.index, columns=series.columns)
+    result_df = pd.DataFrame(index=series.index, columns=series.columns, dtype=float)
 
     for name in series.columns:
         # Use .ffill() - fillna(method=) is deprecated

@@ -95,7 +95,7 @@ def fit_kde(
 def _mp_pdf_fit_error(
     variance: float, q: float, eigenvalues: np.ndarray, bandwidth: float
 ) -> float: # <-- FIX 2: Added bandwidth
-    """
+    r"""
     Error function for fitting the MP PDF to observed eigenvalues.
     
     Calculates the sum of squared errors between the theoretical
@@ -136,7 +136,7 @@ def _mp_pdf_fit_error(
 def find_max_eval(
     eigenvalues: np.ndarray, q: float, bandwidth: float
 ) -> Tuple[float, float]:
-    """
+    r"""
     Find the maximum theoretical eigenvalue (\(\lambda_{max}\))
     by fitting the Marcenko-Pastur distribution.
 

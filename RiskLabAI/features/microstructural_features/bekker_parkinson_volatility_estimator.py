@@ -52,7 +52,7 @@ def sigma_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
 def bekker_parkinson_volatility_estimates(
     high_prices: pd.Series, low_prices: pd.Series, window_span: int = 20
 ) -> pd.Series:
-    """
+    r"""
     Compute Bekker-Parkinson volatility estimates from high and low prices.
 
     This function first calculates the Corwin-Schultz \(\beta\) and \(\gamma\)
