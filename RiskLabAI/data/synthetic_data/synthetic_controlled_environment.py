@@ -7,7 +7,6 @@ from typing import Dict, List, Tuple, Union, Optional
 
 import numpy as np
 import pandas as pd
-import quantecon.markov as qe
 from numba import jit
 from joblib import Parallel, delayed
 
@@ -277,6 +276,8 @@ def generate_prices_from_regimes(
     rng = np.random.default_rng(random_state)
     
     # 1. Simulate the Markov Chain
+    import quantecon.markov as qe  # optional dependency: RiskLabAI[synth]
+
     regime_names = list(regimes.keys())
     markov_chain = qe.MarkovChain(transition_matrix, state_values=regime_names)
     simulated_regimes = markov_chain.simulate(

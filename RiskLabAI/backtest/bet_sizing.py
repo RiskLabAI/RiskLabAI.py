@@ -3,31 +3,15 @@ Functions for calculating bet size based on model probabilities and
 other strategy parameters.
 
 Includes implementations from de Prado (2018).
-
-## TODO:
-- [ ] **HPC Dependency:** The `mpPandasObj` placeholder in
-      `strategy_bet_sizing` and `avgActiveSignals` should be
-      hardened. If `RiskLabAI.hpc` is a core dependency,
-      consider raising an `ImportError` instead of using a
-      placeholder that returns an empty DataFrame, which could
-      fail silently.
 """
 
-from typing import Optional, Any
+from typing import Optional
 import numpy as np
 import pandas as pd
 from numba import jit
 from scipy.stats import norm
 
-# Assuming RiskLabAI.hpc provides mpPandasObj
-# Since it's not provided, we'll create a placeholder for type hinting
-try:
-    from RiskLabAI.hpc import mpPandasObj
-except ImportError:
-    # Placeholder for type hinting if hpc module is not available
-    def mpPandasObj(*args: Any, **kwargs: Any) -> pd.DataFrame:
-        print("Warning: RiskLabAI.hpc.mpPandasObj not found. Using placeholder.")
-        return pd.DataFrame()
+from RiskLabAI.hpc import mp_pandas_obj
 
 
 def probability_bet_size(
@@ -182,7 +166,7 @@ def avgActiveSignals(
         DataFrame with signal start times as index, and columns 't1' (end time)
         and 'signal' (signal value).
     nThreads : int
-        Number of threads to use for parallel execution via `mpPandasObj`.
+        Number of threads to use for parallel execution via `mp_pandas_obj`.
 
     Returns
     -------
@@ -196,7 +180,7 @@ def avgActiveSignals(
     timePoints.sort()
     
     # 2) call parallel function
-    out = mpPandasObj(
+    out = mp_pandas_obj(
         mpAvgActiveSignals,
         ("molecule", timePoints),
         nThreads,
