@@ -41,8 +41,9 @@ def calculate_t_value_linear_regression(prices: pd.Series) -> float:
         return np.nan
         
     if ols.stderr == 0:
-        # Handle perfect fit (vertical line, or constant)
-        return np.sign(ols.slope) * np.inf if ols.slope != 0 else 0.0
+        # Perfect trend: t -> +/- inf. Constant series: 0/0 -> undefined (NaN),
+        # consistent with the documented contract.
+        return np.sign(ols.slope) * np.inf if ols.slope != 0 else np.nan
 
     return ols.slope / ols.stderr
 
