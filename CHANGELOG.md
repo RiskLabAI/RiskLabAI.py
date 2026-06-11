@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Fixed
+- `features.feature_importance` (MDA): feature shuffling mutated a column view
+  in place, which raises `ValueError: array is read-only` under pandas
+  copy-on-write (default since pandas 3.0). Now shuffles a copy and assigns back.
+
 ## [1.0.9]
 
 ### Fixed
