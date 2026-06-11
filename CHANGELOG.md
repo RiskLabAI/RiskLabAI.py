@@ -3,7 +3,7 @@
 All notable changes to RiskLabAI.py are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [1.0.9]
 
 ### Fixed
 - `utils.determine_strategy_side`: signal dtype was platform-dependent (int32 on
