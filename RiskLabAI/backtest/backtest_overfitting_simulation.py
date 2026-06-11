@@ -27,7 +27,6 @@ import itertools
 import warnings
 from typing import Dict, Union, Tuple, List, Any, Optional
 from scipy.stats import kendalltau
-from memory_profiler import memory_usage
 import subprocess
 
 from RiskLabAI.data.differentiation import fractionally_differentiated_log_price
@@ -987,6 +986,8 @@ def generate_random_data(n_samples: int, n_features: int) -> Tuple[pd.DataFrame,
 
 # Function to measure computational requirements
 def measure_computational_requirements(cross_validator, model, data, target, weights, n_jobs: int = 1) -> Dict[str, Any]:
+    from memory_profiler import memory_usage  # optional dependency: RiskLabAI[dev]
+
     start_time = time.time()
     mem_usage = memory_usage((cross_validator.backtest_predictions, (model, data, target, weights), {'predict_probability': True, 'n_jobs': n_jobs}), interval=0.1)
     end_time = time.time()
