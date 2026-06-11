@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: pytest (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package with all extras
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[all]" pytest
+      - name: Run tests
+        # test/pde requires a working torch runtime; revisit when pde is
+        # re-validated (see IMPROVEMENT_PLAN.md phase 3).
+        run: pytest -q --ignore=test/pde
+
+  minimal-install:
+    name: base install is importable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install base package only (no extras)
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+      - name: Import every public sub-package
+        run: |
+          python -c "
+          import RiskLabAI
+          print('version:', RiskLabAI.__version__)
+          for sub in ['backtest', 'cluster', 'controller', 'data',
+                      'ensemble', 'features', 'hpc', 'optimization', 'utils']:
+              getattr(RiskLabAI, sub)
+              print('ok:', sub)
+          "
+
+  lint:
+    name: ruff + black (advisory until format pass lands)
+    runs-on: ubuntu-latest
+    # Non-blocking until the mechanical black/ruff formatting commit lands;
+    # then remove continue-on-error to make style CI-enforced.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff black
+      - run: ruff check RiskLabAI test
+      - run: black --check RiskLabAI test

@@ -34,16 +34,16 @@ keywords = [
 # --- CORE DEPENDENCIES ---
 # These are fast to install and essential for the library's main functions.
 dependencies = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "scikit-learn",
-    "statsmodels",
-    "numba",
-    "joblib",
-    "ta",
-    "tqdm",
-    "sympy",
+    "numpy>=1.22,<3",
+    "pandas>=1.5",
+    "scipy>=1.8",
+    "scikit-learn>=1.1",
+    "statsmodels>=0.13",
+    "numba>=0.57",
+    "joblib>=1.1",
+    "ta>=0.10",
+    "tqdm>=4.60",
+    "sympy>=1.10",
 ]
 
 # --- OPTIONAL DEPENDENCIES ---
@@ -76,3 +76,16 @@ Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/blob/main/CHANGELOG.md"
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+# E501 deferred until the mechanical black formatting pass lands
+ignore = ["E501"]

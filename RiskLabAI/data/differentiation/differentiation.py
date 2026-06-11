@@ -12,7 +12,6 @@ Reference:
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 from typing import Tuple, Optional
 
@@ -230,8 +229,8 @@ def plot_weights(
     degree_range: Tuple[float, float],
     number_degrees: int,
     size: int,
-    ax: Optional[plt.Axes] = None
-) -> plt.Axes:
+    ax: Optional["plt.Axes"] = None
+) -> "plt.Axes":
     """
     Plot the weights of fractionally differentiated series for various degrees.
 
@@ -251,6 +250,8 @@ def plot_weights(
     plt.Axes
         The axes object with the plot.
     """
+    import matplotlib.pyplot as plt  # optional dependency: RiskLabAI[plot]
+
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 6))
         
