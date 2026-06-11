@@ -42,6 +42,8 @@ dependencies = [
     "numba",
     "joblib",
     "ta",
+    "tqdm",
+    "sympy",
 ]
 
 # --- OPTIONAL DEPENDENCIES ---
@@ -58,6 +60,7 @@ dev = [
     "gymnasium",
     "torchvision", # Often needed with torch
     "torchaudio",  # Often needed with torch
+    "pytest",
 ]
 all = [
     "RiskLabAI[pde]",
@@ -69,9 +72,7 @@ all = [
 [project.urls]
 Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
 "Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
-Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/releases"
+Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/blob/main/CHANGELOG.md"
 
-# --- ENTRY POINT ---
-# This was moved from setup.cfg
-[project.scripts]
-RiskLabAI = "RiskLabAI.app:entry_point"
+[tool.pytest.ini_options]
+testpaths = ["test"]

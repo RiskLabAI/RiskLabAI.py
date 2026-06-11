@@ -44,7 +44,13 @@ from . import optimization
 # from . import pde # Temporarily disabled to prevent torch crash
 from . import utils
 
-__version__ = "0.0.93"
+# Single source of truth for the version is pyproject.toml.
+try:
+    from importlib.metadata import version as _version
+
+    __version__ = _version("RiskLabAI")
+except Exception:  # pragma: no cover - package not installed (e.g. source tree)
+    __version__ = "0.0.0+unknown"
 
 __all__ = [
     "backtest",
