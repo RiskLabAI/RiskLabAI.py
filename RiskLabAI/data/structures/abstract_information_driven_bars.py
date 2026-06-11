@@ -6,17 +6,7 @@ from abc import abstractmethod
 from typing import Union, List, Optional
 import numpy as np
 
-# Assuming ewma is in utils.
-try:
-    from RiskLabAI.utils.ewma import ewma 
-except ImportError:
-    # Fallback if ewma is not in utils (as seen in older files)
-    def ewma(array: np.ndarray, window: int) -> np.ndarray:
-        """Placeholder EWMA function."""
-        if array.size == 0:
-            return np.array([np.nan])
-        return pd.Series(array).ewm(span=window).mean().values
-
+from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import *
 

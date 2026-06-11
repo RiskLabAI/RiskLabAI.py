@@ -10,16 +10,7 @@ import numpy as np
 from RiskLabAI.data.structures.abstract_imbalance_bars import AbstractImbalanceBars
 from RiskLabAI.utils.constants import *
 
-# Assuming ewma is in utils
-try:
-    from RiskLabAI.utils.ewma import ewma 
-except ImportError:
-    # Fallback if ewma is not in utils (as seen in older files)
-    def ewma(array: np.ndarray, window: int) -> np.ndarray:
-        """Placeholder EWMA function."""
-        if array.size == 0:
-            return np.array([np.nan])
-        return pd.Series(array).ewm(span=window).mean().values
+from RiskLabAI.utils.ewma import ewma
 
 class ExpectedImbalanceBars(AbstractImbalanceBars):
     """

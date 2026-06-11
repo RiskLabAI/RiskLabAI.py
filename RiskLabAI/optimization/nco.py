@@ -10,16 +10,9 @@ import pandas as pd
 from typing import Optional, Tuple, Dict, List
 
 # Import canonical implementations instead of duplicating
-try:
-    from RiskLabAI.cluster.clustering import (
-        cluster_k_means_base, covariance_to_correlation
-    )
-except ImportError:
-    # Fallback for testing if cluster module not found
-    print("Warning: RiskLabAI.cluster.clustering not found. Using dummy functions.")
-    def covariance_to_correlation(cov: np.ndarray) -> np.ndarray: return cov
-    def cluster_k_means_base(*args, **kwargs) -> Tuple:
-        return pd.DataFrame(), {}, pd.Series()
+from RiskLabAI.cluster.clustering import (
+    cluster_k_means_base, covariance_to_correlation
+)
 
 def get_optimal_portfolio_weights(
     covariance: np.ndarray, mu: Optional[np.ndarray] = None

@@ -2,3 +2,12 @@ desktop.ini
 
 __pycache__/
 *.pyc
+*.egg-info/
+dist/
+build/
+.pypirc
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/

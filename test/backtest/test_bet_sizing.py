@@ -10,10 +10,38 @@ from RiskLabAI.backtest.bet_sizing import (
     probability_bet_size,
     average_bet_sizes,
     strategy_bet_sizing,
+    avgActiveSignals,
     betSize,
     TPos,
     getW,
 )
+
+
+def test_avg_active_signals():
+    """
+    Regression test: avgActiveSignals used to silently return an empty
+    DataFrame because of a broken `mpPandasObj` import (the placeholder
+    fallback always took over). Verifies real averaged values are returned.
+    """
+    idx = pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-05"])
+    signals = pd.DataFrame(
+        {
+            "t1": pd.to_datetime(["2020-01-03", "2020-01-04", "2020-01-06"]),
+            "signal": [1.0, 0.5, -1.0],
+        },
+        index=idx,
+    )
+
+    out = avgActiveSignals(signals, nThreads=1)
+
+    assert len(out) > 0, "avgActiveSignals returned an empty result"
+    out = out.sort_index()
+    # At 2020-01-02: signals 1 (active, t1=01-03) and 2 (starts 01-02) -> (1.0+0.5)/2
+    assert np.isclose(out.loc[pd.Timestamp("2020-01-02")], 0.75)
+    # At 2020-01-03: signal 1 expired at its t1, signal 2 active -> 0.5
+    assert np.isclose(out.loc[pd.Timestamp("2020-01-03")], 0.5)
+    # At 2020-01-05: only signal 3 -> -1.0
+    assert np.isclose(out.loc[pd.Timestamp("2020-01-05")], -1.0)
 
 def test_probability_bet_size():
     """Test probability_bet_size function."""
