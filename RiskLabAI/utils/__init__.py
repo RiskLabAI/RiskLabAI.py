@@ -15,12 +15,26 @@ from .constants import *
 from .ewma import ewma
 from .progress import progress_bar
 from .momentum_mean_reverting_strategy_sides import determine_strategy_side
-from .update_figure_layout import update_figure_layout
-from .publication_plots import (
-    setup_publication_style,
-    apply_plot_style,
-    finalize_plot
-)
+
+# Plotting helpers are imported lazily (PEP 562) so that the base install
+# does not require matplotlib/seaborn/plotly (RiskLabAI[plot] extra).
+_LAZY_PLOTTING = {
+    "update_figure_layout": ("update_figure_layout", "update_figure_layout"),
+    "setup_publication_style": ("publication_plots", "setup_publication_style"),
+    "apply_plot_style": ("publication_plots", "apply_plot_style"),
+    "finalize_plot": ("publication_plots", "finalize_plot"),
+}
+
+
+def __getattr__(name):
+    if name in _LAZY_PLOTTING:
+        from importlib import import_module
+
+        module_name, attr = _LAZY_PLOTTING[name]
+        value = getattr(import_module(f".{module_name}", __name__), attr)
+        globals()[name] = value
+        return value
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 # --- Alias for Backward Compatibility ---
 # 'smoothing_average.py' is a duplicate of 'ewma.py'.

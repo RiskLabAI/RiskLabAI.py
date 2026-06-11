@@ -5,23 +5,12 @@ Abstract base class for Run Bars (Fixed and Expected).
 from abc import abstractmethod
 from typing import Union, List, Any, Iterable, Optional
 import numpy as np
-import pandas as pd # Added for ewma fallback
 
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars
 )
 from RiskLabAI.data.structures.abstract_bars import TickData
-
-try:
-    from RiskLabAI.utils.ewma import ewma 
-except ImportError:
-    # Fallback if ewma is not in utils (as seen in older files)
-    def ewma(array: np.ndarray, window: int) -> np.ndarray:
-        """Placeholder EWMA function."""
-        if array.size == 0:
-            return np.array([np.nan])
-        return pd.Series(array).ewm(span=window).mean().values
-
+from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.utils.constants import *
 
 

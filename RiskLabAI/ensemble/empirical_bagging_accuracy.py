@@ -14,8 +14,6 @@ from sklearn.exceptions import NotFittedError
 from scipy.stats import norm
 from typing import List, Optional, Tuple, Dict, Any
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 class BaggingClassifierAccuracy:
@@ -345,8 +343,8 @@ def plot_bootstrap_accuracy_distribution(
     a_n_values: np.ndarray,
     a_n_mean: float,
     a_n_std: float,
-    ax: Optional[plt.Axes] = None
-) -> plt.Axes:
+    ax: Optional["plt.Axes"] = None
+) -> "plt.Axes":
     """
     Plots the distribution of bootstrapped accuracy scores.
 
@@ -366,6 +364,9 @@ def plot_bootstrap_accuracy_distribution(
     plt.Axes
         The Axes object with the plot.
     """
+    import matplotlib.pyplot as plt  # optional dependency: RiskLabAI[plot]
+    import seaborn as sns  # optional dependency: RiskLabAI[plot]
+
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 6))
 
