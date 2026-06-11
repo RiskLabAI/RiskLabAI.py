@@ -97,7 +97,12 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
             rng = np.random.default_rng(self.random_state + i) 
             for feature in x.columns:
                 x_test_shuffled = x_test.copy(deep=True)
-                rng.shuffle(x_test_shuffled[feature].values) # <-- USE SEEDED SHUFFLE
+                # Shuffle a copy and assign back: with pandas copy-on-write
+                # (default since pandas 3.0), column .values is a read-only
+                # view and in-place shuffling raises ValueError.
+                shuffled_values = x_test_shuffled[feature].to_numpy(copy=True)
+                rng.shuffle(shuffled_values)  # seeded shuffle
+                x_test_shuffled[feature] = shuffled_values
 
                 shuffled_proba = fitted_classifier.predict_proba(x_test_shuffled)
                 
