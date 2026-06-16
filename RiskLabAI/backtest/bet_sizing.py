@@ -215,18 +215,41 @@ def mpAvgActiveSignals(
     pd.Series
         Series indexed by `loc` (timestamp) with the average signal value.
     """
-    out = pd.Series()
-    for loc in molecule:
-        # Keep signal that contain loc
-        signal_ = (signals.index.values <= loc) & (
-            (loc < signals["t1"]) | pd.isnull(signals["t1"])
-        )
-        act = signals[signal_].index
-        if len(act) > 0:
-            out[loc] = signals.loc[act, "signal"].mean()
-        else:
-            out[loc] = 0  # no signals active at this time
-    return out
+    # A signal i is active at `loc` iff start_i <= loc < t1_i. The average of
+    # active signals therefore equals (sum of `signal` over signals started by
+    # `loc`) minus (sum over signals ended by `loc`), divided by the analogous
+    # active count. Prefix sums + searchsorted compute this for every `loc` in
+    # O((n + m) log n) instead of the O(n * m) double scan, with identical
+    # values (verified in test/test_performance.py).
+    molecule_list = list(molecule)
+    if len(signals) == 0 or len(molecule_list) == 0:
+        return pd.Series(0.0, index=molecule_list)
+
+    molecule_array = np.asarray(molecule_list)
+    signal_values = signals["signal"].to_numpy(dtype=float)
+
+    starts = signals.index.values
+    start_order = np.argsort(starts, kind="mergesort")
+    sorted_starts = starts[start_order]
+    cum_signal_start = np.concatenate(([0.0], np.cumsum(signal_values[start_order])))
+    cum_count_start = np.arange(len(sorted_starts) + 1)
+
+    finite = ~pd.isnull(signals["t1"]).to_numpy()
+    end_times = signals["t1"].to_numpy()[finite]
+    end_order = np.argsort(end_times, kind="mergesort")
+    sorted_ends = end_times[end_order]
+    cum_signal_end = np.concatenate(([0.0], np.cumsum(signal_values[finite][end_order])))
+    cum_count_end = np.arange(len(sorted_ends) + 1)
+
+    started = np.searchsorted(sorted_starts, molecule_array, side="right")
+    ended = np.searchsorted(sorted_ends, molecule_array, side="right")
+    active_signal = cum_signal_start[started] - cum_signal_end[ended]
+    active_count = cum_count_start[started] - cum_count_end[ended]
+
+    with np.errstate(invalid="ignore", divide="ignore"):
+        averages = np.where(active_count > 0, active_signal / active_count, 0.0)
+
+    return pd.Series(averages, index=molecule_list)
 
 
 def discreteSignal(signal: pd.Series, stepSize: float) -> pd.Series:

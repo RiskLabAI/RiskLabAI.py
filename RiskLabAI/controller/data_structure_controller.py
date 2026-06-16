@@ -5,6 +5,8 @@ This class reads data in batches from CSVs or DataFrames and
 uses the BarsInitializerController to construct bars based on
 a specified method.
 """
+import logging
+
 import pandas as pd
 import numpy as np
 from typing import Iterable, Optional, Generator, Union, Dict, Any, List
@@ -17,6 +19,8 @@ from RiskLabAI.utils.constants import (
     CUMULATIVE_BUY_VOLUME, CUMULATIVE_SELL_VOLUME,
     CUMULATIVE_TICKS, CUMULATIVE_DOLLAR, THRESHOLD
 )
+
+logger = logging.getLogger(__name__)
 
 # Define the bar column schema
 BAR_COLUMNS = [
@@ -52,16 +56,20 @@ class Controller:
         try:
             initializer_method = self.bars_initializer.method_name_to_method[method_name]
         except KeyError:
-            print(f"Error: Bar method '{method_name}' not found.")
             valid_methods = list(self.bars_initializer.method_name_to_method.keys())
-            print(f"Valid methods are: {valid_methods}")
+            logger.error(
+                "Bar method '%s' not found. Valid methods are: %s",
+                method_name, valid_methods,
+            )
             return pd.DataFrame(columns=BAR_COLUMNS)
             
         try:
             bar_generator: AbstractBars = initializer_method(**method_arguments)
         except TypeError as e:
-            print(f"Error initializing bar method '{method_name}' with arguments {method_arguments}.")
-            print(f"TypeError: {e}")
+            logger.error(
+                "Error initializing bar method '%s' with arguments %s: %s",
+                method_name, method_arguments, e,
+            )
             return pd.DataFrame(columns=BAR_COLUMNS)
 
         # 2. Get the correct batch generator
@@ -75,7 +83,7 @@ class Controller:
         all_bars: List[List[Any]] = []
         
         # 3. Process data in batches
-        print("Processing data in batches...")
+        logger.info("Processing data in batches...")
         try:
             for data_batch in data_generator:
                 # We assume data is [datetime, price, volume]
@@ -83,22 +91,24 @@ class Controller:
                 bars = bar_generator.construct_bars_from_data(data=data_batch.values)
                 all_bars.extend(bars)
         except Exception as e:
-            print(f"Error during bar construction: {e}")
-            print("Returning DataFrame with bars constructed so far.")
+            logger.warning(
+                "Error during bar construction: %s. Returning DataFrame with "
+                "bars constructed so far.", e,
+            )
             # Continue to return whatever was processed
-            
-        print(f"Done. Constructed {len(all_bars)} bars.")
+
+        logger.info("Done. Constructed %d bars.", len(all_bars))
 
         # 4. Create final DataFrame
         bars_df = pd.DataFrame(all_bars, columns=BAR_COLUMNS)
 
         if output_path:
-            print(f"Saving bars to {output_path}...")
+            logger.info("Saving bars to %s...", output_path)
             try:
                 bars_df.to_csv(output_path, index=False)
-                print("Save complete.")
+                logger.info("Save complete.")
             except Exception as e:
-                print(f"Error saving file to {output_path}: {e}")
+                logger.error("Error saving file to %s: %s", output_path, e)
 
         return bars_df
 
@@ -130,13 +140,15 @@ class Controller:
             ):
                 yield batch
         except FileNotFoundError:
-            print(f"Error: File not found at {input_path}")
+            logger.error("File not found at %s", input_path)
             return
         except pd.errors.ParserError as e:
-            print(f"Error parsing CSV file {input_path}: {e}")
+            logger.error("Error parsing CSV file %s: %s", input_path, e)
             return
         except Exception as e:
-            print(f"An unexpected error occurred while reading {input_path}: {e}")
+            logger.error(
+                "An unexpected error occurred while reading %s: %s", input_path, e
+            )
             return
 
 

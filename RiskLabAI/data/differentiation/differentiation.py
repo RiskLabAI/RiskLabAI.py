@@ -105,31 +105,31 @@ def fractional_difference_std(
     """
     # 1. Compute weights for the full series
     weights = calculate_weights_std(degree, series.shape[0])
-    
+
     # 2. Determine warm-up period
     weights_cumsum_abs = np.cumsum(np.abs(weights))
     weights_cumsum_abs /= weights_cumsum_abs[-1]
     skip = np.searchsorted(weights_cumsum_abs, threshold)
-    
+
     result_df = pd.DataFrame(index=series.index, columns=series.columns, dtype=float)
+
+    # The expanding-window value result[t] = sum_j w_j * x[t - j] is exactly the
+    # first len(x) terms of a causal convolution of the series with the weights
+    # in natural order [w_0, w_1, ...]. Using np.convolve replaces the O(n^2)
+    # per-row growing-window dot product with a single O(n*k) pass per column,
+    # producing identical values (verified in test/test_performance.py).
+    weights_natural = weights[::-1].flatten()
 
     for name in series.columns:
         # Use .ffill() - fillna(method=) is deprecated
         series_ffill = series[[name]].ffill().dropna()
-        if series_ffill.empty or series_ffill.shape[0] < skip:
+        n_obs = series_ffill.shape[0]
+        if series_ffill.empty or n_obs < skip:
             continue
-            
-        series_np = series_ffill.to_numpy()
 
-        for iloc in range(skip, series_np.shape[0]):
-            # Get the relevant window of data and weights
-            window_data = series_np[:iloc + 1]
-            window_weights = weights[-(iloc + 1):]
-            
-            # Dot product
-            result_df.loc[series_ffill.index[iloc], name] = np.dot(
-                window_weights.T, window_data
-            )[0, 0]
+        series_np = series_ffill.to_numpy().reshape(-1)
+        convolved = np.convolve(series_np, weights_natural[:n_obs])[:n_obs]
+        result_df.loc[series_ffill.index[skip:], name] = convolved[skip:]
 
     return result_df.dropna(how='all')
 

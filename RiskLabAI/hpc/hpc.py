@@ -5,6 +5,7 @@ Provides a set of functions to parallelize operations, especially
 on pandas objects, using Python's multiprocessing and Joblib.
 """
 
+import logging
 import multiprocessing as mp
 import pandas as pd
 import numpy as np
@@ -12,6 +13,8 @@ import datetime as dt
 import time
 import joblib  # <-- Added missing import
 from typing import List, Dict, Any, Callable, Tuple, Union, Iterable, Optional
+
+logger = logging.getLogger(__name__)
 
 def parallel_run(
     func: Callable[..., Any],
@@ -112,11 +115,9 @@ def report_progress(
         f"{elapsed_time_min:.2f} minutes. Remaining {remaining_time_min:.2f} minutes."
     )
     
-    if job_number < total_jobs:
-        print(message, end='\r')
-    else:
-        # Print a newline at the end
-        print(message)
+    # Progress is emitted via logging (configure the 'RiskLabAI' logger to see
+    # it; the library is silent by default).
+    logger.info(message)
 
 
 def expand_call(kargs: Dict[str, Any]) -> Any:
@@ -170,7 +171,7 @@ def process_jobs(
 
     # <-- Handle sequential case for debugging
     if num_threads == 1:
-        print(f"Running {len(jobs)} jobs sequentially for debugging.")
+        logger.debug("Running %d jobs sequentially for debugging.", len(jobs))
         return process_jobs_sequential(jobs)
 
     # <-- Handle -1 for all CPUs

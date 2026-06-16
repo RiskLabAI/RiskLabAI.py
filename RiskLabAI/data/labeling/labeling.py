@@ -4,22 +4,29 @@ Implements the core financial labeling functions, including:
 - Volatility estimation.
 - The Triple-Barrier Method (vertical and horizontal barriers).
 - Meta-labeling.
-- Multiprocessing helpers for parallel execution.
+- Re-exports of the parallel-execution helpers from ``RiskLabAI.hpc``.
 
 Reference:
     De Prado, M. (2018) Advances in financial machine learning.
     John Wiley & Sons, Chapters 3 & 4.
 """
 
-import sys
-import time
-import datetime
-import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
-from typing import List, Optional, Tuple, Callable, Dict, Any
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
+
+# Parallel-processing helpers have a single source of truth in RiskLabAI.hpc.
+# They were previously duplicated in this module; they are re-exported here
+# under their historical names for backward compatibility. `lin_parts` maps to
+# hpc's `linear_partitions` (identical for valid inputs, with an added guard).
+from RiskLabAI.hpc import (  # noqa: F401  (re-exported for backward compat)
+    process_jobs,
+    expand_call,
+    report_progress,
+    linear_partitions as lin_parts,
+)
 
 
 def cusum_filter_events_dynamic_threshold(
@@ -50,7 +57,7 @@ def cusum_filter_events_dynamic_threshold(
     time_events = []
     shift_positive, shift_negative = 0.0, 0.0
     price_delta = prices.diff().dropna()
-    
+
     # Align price changes with thresholds
     price_delta, thresholds = price_delta.align(
         threshold, join="inner", copy=False
@@ -141,7 +148,7 @@ def daily_volatility_with_log_returns(
         close.index[df - 1],
         index=close.index[close.shape[0] - df.shape[0] :],
     )
-    
+
     # Calculate log returns
     returns = np.log(close.loc[df.index] / close.loc[df.values].values)
     stds = returns.ewm(span=span).std().rename("std")
@@ -176,14 +183,14 @@ def vertical_barrier(
         value is the vertical barrier timestamp.
     """
     barrier_dates = time_events + pd.Timedelta(days=number_days)
-    
+
     # Find the integer location of the barrier dates in the price index
     timestamp_array = close.index.searchsorted(barrier_dates)
-    
+
     # Filter out any indices that are out of bounds
     valid_indices = timestamp_array < close.shape[0]
     timestamp_array = timestamp_array[valid_indices]
-    
+
     barrier_series = pd.Series(
         close.index[timestamp_array],
         index=time_events[valid_indices],
@@ -244,27 +251,57 @@ def triple_barrier(
     # Get side if it exists, otherwise default to 1 (long)
     side = events_filtered.get("Side", pd.Series(1.0, index=events_filtered.index))
 
-    # 2. Find first touch time
-    for location, vertical_barrier_time in events_filtered["End Time"].fillna(close.index[-1]).items():
-        # Path prices from event start to vertical barrier
-        path_prices = close.loc[location:vertical_barrier_time]
-        
-        # Calculate path returns, adjusted by side
-        path_returns = (
-            np.log(path_prices / close[location]) * side.at[location]
-        )
+    # 2. Find first touch time.
+    # Positional numpy indexing replaces the per-event pandas label slicing and
+    # scalar `.loc` writes. For each event we slice the close-price array between
+    # the event start and its vertical barrier, compute side-adjusted log
+    # returns, and take the first index where each horizontal barrier is
+    # crossed. This yields the same first-touch timestamps as the previous
+    # implementation (verified in test/test_performance.py) but is ~10-70x
+    # faster on realistic sizes.
+    close_index = close.index
+    close_values = close.to_numpy(dtype=float)
+    close_index_values = close_index.values
 
-        output.loc[location, "stop_loss"] = path_returns[
-            path_returns < stop_loss.at[location]
-        ].index.min()
-        
-        output.loc[location, "profit_taking"] = path_returns[
-            path_returns > profit_taking.at[location]
-        ].index.min()
+    vertical_filled = events_filtered["End Time"].fillna(close_index[-1])
+    start_positions = close_index.get_indexer(events_filtered.index)
+    end_positions = (
+        close_index.searchsorted(vertical_filled.to_numpy(), side="right") - 1
+    )
 
-    # The 'End Time' column in output now holds the *first* barrier touched
-    output["End Time"] = output.min(axis=1)
-    return output.drop(columns=["stop_loss", "profit_taking"])
+    stop_loss_values = stop_loss.to_numpy()
+    profit_taking_values = profit_taking.to_numpy()
+    side_values = side.to_numpy(dtype=float)
+
+    n_events = len(events_filtered)
+    stop_loss_touch = np.full(n_events, np.datetime64("NaT"), dtype="datetime64[ns]")
+    profit_taking_touch = np.full(n_events, np.datetime64("NaT"), dtype="datetime64[ns]")
+
+    for i in range(n_events):
+        start, end = start_positions[i], end_positions[i]
+        segment = close_values[start:end + 1]
+        path_returns = np.log(segment / segment[0]) * side_values[i]
+
+        below = path_returns < stop_loss_values[i]
+        if below.any():
+            stop_loss_touch[i] = close_index_values[start + np.argmax(below)]
+
+        above = path_returns > profit_taking_values[i]
+        if above.any():
+            profit_taking_touch[i] = close_index_values[start + np.argmax(above)]
+
+    # First barrier touched = earliest of {vertical, stop-loss, profit-taking},
+    # ignoring NaT (the same semantics as the previous output.min(axis=1)).
+    candidates = pd.DataFrame(
+        np.vstack([
+            events_filtered["End Time"].to_numpy().astype("datetime64[ns]"),
+            stop_loss_touch,
+            profit_taking_touch,
+        ]).T,
+        index=events_filtered.index,
+    )
+    output["End Time"] = candidates.min(axis=1)
+    return output[["End Time"]]
 
 
 def meta_events(
@@ -341,10 +378,10 @@ def meta_events(
         },
         axis=1,
     ).dropna(subset=["Base Width"])
-    
+
     # 5. Run in parallel
     molecule_subsets = np.array_split(events.index, num_threads)
-    
+
     with ProcessPoolExecutor(max_workers=num_threads) as executor:
         results = list(executor.map(
             triple_barrier,
@@ -360,7 +397,7 @@ def meta_events(
 
     if side is None:
         events = events.drop("Side", axis=1)
-    
+
     return events
 
 
@@ -390,18 +427,18 @@ def meta_labeling(
         - 'Side': (Optional) The side of the bet.
     """
     events_filtered = events.dropna(subset=["End Time"])
-    
+
     # Get all unique timestamps
     all_dates = events_filtered.index.union(
         events_filtered["End Time"].values
     ).drop_duplicates()
-    
+
     # Reindex prices to only the required dates
     close_filtered = close.reindex(all_dates, method="bfill")
 
     out = pd.DataFrame(index=events_filtered.index)
     out["End Time"] = events_filtered["End Time"]
-    
+
     out["Return"] = (
         np.log(close_filtered.loc[events_filtered["End Time"].values].values)
         - np.log(close_filtered.loc[events_filtered.index].values)
@@ -413,107 +450,9 @@ def meta_labeling(
 
     # Assign labels
     out["Label"] = np.sign(out["Return"])
-    
+
     if "Side" in events_filtered:
         # Meta-labeling: 1 if profitable, 0 if not
         out.loc[out["Return"] <= 0, "Label"] = 0.0
 
     return out
-
-
-# --- Multiprocessing Helper Functions ---
-# (These are generic utilities)
-
-def lin_parts(num_atoms: int, num_threads: int) -> np.ndarray:
-    """
-    Create linear partitions for parallel processing.
-
-    Parameters
-    ----------
-    num_atoms : int
-        Total number of items to process.
-    num_threads : int
-        Number of threads (partitions) to create.
-
-    Returns
-    -------
-    np.ndarray
-        Array of partition indices.
-    """
-    parts = np.linspace(0, num_atoms, min(num_threads, num_atoms) + 1)
-    parts = np.ceil(parts).astype(int)
-    return parts
-
-
-def process_jobs(
-    jobs: List[Dict[str, Any]], task: Optional[str] = None, num_threads: int = 24
-) -> List[Any]:
-    """
-    Run jobs in parallel using multiprocessing.
-
-    Parameters
-    ----------
-    jobs : List[Dict]
-        List of job dictionaries. Each dict must contain a 'func' key
-        and its corresponding arguments.
-    task : str, optional
-        Name of the task for progress reporting.
-    num_threads : int, default=24
-        Number of threads to use.
-
-    Returns
-    -------
-    List[Any]
-        A list containing the results from each job.
-    """
-    if task is None:
-        task = jobs[0]["func"].__name__
-    
-    with mp.Pool(processes=num_threads) as pool:
-        outputs = pool.imap_unordered(expand_call, jobs)
-        out = []
-        time0 = time.time()
-        
-        # Process async output, report progress
-        for i, out_ in enumerate(outputs, 1):
-            out.append(out_)
-            report_progress(i, len(jobs), time0, task)
-            
-    return out
-
-
-def expand_call(kargs: Dict[str, Any]) -> Any:
-    """
-    Worker function to expand keyword arguments and call the function.
-
-    Parameters
-    ----------
-    kargs : Dict
-        Dictionary of arguments, including the 'func' to be called.
-
-    Returns
-    -------
-    Any
-        The result of the function call.
-    """
-    func = kargs.pop('func')
-    return func(**kargs)
-
-
-def report_progress(
-    job_num: int, num_jobs: int, time0: float, task: str
-) -> None:
-    """Report progress of parallel jobs."""
-    msg = [float(job_num) / num_jobs, (time.time() - time0) / 60.0]
-    msg.append(msg[1] * (1 / msg[0] - 1))  # Remaining time
-    timestamp = str(datetime.datetime.fromtimestamp(time.time()))
-    
-    msg_str = (
-        f"{timestamp} {msg[0]*100:.2f}% {task} done after "
-        f"{msg[1]:.2f} minutes. Remaining {msg[2]:.2f} minutes."
-    )
-    
-    if job_num < num_jobs:
-        sys.stderr.write(msg_str + "\r")
-    else:
-        sys.stderr.write(msg_str + "\n")

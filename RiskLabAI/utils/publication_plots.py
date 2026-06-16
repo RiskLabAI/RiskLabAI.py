@@ -5,11 +5,15 @@ and Seaborn, using Times New Roman font and high DPI.
 Provides 6 themes and a configuration-based saving function.
 """
 
+import logging
+
 import matplotlib.pyplot as plt
 import matplotlib.figure as fig  # For type hinting
 import seaborn as sns
 import os
 from typing import Optional, Dict, Any
+
+logger = logging.getLogger(__name__)
 
 # [THEMES dictionary remains the same]
 THEMES: Dict[str, Dict[str, Any]] = {
@@ -109,8 +113,8 @@ def setup_publication_style(
         params['savefig.transparent'] = False
     try:
         plt.rc('font', family='Times New Roman')
-    except:
-        print("Warning: Times New Roman not found. Defaulting to serif.")
+    except Exception:
+        logger.warning("Times New Roman not found. Defaulting to serif.")
         plt.rc('font', family='serif')
     plt.rcParams.update(params)
     sns_style = "darkgrid" if base_theme_name == 'dark' else "whitegrid"
@@ -120,11 +124,13 @@ def setup_publication_style(
     _CONFIG['save_plots'] = save_plots
     _CONFIG['save_dir'] = save_dir
     
-    print(f"Matplotlib style updated. Theme: '{theme}', Quality: {quality} DPI.")
+    logger.info(
+        "Matplotlib style updated. Theme: '%s', Quality: %s DPI.", theme, quality
+    )
     if save_plots:
-        print(f"Plot saving enabled. Saving to: '{save_dir}'")
+        logger.info("Plot saving enabled. Saving to: '%s'", save_dir)
     else:
-        print("Plot saving disabled.")
+        logger.info("Plot saving disabled.")
 
 # [apply_plot_style function remains exactly the same]
 def apply_plot_style(
@@ -171,7 +177,7 @@ def finalize_plot(
         # Save the figure
         fig.savefig(full_path, bbox_inches='tight')
         
-        print(f"Figure saved to: {full_path}")
+        logger.info("Figure saved to: %s", full_path)
     
     # --- 2. Always show the plot ---
     plt.show()

@@ -12,6 +12,10 @@ backtest
     advanced cross-validation (PurgedKFold, CPCV).
 cluster
     Algorithms for portfolio clustering (ONC).
+core
+    The extension layer: a component registry, base interfaces per model
+    family, and a built-in catalogue. Start here to add a new model. See
+    ``EXTENDING.md``.
 controller
     High-level controllers for bar generation and data processing.
 data
@@ -30,14 +34,29 @@ pde
     Implementation of a Deep BSDE solver for PDEs.
 utils
     Common helper functions, constants, and plotting utilities.
+
+Logging
+-------
+RiskLabAI uses the standard ``logging`` module under the ``"RiskLabAI"`` logger
+and is silent by default (a ``NullHandler`` is attached). To see progress and
+diagnostics, configure logging in your application, e.g.::
+
+    import logging
+    logging.basicConfig(level=logging.INFO)
 """
 
+import logging as _logging
 from importlib import import_module
+
+# Attach a NullHandler so the library never emits "No handlers could be found"
+# and stays silent unless the application opts in by configuring logging.
+_logging.getLogger(__name__).addHandler(_logging.NullHandler())
 
 _SUBMODULES = frozenset({
     "backtest",
     "cluster",
     "controller",
+    "core",
     "data",
     "ensemble",
     "features",

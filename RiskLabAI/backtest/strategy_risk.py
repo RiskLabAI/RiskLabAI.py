@@ -3,11 +3,14 @@ Functions for calculating strategy risk metrics, such as implied
 precision, binomial Sharpe ratio, and probability of failure.
 """
 
+import logging
 from typing import Tuple
 import numpy as np
 import scipy.stats as ss
 import sympy
 from sympy import symbols, factor
+
+logger = logging.getLogger(__name__)
 
 def sharpe_ratio_trials(p: float, n_run: int) -> Tuple[float, float, float]:
     r"""
@@ -366,5 +369,5 @@ def calculate_strategy_risk(
         returns, frequency, target_sharpe_ratio
     )
     
-    print(f"Probability that strategy will fail: {probability_fail:.2%}")
+    logger.info("Probability that strategy will fail: %.2f%%", probability_fail * 100)
     return probability_fail
