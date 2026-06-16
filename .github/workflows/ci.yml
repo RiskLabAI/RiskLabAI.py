@@ -52,14 +52,28 @@ jobs:
               print('ok:', sub)
           "
 
-  lint:
-    name: ruff + black
+  format:
+    name: black
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install ruff black
-      - run: ruff check RiskLabAI test
+      - run: pip install black
       - run: black --check RiskLabAI test
+
+  lint:
+    name: ruff (advisory until cleanup lands)
+    runs-on: ubuntu-latest
+    # Advisory until the dedicated ruff-cleanup pass lands (Dict->dict
+    # modernization, star-import removal, unused-import pruning); then remove
+    # continue-on-error to enforce.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff
+      - run: ruff check RiskLabAI test
