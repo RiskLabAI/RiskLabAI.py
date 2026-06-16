@@ -158,6 +158,12 @@ def test_triple_barrier_matches_reference_randomized():
 
         fast = triple_barrier(close, events, ptsl, molecule)
         reference = _triple_barrier_reference(close, events, ptsl, molecule)
+        # check_dtype=False: the timestamps are identical, but pandas >= 3 can
+        # land the two construction paths on different datetime *resolutions*
+        # (ns vs us). We assert the values match, not the resolution unit.
         pd.testing.assert_series_equal(
-            fast["End Time"], reference["End Time"], check_names=False
+            fast["End Time"],
+            reference["End Time"],
+            check_names=False,
+            check_dtype=False,
         )
