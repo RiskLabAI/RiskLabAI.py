@@ -11,6 +11,7 @@ from RiskLabAI.backtest.probabilistic_sharpe_ratio import (
     benchmark_sharpe_ratio,
 )
 
+
 def test_probabilistic_sharpe_ratio_normal():
     """
     Test PSR with normal parameters (skew=0, kurtosis=3).
@@ -39,6 +40,7 @@ def test_probabilistic_sharpe_ratio_normal():
     )
     assert psr < 0.5
 
+
 def test_probabilistic_sharpe_ratio_non_normal():
     """
     Test PSR with non-normal parameters.
@@ -57,13 +59,14 @@ def test_probabilistic_sharpe_ratio_non_normal():
         benchmark_sharpe_ratio=1.0,
         number_of_returns=100,
         skewness_of_returns=-1.0,  # Negative skew
-        kurtosis_of_returns=5.0,   # High kurtosis
+        kurtosis_of_returns=5.0,  # High kurtosis
     )
-    
+
     # Denominator (normal) = 1
     # Denominator (non-normal) = 1 - (-1)*(2) + (5-1)/4 * (2**2) = 1 + 2 + 4 = 7
     # Z-stat (non-normal) will be lower, so PSR will be lower.
     assert psr_non_normal < psr_normal
+
 
 def test_probabilistic_sharpe_ratio_statistic():
     """
@@ -80,8 +83,9 @@ def test_probabilistic_sharpe_ratio_statistic():
     # Z = (1.5 - 1.0) * sqrt(99) / sqrt(1 - 0 + (3-1)/4 * 1.5**2)
     # Z = 0.5 * 9.9498 / sqrt(1 + 0.5 * 2.25)
     # Z = 4.9749 / sqrt(2.125) = 4.9749 / 1.4577 = 3.4127...
-    assert np.isclose(z_stat, 3.4127787539671264) 
-    assert np.isclose(ss.norm.cdf(z_stat), 0.99968) 
+    assert np.isclose(z_stat, 3.4127787539671264)
+    assert np.isclose(ss.norm.cdf(z_stat), 0.99968)
+
 
 def test_benchmark_sharpe_ratio():
     """
@@ -90,15 +94,16 @@ def test_benchmark_sharpe_ratio():
     sr_list = [0.5, 1.0, 1.5, 0.8, 1.2]
     n_estimates = 5
     std_dev = np.std(sr_list)
-    
+
     bsr = benchmark_sharpe_ratio(sr_list)
-    
+
     # Manual calculation
     term1 = (1 - np.euler_gamma) * norm.ppf(1 - 1 / n_estimates)
     term2 = np.euler_gamma * norm.ppf(1 - 1 / (n_estimates * np.e))
     expected_bsr = std_dev * (term1 + term2)
-    
+
     assert np.isclose(bsr, expected_bsr)
+
 
 def test_benchmark_sharpe_ratio_edge_cases():
     """

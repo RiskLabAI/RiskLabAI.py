@@ -7,7 +7,7 @@ from typing import Union, List, Any, Iterable, Optional
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
-    AbstractInformationDrivenBars
+    AbstractInformationDrivenBars,
 )
 from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.utils.ewma import ewma
@@ -60,16 +60,16 @@ class AbstractRunBars(AbstractInformationDrivenBars):
         (Parameters same as original)
         """
         bars_list = []
-        
+
         # Keep track of last timestamp and threshold
         date_time = None
         threshold = np.inf
-        
+
         for tick_data in data:
             self.tick_counter += 1
 
             date_time, price, volume = tick_data[0], tick_data[1], tick_data[2]
-            
+
             # Update common fields
             tick_rule = self._tick_rule(price)
             self.update_base_fields(price, tick_rule, volume)
@@ -94,25 +94,29 @@ class AbstractRunBars(AbstractInformationDrivenBars):
             warm_up_stats = [
                 self.run_bars_statistics[EXPECTED_BUY_IMBALANCE],
                 self.run_bars_statistics[EXPECTED_SELL_IMBALANCE],
-                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION]
+                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION],
             ]
-            
+
             if np.isnan(warm_up_stats).any():
-                self.run_bars_statistics[
-                    EXPECTED_BUY_IMBALANCE
-                ] = self._ewma_expected_imbalance(
-                    self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
-                    self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW],
-                    warm_up=True
+                self.run_bars_statistics[EXPECTED_BUY_IMBALANCE] = (
+                    self._ewma_expected_imbalance(
+                        self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
+                        self.information_driven_bars_statistics[
+                            EXPECTED_IMBALANCE_WINDOW
+                        ],
+                        warm_up=True,
+                    )
                 )
-                self.run_bars_statistics[
-                    EXPECTED_SELL_IMBALANCE
-                ] = self._ewma_expected_imbalance(
-                    self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
-                    self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW],
-                    warm_up=True
+                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] = (
+                    self._ewma_expected_imbalance(
+                        self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
+                        self.information_driven_bars_statistics[
+                            EXPECTED_IMBALANCE_WINDOW
+                        ],
+                        warm_up=True,
+                    )
                 )
-                
+
                 # Update P[buy]
                 if self.base_statistics[CUMULATIVE_TICKS] > 0:
                     buy_ticks_num = self.run_bars_statistics[BUY_TICKS_NUMBER]
@@ -126,10 +130,10 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                     **self.base_statistics,
                     **self.information_driven_bars_statistics,
                     **self.run_bars_statistics,
-                    'timestamp': date_time
+                    "timestamp": date_time,
                 }
                 self.analyse_thresholds.append(stats)
-            
+
             # Calculate threshold and check condition
             threshold = self._calculate_run_threshold()
 
@@ -147,11 +151,9 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 # Store T and P[buy] for E[T] and E[P[buy]] updates
                 cum_ticks = self.base_statistics[CUMULATIVE_TICKS]
                 buy_ticks_num = self.run_bars_statistics[BUY_TICKS_NUMBER]
-                
-                self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(
-                    cum_ticks
-                )
-                
+
+                self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST].append(cum_ticks)
+
                 # Avoid division by zero if bar has 0 ticks (should be rare)
                 buy_proportion = (buy_ticks_num / cum_ticks) if cum_ticks > 0 else 0
                 self.run_bars_statistics[
@@ -159,37 +161,43 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 ].append(buy_proportion)
 
                 # Update E[T]
-                self.information_driven_bars_statistics[
-                    EXPECTED_TICKS_NUMBER
-                ] = self._expected_number_of_ticks()
+                self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER] = (
+                    self._expected_number_of_ticks()
+                )
 
                 # Update E[P[buy]]
-                window = self.window_size_for_expected_n_ticks_estimation or \
-                        self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
+                window = (
+                    self.window_size_for_expected_n_ticks_estimation
+                    or self.information_driven_bars_statistics[
+                        EXPECTED_IMBALANCE_WINDOW
+                    ]
+                )
 
                 prob_buy_list = self.run_bars_statistics[
                     PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST
                 ]
-                
-                self.run_bars_statistics[
-                    EXPECTED_BUY_TICKS_PROPORTION
-                ] = ewma(
+
+                self.run_bars_statistics[EXPECTED_BUY_TICKS_PROPORTION] = ewma(
                     np.array(prob_buy_list[-window:], dtype=float),
                     window,
                 )[-1]
 
                 # Update E[theta_buy] and E[theta_sell]
-                self.run_bars_statistics[
-                    EXPECTED_BUY_IMBALANCE
-                ] = self._ewma_expected_imbalance(
-                    self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
-                    self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
+                self.run_bars_statistics[EXPECTED_BUY_IMBALANCE] = (
+                    self._ewma_expected_imbalance(
+                        self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST],
+                        self.information_driven_bars_statistics[
+                            EXPECTED_IMBALANCE_WINDOW
+                        ],
+                    )
                 )
-                self.run_bars_statistics[
-                    EXPECTED_SELL_IMBALANCE
-                ] = self._ewma_expected_imbalance(
-                    self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
-                    self.information_driven_bars_statistics[EXPECTED_IMBALANCE_WINDOW]
+                self.run_bars_statistics[EXPECTED_SELL_IMBALANCE] = (
+                    self._ewma_expected_imbalance(
+                        self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST],
+                        self.information_driven_bars_statistics[
+                            EXPECTED_IMBALANCE_WINDOW
+                        ],
+                    )
                 )
 
                 # Reset cached fields
@@ -210,15 +218,14 @@ class AbstractRunBars(AbstractInformationDrivenBars):
         # Threshold = E[T] * max(P[buy] * E[theta_buy], (1-P[buy]) * E[theta_sell])
         buy_threshold = e_p_buy * e_theta_buy
         sell_threshold = (1 - e_p_buy) * e_theta_sell
-        
-        return e_t * max(buy_threshold, sell_threshold)
 
+        return e_t * max(buy_threshold, sell_threshold)
 
     def _bar_construction_condition(self, threshold: float) -> bool:
         """Check if cumulative buy or sell run exceeds the threshold."""
         if np.isinf(threshold) or np.isnan(threshold):
             return False
-            
+
         max_theta = max(
             self.run_bars_statistics[CUMULATIVE_BUY_θ],
             self.run_bars_statistics[CUMULATIVE_SELL_θ],

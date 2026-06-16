@@ -12,6 +12,7 @@ from sympy import symbols, factor
 
 logger = logging.getLogger(__name__)
 
+
 def sharpe_ratio_trials(p: float, n_run: int) -> Tuple[float, float, float]:
     r"""
     Simulate binomial trials to estimate mean, std dev, and Sharpe ratio.
@@ -109,14 +110,13 @@ def implied_precision(
     """
     a = (frequency + target_sharpe_ratio**2) * (profit_taking - stop_loss) ** 2
     b = (
-        (2 * frequency * stop_loss - target_sharpe_ratio**2 * (profit_taking - stop_loss))
-        * (profit_taking - stop_loss)
-    )
+        2 * frequency * stop_loss - target_sharpe_ratio**2 * (profit_taking - stop_loss)
+    ) * (profit_taking - stop_loss)
     c = frequency * stop_loss**2
-    
+
     discriminant = b**2 - 4 * a * c
     if discriminant < 0:
-        return np.nan # No real solution
+        return np.nan  # No real solution
 
     precision = (-b + np.sqrt(discriminant)) / (2.0 * a)
     return precision
@@ -133,7 +133,7 @@ def bin_frequency(
 
     .. math::
         f = \frac{S^2 (pt - sl)^2 p (1 - p)}{((pt - sl) p - sl)^2}
-    
+
     Note: The original formula had `((pt - sl) * p + sl)` in the denominator,
     which corresponds to `sl` being negative (a loss). This
     implementation assumes `stop_loss` is a positive value, so the
@@ -174,7 +174,7 @@ def bin_frequency(
         * (1 - precision)
     )
     denominator = ((profit_taking - stop_loss) * precision + stop_loss) ** 2
-    
+
     if denominator == 0:
         return np.inf
 
@@ -213,7 +213,7 @@ def binomial_sharpe_ratio(
         The annualized Sharpe Ratio.
     """
     expected_return = (profit_taking * probability) + (stop_loss * (1 - probability))
-    
+
     p = probability
     stdev_return = (profit_taking - stop_loss) * np.sqrt(p * (1 - p))
 
@@ -222,7 +222,7 @@ def binomial_sharpe_ratio(
 
     sr_trade = expected_return / stdev_return
     sr_annual = sr_trade * np.sqrt(frequency)
-    
+
     return sr_annual
 
 
@@ -259,7 +259,7 @@ def mix_gaussians(
     """
     n_obs1 = int(n_obs * probability)
     n_obs2 = n_obs - n_obs1
-    
+
     returns1 = np.random.normal(mu1, sigma1, size=n_obs1)
     returns2 = np.random.normal(mu2, sigma2, size=n_obs2)
 
@@ -296,11 +296,11 @@ def failure_probability(
     negative_returns = returns[returns <= 0]
 
     if len(positive_returns) == 0 or len(negative_returns) == 0:
-        return 0.0 # Cannot calculate
+        return 0.0  # Cannot calculate
 
     profit_taking = positive_returns.mean()
-    stop_loss = negative_returns.mean() # This will be negative
-    
+    stop_loss = negative_returns.mean()  # This will be negative
+
     # Observed precision
     observed_precision = positive_returns.shape[0] / float(returns.shape[0])
 
@@ -308,22 +308,23 @@ def failure_probability(
     required_precision = implied_precision(
         abs(stop_loss), profit_taking, frequency, target_sharpe_ratio
     )
-    
+
     if np.isnan(required_precision):
-        return 1.0 # Cannot achieve target SR
+        return 1.0  # Cannot achieve target SR
 
     # Probability that observed_precision < required_precision
     # This is a test on a proportion
     p_var = observed_precision * (1 - observed_precision)
     if p_var == 0:
         return 0.0 if observed_precision >= required_precision else 1.0
-        
-    p_std = np.sqrt(p_var / returns.shape[0]) # Std dev of the proportion
-    
+
+    p_std = np.sqrt(p_var / returns.shape[0])  # Std dev of the proportion
+
     z_score = (observed_precision - required_precision) / p_std
-    risk = ss.norm.cdf(z_score) # Prob of being <= required_precision
+    risk = ss.norm.cdf(z_score)  # Prob of being <= required_precision
 
     return risk
+
 
 def calculate_strategy_risk(
     mu1: float,
@@ -362,12 +363,8 @@ def calculate_strategy_risk(
     float
         Calculated probability of strategy failure.
     """
-    returns = mix_gaussians(
-        mu1, mu2, sigma1, sigma2, probability, n_obs
-    )
-    probability_fail = failure_probability(
-        returns, frequency, target_sharpe_ratio
-    )
-    
+    returns = mix_gaussians(mu1, mu2, sigma1, sigma2, probability, n_obs)
+    probability_fail = failure_probability(returns, frequency, target_sharpe_ratio)
+
     logger.info("Probability that strategy will fail: %.2f%%", probability_fail * 100)
     return probability_fail

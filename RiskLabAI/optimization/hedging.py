@@ -5,6 +5,7 @@ Implements PCA-based portfolio hedging techniques.
 import numpy as np
 from typing import Optional
 
+
 def pca_weights(
     cov: np.ndarray,
     risk_distribution: Optional[np.ndarray] = None,
@@ -48,7 +49,7 @@ def pca_weights(
     """
     # Calculate eigenvalues and eigenvectors
     eigen_values, eigen_vectors = np.linalg.eigh(cov)
-    
+
     # Sort in descending order
     indices = eigen_values.argsort()[::-1]
     eigen_values, eigen_vectors = eigen_values[indices], eigen_vectors[:, indices]
@@ -60,7 +61,7 @@ def pca_weights(
 
     # Compute loads (allocation in the orthogonal basis)
     loads = risk_target * (risk_distribution / eigen_values) ** 0.5
-    
+
     # Calculate weights in the original basis
     weights = np.dot(eigen_vectors, np.reshape(loads, (-1, 1)))
 

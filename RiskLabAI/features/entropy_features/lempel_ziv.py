@@ -2,6 +2,7 @@
 Implements the Lempel-Ziv (LZ) Entropy estimator.
 """
 
+
 def lempel_ziv_entropy(message: str) -> float:
     """
     Calculate the Lempel-Ziv (LZ) complexity as an entropy estimator.
@@ -32,7 +33,7 @@ def lempel_ziv_entropy(message: str) -> float:
         # Find the longest substring starting at `i` that is *not* in the library
         while j < message_length and message[i : j + 1] in library:
             j += 1
-        
+
         # Add the new, unseen substring to the library
         library.add(message[i : j + 1])
         i = j + 1

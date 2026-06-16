@@ -6,8 +6,9 @@ import pandas as pd
 import numpy as np
 from typing import List, Optional, Union, Any
 from sklearn.ensemble import BaseEnsemble
-from sklearn.ensemble import BaseEnsemble  
+from sklearn.ensemble import BaseEnsemble
 from .feature_importance_strategy import FeatureImportanceStrategy
+
 
 class FeatureImportanceMDI(FeatureImportanceStrategy):
     """
@@ -50,8 +51,8 @@ class FeatureImportanceMDI(FeatureImportanceStrategy):
         pd.DataFrame
             DataFrame with "Mean" and "StandardDeviation" of importance.
         """
-        train_sample_weights = kwargs.get('sample_weight')
-        
+        train_sample_weights = kwargs.get("sample_weight")
+
         # Fit the classifier
         self.classifier.fit(x, y, sample_weight=train_sample_weights)
 
@@ -61,12 +62,12 @@ class FeatureImportanceMDI(FeatureImportanceStrategy):
             for i, tree in enumerate(self.classifier.estimators_)
         }
         importances_df = pd.DataFrame.from_dict(importances_dict, orient="index")
-        
+
         # Ensure correct feature names
-        if hasattr(self.classifier, 'feature_names_in_'):
-             importances_df.columns = self.classifier.feature_names_in_
+        if hasattr(self.classifier, "feature_names_in_"):
+            importances_df.columns = self.classifier.feature_names_in_
         else:
-             importances_df.columns = x.columns
+            importances_df.columns = x.columns
 
         # Replace 0 with NaN (as per user's original code)
         importances_df.replace(0, np.nan, inplace=True)
@@ -75,8 +76,7 @@ class FeatureImportanceMDI(FeatureImportanceStrategy):
             {
                 "Mean": importances_df.mean(),
                 "StandardDeviation": (
-                    importances_df.std()
-                    * (importances_df.shape[0] ** -0.5)
+                    importances_df.std() * (importances_df.shape[0] ** -0.5)
                 ),
             },
             axis=1,

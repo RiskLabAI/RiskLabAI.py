@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from typing import Optional
 
+
 def expand_label_for_meta_labeling(
     close_index: pd.Index,
     timestamp: pd.Series,
@@ -45,7 +46,7 @@ def expand_label_for_meta_labeling(
     ts = timestamp.fillna(close_index[-1])
     ts = ts[ts.index.isin(molecule)]
     ts = ts[ts > molecule[0]]
-    
+
     if ts.empty:
         # Return an empty series; align in the caller will handle it
         return pd.Series(dtype=float)
@@ -53,7 +54,7 @@ def expand_label_for_meta_labeling(
     # Find min/max index locations
     iloc_min = close_index.searchsorted(ts.index[0])
     iloc_max = close_index.searchsorted(ts.max())
-    
+
     # Create a count series over the relevant time span
     count = pd.Series(0, index=close_index[iloc_min : iloc_max + 1])
 
@@ -91,23 +92,23 @@ def calculate_average_uniqueness(
     """
     # c_t: Concurrency at each timestamp
     concurrency = index_matrix.sum(axis=1)
-    
+
     # 1/c_t: Uniqueness at each timestamp
     # This is a (T x N) DataFrame, 0 where event is not active
     uniqueness = index_matrix.div(concurrency, axis=0).fillna(0)
-    
+
     # Sum of 1/c_t for each event
     total_uniqueness = uniqueness.sum(axis=0)
-    
+
     # Number of active periods for each event
     event_duration = (index_matrix > 0).sum(axis=0)
-    
+
     # Average uniqueness: sum(1/c_t) / sum(I)
     average_uniqueness = total_uniqueness / event_duration
-    
+
     # Handle events that never occurred (duration 0)
     average_uniqueness = average_uniqueness.fillna(0)
-    
+
     return average_uniqueness
 
 
@@ -146,10 +147,10 @@ def sample_weight_absolute_return_meta_labeling(
     concurrency_events = expand_label_for_meta_labeling(
         price.index, timestamp, molecule
     )
-    
+
     # 2. Compute absolute log returns
     log_return = np.log(price).diff().abs()
-    
+
     # Align returns and concurrency
     # Use 'left' join to keep the log_return (price) index
     log_return, concurrency_events = log_return.align(
@@ -161,38 +162,36 @@ def sample_weight_absolute_return_meta_labeling(
     # 3. Calculate weighted returns
     for t_in, t_out in timestamp.loc[weight.index].items():
         if t_out not in log_return.index:
-             # Find the closest preceding index
-             t_out = log_return.index[log_return.index.searchsorted(t_out) - 1]
-             
+            # Find the closest preceding index
+            t_out = log_return.index[log_return.index.searchsorted(t_out) - 1]
+
         # r_t / c_t
         # Filter concurrency > 0 to avoid division by zero
         relevant_concurrency = concurrency_events.loc[t_in:t_out]
         relevant_log_return = log_return.loc[t_in:t_out]
-        
+
         active_periods = relevant_concurrency > 0
         if active_periods.any():
             weighted_return = (
-                relevant_log_return[active_periods] / 
-                relevant_concurrency[active_periods]
+                relevant_log_return[active_periods]
+                / relevant_concurrency[active_periods]
             )
             weight.loc[t_in] = weighted_return.sum()
         else:
             weight.loc[t_in] = 0.0
 
     weight = weight.abs()
-    
+
     # 4. Normalize
     if weight.sum() == 0:
         # Avoid division by zero if all weights are 0
         return pd.Series(1.0, index=molecule)
-        
+
     weight *= len(weight) / weight.sum()
     return weight
 
 
-def calculate_time_decay(
-    weight: pd.Series, clf_last_weight: float = 1.0
-) -> pd.Series:
+def calculate_time_decay(weight: pd.Series, clf_last_weight: float = 1.0) -> pd.Series:
     """
     Apply a time-decay factor to sample weights.
 
@@ -218,7 +217,7 @@ def calculate_time_decay(
         The new weights with time decay applied.
     """
     clf_weight = weight.sort_index().cumsum()
-    
+
     if clf_last_weight < 0 or clf_last_weight > 1:
         raise ValueError("clf_last_weight must be between 0 and 1")
 
@@ -229,8 +228,8 @@ def calculate_time_decay(
     else:
         slope = (1.0 - clf_last_weight) / clf_weight.iloc[-1]
         const = 1.0 - slope * clf_weight.iloc[-1]
-        
+
     clf_weight = const + slope * clf_weight
-    clf_weight[clf_weight < 0] = 0.0 # Should not happen if clf_last_weight >= 0
-    
+    clf_weight[clf_weight < 0] = 0.0  # Should not happen if clf_last_weight >= 0
+
     return clf_weight

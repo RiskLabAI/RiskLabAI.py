@@ -8,9 +8,7 @@ from collections import ChainMap, defaultdict
 from copy import deepcopy
 from itertools import combinations
 from math import comb
-from typing import (
-    Any, Dict, Generator, List, Optional, Tuple, Union
-)
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -21,6 +19,7 @@ from .purged_kfold import PurgedKFold
 
 # For type hinting sklearn-like estimators
 Estimator = Any
+
 
 class CombinatorialPurged(PurgedKFold):
     """
@@ -50,8 +49,7 @@ class CombinatorialPurged(PurgedKFold):
 
     @staticmethod
     def _path_locations(
-        n_splits: int,
-        combinations_list: List[Tuple[int, ...]]
+        n_splits: int, combinations_list: List[Tuple[int, ...]]
     ) -> Dict[int, List[Tuple[int, int]]]:
         """
         Generate a labeled path matrix to map splits to backtest paths.
@@ -70,7 +68,7 @@ class CombinatorialPurged(PurgedKFold):
             coordinates (group, split_num) in the path matrix.
         """
         n_combinations = len(combinations_list)
-        
+
         # Initialize a zero matrix
         matrix = np.zeros((n_splits, n_combinations), dtype=int)
 
@@ -103,8 +101,7 @@ class CombinatorialPurged(PurgedKFold):
 
     @staticmethod
     def _combinatorial_splits(
-        combinations_list: List[Tuple[int, ...]],
-        split_segments: List[np.ndarray]
+        combinations_list: List[Tuple[int, ...]], split_segments: List[np.ndarray]
     ) -> Generator[np.ndarray, None, None]:
         """
         Generate combinatorial test sets.
@@ -124,8 +121,7 @@ class CombinatorialPurged(PurgedKFold):
         """
         for test_groups in combinations_list:
             test_sets = [
-                split for i, split in enumerate(split_segments) 
-                if i in test_groups
+                split for i, split in enumerate(split_segments) if i in test_groups
             ]
             yield np.concatenate(test_sets)
 
@@ -134,7 +130,7 @@ class CombinatorialPurged(PurgedKFold):
         n_splits: int,
         n_test_groups: int,
         times: Union[pd.Series, Dict[str, pd.Series]],
-        embargo: float = 0
+        embargo: float = 0,
     ) -> None:
         """
         Initialize the CombinatorialPurged class.
@@ -152,16 +148,14 @@ class CombinatorialPurged(PurgedKFold):
         """
         super().__init__(n_splits, times, embargo)
         if n_test_groups >= n_splits:
-            raise ValueError(
-                "n_test_groups must be strictly less than n_splits"
-            )
+            raise ValueError("n_test_groups must be strictly less than n_splits")
         self.n_test_groups = n_test_groups
 
     def get_n_splits(
         self,
         data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
         labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
-        groups: Optional[np.ndarray] = None
+        groups: Optional[np.ndarray] = None,
     ) -> int:
         """
         Return the total number of combinatorial splits.
@@ -213,9 +207,7 @@ class CombinatorialPurged(PurgedKFold):
         self._validate_input(single_times, single_data)
 
         split_segments = self._get_split_segments(single_data)
-        combinations_list = list(
-            combinations(range(self.n_splits), self.n_test_groups)
-        )
+        combinations_list = list(combinations(range(self.n_splits), self.n_test_groups))
 
         all_combinatorial_splits = self._combinatorial_splits(
             combinations_list, split_segments
@@ -229,9 +221,10 @@ class CombinatorialPurged(PurgedKFold):
             yield train_indices, test_indices
 
     def _combinations_and_path_locations_and_split_segments(
-        self,
-        data: pd.DataFrame
-    ) -> Tuple[List[Tuple[int, ...]], Dict[int, List[Tuple[int, int]]], List[np.ndarray]]:
+        self, data: pd.DataFrame
+    ) -> Tuple[
+        List[Tuple[int, ...]], Dict[int, List[Tuple[int, int]]], List[np.ndarray]
+    ]:
         """
         Helper to compute all necessary components for CPCV.
 
@@ -247,18 +240,16 @@ class CombinatorialPurged(PurgedKFold):
             - locations: The path location dictionary from `_path_locations`.
             - split_segments: List of index arrays for each of the `n_splits` groups.
         """
-        combinations_list = list(
-            combinations(range(self.n_splits), self.n_test_groups)
-        )
+        combinations_list = list(combinations(range(self.n_splits), self.n_test_groups))
         locations = self._path_locations(self.n_splits, combinations_list)
         split_segments = self._get_split_segments(data)
 
         return combinations_list, locations, split_segments
 
     def _single_backtest_paths(
-            self,
-            single_times: pd.Series,
-            single_data: pd.DataFrame,
+        self,
+        single_times: pd.Series,
+        single_data: pd.DataFrame,
     ) -> Dict[str, List[Dict[str, np.ndarray]]]:
         """
         Generate all combinatorial backtest paths for a single dataset.
@@ -279,34 +270,35 @@ class CombinatorialPurged(PurgedKFold):
         self._validate_input(single_times, single_data)
 
         paths = {}
-        combinations_list, locations, split_segments = \
+        combinations_list, locations, split_segments = (
             self._combinations_and_path_locations_and_split_segments(single_data)
-        
+        )
+
         all_combinatorial_splits = list(
             self._combinatorial_splits(combinations_list, split_segments)
         )
 
         for path_num, locs in locations.items():
             path_data = []
-            for (group_idx, split_idx) in locs:
+            for group_idx, split_idx in locs:
                 # Get the full test set for this *combination*
                 combinatorial_test_indices = all_combinatorial_splits[split_idx]
-                
+
                 # Get the train set purged against this *combination*
                 train_indices = self._get_train_indices(
-                    combinatorial_test_indices, 
-                    single_times, 
-                    continous_test_times=False
+                    combinatorial_test_indices, single_times, continous_test_times=False
                 )
-                
+
                 # The test set for this *path segment* is just one group
                 test_indices_segment = split_segments[group_idx]
 
-                path_data.append({
-                    "Train": train_indices,
-                    "Test": test_indices_segment,
-                })
-            
+                path_data.append(
+                    {
+                        "Train": train_indices,
+                        "Test": test_indices_segment,
+                    }
+                )
+
             # This path is complete
             paths[f"Path {path_num}"] = path_data
 
@@ -320,7 +312,7 @@ class CombinatorialPurged(PurgedKFold):
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Dict[str, np.ndarray]:
         """
         Obtain backtest predictions for all CPCV paths.
@@ -353,18 +345,16 @@ class CombinatorialPurged(PurgedKFold):
         if single_weights is None:
             single_weights = np.ones(len(single_data))
 
-        combinations_list, locations, split_segments = \
+        combinations_list, locations, split_segments = (
             self._combinations_and_path_locations_and_split_segments(single_data)
+        )
 
         def train_single_estimator(
-            estimator_: Estimator,
-            combinatorial_test_indices: np.ndarray
+            estimator_: Estimator, combinatorial_test_indices: np.ndarray
         ) -> Estimator:
             """Train one estimator for one C(n,k) split."""
             train_indices = self._get_train_indices(
-                combinatorial_test_indices,
-                single_times,
-                continous_test_times=False
+                combinatorial_test_indices, single_times, continous_test_times=False
             )
 
             X_train = single_data.iloc[train_indices]
@@ -372,7 +362,7 @@ class CombinatorialPurged(PurgedKFold):
             weights_train = single_weights[train_indices]
 
             with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', category=ConvergenceWarning)
+                warnings.filterwarnings("ignore", category=ConvergenceWarning)
                 try:
                     estimator_.fit(X_train, y_train, sample_weight=weights_train)
                 except TypeError:
@@ -382,26 +372,23 @@ class CombinatorialPurged(PurgedKFold):
 
         # 1. Train all C(n, k) estimators in parallel
         combinatorial_trained_estimators = Parallel(n_jobs=n_jobs)(
-            delayed(train_single_estimator)(
-                deepcopy(single_estimator), test_indices
-            )
+            delayed(train_single_estimator)(deepcopy(single_estimator), test_indices)
             for test_indices in self._combinatorial_splits(
                 combinations_list, split_segments
             )
         )
 
         def get_path_data(
-            path_num: int,
-            locs: List[Tuple[int, int]]
+            path_num: int, locs: List[Tuple[int, int]]
         ) -> Dict[str, np.ndarray]:
             """Assemble predictions for one path."""
             path_predictions = []
 
-            for (group_idx, split_idx) in locs:
+            for group_idx, split_idx in locs:
                 # Get the test segment for this path
                 test_indices_segment = split_segments[group_idx]
                 X_test = single_data.iloc[test_indices_segment]
-                
+
                 # Get the estimator trained for this split
                 estimator = combinatorial_trained_estimators[split_idx]
 
@@ -411,7 +398,7 @@ class CombinatorialPurged(PurgedKFold):
                     preds = estimator.predict(X_test)
 
                 path_predictions.append(preds)
-            
+
             return {f"Path {path_num}": np.concatenate(path_predictions)}
 
         # 2. Assemble predictions for all paths in parallel
@@ -419,7 +406,7 @@ class CombinatorialPurged(PurgedKFold):
             delayed(get_path_data)(path_num, locs)
             for path_num, locs in locations.items()
         )
-        
+
         # Combine list of dicts into one dict
         paths_predictions = dict(ChainMap(*reversed(path_results)))
         return paths_predictions

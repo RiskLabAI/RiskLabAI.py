@@ -5,6 +5,7 @@ Implements the Shannon Entropy estimator.
 from collections import Counter
 from math import log2
 
+
 def shannon_entropy(message: str) -> float:
     """
     Calculate the Shannon Entropy of a message.

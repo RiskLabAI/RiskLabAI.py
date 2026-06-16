@@ -52,19 +52,21 @@ from importlib import import_module
 # and stays silent unless the application opts in by configuring logging.
 _logging.getLogger(__name__).addHandler(_logging.NullHandler())
 
-_SUBMODULES = frozenset({
-    "backtest",
-    "cluster",
-    "controller",
-    "core",
-    "data",
-    "ensemble",
-    "features",
-    "hpc",
-    "optimization",
-    "pde",
-    "utils",
-})
+_SUBMODULES = frozenset(
+    {
+        "backtest",
+        "cluster",
+        "controller",
+        "core",
+        "data",
+        "ensemble",
+        "features",
+        "hpc",
+        "optimization",
+        "pde",
+        "utils",
+    }
+)
 
 # Single source of truth for the version is pyproject.toml.
 try:

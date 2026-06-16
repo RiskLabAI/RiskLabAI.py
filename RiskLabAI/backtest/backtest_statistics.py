@@ -14,10 +14,9 @@ import numpy as np
 import pandas as pd
 from numba import jit
 
+
 @jit(nopython=True)
-def sharpe_ratio(
-    returns: np.ndarray, risk_free_rate: float = 0.0
-) -> float:
+def sharpe_ratio(returns: np.ndarray, risk_free_rate: float = 0.0) -> float:
     """
     Calculate the Sharpe Ratio (Numba-optimized).
 
@@ -35,11 +34,12 @@ def sharpe_ratio(
     """
     excess_returns = returns - risk_free_rate
     std_dev = np.std(excess_returns)
-    
+
     if std_dev == 0.0:
         return 0.0
-        
+
     return np.mean(excess_returns) / std_dev
+
 
 def bet_timing(target_positions: pd.Series) -> pd.Index:
     """
@@ -84,6 +84,7 @@ dtype='datetime64[ns]', freq=None)
 
     return bets
 
+
 def calculate_holding_period(
     target_positions: pd.Series,
 ) -> Tuple[pd.DataFrame, float]:
@@ -108,9 +109,9 @@ def calculate_holding_period(
     time_entry = 0.0  # Average entry time
     position_diff = target_positions.diff()
     # Time difference in fractional days
-    time_diff = (
-        target_positions.index - target_positions.index[0]
-    ) / np.timedelta64(1, "D")
+    time_diff = (target_positions.index - target_positions.index[0]) / np.timedelta64(
+        1, "D"
+    )
 
     for i in range(1, target_positions.shape[0]):
         current_pos = target_positions.iloc[i]
@@ -120,9 +121,7 @@ def calculate_holding_period(
         if diff * prev_pos >= 0:  # Position increase or flat
             if current_pos != 0:
                 # Update average entry time
-                time_entry = (
-                    time_entry * prev_pos + time_diff[i] * diff
-                ) / current_pos
+                time_entry = (time_entry * prev_pos + time_diff[i] * diff) / current_pos
         else:  # Position decrease or flip
             if current_pos * prev_pos < 0:  # Position flip
                 # Close old position
@@ -142,21 +141,21 @@ def calculate_holding_period(
                         "w": abs(diff),
                     }
                 )
-    
+
     if not hold_period_data:
-        return pd.DataFrame(columns=['dT', 'w']), np.nan
-        
-    hold_period_df = pd.DataFrame(hold_period_data).set_index('index')
-    
+        return pd.DataFrame(columns=["dT", "w"]), np.nan
+
+    hold_period_df = pd.DataFrame(hold_period_data).set_index("index")
+
     if hold_period_df["w"].sum() > 0:
         mean_holding_period = (
-            (hold_period_df["dT"] * hold_period_df["w"]).sum()
-            / hold_period_df["w"].sum()
-        )
+            hold_period_df["dT"] * hold_period_df["w"]
+        ).sum() / hold_period_df["w"].sum()
     else:
         mean_holding_period = np.nan
 
     return hold_period_df, mean_holding_period
+
 
 def calculate_hhi(bet_returns: pd.Series) -> float:
     """
@@ -185,12 +184,13 @@ def calculate_hhi(bet_returns: pd.Series) -> float:
 
     weights = bet_returns / total_return
     hhi = (weights**2).sum()
-    
+
     # Normalize HHI
     n = bet_returns.shape[0]
     hhi_normalized = (hhi - 1.0 / n) / (1.0 - 1.0 / n)
 
     return hhi_normalized
+
 
 def calculate_hhi_concentration(returns: pd.Series) -> Tuple[float, float, float]:
     """
@@ -210,12 +210,13 @@ def calculate_hhi_concentration(returns: pd.Series) -> Tuple[float, float, float
     """
     hhi_positive = calculate_hhi(returns[returns >= 0])
     hhi_negative = calculate_hhi(returns[returns < 0])
-    
+
     # Calculate time concentration (by month)
     time_concentration = returns.groupby(pd.Grouper(freq="M")).count()
     hhi_time = calculate_hhi(time_concentration)
 
     return hhi_positive, hhi_negative, hhi_time
+
 
 def compute_drawdowns_time_under_water(
     pnl_series: pd.Series, dollars: bool = False
@@ -264,7 +265,7 @@ def compute_drawdowns_time_under_water(
 
     drawdown_analysis_df = pd.DataFrame(drawdown_analysis_data)
     drawdown_analysis_df = drawdown_analysis_df.set_index("Start")
-    
+
     if dollars:
         drawdown = drawdown_analysis_df["HWM"] - drawdown_analysis_df["Min"]
     else:
@@ -273,11 +274,12 @@ def compute_drawdowns_time_under_water(
 
     # Time under water in fractional years
     time_under_water = (
-        drawdown_analysis_df["Stop"] - drawdown_analysis_df.index
-    ) / np.timedelta64(1, "D") / 365.25
+        (drawdown_analysis_df["Stop"] - drawdown_analysis_df.index)
+        / np.timedelta64(1, "D")
+        / 365.25
+    )
 
-
-    drawdown.index.name = 'Datetime'
-    time_under_water.index.name = 'Datetime'
+    drawdown.index.name = "Datetime"
+    time_under_water.index.name = "Datetime"
 
     return drawdown, time_under_water

@@ -8,7 +8,8 @@ import pandas as pd
 
 # Import bar types
 from RiskLabAI.data.structures.imbalance_bars import (
-    ExpectedImbalanceBars, FixedImbalanceBars
+    ExpectedImbalanceBars,
+    FixedImbalanceBars,
 )
 from RiskLabAI.data.structures.run_bars import ExpectedRunBars, FixedRunBars
 from RiskLabAI.data.structures.standard_bars import StandardBars
@@ -17,8 +18,11 @@ from RiskLabAI.data.structures.abstract_bars import AbstractBars
 
 # Import constants
 from RiskLabAI.utils.constants import (
-    CUMULATIVE_DOLLAR, CUMULATIVE_VOLUME, CUMULATIVE_TICKS
+    CUMULATIVE_DOLLAR,
+    CUMULATIVE_VOLUME,
+    CUMULATIVE_TICKS,
 )
+
 
 class BarsInitializerController:
     """
@@ -58,7 +62,7 @@ class BarsInitializerController:
         initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
         expected_ticks_number_bounds: Optional[Tuple[float, float]] = None,
         analyse_thresholds: bool = False,
-        **kwargs: Any, # Accept extra kwargs but don't use them
+        **kwargs: Any,  # Accept extra kwargs but don't use them
     ) -> ExpectedImbalanceBars:
         """
         Initialize expected dollar imbalance bars.

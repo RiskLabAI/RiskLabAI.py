@@ -11,6 +11,7 @@ from RiskLabAI.utils.constants import *
 # Type hint for a single tick: (datetime, price, volume)
 TickData = Union[List[Any], Tuple[Any, ...], np.ndarray]
 
+
 class AbstractBars(ABC):
     """
     Abstract base class for all bar types.
@@ -39,7 +40,7 @@ class AbstractBars(ABC):
         self.close_price: Optional[float] = None
         self.high_price: float = -np.inf
         self.low_price: float = np.inf
-        
+
         self.base_statistics: Dict[str, Union[int, float]] = {
             PREVIOUS_TICK_RULE: 0,
             CUMULATIVE_TICKS: 0,

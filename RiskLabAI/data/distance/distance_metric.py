@@ -18,6 +18,7 @@ import scipy.stats as ss
 from sklearn.metrics import mutual_info_score
 from typing import Optional
 
+
 def calculate_variation_of_information(
     x: np.ndarray, y: np.ndarray, bins: int, norm: bool = False
 ) -> float:
@@ -47,10 +48,8 @@ def calculate_variation_of_information(
         The Variation of Information.
     """
     histogram_xy = np.histogram2d(x, y, bins)[0]
-    mutual_information = mutual_info_score(
-        None, None, contingency=histogram_xy
-    )
-    
+    mutual_information = mutual_info_score(None, None, contingency=histogram_xy)
+
     marginal_x = ss.entropy(histogram_xy.sum(axis=1))
     marginal_y = ss.entropy(histogram_xy.sum(axis=0))
 
@@ -59,7 +58,7 @@ def calculate_variation_of_information(
     if norm:
         joint_xy = marginal_x + marginal_y - mutual_information
         if joint_xy == 0:
-            return 0.0 # Avoid division by zero if entropies are 0
+            return 0.0  # Avoid division by zero if entropies are 0
         variation_xy /= joint_xy
 
     return variation_xy
@@ -102,7 +101,7 @@ def calculate_number_of_bins(
         if np.isclose(correlation, 1.0) or np.isclose(correlation, -1.0):
             # Handle perfect correlation case by setting to almost 1
             correlation = np.sign(correlation) * (1.0 - 1e-10)
-            
+
         if (1.0 - correlation**2) == 0:
             # Handle numerical instability if correlation is still 1
             return calculate_number_of_bins(num_observations, correlation=None)
@@ -110,15 +109,7 @@ def calculate_number_of_bins(
         # Bivariate formula
         bins = round(
             (2**-0.5)
-            * (
-                1
-                + (
-                    1
-                    + 24 * num_observations / (1.0 - correlation**2)
-                )
-                ** 0.5
-            )
-            ** 0.5
+            * (1 + (1 + 24 * num_observations / (1.0 - correlation**2)) ** 0.5) ** 0.5
         )
     return int(bins)
 
@@ -151,7 +142,7 @@ def calculate_variation_of_information_extended(
     """
     correlation = np.corrcoef(x, y)[0, 1]
     num_bins = calculate_number_of_bins(x.shape[0], correlation=correlation)
-    
+
     return calculate_variation_of_information(x, y, num_bins, norm)
 
 
@@ -183,11 +174,9 @@ def calculate_mutual_information(
     """
     correlation = np.corrcoef(x, y)[0, 1]
     num_bins = calculate_number_of_bins(x.shape[0], correlation=correlation)
-    
+
     histogram_xy = np.histogram2d(x, y, num_bins)[0]
-    mutual_information = mutual_info_score(
-        None, None, contingency=histogram_xy
-    )
+    mutual_information = mutual_info_score(None, None, contingency=histogram_xy)
 
     if norm:
         marginal_x = ss.entropy(histogram_xy.sum(axis=1))
@@ -195,16 +184,14 @@ def calculate_mutual_information(
 
         min_entropy = min(marginal_x, marginal_y)
         if min_entropy == 0:
-            return 0.0 # Avoid division by zero
-        
+            return 0.0  # Avoid division by zero
+
         mutual_information /= min_entropy
 
     return mutual_information
 
 
-def calculate_distance(
-    dependence: np.ndarray, metric: str = "angular"
-) -> np.ndarray:
+def calculate_distance(dependence: np.ndarray, metric: str = "angular") -> np.ndarray:
     r"""
     Calculate a distance matrix from a dependence matrix (e.g., correlation).
 
@@ -226,7 +213,7 @@ def calculate_distance(
     """
     # Clip to handle potential floating point errors
     dependence = np.clip(dependence, -1.0, 1.0)
-    
+
     if metric == "angular":
         distance = ((1 - dependence).round(6) / 2.0) ** 0.5
     elif metric == "absolute_angular":
@@ -236,9 +223,7 @@ def calculate_distance(
     return distance
 
 
-def calculate_kullback_leibler_divergence(
-    p: np.ndarray, q: np.ndarray
-) -> float:
+def calculate_kullback_leibler_divergence(p: np.ndarray, q: np.ndarray) -> float:
     """
     Calculate Kullback-Leibler (KL) divergence.
 
@@ -260,7 +245,7 @@ def calculate_kullback_leibler_divergence(
     # Ensure probabilities sum to 1
     p = p / np.sum(p)
     q = q / np.sum(q)
-    
+
     # Filter for terms where p > 0 and q > 0
     # Where p_i = 0, the term is 0.
     # Where q_i = 0 (and p_i > 0), the term is +inf.
@@ -269,8 +254,8 @@ def calculate_kullback_leibler_divergence(
     q_filtered = q[mask]
 
     if len(p_filtered) == 0:
-        return 0.0 # No overlapping support
-        
+        return 0.0  # No overlapping support
+
     # Check if any p_i > 0 corresponds to q_i = 0
     if np.any(p[q == 0] > 0):
         return np.inf
@@ -299,14 +284,14 @@ def calculate_cross_entropy(p: np.ndarray, q: np.ndarray) -> float:
     """
     p = p / np.sum(p)
     q = q / np.sum(q)
-    
+
     # Filter for terms where p > 0 and q > 0
     # Where p_i = 0, the term is 0.
     # Where q_i = 0 (and p_i > 0), the term is +inf.
     mask = (p > 0) & (q > 0)
     p_filtered = p[mask]
     q_filtered = q[mask]
-    
+
     if len(p_filtered) == 0:
         return 0.0
 

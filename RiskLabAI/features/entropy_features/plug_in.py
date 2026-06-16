@@ -6,9 +6,8 @@ from math import log2
 from typing import Dict
 from .pmf import probability_mass_function
 
-def plug_in_entropy_estimator(
-    message: str, approximate_word_length: int = 1
-) -> float:
+
+def plug_in_entropy_estimator(message: str, approximate_word_length: int = 1) -> float:
     """
     Calculate the Plug-in Entropy Estimator (based on n-gram PMF).
 
@@ -29,14 +28,12 @@ def plug_in_entropy_estimator(
     """
     if not message:
         return 0.0
-        
+
     pmf = probability_mass_function(message, approximate_word_length)
     if not pmf:
         return 0.0
 
-    plug_in_entropy = -sum(
-        p * log2(p) for p in pmf.values() if p > 0
-    )
-    
+    plug_in_entropy = -sum(p * log2(p) for p in pmf.values() if p > 0)
+
     # Normalize by word length
     return plug_in_entropy / approximate_word_length

@@ -8,6 +8,7 @@ from sklearn.ensemble import BaseEnsemble
 from typing import Dict, List, Any
 from .feature_importance_strategy import FeatureImportanceStrategy
 
+
 class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
     """
     Computes Clustered MDI feature importance.
@@ -47,13 +48,13 @@ class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
         for cluster_name, feature_names in clusters.items():
             # Sum importance for all features in the cluster
             cluster_data = dataframe[feature_names].sum(axis=1)
-            
+
             cluster_mean = cluster_data.mean()
             cluster_std = cluster_data.std()
-            
+
             output.loc[f"C_{cluster_name}", "Mean"] = cluster_mean
-            output.loc[f"C_{cluster_name}", "StandardDeviation"] = (
-                cluster_std * (cluster_data.shape[0] ** -0.5)
+            output.loc[f"C_{cluster_name}", "StandardDeviation"] = cluster_std * (
+                cluster_data.shape[0] ** -0.5
             )
         return output
 
@@ -77,29 +78,29 @@ class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
             DataFrame with "Mean" and "StandardDeviation" of importance
             for each *cluster*.
         """
-        train_sample_weights = kwargs.get('sample_weight')
-        
+        train_sample_weights = kwargs.get("sample_weight")
+
         # Fit the classifier
         self.classifier.fit(x, y, sample_weight=train_sample_weights)
-        
+
         # Get importance from each tree
         importances_dict = {
             i: tree.feature_importances_
             for i, tree in enumerate(self.classifier.estimators_)
         }
         importances_df = pd.DataFrame.from_dict(importances_dict, orient="index")
-        
-        if hasattr(self.classifier, 'feature_names_in_'):
-             importances_df.columns = self.classifier.feature_names_in_
+
+        if hasattr(self.classifier, "feature_names_in_"):
+            importances_df.columns = self.classifier.feature_names_in_
         else:
-             importances_df.columns = x.columns
+            importances_df.columns = x.columns
 
         # Replace 0 with NaN
         importances_df.replace(0, np.nan, inplace=True)
 
         # Group by cluster
         aggregated_importances = self._group_mean_std(importances_df, self.clusters)
-        
+
         # Normalize
         aggregated_importances /= aggregated_importances["Mean"].sum()
         return aggregated_importances

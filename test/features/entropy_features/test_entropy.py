@@ -15,12 +15,14 @@ MSG_LOW = "AAAAAAAAAA"
 MSG_MED = "ABABABABAB"
 MSG_HIGH = "ABCDEFGHIJ"
 
+
 # --- Shannon Tests ---
 def test_shannon_entropy():
     assert np.isclose(shannon_entropy(MSG_LOW), 0.0)
     assert np.isclose(shannon_entropy(MSG_MED), 1.0)
     assert np.isclose(shannon_entropy(MSG_HIGH), np.log2(10))
     assert np.isclose(shannon_entropy(""), 0.0)
+
 
 # --- Lempel-Ziv Tests ---
 def test_lempel_ziv_entropy():
@@ -30,6 +32,7 @@ def test_lempel_ziv_entropy():
     assert np.isclose(lempel_ziv_entropy(MSG_MED), 5 / 10.0)
     # lib = {"A", "B", "C", ..., "J"} -> len=10
     assert np.isclose(lempel_ziv_entropy(MSG_HIGH), 10 / 10.0)
+
 
 # --- PMF Tests ---
 def test_probability_mass_function():
@@ -42,17 +45,19 @@ def test_probability_mass_function():
     assert np.isclose(pmf_2["AB"], 5 / 9.0)
     assert np.isclose(pmf_2["BA"], 4 / 9.0)
 
+
 # --- Plug-in Tests ---
 def test_plug_in_estimator():
     # word_len=1 -> same as shannon
     assert np.isclose(plug_in_entropy_estimator(MSG_LOW, 1), 0.0)
     assert np.isclose(plug_in_entropy_estimator(MSG_MED, 1), 1.0)
-    
+
     # word_len=2
     # H = -( (5/9)*log2(5/9) + (4/9)*log2(4/9) ) = 0.991
     # H_norm = H / 2
-    h = -( (5/9)*np.log2(5/9) + (4/9)*np.log2(4/9) )
+    h = -((5 / 9) * np.log2(5 / 9) + (4 / 9) * np.log2(4 / 9))
     assert np.isclose(plug_in_entropy_estimator(MSG_MED, 2), h / 2.0)
+
 
 # --- Kontoyiannis Tests ---
 def test_kontoyiannis_entropy():
@@ -64,7 +69,6 @@ def test_kontoyiannis_entropy():
     # i=4: n=4, L_i(msg, 4, 4) -> "A" in "AAAA" -> L=2. sum += log2(4)/2 = 1.0
     # h = (0.5 + 0.528 + 1.0) / 3 = 2.028 / 3 = 0.676
     assert np.isclose(kontoyiannis_entropy("AAAAA"), 0.62055, atol=1e-3)
-
 
     # Rolling window
     # window=3. points=range(3, 5) -> [3, 4]

@@ -38,14 +38,11 @@ __all__ = [
     "quasi_diagonal",
     "recursive_bisection",
     "hrp",
-    
     # nco.py
     "get_optimal_portfolio_weights",
     "get_optimal_portfolio_weights_nco",
-    
     # hedging.py
     "pca_weights",
-    
     # hyper_parameter_tuning.py
     "MyPipeline",
     "clf_hyper_fit",

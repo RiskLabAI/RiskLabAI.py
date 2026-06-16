@@ -9,6 +9,7 @@ import pandas as pd
 from sklearn.datasets import make_classification
 from typing import Tuple
 
+
 def get_test_dataset(
     n_features: int = 100,
     n_informative: int = 25,
@@ -63,19 +64,18 @@ def get_test_dataset(
 
     # 3. Create redundant features
     # Randomly pick informative features to copy
-    redundant_indices = rng.choice(
-        range(n_informative), size=n_redundant, replace=True
-    )
-    
+    redundant_indices = rng.choice(range(n_informative), size=n_redundant, replace=True)
+
     for i, orig_idx in enumerate(redundant_indices):
         orig_feature_name = f"I_{orig_idx}"
         new_feature_name = f"R_{i}"
-        
+
         # Add noise to the original informative feature
-        noise = rng.normal(
-            loc=0.0, scale=sigma_std, size=n_samples
-        ) * x_df[orig_feature_name].std()
-        
+        noise = (
+            rng.normal(loc=0.0, scale=sigma_std, size=n_samples)
+            * x_df[orig_feature_name].std()
+        )
+
         x_df[new_feature_name] = x_df[orig_feature_name] + noise
 
     return x_df[sorted(x_df.columns)], y_series

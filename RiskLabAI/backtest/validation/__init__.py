@@ -24,7 +24,6 @@ from .cross_validator_controller import CrossValidatorController
 __all__ = [
     # Interface
     "CrossValidator",
-    
     # Validators
     "KFold",
     "PurgedKFold",
@@ -32,7 +31,6 @@ __all__ = [
     "CombinatorialPurged",  # <-- Fix
     "BaggedCombinatorialPurged",  # <-- Fix
     "AdaptiveCombinatorialPurged",  # <-- Fix
-    
     # Utilities
     "CrossValidatorFactory",
     "CrossValidatorController",

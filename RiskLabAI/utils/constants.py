@@ -1,5 +1,5 @@
 DATE_TIME = "Date Time"
-TIMESTAMP = 'Timestamp'
+TIMESTAMP = "Timestamp"
 TICK_NUMBER = "Tick Number"
 OPEN_PRICE = "Open"
 HIGH_PRICE = "High"
@@ -40,4 +40,3 @@ PREVIOUS_TICK_IMBALANCES_SELL_LIST = "List of previous (sell) tick imbalances"
 PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST = "List of previous bars buy ticks proportion"
 
 N_PREVIOUS_BARS_FOR_EXPECTED_N_TICKS_ESTIMATION = "Window size for E[T]"
-

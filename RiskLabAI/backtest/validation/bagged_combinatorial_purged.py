@@ -4,9 +4,7 @@ Implements Bagged Combinatorial Purged Cross-Validation (B-CPCV).
 
 import warnings
 from collections import ChainMap
-from typing import (
-    Any, Dict, Optional, Union
-)
+from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -21,6 +19,7 @@ from .combinatorial_purged import CombinatorialPurged
 
 # For type hinting sklearn-like estimators
 Estimator = Any
+
 
 class BaggedCombinatorialPurged(CombinatorialPurged):
     """
@@ -69,7 +68,7 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         max_features: float = 1.0,
         bootstrap: bool = True,
         bootstrap_features: bool = False,
-        random_state: int = None
+        random_state: int = None,
     ):
         """
         Initialize the BaggedCombinatorialPurged class.
@@ -91,7 +90,7 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Dict[str, np.ndarray]:
         """
         Obtain backtest predictions for all B-CPCV paths.
@@ -127,24 +126,22 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
 
         if single_weights is None:
             single_weights = np.ones(len(single_data))
-            
+
         if predict_probability and not self.classifier:
             raise ValueError(
                 "Cannot use predict_probability=True when classifier=False"
             )
 
-        combinations_list, locations, split_segments = \
+        combinations_list, locations, split_segments = (
             self._combinations_and_path_locations_and_split_segments(single_data)
+        )
 
         def train_single_bagging_estimator(
-            base_estimator_: Estimator,
-            combinatorial_test_indices: np.ndarray
+            base_estimator_: Estimator, combinatorial_test_indices: np.ndarray
         ) -> Estimator:
             """Train one Bagging estimator for one C(n,k) split."""
             train_indices = self._get_train_indices(
-                combinatorial_test_indices,
-                single_times,
-                continous_test_times=False
+                combinatorial_test_indices, single_times, continous_test_times=False
             )
 
             X_train = single_data.iloc[train_indices]
@@ -161,7 +158,7 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
                     bootstrap=self.bootstrap,
                     bootstrap_features=self.bootstrap_features,
                     random_state=self.random_state,
-                    n_jobs=n_jobs  # Parallelize bagging itself
+                    n_jobs=n_jobs,  # Parallelize bagging itself
                 )
             else:
                 bagging_estimator = BaggingRegressor(
@@ -172,12 +169,12 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
                     bootstrap=self.bootstrap,
                     bootstrap_features=self.bootstrap_features,
                     random_state=self.random_state,
-                    n_jobs=n_jobs # Parallelize bagging itself
+                    n_jobs=n_jobs,  # Parallelize bagging itself
                 )
             # --- End Bagging Wrapper ---
 
             with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', category=ConvergenceWarning)
+                warnings.filterwarnings("ignore", category=ConvergenceWarning)
                 try:
                     bagging_estimator.fit(X_train, y_train, sample_weight=weights_train)
                 except (TypeError, ValueError):
@@ -190,28 +187,26 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         # Note: We set n_jobs=1 for the *outer* parallel loop
         # and let the *inner* bagging estimator use `n_jobs`.
         # This avoids nested parallelization issues.
-        
+
         # Determine parallelization strategy
         if n_jobs > 1 or n_jobs == -1:
             outer_n_jobs = n_jobs
-            inner_n_jobs = 1 
-            
+            inner_n_jobs = 1
+
             # Update bagging params to use inner_n_jobs
             if self.classifier:
-                BaggingClassifier.__init__ = (
-                    lambda self, **kwargs: 
-                    super(BaggingClassifier, self).__init__(**kwargs, n_jobs=inner_n_jobs)
-                )
+                BaggingClassifier.__init__ = lambda self, **kwargs: super(
+                    BaggingClassifier, self
+                ).__init__(**kwargs, n_jobs=inner_n_jobs)
             else:
-                BaggingRegressor.__init__ = (
-                    lambda self, **kwargs: 
-                    super(BaggingRegressor, self).__init__(**kwargs, n_jobs=inner_n_jobs)
-                )
+                BaggingRegressor.__init__ = lambda self, **kwargs: super(
+                    BaggingRegressor, self
+                ).__init__(**kwargs, n_jobs=inner_n_jobs)
         else:
             # Let bagging use all cores if outer loop is serial
             outer_n_jobs = 1
-            inner_n_jobs = -1 # Use all
-        
+            inner_n_jobs = -1  # Use all
+
         combinatorial_trained_estimators = Parallel(n_jobs=outer_n_jobs)(
             delayed(train_single_bagging_estimator)(
                 clone(single_estimator), test_indices
@@ -220,20 +215,18 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
                 combinations_list, split_segments
             )
         )
-        
+
         # Restore default constructors
         BaggingClassifier.__init__ = BaggingClassifier.__init__
         BaggingRegressor.__init__ = BaggingRegressor.__init__
 
-
         # 2. Assemble predictions (this is fast, can be serial or parallel)
         def get_path_data(
-            path_num: int,
-            locs: List[Tuple[int, int]]
+            path_num: int, locs: List[Tuple[int, int]]
         ) -> Dict[str, np.ndarray]:
             """Assemble predictions for one path."""
             path_predictions = []
-            for (group_idx, split_idx) in locs:
+            for group_idx, split_idx in locs:
                 test_indices_segment = split_segments[group_idx]
                 X_test = single_data.iloc[test_indices_segment]
                 estimator = combinatorial_trained_estimators[split_idx]
@@ -244,13 +237,13 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
                     preds = estimator.predict(X_test)
 
                 path_predictions.append(preds)
-            
+
             return {f"Path {path_num}": np.concatenate(path_predictions)}
 
         path_results = Parallel(n_jobs=outer_n_jobs)(
             delayed(get_path_data)(path_num, locs)
             for path_num, locs in locations.items()
         )
-        
+
         paths_predictions = dict(ChainMap(*reversed(path_results)))
         return paths_predictions

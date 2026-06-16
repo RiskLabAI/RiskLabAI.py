@@ -19,7 +19,7 @@ from .denoising import (
     cov_to_corr,
     corr_to_cov,
     denoise_cov,
-    optimal_portfolio, 
+    optimal_portfolio,
 )
 
 __all__ = [
@@ -27,10 +27,10 @@ __all__ = [
     "fit_kde",
     "find_max_eval",
     "pca",
-    "denoised_corr",   
-    "denoised_corr2", 
+    "denoised_corr",
+    "denoised_corr2",
     "cov_to_corr",
     "corr_to_cov",
     "denoise_cov",
-    "optimal_portfolio",  
+    "optimal_portfolio",
 ]

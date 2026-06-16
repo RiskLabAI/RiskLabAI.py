@@ -40,10 +40,10 @@ def beta_estimates(
         The estimated \(\beta\) vector.
     """
     log_ratios_sq = np.log(high_prices / low_prices) ** 2
-    
+
     # Sum of current and previous day's squared log-ratio
     beta = log_ratios_sq.rolling(window=2).sum()
-    
+
     # Average over the window span
     beta = beta.rolling(window=window_span).mean()
     return beta
@@ -97,7 +97,7 @@ def alpha_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     """
     term1 = ((2**0.5) - 1) * (beta**0.5) / _DENOMINATOR
     term2 = (gamma / _DENOMINATOR) ** 0.5
-    
+
     # Floor at zero
     alpha = np.maximum(term1 - term2, 0)
     return alpha
@@ -129,7 +129,7 @@ def corwin_schultz_estimator(
     beta = beta_estimates(high_prices, low_prices, window_span)
     gamma = gamma_estimates(high_prices, low_prices)
     alpha = alpha_estimates(beta, gamma)
-    
+
     # Calculate spread
     spread = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
     return spread

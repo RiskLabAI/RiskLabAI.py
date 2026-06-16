@@ -40,20 +40,17 @@ __all__ = [
     "FeatureImportanceStrategy",
     "FeatureImportanceFactory",
     "FeatureImportanceController",
-    
     # Strategy Implementations
     "FeatureImportanceMDI",
     "ClusteredFeatureImportanceMDI",
     "FeatureImportanceMDA",
     "ClusteredFeatureImportanceMDA",
     "FeatureImportanceSFI",
-    
     # Imported utilities from *other* modules
     "cluster_k_means_top",
     "random_block_correlation",
     "form_true_matrix",
     "simulates_cov_mu",
-    
     # Utilities *from this* module
     "get_test_dataset",
     "orthogonal_features",

@@ -4,9 +4,7 @@ Implements a standard K-Fold cross-validator.
 
 import warnings
 from copy import deepcopy
-from typing import (
-    Any, Dict, Generator, List, Optional, Tuple, Union
-)
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -17,6 +15,7 @@ from .cross_validator_interface import CrossValidator
 
 # For type hinting sklearn-like estimators
 Estimator = Any
+
 
 class KFold(CrossValidator):
     """
@@ -31,10 +30,7 @@ class KFold(CrossValidator):
     """
 
     def __init__(
-        self,
-        n_splits: int,
-        shuffle: bool = False,
-        random_seed: int = None
+        self, n_splits: int, shuffle: bool = False, random_seed: int = None
     ) -> None:
         """
         Initialize the K-Fold cross-validator.
@@ -58,7 +54,7 @@ class KFold(CrossValidator):
         self,
         data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
         labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
-        groups: Optional[np.ndarray] = None
+        groups: Optional[np.ndarray] = None,
     ) -> int:
         """
         Return the number of splits.
@@ -113,10 +109,10 @@ class KFold(CrossValidator):
         self,
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
         labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
-        groups: Optional[np.ndarray] = None
+        groups: Optional[np.ndarray] = None,
     ) -> Union[
         Generator[Tuple[np.ndarray, np.ndarray], None, None],
-        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None]
+        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None],
     ]:
         """
         Split data (or dictionary of data) into train-test indices.
@@ -145,8 +141,7 @@ class KFold(CrossValidator):
                 yield train_indices, test_indices
 
     def _single_backtest_paths(
-        self,
-        single_data: pd.DataFrame
+        self, single_data: pd.DataFrame
     ) -> Dict[str, List[Dict[str, np.ndarray]]]:
         """
         Generate backtest paths for a single dataset.
@@ -167,12 +162,14 @@ class KFold(CrossValidator):
         paths = {}
 
         for train_indices, test_indices in self._single_split(single_data):
-            path_data.append({
-                "Train": train_indices,
-                "Test": test_indices,
-            })
+            path_data.append(
+                {
+                    "Train": train_indices,
+                    "Test": test_indices,
+                }
+            )
 
-        paths['Path 1'] = path_data
+        paths["Path 1"] = path_data
         return paths
 
     def backtest_paths(
@@ -180,7 +177,7 @@ class KFold(CrossValidator):
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
     ) -> Union[
         Dict[str, List[Dict[str, np.ndarray]]],
-        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]]
+        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]],
     ]:
         """
         Generate backtest paths for data or a dictionary of data.
@@ -203,7 +200,7 @@ class KFold(CrossValidator):
             for key in data:
                 multiple_paths[key] = self._single_backtest_paths(data[key])
             return multiple_paths
-        
+
         return self._single_backtest_paths(data)
 
     def _single_backtest_predictions(
@@ -213,7 +210,7 @@ class KFold(CrossValidator):
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Dict[str, np.ndarray]:
         """
         Obtain backtest predictions for a single dataset.
@@ -244,9 +241,7 @@ class KFold(CrossValidator):
             single_weights = np.ones(len(single_data))
 
         def train_test_single_estimator(
-            estimator_: Estimator,
-            train_indices: np.ndarray,
-            test_indices: np.ndarray
+            estimator_: Estimator, train_indices: np.ndarray, test_indices: np.ndarray
         ) -> Tuple[np.ndarray, np.ndarray]:
             """Train model and return (predictions, test_indices)."""
             X_train = single_data.iloc[train_indices]
@@ -254,7 +249,7 @@ class KFold(CrossValidator):
             weights_train = single_weights[train_indices]
 
             with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', category=ConvergenceWarning)
+                warnings.filterwarnings("ignore", category=ConvergenceWarning)
                 try:
                     estimator_.fit(X_train, y_train, sample_weight=weights_train)
                 except TypeError:
@@ -274,7 +269,8 @@ class KFold(CrossValidator):
         results = Parallel(n_jobs=n_jobs)(
             delayed(train_test_single_estimator)(
                 deepcopy(single_estimator), train_indices, test_indices
-            ) for train_indices, test_indices in self._single_split(single_data)
+            )
+            for train_indices, test_indices in self._single_split(single_data)
         )
 
         # Unpack predictions and their corresponding original indices
@@ -291,7 +287,7 @@ class KFold(CrossValidator):
             reorder_indices = np.argsort(original_indices)
             path_data = path_data[reorder_indices]
 
-        paths_predictions = {'Path 1': path_data}
+        paths_predictions = {"Path 1": path_data}
         return paths_predictions
 
     def backtest_predictions(
@@ -301,7 +297,7 @@ class KFold(CrossValidator):
         labels: Union[pd.Series, Dict[str, pd.Series]],
         sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Union[Dict[str, np.ndarray], Dict[str, Dict[str, np.ndarray]]]:
         """
         Generate backtest predictions for single or multiple datasets.
@@ -328,14 +324,16 @@ class KFold(CrossValidator):
             - If data is a dict: A nested dictionary of predictions.
         """
         if isinstance(data, dict):
-            if not isinstance(estimator, dict) or \
-               not isinstance(labels, dict) or \
-               (sample_weights and not isinstance(sample_weights, dict)):
+            if (
+                not isinstance(estimator, dict)
+                or not isinstance(labels, dict)
+                or (sample_weights and not isinstance(sample_weights, dict))
+            ):
                 raise ValueError(
                     "If data is a dict, estimator, labels, "
                     "and sample_weights (if provided) must also be dicts."
                 )
-            
+
             multiple_paths_predictions = {}
             for key in data:
                 multiple_paths_predictions[key] = self._single_backtest_predictions(
@@ -344,23 +342,17 @@ class KFold(CrossValidator):
                     labels[key],
                     sample_weights[key] if sample_weights else None,
                     predict_probability,
-                    n_jobs
+                    n_jobs,
                 )
             return multiple_paths_predictions
 
         # Handle single dataset case
-        if not (isinstance(data, pd.DataFrame) and 
-                isinstance(labels, pd.Series)):
+        if not (isinstance(data, pd.DataFrame) and isinstance(labels, pd.Series)):
             raise ValueError(
                 "If data is a DataFrame, estimator must be a single estimator "
                 "and labels must be a single Series."
             )
 
         return self._single_backtest_predictions(
-            estimator,
-            data,
-            labels,
-            sample_weights,
-            predict_probability,
-            n_jobs
+            estimator, data, labels, sample_weights, predict_probability, n_jobs
         )

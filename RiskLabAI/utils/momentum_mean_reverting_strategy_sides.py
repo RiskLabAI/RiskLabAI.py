@@ -4,6 +4,7 @@ Determines strategy side (long/short) based on moving average crossovers.
 
 import pandas as pd
 
+
 def determine_strategy_side(
     prices: pd.Series,
     fast_window: int = 20,
@@ -61,9 +62,9 @@ def determine_strategy_side(
     # Explicit int64: plain `int` maps to int32 on Windows, which makes the
     # returned dtype platform-dependent.
     signal = (fast_ma >= slow_ma).astype("int64") * 2 - 1
-    
+
     if mean_reversion:
         # Invert the signal for mean reversion
         return -signal
-    
+
     return signal

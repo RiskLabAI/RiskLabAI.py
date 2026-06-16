@@ -58,25 +58,21 @@ class ExpectedRunBars(AbstractRunBars):
             self.expected_ticks_number_lower_bound = 0.0
             self.expected_ticks_number_upper_bound = np.inf
         else:
-            self.expected_ticks_number_lower_bound = (
-                expected_ticks_number_bounds[0]
-            )
-            self.expected_ticks_number_upper_bound = (
-                expected_ticks_number_bounds[1]
-            )
+            self.expected_ticks_number_lower_bound = expected_ticks_number_bounds[0]
+            self.expected_ticks_number_upper_bound = expected_ticks_number_bounds[1]
 
     def _expected_number_of_ticks(self) -> float:
         """
         Calculate E[T] using an EWMA of previous bar tick counts.
         """
         prev_ticks_list = self.run_bars_statistics[PREVIOUS_BARS_N_TICKS_LIST]
-        
+
         window = self.window_size_for_expected_n_ticks_estimation
         if window is None or window <= 0:
-             return np.mean(prev_ticks_list)
-             
+            return np.mean(prev_ticks_list)
+
         if not prev_ticks_list:
-             return self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER]
+            return self.information_driven_bars_statistics[EXPECTED_TICKS_NUMBER]
 
         ewma_ticks = ewma(
             np.array(prev_ticks_list[-window:], dtype=float), window=window
@@ -100,7 +96,7 @@ class FixedRunBars(AbstractRunBars):
         initial_estimate_of_expected_n_ticks_in_bar: int,
         window_size_for_expected_imbalance_estimation: int,
         analyse_thresholds: bool = False,
-        window_size_for_expected_n_ticks_estimation: Optional[int] = None, # Not used
+        window_size_for_expected_n_ticks_estimation: Optional[int] = None,  # Not used
     ):
         """
         Constructor.

@@ -4,9 +4,7 @@ Implements a Walk-Forward cross-validator for time-series data.
 
 import warnings
 from copy import deepcopy
-from typing import (
-    Any, Dict, Generator, Optional, Tuple
-)
+from typing import Any, Dict, Generator, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,6 +15,7 @@ from .kfold import KFold
 
 # For type hinting sklearn-like estimators
 Estimator = Any
+
 
 class WalkForward(KFold):
     """
@@ -43,10 +42,7 @@ class WalkForward(KFold):
     """
 
     def __init__(
-        self,
-        n_splits: int = 5,
-        max_train_size: Optional[int] = None,
-        gap: int = 0
+        self, n_splits: int = 5, max_train_size: Optional[int] = None, gap: int = 0
     ) -> None:
         """
         Initialize the WalkForward cross-validator.
@@ -84,15 +80,15 @@ class WalkForward(KFold):
             A generator where each item is a tuple of (train_indices, test_indices).
         """
         indices = np.arange(single_data.shape[0])
-        
+
         # np.array_split handles non-divisible splits
         for test_indices in np.array_split(indices, self.n_splits):
             # The first test index
             first_test_idx_loc = test_indices[0]
-            
+
             # Train indices end `gap` samples before the test set
             train_end_loc = first_test_idx_loc - self.gap
-            
+
             if train_end_loc < 0:
                 # No training data possible
                 train_indices = np.array([], dtype=int)
@@ -102,7 +98,7 @@ class WalkForward(KFold):
                     train_indices = indices[train_start_loc:train_end_loc]
                 else:
                     train_indices = indices[:train_end_loc]
-            
+
             yield train_indices, test_indices
 
     def _single_backtest_predictions(
@@ -112,7 +108,7 @@ class WalkForward(KFold):
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Dict[str, np.ndarray]:
         """
         Obtain backtest predictions for a single dataset.
@@ -142,16 +138,18 @@ class WalkForward(KFold):
             single_weights = np.ones(len(single_data))
 
         def train_test_single_estimator(
-            estimator_: Estimator,
-            train_indices: np.ndarray,
-            test_indices: np.ndarray
+            estimator_: Estimator, train_indices: np.ndarray, test_indices: np.ndarray
         ) -> np.ndarray:
             """Train model and return predictions."""
-            
+
             if len(train_indices) == 0:
                 # No training data, return NaNs
                 n_classes = len(np.unique(single_labels)) if predict_probability else 1
-                shape = (len(test_indices), n_classes) if predict_probability else (len(test_indices),)
+                shape = (
+                    (len(test_indices), n_classes)
+                    if predict_probability
+                    else (len(test_indices),)
+                )
                 return np.full(shape, np.nan)
 
             X_train = single_data.iloc[train_indices]
@@ -159,7 +157,7 @@ class WalkForward(KFold):
             weights_train = single_weights[train_indices]
 
             with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', category=ConvergenceWarning)
+                warnings.filterwarnings("ignore", category=ConvergenceWarning)
                 try:
                     estimator_.fit(X_train, y_train, sample_weight=weights_train)
                 except TypeError:
@@ -169,15 +167,16 @@ class WalkForward(KFold):
 
             if predict_probability:
                 return estimator_.predict_proba(X_test)
-            
+
             return estimator_.predict(X_test)
 
         path_data = Parallel(n_jobs=n_jobs)(
             delayed(train_test_single_estimator)(
                 deepcopy(single_estimator), train_indices, test_indices
-            ) for train_indices, test_indices in self._single_split(single_data)
+            )
+            for train_indices, test_indices in self._single_split(single_data)
         )
 
         # Since shuffle=False, we can just concatenate
-        paths_predictions = {'Path 1': np.concatenate(path_data)}
+        paths_predictions = {"Path 1": np.concatenate(path_data)}
         return paths_predictions

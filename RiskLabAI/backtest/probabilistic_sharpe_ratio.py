@@ -13,6 +13,7 @@ from typing import List
 import numpy as np
 from scipy import stats as ss
 
+
 def probabilistic_sharpe_ratio(
     observed_sharpe_ratio: float,
     benchmark_sharpe_ratio: float,

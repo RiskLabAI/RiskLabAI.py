@@ -14,9 +14,7 @@ from scipy.stats import norm
 from RiskLabAI.hpc import mp_pandas_obj
 
 
-def probability_bet_size(
-    probabilities: np.ndarray, sides: np.ndarray
-) -> np.ndarray:
+def probability_bet_size(probabilities: np.ndarray, sides: np.ndarray) -> np.ndarray:
     r"""
     Calculate the bet size based on probabilities and side.
 
@@ -133,9 +131,7 @@ def strategy_bet_sizing(
     _probabilities = probabilities.loc[common_index]
 
     # 1. Calculate individual bet sizes
-    bet_sizes_arr = probability_bet_size(
-        _probabilities.to_numpy(), _sides.to_numpy()
-    )
+    bet_sizes_arr = probability_bet_size(_probabilities.to_numpy(), _sides.to_numpy())
 
     # 2. Calculate concurrent average
     avg_bet_sizes_arr = average_bet_sizes(
@@ -151,12 +147,11 @@ def strategy_bet_sizing(
 # --- The following functions appear to be from de Prado (2018) ---
 # --- Naming convention (camelCase) is preserved for reference. ---
 
-def avgActiveSignals(
-    signals: pd.DataFrame, nThreads: int
-) -> pd.DataFrame:
+
+def avgActiveSignals(signals: pd.DataFrame, nThreads: int) -> pd.DataFrame:
     """
     Calculate the average signal among active signals using parallel processing.
-    
+
     Reference: De Prado, M. (2018) Advances in financial machine learning.
     Methodology: SNIPPET 10.2
 
@@ -178,7 +173,7 @@ def avgActiveSignals(
     timePoints = timePoints.union(signals.index.values)
     timePoints = list(timePoints)
     timePoints.sort()
-    
+
     # 2) call parallel function
     out = mp_pandas_obj(
         mpAvgActiveSignals,
@@ -189,12 +184,10 @@ def avgActiveSignals(
     return out
 
 
-def mpAvgActiveSignals(
-    signals: pd.DataFrame, molecule: list
-) -> pd.Series:
+def mpAvgActiveSignals(signals: pd.DataFrame, molecule: list) -> pd.Series:
     """
     Worker function for `avgActiveSignals`.
-    
+
     At time `loc`, average signal among those still active.
     Signal is active if:
     a) issued before or at `loc` AND
@@ -238,7 +231,9 @@ def mpAvgActiveSignals(
     end_times = signals["t1"].to_numpy()[finite]
     end_order = np.argsort(end_times, kind="mergesort")
     sorted_ends = end_times[end_order]
-    cum_signal_end = np.concatenate(([0.0], np.cumsum(signal_values[finite][end_order])))
+    cum_signal_end = np.concatenate(
+        ([0.0], np.cumsum(signal_values[finite][end_order]))
+    )
     cum_count_end = np.arange(len(sorted_ends) + 1)
 
     started = np.searchsorted(sorted_starts, molecule_array, side="right")
@@ -326,11 +321,9 @@ def Signal(
         signal *= events.loc[signal.index, "side"]  # meta-labeling
 
     # 2) compute average signal among those concurrently open
-    signal_df = signal.to_frame("signal").join(
-        events[["t1"]], how="left"
-    )
+    signal_df = signal.to_frame("signal").join(events[["t1"]], how="left")
     avg_signal = avgActiveSignals(signal_df, nThreads)
-    
+
     # 3) discretize signal
     discretized_signal = discreteSignal(signal=avg_signal, stepSize=stepSize)
     return discretized_signal
@@ -358,9 +351,7 @@ def betSize(w: float, x: float) -> float:
     return x / np.sqrt(w + x**2)
 
 
-def TPos(
-    w: float, f: float, acctualPrice: float, maximumPositionSize: int
-) -> int:
+def TPos(w: float, f: float, acctualPrice: float, maximumPositionSize: int) -> int:
     """
     Calculate the target position size.
 
@@ -383,9 +374,7 @@ def TPos(
     int
         The target position size (integer).
     """
-    return int(
-        betSize(w, f - acctualPrice) * maximumPositionSize
-    )
+    return int(betSize(w, f - acctualPrice) * maximumPositionSize)
 
 
 def inversePrice(f: float, w: float, m: float) -> float:
@@ -410,7 +399,7 @@ def inversePrice(f: float, w: float, m: float) -> float:
         The implied price for bet size `m`.
     """
     if m == 1.0 or m == -1.0:
-        return f # Avoid division by zero
+        return f  # Avoid division by zero
     return f - m * np.sqrt(w / (1 - m**2))
 
 
@@ -446,17 +435,15 @@ def limitPrice(
         The average limit price.
     """
     if targetPositionSize == cPosition:
-        return f # No change
-        
+        return f  # No change
+
     sgn = np.sign(targetPositionSize - cPosition)
     lP = 0.0
-    
+
     # Average price from current to target position
-    for i in range(
-        abs(cPosition + sgn), abs(targetPositionSize + sgn)
-    ):
+    for i in range(abs(cPosition + sgn), abs(targetPositionSize + sgn)):
         lP += inversePrice(f, w, i / float(maximumPositionSize))
-        
+
     lP /= abs(targetPositionSize - cPosition)
     return lP
 
@@ -481,5 +468,5 @@ def getW(x: float, m: float) -> float:
         The implied 'w' coefficient.
     """
     if m == 0.0 or m == 1.0 or m == -1.0:
-        return np.inf # w is undefined
-    return x**2 * ( (1 / m**2) - 1 )
+        return np.inf  # w is undefined
+    return x**2 * ((1 / m**2) - 1)

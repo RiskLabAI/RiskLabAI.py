@@ -43,7 +43,7 @@ from .model import (
 from .solver import (
     initialize_weights,
     FBSDESolver,
-    FBSNNolver, # Note: Typo in original filename?
+    FBSNNolver,  # Note: Typo in original filename?
 )
 
 __all__ = [
@@ -53,18 +53,19 @@ __all__ = [
     "HJBLQ",
     "BlackScholesBarenblatt",
     "PricingDiffRate",
-    
     # Models
     "TimeNet",
     "Net1",
-    "MAB", "SAB", "ISAB", "PMA",
+    "MAB",
+    "SAB",
+    "ISAB",
+    "PMA",
     "TimeNetForSet",
     "DeepTimeSetTransformer",
     "FBSNNNetwork",
     "DeepBSDE",
     "TimeDependentNetwork",
     "TimeDependentNetworkMonteCarlo",
-    
     # Solvers
     "initialize_weights",
     "FBSDESolver",
