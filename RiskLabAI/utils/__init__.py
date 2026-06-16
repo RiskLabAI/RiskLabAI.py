@@ -36,11 +36,10 @@ def __getattr__(name):
         return value
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
-# --- Alias for Backward Compatibility ---
-# 'smoothing_average.py' is a duplicate of 'ewma.py'.
-# We import 'ewma' and alias it to 'compute_exponential_weighted_moving_average'
-# to maintain compatibility with modules that imported the old name.
-# You can safely delete the 'smoothing_average.py' file.
+# --- Alias for backward compatibility ---
+# The historical `compute_exponential_weighted_moving_average` name now maps to
+# the canonical, numba-jitted `ewma` (the former `smoothing_average.py`
+# duplicate has been removed).
 compute_exponential_weighted_moving_average = ewma
 
 __all__ = [

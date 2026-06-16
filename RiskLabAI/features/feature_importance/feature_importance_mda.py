@@ -2,12 +2,15 @@
 Computes Mean Decrease Accuracy (MDA) feature importance.
 """
 
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss
 from sklearn.model_selection import KFold
 from typing import List, Optional, Any, Callable
 from .feature_importance_strategy import FeatureImportanceStrategy
+
+logger = logging.getLogger(__name__)
 
 class FeatureImportanceMDA(FeatureImportanceStrategy):
     """
@@ -67,7 +70,7 @@ class FeatureImportanceMDA(FeatureImportanceStrategy):
         shuffled_scores = pd.DataFrame(columns=x.columns, dtype=float)
 
         for i, (train_idx, test_idx) in enumerate(cv_generator.split(x)):
-            print(f"Fold {i} start ...")
+            logger.debug("Fold %d start ...", i)
 
             x_train, y_train, w_train = (
                 x.iloc[train_idx, :],

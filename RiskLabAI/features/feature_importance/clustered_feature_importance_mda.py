@@ -2,6 +2,7 @@
 Computes Clustered Mean Decrease Accuracy (MDA) feature importance.
 """
 
+import logging
 from typing import Dict, Tuple, List, Any
 import numpy as np
 import pandas as pd
@@ -9,6 +10,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import log_loss
 from .feature_importance_strategy import FeatureImportanceStrategy
+
+logger = logging.getLogger(__name__)
 
 class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
     """
@@ -81,7 +84,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
         shuffled_scores = pd.DataFrame(columns=self.clusters.keys(), dtype=float)   
 
         for i, (train_idx, test_idx) in enumerate(cv_generator.split(X=x)):
-            print(f"Fold {i} start ...")
+            logger.debug("Fold %d start ...", i)
 
             x_train, y_train, w_train = (
                 x.iloc[train_idx, :],

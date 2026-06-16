@@ -35,14 +35,13 @@ def covariance_to_correlation(covariance: np.ndarray) -> np.ndarray:
     np.ndarray
         The corresponding correlation matrix.
     """
-    std = np.sqrt(np.diag(covariance))
-    correlation = covariance / np.outer(std, std)
-    
-    # Handle numerical errors
-    correlation[correlation < -1] = -1.0
-    correlation[correlation > 1] = 1.0
-    
-    return correlation
+    # Single source of truth: RiskLabAI.data.denoise.cov_to_corr implements the
+    # same conversion (Snippet 2.3) with added zero-std and diagonal safeguards.
+    # Output is identical to floating-point precision for valid covariance
+    # matrices. Imported locally to avoid any import cycle at module load.
+    from RiskLabAI.data.denoise.denoising import cov_to_corr
+
+    return cov_to_corr(covariance)
 
 def cluster_k_means_base(
     correlation: pd.DataFrame,

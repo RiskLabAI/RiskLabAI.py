@@ -5,6 +5,74 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- `RiskLabAI.core`: a non-breaking extension layer that makes the library easier
+  to grow with new models.
+  - `core.registry.Registry`: a reusable, case-insensitive component registry
+    with lazy (import-path) registration, aliases, duplicate protection, optional
+    kwarg filtering, and helpful "not found" errors. Generalises the three
+    hand-written `name -> class` factories (`bars_initializer`,
+    `cross_validator_factory`, `feature_importance_factory`).
+  - `core.base`: base interfaces per model family — re-exports the existing
+    `AbstractBars`, `CrossValidator`, `FeatureImportanceStrategy` (lazily), an
+    `Estimator` structural `Protocol`, and new optional contracts
+    `BaseLabeler` / `BaseBetSizer` / `BasePortfolioOptimizer` for the
+    free-function families.
+  - Per-family registries (`BARS`, `CROSS_VALIDATORS`, `FEATURE_IMPORTANCE`,
+    `LABELERS`, `BET_SIZERS`, `PORTFOLIO_OPTIMIZERS`) pre-populated with the
+    built-in catalogue, plus `list_components()` / `get_registry()` for
+    discovery.
+  - `EXTENDING.md`: a step-by-step guide with worked examples for adding a new
+    model. Existing factories and public APIs are unchanged; importing
+    `RiskLabAI.core` pulls in no heavy dependencies.
+
+### Changed
+- Removed duplicated code by single-sourcing two helpers (no public API change):
+  - `data.labeling` no longer defines its own copies of the parallel-processing
+    helpers (`lin_parts`, `process_jobs`, `expand_call`, `report_progress`).
+    They are re-exported from the canonical `RiskLabAI.hpc` (`lin_parts` maps to
+    `hpc.linear_partitions`); the names remain importable from `data.labeling`.
+    The dead duplicate's `num_threads=24` default is gone (the canonical default
+    is `-1` = all cores); the copies were unused inside the package.
+  - `cluster.covariance_to_correlation` now delegates to the canonical
+    `data.denoise.cov_to_corr`. Output is identical to floating-point precision
+    for valid covariance matrices (verified over random inputs; the canonical
+    version adds zero-std and exact-diagonal safeguards).
+- Note: the two `sharpe_ratio` definitions were deliberately left separate.
+  `backtest_statistics.sharpe_ratio` is numba-jitted and array-only (ddof=0),
+  while `backtest_overfitting_simulation`'s relies on pandas `Series.std()`
+  (ddof=1) in its rank-correlation path — unifying them would change results.
+- Replaced library `print()` calls with the standard `logging` module across
+  `controller.data_structure_controller`, `hpc`, `backtest.strategy_risk`,
+  `features.feature_importance` (MDA/clustered MDA), `pde.solver`, and
+  `utils.publication_plots` (errors -> `logger.error`, recoverable issues ->
+  `logger.warning`, progress -> `logger.info`/`debug`). The `RiskLabAI` logger
+  gets a `NullHandler`, so the library is silent by default; configure logging
+  (e.g. `logging.basicConfig(level=logging.INFO)`) to see output. Return values
+  are unchanged.
+- `pde`: importing `RiskLabAI.pde` without PyTorch now raises a clear, actionable
+  `ImportError` pointing to `pip install 'RiskLabAI[pde]'`, instead of a bare
+  `ModuleNotFoundError: No module named 'torch'`. The base install remains
+  torch-free (`import RiskLabAI` never imports the sub-package).
+
+### Performance
+- Vectorized three O(n^2) hot paths; outputs are unchanged (locked by
+  `test/test_performance.py`, which checks each against a brute-force reference):
+  - `data.differentiation.fractional_difference_std`: the per-row expanding
+    weighted sum is now a single causal convolution (`np.convolve`) per column.
+  - `backtest.bet_sizing.mpAvgActiveSignals`: the per-timepoint active-signal
+    average is now prefix sums + `searchsorted` (interval-stabbing sweep),
+    turning an O(n*m) double scan into O((n+m) log n) — ~1500x on a 3k-signal
+    benchmark.
+  - `data.labeling.triple_barrier`: per-event pandas label slicing replaced
+    with positional numpy indexing (~70x on 50k closes / 2k events).
+
+### Removed
+- Deleted dead modules `utils/utilities_lopez.py` (unreferenced) and
+  `utils/smoothing_average.py` (a duplicate of `utils.ewma`). The public
+  `compute_exponential_weighted_moving_average` name is unaffected — it remains
+  available from `RiskLabAI.utils` as an alias of the canonical `ewma`.
+
 ### Fixed
 - `features.feature_importance` (MDA): feature shuffling mutated a column view
   in place, which raises `ValueError: array is read-only` under pandas

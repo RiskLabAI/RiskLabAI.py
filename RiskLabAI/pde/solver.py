@@ -3,6 +3,8 @@ Implements the main FBSDE (Forward-Backward Stochastic Differential
 Equation) solver classes.
 """
 
+import logging
+
 import torch
 import torch.nn as nn
 import torch.autograd as autograd
@@ -11,6 +13,8 @@ from typing import List, Tuple, Any
 
 from RiskLabAI.pde.model import *
 from RiskLabAI.pde.equation import Equation
+
+logger = logging.getLogger(__name__)
 
 def initialize_weights(m: nn.Module) -> None:
     """
@@ -194,7 +198,7 @@ class FBSDESolver:
                 model.train()
 
         for j in range(num_iterations):
-            print(f"Iteration {j + 1}/{num_iterations}")
+            logger.info("Iteration %d/%d", j + 1, num_iterations)
 
             dw_train, y_train = self.pde.sample(batch_size)
             y_train = torch.tensor(y_train, dtype=torch.float32, device=self.device)
@@ -228,10 +232,10 @@ class FBSDESolver:
                     # from the loss function's components.
                     y0_new = torch.mean((payoff - dw_coef) / coef)
                     inits.append(y0_new.item())
-                    print(f"Loss: {val_loss.item():.4f}, Y_0: {y0_new.item():.4f}")
+                    logger.info("Loss: %.4f, Y_0: %.4f", val_loss.item(), y0_new.item())
                 else:
                     inits.append(y0.item())
-                    print(f"Loss: {val_loss.item():.4f}, Y_0: {y0.item():.4f}")
+                    logger.info("Loss: %.4f, Y_0: %.4f", val_loss.item(), y0.item())
                     
                 losses.append(val_loss.item())
 
@@ -369,7 +373,7 @@ class FBSNNolver:
         t_val = torch.ones((128, 1), device=self.device)
 
         for j in range(num_iterations):
-            print(f"Iteration {j + 1}/{num_iterations}")
+            logger.info("Iteration %d/%d", j + 1, num_iterations)
 
             dw_train, y_train = self.pde.sample(batch_size)
             y_train = torch.tensor(y_train, dtype=torch.float32, device=self.device)
@@ -397,7 +401,7 @@ class FBSNNolver:
                 
                 y0_mean = torch.mean(y0_val).item()
                 inits.append(y0_mean)
-                
-                print(f"Loss: {val_loss.item():.4f}, Y_0: {y0_mean:.4f}")
+
+                logger.info("Loss: %.4f, Y_0: %.4f", val_loss.item(), y0_mean)
 
         return losses, inits
