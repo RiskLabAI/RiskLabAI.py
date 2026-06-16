@@ -19,6 +19,7 @@ from joblib import Parallel, delayed
 
 from .backtest_statistics import sharpe_ratio
 
+
 def performance_evaluation(
     train_partition: np.ndarray,
     test_partition: np.ndarray,
@@ -54,15 +55,13 @@ def performance_evaluation(
     """
     # 1. Find best strategy on training data
     evaluate_train = [
-        metric(train_partition[:, i], risk_free_return)
-        for i in range(n_strategies)
+        metric(train_partition[:, i], risk_free_return) for i in range(n_strategies)
     ]
     best_strategy_idx = np.argmax(evaluate_train)
 
     # 2. Evaluate all strategies on test data
     evaluate_test = [
-        metric(test_partition[:, i], risk_free_return)
-        for i in range(n_strategies)
+        metric(test_partition[:, i], risk_free_return) for i in range(n_strategies)
     ]
 
     # 3. Find rank of the best_strategy in the test set
@@ -129,7 +128,7 @@ def probability_of_backtest_overfitting(
     _, n_strategies = performances.shape
     partitions = np.array_split(performances, n_partitions)
     partition_indices = list(range(n_partitions))
-    
+
     # Get all combinations of training partition indices
     partition_combinations_indices = list(
         combinations(partition_indices, n_partitions // 2)
@@ -139,11 +138,7 @@ def probability_of_backtest_overfitting(
         delayed(performance_evaluation)(
             np.concatenate([partitions[i] for i in train_indices], axis=0),
             np.concatenate(
-                [
-                    partitions[i]
-                    for i in partition_indices
-                    if i not in train_indices
-                ],
+                [partitions[i] for i in partition_indices if i not in train_indices],
                 axis=0,
             ),
             n_strategies,

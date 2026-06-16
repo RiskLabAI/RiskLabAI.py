@@ -15,7 +15,6 @@ from scipy.stats import norm
 from typing import List, Optional, Tuple, Dict, Any
 
 
-
 class BaggingClassifierAccuracy:
     """
     Evaluates a bagging classifier's accuracy using different
@@ -34,7 +33,7 @@ class BaggingClassifierAccuracy:
         n_estimators: int = 1000,
         max_samples: int = 100,
         max_features: float = 1.0,
-        random_state: Optional[int] = None
+        random_state: Optional[int] = None,
     ):
         """
         Initializes the BaggingClassifier.
@@ -60,19 +59,19 @@ class BaggingClassifierAccuracy:
         self.random_state = random_state
 
         self.base_estimator = DecisionTreeClassifier(
-            criterion='entropy',
+            criterion="entropy",
             max_features=1,  # Trees vote on one feature
-            class_weight='balanced'
+            class_weight="balanced",
         )
-        
+
         self.clf = BaggingClassifier(
             estimator=self.base_estimator,
             n_estimators=self.n_estimators,
             max_samples=self.max_samples,
             max_features=self.max_features,
-            random_state=self.random_state
+            random_state=self.random_state,
         )
-        
+
         self.estimators_ = None
         self.weights_ = None
         self.c_i_scores_ = None
@@ -80,7 +79,7 @@ class BaggingClassifierAccuracy:
         self.class_0_ = None
         self.class_1_ = None
 
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> 'BaggingClassifierAccuracy':
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> "BaggingClassifierAccuracy":
         """
         Fits the bagging classifier on the training data.
 
@@ -98,14 +97,14 @@ class BaggingClassifierAccuracy:
         """
         self.clf.fit(X, y)
         self.estimators_ = self.clf.estimators_
-        
+
         # <-- ADDED: Check for binary classification and store classes
         if len(self.clf.classes_) != 2:
             raise ValueError("This class only supports binary classification.")
-            
+
         self.class_0_ = self.clf.classes_[0]
         self.class_1_ = self.clf.classes_[1]
-        
+
         return self
 
     def calculate_c_i(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
@@ -127,21 +126,17 @@ class BaggingClassifierAccuracy:
         """
         if self.estimators_ is None:
             raise NotFittedError("Classifier must be fitted first. Call .fit()")
-            
+
         c_i_scores = []
         for tree in self.estimators_:
             y_pred = tree.predict(X)
             acc = accuracy_score(y, y_pred)
             c_i_scores.append(acc)
-            
+
         self.c_i_scores_ = np.array(c_i_scores)
         return self.c_i_scores_
 
-    def calculate_weights(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series
-    ) -> Dict[str, np.ndarray]:
+    def calculate_weights(self, X: pd.DataFrame, y: pd.Series) -> Dict[str, np.ndarray]:
         """
         Calculates weights for each estimator based on three schemes:
         1. Uniform (w_i = 1/N)
@@ -163,7 +158,7 @@ class BaggingClassifierAccuracy:
         if self.c_i_scores_ is None:
             # calculate_c_i also checks if model is fitted
             self.calculate_c_i(X, y)
-            
+
         c_i = self.c_i_scores_
         n = len(c_i)
 
@@ -176,22 +171,14 @@ class BaggingClassifierAccuracy:
 
         # 3. 1 - c_i^2 weights (proportional to variance)
         c_i_squared = c_i**2
-        w_variance = 1. - c_i_squared
+        w_variance = 1.0 - c_i_squared
         sum_w_var = np.sum(w_variance)
         w_variance = w_variance / sum_w_var if sum_w_var != 0 else w_uniform
-        
-        self.weights_ = {
-            'uniform': w_uniform,
-            'c_i': w_c_i,
-            'variance': w_variance
-        }
+
+        self.weights_ = {"uniform": w_uniform, "c_i": w_c_i, "variance": w_variance}
         return self.weights_
 
-    def predict(
-        self,
-        X: pd.DataFrame,
-        weight_scheme: str = 'uniform'
-    ) -> np.ndarray:
+    def predict(self, X: pd.DataFrame, weight_scheme: str = "uniform") -> np.ndarray:
         """
         Predicts class labels for X using the specified weighting scheme.
 
@@ -210,33 +197,37 @@ class BaggingClassifierAccuracy:
         # <-- UPDATED: Check fit status first
         if self.estimators_ is None:
             raise NotFittedError("Classifier must be fitted first. Call .fit()")
-            
+
         if self.weights_ is None:
             # <-- UPDATED: More specific error
-            raise NotFittedError("Weights must be calculated first. Call .calculate_weights()")
-            
+            raise NotFittedError(
+                "Weights must be calculated first. Call .calculate_weights()"
+            )
+
         if weight_scheme not in self.weights_:
-            raise ValueError(f"Unknown weight_scheme: {weight_scheme}. "
-                             f"Must be one of {list(self.weights_.keys())}")
+            raise ValueError(
+                f"Unknown weight_scheme: {weight_scheme}. "
+                f"Must be one of {list(self.weights_.keys())}"
+            )
 
         weights = self.weights_[weight_scheme]
-        
+
         # Get predictions from each tree
         # (N_samples, N_estimators)
         tree_preds = np.array([tree.predict(X) for tree in self.estimators_]).T
-        
+
         # <-- UPDATED: Convert labels {class_0, class_1} to {-1, 1}
         # Map class_1 to 1, and class_0 to -1
         tree_preds_signed = np.where(tree_preds == self.class_1_, 1, -1)
-        
+
         # Calculate weighted average vote
         # (N_samples, N_estimators) * (N_estimators,) -> (N_samples,)
         weighted_votes = np.dot(tree_preds_signed, weights)
-        
+
         # <-- UPDATED: Convert vote back to {class_0, class_1}
         # Positive vote -> class_1, Negative or Zero vote -> class_0
         y_pred = np.where(weighted_votes > 0, self.class_1_, self.class_0_)
-        
+
         return y_pred
 
     def evaluate_all_schemes(
@@ -244,7 +235,7 @@ class BaggingClassifierAccuracy:
         X_test: pd.DataFrame,
         y_test: pd.Series,
         X_train: pd.DataFrame,
-        y_train: pd.Series
+        y_train: pd.Series,
     ) -> Dict[str, float]:
         """
         Fits, calculates weights, and evaluates accuracy for all
@@ -268,26 +259,24 @@ class BaggingClassifierAccuracy:
         """
         # Fit classifier
         self.fit(X_train, y_train)
-        
+
         # Calculate weights (uses X_train, y_train implicitly)
         self.calculate_weights(X_train, y_train)
-        
+
         accuracies = {}
         for scheme in self.weights_.keys():
             y_pred = self.predict(X_test, weight_scheme=scheme)
             acc = accuracy_score(y_test, y_pred)
             accuracies[scheme] = acc
-            
+
         return accuracies
 
 
 # --- Standalone Functions for Bootstrap Analysis ---
 
+
 def calculate_bootstrap_accuracy(
-    clf: BaggingClassifier,
-    X: pd.DataFrame,
-    y: pd.Series,
-    n_bootstraps: int = 1000
+    clf: BaggingClassifier, X: pd.DataFrame, y: pd.Series, n_bootstraps: int = 1000
 ) -> Tuple[np.ndarray, float, float]:
     """
     Calculates the accuracy of a bagging classifier over multiple
@@ -315,27 +304,27 @@ def calculate_bootstrap_accuracy(
     """
     a_n_values = []
     n_samples = len(y)
-    
+
     # Use indices from the original X/y DataFrames/Series
     indices = X.index
-    
+
     # --- CHANGE: Fixed typo n_bootstraMps -> n_bootstraps ---
     for _ in range(n_bootstraps):
-    # --- END CHANGE ---
+        # --- END CHANGE ---
         # Sample test set with replacement
         boot_indices = np.random.choice(indices, n_samples, replace=True)
         X_boot = X.loc[boot_indices]
         y_boot = y.loc[boot_indices]
-        
+
         # Predict on the bootstrapped sample
         y_pred = clf.predict(X_boot)
         acc = accuracy_score(y_boot, y_pred)
         a_n_values.append(acc)
-        
+
     a_n_values = np.array(a_n_values)
     a_n_mean = np.mean(a_n_values)
     a_n_std = np.std(a_n_values, ddof=1)
-    
+
     return a_n_values, a_n_mean, a_n_std
 
 
@@ -343,7 +332,7 @@ def plot_bootstrap_accuracy_distribution(
     a_n_values: np.ndarray,
     a_n_mean: float,
     a_n_std: float,
-    ax: Optional["plt.Axes"] = None
+    ax: Optional["plt.Axes"] = None,
 ) -> "plt.Axes":
     """
     Plots the distribution of bootstrapped accuracy scores.
@@ -370,13 +359,15 @@ def plot_bootstrap_accuracy_distribution(
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 6))
 
-    sns.histplot(a_n_values, kde=True, ax=ax, stat='density', label='Empirical Distribution')
-    
+    sns.histplot(
+        a_n_values, kde=True, ax=ax, stat="density", label="Empirical Distribution"
+    )
+
     # Overlay a normal distribution
     x_min, x_max = ax.get_xlim()
     x = np.linspace(x_min, x_max, 100)
     p = norm.pdf(x, a_n_mean, a_n_std)
-    ax.plot(x, p, 'k', linewidth=2, label=f'Normal(μ={a_n_mean:.3f}, σ={a_n_std:.3f})')
-    
+    ax.plot(x, p, "k", linewidth=2, label=f"Normal(μ={a_n_mean:.3f}, σ={a_n_std:.3f})")
+
     ax.legend()
     return ax

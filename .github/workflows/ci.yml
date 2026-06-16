@@ -53,11 +53,8 @@ jobs:
           "
 
   lint:
-    name: ruff + black (advisory until format pass lands)
+    name: ruff + black
     runs-on: ubuntu-latest
-    # Non-blocking until the mechanical black/ruff formatting commit lands;
-    # then remove continue-on-error to make style CI-enforced.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -10,6 +10,7 @@ from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import *
 
+
 class AbstractInformationDrivenBars(AbstractBars):
     """
     Abstract class for Information-Driven Bars (Imbalance and Run).
@@ -44,9 +45,7 @@ class AbstractInformationDrivenBars(AbstractBars):
         """
         super().__init__(bar_type)
         self.information_driven_bars_statistics = {
-            EXPECTED_TICKS_NUMBER: float(
-                initial_estimate_of_expected_n_ticks_in_bar
-            ),
+            EXPECTED_TICKS_NUMBER: float(initial_estimate_of_expected_n_ticks_in_bar),
             EXPECTED_IMBALANCE_WINDOW: window_size_for_expected_imbalance_estimation,
         }
         self.window_size_for_expected_n_ticks_estimation = (
@@ -84,9 +83,7 @@ class AbstractInformationDrivenBars(AbstractBars):
         if ewma_window == 0:
             return np.nan
 
-        return ewma(
-            np.array(array[-ewma_window:], dtype=float), window=ewma_window
-        )[-1]
+        return ewma(np.array(array[-ewma_window:], dtype=float), window=ewma_window)[-1]
 
     def _imbalance_at_tick(
         self, price: float, signed_tick: int, volume: float

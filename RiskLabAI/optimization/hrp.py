@@ -12,6 +12,7 @@ import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as scd
 from typing import List
 
+
 def inverse_variance_weights(covariance_matrix: pd.DataFrame) -> np.ndarray:
     """
     Compute the inverse-variance portfolio weights.
@@ -51,7 +52,7 @@ def cluster_variance(
     """
     cov_slice = covariance_matrix.loc[clustered_items, clustered_items]
     weights = inverse_variance_weights(cov_slice).reshape(-1, 1)
-    
+
     # V_cluster = w' * C * w
     cluster_var = np.dot(np.dot(weights.T, cov_slice), weights)[0, 0]
     return cluster_var
@@ -129,20 +130,20 @@ def recursive_bisection(
         for i in range(0, len(clustered_items), 2):
             cluster_0 = clustered_items[i]
             cluster_1 = clustered_items[i + 1]
-            
+
             # 1. Calculate variance for each cluster
             variance_0 = cluster_variance(covariance_matrix, cluster_0)
             variance_1 = cluster_variance(covariance_matrix, cluster_1)
-            
+
             # 2. Calculate allocation factor (alpha)
             if variance_0 + variance_1 == 0:
-                alpha = 0.5 # Default to equal weight if both variances are zero
+                alpha = 0.5  # Default to equal weight if both variances are zero
             else:
                 alpha = 1 - variance_0 / (variance_0 + variance_1)
-            
+
             # 3. Apply weights
             weights[cluster_0] *= alpha
-            weights[cluster_1] *= (1 - alpha)
+            weights[cluster_1] *= 1 - alpha
 
     return weights
 
@@ -193,16 +194,16 @@ def hrp(cov: pd.DataFrame, corr: pd.DataFrame) -> pd.Series:
     # 1. Calculate distance
     distance = distance_corr(corr_df.values)
 
-    dist_condensed = scd.squareform(distance, force='tovector')
+    dist_condensed = scd.squareform(distance, force="tovector")
 
     # 2. Cluster
     link = sch.linkage(dist_condensed, "single")
-    
+
     # 3. Quasi-diagonalize
     sorted_items_idx = quasi_diagonal(link)
     sorted_items_names = corr_df.index[sorted_items_idx].tolist()
-    
+
     # 4. Recursive bisection
     hrp_portfolio = recursive_bisection(cov_df, sorted_items_names)
-    
+
     return hrp_portfolio.sort_index()

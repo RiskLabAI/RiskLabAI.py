@@ -43,7 +43,6 @@ __all__ = [
     "process_jobs",
     "expand_call",
     "report_progress",
-    
     # from financial_labels.py
     "calculate_t_value_linear_regression",
     "find_trend_using_trend_scanning",

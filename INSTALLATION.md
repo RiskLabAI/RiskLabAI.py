@@ -1,58 +1,65 @@
-### 1\. Create the New Environment
+# Installation & Development Setup
 
-Open your terminal or Anaconda Prompt. This command will create a new, empty environment named `risklab` using a stable Python version (e.g., 3.10).
+## Install (users)
 
 ```bash
-conda create -n risklab python=3.10 -y
+pip install RiskLabAI
 ```
 
-### 2\. Activate the Environment
-
-You must activate the environment to install packages into it and use it.
+Optional extras pull in heavier dependencies only when you need them:
 
 ```bash
+pip install "RiskLabAI[pde]"     # torch — the Deep-BSDE PDE solver
+pip install "RiskLabAI[plot]"    # matplotlib / seaborn / plotly — plotting helpers
+pip install "RiskLabAI[synth]"   # quantecon — synthetic-data utilities
+pip install "RiskLabAI[all]"     # everything above
+```
+
+The base install is intentionally lightweight: `import RiskLabAI` does not pull
+in torch or plotting libraries — sub-packages that need them are imported lazily.
+
+## Development setup (contributors)
+
+### 1. Create and activate an environment
+
+```bash
+conda create -n risklab python=3.11 -y
 conda activate risklab
 ```
 
-Your terminal prompt should now change to show `(risklab)` at the beginning.
+(Any Python 3.9–3.12 works; a venv is fine too.)
 
-### 3\. Install Your Project's Dependencies
+### 2. Install in editable mode with all extras and test tooling
 
-Navigate to the root directory of your `RiskLabAI.py` project (the one containing `requirements.txt`). This command will read your `requirements.txt` file and install all the necessary packages.
+Dependencies are declared in `pyproject.toml` (there is **no** `requirements.txt`).
+From the repository root:
 
 ```bash
-# Navigate to your project folder first
-cd /path/to/your/RiskLabAI.py
-
-# Install all packages from your requirements file
-pip install -r requirements.txt
+pip install -e ".[all]" pytest black ruff
 ```
 
-### 4\. Install Your Library in "Editable" Mode
+The editable install (`-e`) links the package to your source tree so the test
+suite imports your local code.
 
-This is a crucial step for development and testing. It links your `RiskLabAI` source code to the environment, which allows your test suite to import your library as if it were officially installed.
+> On some setuptools versions the plain editable install does not expose all
+> sub-modules. If `import RiskLabAI.backtest.bet_sizing` fails, reinstall with
+> the compatibility mode:
+> ```bash
+> pip install -e . --config-settings editable_mode=compat
+> ```
 
-From the same root directory (where your `pyproject.toml` is), run:
+### 3. Run the tests
 
 ```bash
-pip install -e .
+pytest -q --ignore=test/pde
 ```
 
-### 5\. Run Your Tests
+`test/pde` is skipped unless you have a working `torch` runtime (install the
+`[pde]` extra to include it).
 
-Now you are all set. The standard way to run your test suite is by using `pytest`. If `pytest` wasn't included in your `requirements.txt`, you can install it:
-
-```bash
-pip install pytest
-```
-
-Then, simply run the following command from your project's root directory:
+### 4. Lint and format before committing
 
 ```bash
-pytest
-```
-If you want to be fast, you can tell `pytest` to ignore that specific directory when you run your tests:
-
-```bash
-pytest --ignore=RiskLabAI/pde
+black RiskLabAI test
+ruff check RiskLabAI test
 ```

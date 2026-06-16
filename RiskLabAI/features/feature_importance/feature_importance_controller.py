@@ -7,6 +7,7 @@ import pandas as pd
 from .feature_importance_factory import FeatureImportanceFactory
 from .feature_importance_strategy import FeatureImportanceStrategy
 
+
 class FeatureImportanceController:
     """
     Controller class to manage and execute feature importance strategies.
@@ -16,14 +17,14 @@ class FeatureImportanceController:
     .. code-block:: python
 
        from sklearn.ensemble import RandomForestClassifier
-       
+
        my_classifier = RandomForestClassifier(n_estimators=10, seed=42)
        my_clusters = {'cluster_0': ['feat_0', 'feat_1']}
 
        # Initialize the controller
        controller = FeatureImportanceController(
            'ClusteredMDA',
-           classifier=my_classifier, 
+           classifier=my_classifier,
            clusters=my_clusters,
            n_splits=10
        )
@@ -45,9 +46,7 @@ class FeatureImportanceController:
             constructor (e.g., `classifier`, `clusters`, `n_splits`).
         """
         self.strategy_instance: FeatureImportanceStrategy = (
-            FeatureImportanceFactory.create_feature_importance(
-                strategy_type, **kwargs
-            )
+            FeatureImportanceFactory.create_feature_importance(strategy_type, **kwargs)
         )
 
     def calculate_importance(
@@ -65,7 +64,7 @@ class FeatureImportanceController:
         **kwargs : Any
             Additional arguments to pass to the strategy's `compute`
             method (e.g., `sample_weight`).
-        
+
         Returns
         -------
         pd.DataFrame

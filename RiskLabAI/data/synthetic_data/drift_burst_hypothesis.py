@@ -8,6 +8,7 @@ featuring an "explosion" at the midpoint.
 import numpy as np
 from typing import Tuple
 
+
 def drift_volatility_burst(
     bubble_length: int,
     a_before: float,
@@ -89,6 +90,6 @@ def drift_volatility_burst(
             volatilities[nan_mask] = volatilities[nan_index - 1]
         else:
             # Handle case where midpoint is the first element
-            volatilities[nan_mask] = b_before # Fallback
+            volatilities[nan_mask] = b_before  # Fallback
 
     return drifts, volatilities

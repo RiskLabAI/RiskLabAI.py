@@ -59,13 +59,9 @@ def cusum_filter_events_dynamic_threshold(
     price_delta = prices.diff().dropna()
 
     # Align price changes with thresholds
-    price_delta, thresholds = price_delta.align(
-        threshold, join="inner", copy=False
-    )
+    price_delta, thresholds = price_delta.align(threshold, join="inner", copy=False)
 
-    for (index, value), thresh_val in zip(
-        price_delta.items(), thresholds.values
-    ):
+    for (index, value), thresh_val in zip(price_delta.items(), thresholds.values):
         shift_positive = max(0.0, shift_positive + value)
         shift_negative = min(0.0, shift_negative + value)
 
@@ -79,9 +75,7 @@ def cusum_filter_events_dynamic_threshold(
     return pd.DatetimeIndex(time_events)
 
 
-def symmetric_cusum_filter(
-    prices: pd.Series, threshold: float
-) -> pd.DatetimeIndex:
+def symmetric_cusum_filter(prices: pd.Series, threshold: float) -> pd.DatetimeIndex:
     """
     Detect events using the Symmetric CUSUM filter with a fixed threshold.
 
@@ -118,9 +112,7 @@ def symmetric_cusum_filter(
     return pd.DatetimeIndex(time_events)
 
 
-def daily_volatility_with_log_returns(
-    close: pd.Series, span: int = 100
-) -> pd.Series:
+def daily_volatility_with_log_returns(close: pd.Series, span: int = 100) -> pd.Series:
     """
     Calculate daily volatility using log returns.
 
@@ -235,7 +227,7 @@ def triple_barrier(
     # Filter for events this worker owns
     events_filtered = events.loc[molecule]
     output = pd.DataFrame(index=events_filtered.index)
-    output["End Time"] = events_filtered["End Time"] # Use original end time
+    output["End Time"] = events_filtered["End Time"]  # Use original end time
 
     # 1. Set horizontal barriers
     if ptsl[0] > 0:
@@ -275,11 +267,13 @@ def triple_barrier(
 
     n_events = len(events_filtered)
     stop_loss_touch = np.full(n_events, np.datetime64("NaT"), dtype="datetime64[ns]")
-    profit_taking_touch = np.full(n_events, np.datetime64("NaT"), dtype="datetime64[ns]")
+    profit_taking_touch = np.full(
+        n_events, np.datetime64("NaT"), dtype="datetime64[ns]"
+    )
 
     for i in range(n_events):
         start, end = start_positions[i], end_positions[i]
-        segment = close_values[start:end + 1]
+        segment = close_values[start : end + 1]
         path_returns = np.log(segment / segment[0]) * side_values[i]
 
         below = path_returns < stop_loss_values[i]
@@ -293,11 +287,13 @@ def triple_barrier(
     # First barrier touched = earliest of {vertical, stop-loss, profit-taking},
     # ignoring NaT (the same semantics as the previous output.min(axis=1)).
     candidates = pd.DataFrame(
-        np.vstack([
-            events_filtered["End Time"].to_numpy().astype("datetime64[ns]"),
-            stop_loss_touch,
-            profit_taking_touch,
-        ]).T,
+        np.vstack(
+            [
+                events_filtered["End Time"].to_numpy().astype("datetime64[ns]"),
+                stop_loss_touch,
+                profit_taking_touch,
+            ]
+        ).T,
         index=events_filtered.index,
     )
     output["End Time"] = candidates.min(axis=1)
@@ -364,10 +360,10 @@ def meta_events(
     # 3. Set up sides
     if side is None:
         side_series = pd.Series(1.0, index=target.index)
-        ptsl_final = [ptsl[0], ptsl[0]] # Symmetric barriers
+        ptsl_final = [ptsl[0], ptsl[0]]  # Symmetric barriers
     else:
         side_series = side.reindex(target.index)
-        ptsl_final = ptsl[:2] # Asymmetric barriers
+        ptsl_final = ptsl[:2]  # Asymmetric barriers
 
     # 4. Create base events DataFrame
     events = pd.concat(
@@ -383,13 +379,15 @@ def meta_events(
     molecule_subsets = np.array_split(events.index, num_threads)
 
     with ProcessPoolExecutor(max_workers=num_threads) as executor:
-        results = list(executor.map(
-            triple_barrier,
-            [close] * num_threads,
-            [events] * num_threads,
-            [ptsl_final] * num_threads,
-            molecule_subsets
-        ))
+        results = list(
+            executor.map(
+                triple_barrier,
+                [close] * num_threads,
+                [events] * num_threads,
+                [ptsl_final] * num_threads,
+                molecule_subsets,
+            )
+        )
 
     # Combine results and update End Time
     first_touch_times = pd.concat(results, axis=0)["End Time"]
@@ -401,9 +399,7 @@ def meta_events(
     return events
 
 
-def meta_labeling(
-    events: pd.DataFrame, close: pd.Series
-) -> pd.DataFrame:
+def meta_labeling(events: pd.DataFrame, close: pd.Series) -> pd.DataFrame:
     """
     Calculate returns and assign binary labels for meta-labeling.
 
@@ -439,10 +435,9 @@ def meta_labeling(
     out = pd.DataFrame(index=events_filtered.index)
     out["End Time"] = events_filtered["End Time"]
 
-    out["Return"] = (
-        np.log(close_filtered.loc[events_filtered["End Time"].values].values)
-        - np.log(close_filtered.loc[events_filtered.index].values)
-    )
+    out["Return"] = np.log(
+        close_filtered.loc[events_filtered["End Time"].values].values
+    ) - np.log(close_filtered.loc[events_filtered.index].values)
 
     if "Side" in events_filtered:
         out["Return"] *= events_filtered["Side"]

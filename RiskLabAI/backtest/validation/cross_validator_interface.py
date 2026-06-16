@@ -4,15 +4,14 @@ in the RiskLabAI library.
 """
 
 from abc import ABC, abstractmethod
-from typing import (
-    Any, Dict, Generator, List, Optional, Tuple, Union
-)
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
 # For type hinting sklearn-like estimators
 Estimator = Any
+
 
 class CrossValidator(ABC):
     """
@@ -29,7 +28,7 @@ class CrossValidator(ABC):
         self,
         data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
         labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
-        groups: Optional[np.ndarray] = None
+        groups: Optional[np.ndarray] = None,
     ) -> int:
         """
         Return the total number of splits.
@@ -78,10 +77,10 @@ class CrossValidator(ABC):
         self,
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
         labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
-        groups: Optional[np.ndarray] = None
+        groups: Optional[np.ndarray] = None,
     ) -> Union[
         Generator[Tuple[np.ndarray, np.ndarray], None, None],
-        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None]
+        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None],
     ]:
         """
         Split data (or dictionary of data) into train-test indices.
@@ -109,8 +108,7 @@ class CrossValidator(ABC):
 
     @abstractmethod
     def _single_backtest_paths(
-        self,
-        single_data: pd.DataFrame
+        self, single_data: pd.DataFrame
     ) -> Dict[str, List[Dict[str, np.ndarray]]]:
         """
         Generate backtest paths for a single dataset.
@@ -139,7 +137,7 @@ class CrossValidator(ABC):
         data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
     ) -> Union[
         Dict[str, List[Dict[str, np.ndarray]]],
-        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]]
+        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]],
     ]:
         """
         Generate backtest paths for data or a dictionary of data.
@@ -167,7 +165,7 @@ class CrossValidator(ABC):
         single_labels: pd.Series,
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Dict[str, np.ndarray]:
         """
         Obtain backtest predictions for a single dataset.
@@ -203,7 +201,7 @@ class CrossValidator(ABC):
         labels: Union[pd.Series, Dict[str, pd.Series]],
         sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]] = None,
         predict_probability: bool = False,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ) -> Union[Dict[str, np.ndarray], Dict[str, Dict[str, np.ndarray]]]:
         """
         Generate backtest predictions for single or multiple datasets.

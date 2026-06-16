@@ -10,6 +10,7 @@ from .feature_importance_mda import FeatureImportanceMDA
 from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
 from .feature_importance_sfi import FeatureImportanceSFI
 
+
 class FeatureImportanceFactory:
     """
     Factory class to create feature importance strategy instances.
@@ -42,7 +43,7 @@ class FeatureImportanceFactory:
         ValueError
             If an invalid `strategy_type` is provided.
         """
-        
+
         strategies: Dict[str, Type[FeatureImportanceStrategy]] = {
             "MDI": FeatureImportanceMDI,
             "ClusteredMDI": ClusteredFeatureImportanceMDI,
@@ -50,19 +51,18 @@ class FeatureImportanceFactory:
             "ClusteredMDA": ClusteredFeatureImportanceMDA,
             "SFI": FeatureImportanceSFI,
         }
-        
+
         strategy_class = strategies.get(strategy_type)
-        
+
         if strategy_class:
             # Pass only the relevant arguments to the constructor
             # This uses introspection to be robust
             import inspect
+
             sig = inspect.signature(strategy_class.__init__)
-            valid_kwargs = {
-                k: v for k, v in kwargs.items() if k in sig.parameters
-            }
+            valid_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
             return strategy_class(**valid_kwargs)
-        
+
         raise ValueError(
             f"Invalid strategy_type: {strategy_type}. "
             f"Valid types are: {list(strategies.keys())}"

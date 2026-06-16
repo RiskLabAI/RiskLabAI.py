@@ -6,6 +6,7 @@ from typing import Union, List, Any, Iterable
 import numpy as np
 from RiskLabAI.data.structures.abstract_bars import AbstractBars, TickData
 
+
 class StandardBars(AbstractBars):
     """
     Concrete class for Standard Bars (Tick, Volume, Dollar).
@@ -45,20 +46,20 @@ class StandardBars(AbstractBars):
             A list of the constructed standard bars.
         """
         bars_list = []
-        
+
         # Keep track of last timestamp for final bar
-        date_time = None 
-        
+        date_time = None
+
         for tick_data in data:
             self.tick_counter += 1
 
             # Unpack data
             date_time, price, volume = tick_data[0], tick_data[1], tick_data[2]
-            
+
             # Update common fields
             tick_rule = self._tick_rule(price)
             self.update_base_fields(price, tick_rule, volume)
-            self.close_price = price # Update close price continuously
+            self.close_price = price  # Update close price continuously
 
             # Check if bar construction condition is met
             if self._bar_construction_condition(self.threshold):
@@ -71,7 +72,7 @@ class StandardBars(AbstractBars):
                     self.threshold,
                 )
                 bars_list.append(next_bar)
-                
+
                 # Reset cached fields for the next bar
                 self._reset_cached_fields()
 

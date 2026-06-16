@@ -6,6 +6,7 @@ import pytest
 import numpy as np
 from RiskLabAI.ensemble.bagging_classifier_accuracy import bagging_classifier_accuracy
 
+
 def test_bagging_accuracy():
     """
     Test the bagging classifier accuracy.
@@ -23,7 +24,7 @@ def test_bagging_accuracy():
 
     # 4. If N=1, accuracy should be p
     assert np.isclose(bagging_classifier_accuracy(N=1, p=0.7), 0.7)
-    
+
     # 5. Test with N=3, p=0.7
     # P(X=2) + P(X=3)
     # P(X=2) = comb(3, 2) * (0.7**2) * (0.3**1) = 3 * 0.49 * 0.3 = 0.441

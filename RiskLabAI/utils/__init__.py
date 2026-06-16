@@ -36,6 +36,7 @@ def __getattr__(name):
         return value
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
+
 # --- Alias for backward compatibility ---
 # The historical `compute_exponential_weighted_moving_average` name now maps to
 # the canonical, numba-jitted `ewma` (the former `smoothing_average.py`
@@ -75,20 +76,15 @@ __all__ = [
     "PREVIOUS_TICK_IMBALANCES_SELL_LIST",
     "PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST",
     "N_PREVIOUS_BARS_FOR_EXPECTED_N_TICKS_ESTIMATION",
-    
     # ewma
     "ewma",
     "compute_exponential_weighted_moving_average",  # Alias
-    
     # progress
     "progress_bar",
-    
     # momentum_mean_reverting_strategy_sides
     "determine_strategy_side",
-    
     # update_figure_layout
     "update_figure_layout",
-
     # publication_plots
     "setup_publication_style",
     "apply_plot_style",

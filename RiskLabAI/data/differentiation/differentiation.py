@@ -15,6 +15,7 @@ import pandas as pd
 from statsmodels.tsa.stattools import adfuller
 from typing import Tuple, Optional
 
+
 def calculate_weights_std(degree: float, size: int) -> np.ndarray:
     """
     Compute weights for standard (expanding window) fractional differentiation.
@@ -38,9 +39,10 @@ def calculate_weights_std(degree: float, size: int) -> np.ndarray:
     for k in range(1, size):
         weight = -weights[-1] / k * (degree - k + 1)
         weights.append(weight)
-    
+
     # Reverse for dot product: [w_k, ..., w_1, w_0]
     return np.array(weights[::-1]).reshape(-1, 1)
+
 
 def calculate_weights_ffd(degree: float, threshold: float = 1e-5) -> np.ndarray:
     """
@@ -75,10 +77,9 @@ def calculate_weights_ffd(degree: float, threshold: float = 1e-5) -> np.ndarray:
     # Reverse for dot product: [w_k, ..., w_1, w_0]
     return np.array(weights[::-1]).reshape(-1, 1)
 
+
 def fractional_difference_std(
-    series: pd.DataFrame,
-    degree: float,
-    threshold: float = 0.01
+    series: pd.DataFrame, degree: float, threshold: float = 0.01
 ) -> pd.DataFrame:
     """
     Compute the standard (expanding window) fractionally differentiated series.
@@ -131,13 +132,11 @@ def fractional_difference_std(
         convolved = np.convolve(series_np, weights_natural[:n_obs])[:n_obs]
         result_df.loc[series_ffill.index[skip:], name] = convolved[skip:]
 
-    return result_df.dropna(how='all')
+    return result_df.dropna(how="all")
 
 
 def fractional_difference_fixed(
-    series: pd.DataFrame,
-    degree: float,
-    threshold: float = 1e-5
+    series: pd.DataFrame, degree: float, threshold: float = 1e-5
 ) -> pd.DataFrame:
     """
     Compute the Fixed-Width Window (FFD) fractionally differentiated series.
@@ -163,19 +162,17 @@ def fractional_difference_fixed(
         DataFrame of fractionally differentiated series.
     """
     result_df = pd.DataFrame(index=series.index)
-    
+
     for name in series.columns:
         result_df[name] = fractional_difference_fixed_single(
             series[name], degree, threshold
         )
-            
-    return result_df.dropna(how='all')
+
+    return result_df.dropna(how="all")
 
 
 def fractional_difference_fixed_single(
-    series: pd.Series,
-    degree: float,
-    threshold: float = 1e-5
+    series: pd.Series, degree: float, threshold: float = 1e-5
 ) -> pd.Series:
     """
     Compute the FFD series for a single `pd.Series` using np.convolve.
@@ -194,31 +191,31 @@ def fractional_difference_fixed_single(
     pd.Series
         The fractionally differentiated series.
     """
-    
+
     # 1. Compute weights
     # Reverse weights: calculate_weights_ffd returns [w_k, ..., w_0]
     weights = calculate_weights_ffd(degree, threshold).flatten()[::-1]
     width = len(weights)
-    
+
     # 2. Prepare data (drop leading NaNs)
     series_ffill = series.ffill().dropna()
-    
+
     if series_ffill.empty or series_ffill.shape[0] < width:
         # Not enough data to convolve
         return pd.Series(index=series.index, dtype="float64")
-        
+
     series_np = series_ffill.to_numpy()
-    
+
     # 3. Apply convolution
     # 'valid' mode computes the dot product only where the
     # window fully overlaps the series.
-    convolved_vals = np.convolve(series_np, weights, mode='valid')
-    
+    convolved_vals = np.convolve(series_np, weights, mode="valid")
+
     # 4. Create result series on the valid index
     # The result aligns with the *end* of the window
-    result_index = series_ffill.index[width - 1:]
+    result_index = series_ffill.index[width - 1 :]
     valid_results = pd.Series(convolved_vals, index=result_index)
-    
+
     # 5. Reindex to original full index
     # This correctly places NaNs at the start (warm-up)
     # and in any gaps that were in the original series.
@@ -229,7 +226,7 @@ def plot_weights(
     degree_range: Tuple[float, float],
     number_degrees: int,
     size: int,
-    ax: Optional["plt.Axes"] = None
+    ax: Optional["plt.Axes"] = None,
 ) -> "plt.Axes":
     """
     Plot the weights of fractionally differentiated series for various degrees.
@@ -254,13 +251,13 @@ def plot_weights(
 
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 6))
-        
+
     weights_df = pd.DataFrame()
     for degree in np.linspace(degree_range[0], degree_range[1], number_degrees):
         degree = round(degree, 2)
         weights = calculate_weights_std(degree, size)
         weights_df[degree] = pd.Series(weights.flatten(), index=range(size - 1, -1, -1))
-    
+
     weights_df.plot(ax=ax)
     ax.set_xlabel("Lag")
     ax.set_ylabel("Weight")
@@ -270,8 +267,7 @@ def plot_weights(
 
 
 def find_optimal_ffd_simple(
-    input_series: pd.DataFrame,
-    p_value_threshold: float = 0.05
+    input_series: pd.DataFrame, p_value_threshold: float = 0.05
 ) -> pd.DataFrame:
     """
     Find the minimum 'd' that passes the ADF test, for a range of d.
@@ -294,54 +290,53 @@ def find_optimal_ffd_simple(
         DataFrame of ADF test results for each 'd'.
     """
     results_list = []
-    
+
     # Resample to daily to ensure consistent lags
-    series_daily = np.log(input_series[['close']]).resample('1D').last().dropna()
-    
+    series_daily = np.log(input_series[["close"]]).resample("1D").last().dropna()
+
     for d in np.linspace(0, 1, 11):
         differentiated = fractional_difference_fixed(
             series_daily, d, threshold=0.01
         ).dropna()
-        
+
         if differentiated.empty:
             continue
-            
+
         corr = np.corrcoef(
-            series_daily.loc[differentiated.index, 'close'],
-            differentiated['close']
+            series_daily.loc[differentiated.index, "close"], differentiated["close"]
         )[0, 1]
-        
+
         try:
             adf_result = adfuller(
-                differentiated['close'], maxlag=1, regression='c', autolag=None
+                differentiated["close"], maxlag=1, regression="c", autolag=None
             )
-            
+
             results_list.append(
                 {
-                    'd': d,
-                    'adfStat': adf_result[0],
-                    'pVal': adf_result[1],
-                    'lags': adf_result[2],
-                    'nObs': adf_result[3],
-                    '95% conf': adf_result[4]['5%'],
-                    'corr': corr
+                    "d": d,
+                    "adfStat": adf_result[0],
+                    "pVal": adf_result[1],
+                    "lags": adf_result[2],
+                    "nObs": adf_result[3],
+                    "95% conf": adf_result[4]["5%"],
+                    "corr": corr,
                 }
             )
         except Exception:
             # Handle cases where ADF test fails (e.g., insufficient data)
             continue
-    
+
     if not results_list:
         return pd.DataFrame()
-        
-    return pd.DataFrame(results_list).set_index('d')
+
+    return pd.DataFrame(results_list).set_index("d")
 
 
 def fractionally_differentiated_log_price(
     input_series: pd.Series,
     threshold: float = 1e-5,
     step: float = 0.01,
-    p_value_threshold: float = 0.05
+    p_value_threshold: float = 0.05,
 ) -> pd.Series:
     """
     Find the minimum 'd' that makes a log-price series stationary.
@@ -369,34 +364,32 @@ def fractionally_differentiated_log_price(
     log_price = np.log(input_series)
     degree = 0.0
     p_value = 1.0
-    
+
     differentiated_series = None
 
     while p_value > p_value_threshold:
         degree += step
-        if degree > 2.0: # Safety break
-             raise ValueError("Failed to find stationary 'd' < 2.0")
-             
+        if degree > 2.0:  # Safety break
+            raise ValueError("Failed to find stationary 'd' < 2.0")
+
         differentiated = fractional_difference_fixed_single(
             log_price, degree, threshold=threshold
         ).dropna()
-        
+
         if differentiated.empty:
-            continue # Not enough data for this 'd'
-        
+            continue  # Not enough data for this 'd'
+
         try:
-            adf_test = adfuller(
-                differentiated, maxlag=1, regression='c', autolag=None
-            )
+            adf_test = adfuller(differentiated, maxlag=1, regression="c", autolag=None)
             p_value = adf_test[1]
         except Exception:
-            p_value = 1.0 # Failed test, keep going
-        
+            p_value = 1.0  # Failed test, keep going
+
         if differentiated_series is None:
-            differentiated_series = differentiated # Store first valid series
-    
+            differentiated_series = differentiated  # Store first valid series
+
     # Return the last computed series that passed
     if differentiated_series is None:
         raise ValueError("Could not generate any differentiated series.")
-        
+
     return differentiated

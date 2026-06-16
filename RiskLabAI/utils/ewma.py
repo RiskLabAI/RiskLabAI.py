@@ -7,6 +7,7 @@ import numpy as np
 from numba import jit, float64, int64
 from typing import Union
 
+
 @jit(nopython=True)
 def ewma(array: np.ndarray, window: int) -> np.ndarray:
     r"""
@@ -44,7 +45,7 @@ def ewma(array: np.ndarray, window: int) -> np.ndarray:
 
     alpha = 2.0 / (float(window) + 1.0)
     multiplier = 1.0 - alpha
-    
+
     # Handle the sum of weights (denominator)
     weight_sum = 1.0
     current_weighted_sum = array[0]

@@ -5,6 +5,7 @@ Calculates the weighted Kendall's tau.
 import scipy.stats as stats
 import numpy as np
 
+
 def calculate_weighted_tau(
     feature_importances: np.ndarray, principal_component_ranks: np.ndarray
 ) -> float:
@@ -30,6 +31,6 @@ def calculate_weighted_tau(
     """
     # Weights are the inverse of the rank
     weights = 1.0 / principal_component_ranks
-    
+
     tau, _ = stats.weightedtau(feature_importances, weights)
     return tau

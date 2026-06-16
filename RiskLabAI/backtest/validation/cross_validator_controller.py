@@ -7,6 +7,7 @@ from typing import Any
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 
+
 class CrossValidatorController:
     """
     Controller class to handle the cross-validation process.
@@ -15,11 +16,7 @@ class CrossValidatorController:
     creation and access to a specific cross-validator using the factory.
     """
 
-    def __init__(
-        self,
-        validator_type: str,
-        **kwargs: Any
-    ):
+    def __init__(self, validator_type: str, **kwargs: Any):
         """
         Initializes the CrossValidatorController.
 
@@ -32,11 +29,9 @@ class CrossValidatorController:
             Additional keyword arguments to be passed to the
             cross-validator's constructor.
         """
-        self.cross_validator: CrossValidator = \
-            CrossValidatorFactory.create_cross_validator(
-                validator_type,
-                **kwargs
-            )
+        self.cross_validator: CrossValidator = (
+            CrossValidatorFactory.create_cross_validator(validator_type, **kwargs)
+        )
 
     def get_validator(self) -> CrossValidator:
         """

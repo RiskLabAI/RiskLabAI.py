@@ -9,6 +9,7 @@ from typing import List, Tuple
 
 import numpy as np
 
+
 def synthetic_back_testing(
     forecast: float,
     half_life: float,
@@ -84,11 +85,11 @@ def synthetic_back_testing(
                 ):
                     stop_returns.append(gain)
                     break
-        
+
         mean_return = np.mean(stop_returns)
         std_return = np.std(stop_returns)
         sharpe_ratio = mean_return / std_return if std_return > 0 else 0.0
-        
+
         back_test_results.append(
             (profit_taking, stop_loss, mean_return, std_return, sharpe_ratio)
         )

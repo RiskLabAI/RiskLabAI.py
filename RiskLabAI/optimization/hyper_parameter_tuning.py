@@ -50,7 +50,7 @@ class MyPipeline(Pipeline):
             # Add sample_weight to fit_params for the *last step*
             step_name = self.steps[-1][0]
             fit_params[f"{step_name}__sample_weight"] = sample_weight
-            
+
         return super().fit(X, y, **fit_params)
 
 
@@ -106,7 +106,7 @@ def clf_hyper_fit(
         The fitted grid search object, or a fitted Bagging pipeline.
     """
     if bagging is None:
-        bagging = [0, 0.0, 1.0] # Default to no bagging
+        bagging = [0, 0.0, 1.0]  # Default to no bagging
 
     if set(label.unique()) == {0, 1}:
         scoring = "f1"  # F1-score for meta-labeling
@@ -121,8 +121,8 @@ def clf_hyper_fit(
         }
     else:
         # Ensure 'times' is passed if not already present
-        if 'times' not in validator_params:
-            validator_params['times'] = times
+        if "times" not in validator_params:
+            validator_params["times"] = times
 
     # 1. Set up the custom cross-validator
     inner_cv = CrossValidatorController(
@@ -147,17 +147,17 @@ def clf_hyper_fit(
             n_jobs=n_jobs,
             n_iter=rnd_search_iter,
         )
-        
+
     # 3. Fit the search
     gs = gs.fit(feature_data, label, **fit_params)
 
     # 4. (Optional) Fit bagging classifier on the best model
     if bagging[0] > 0:
         best_estimator = gs.best_estimator_
-        
+
         # Create a new pipeline with the best estimator's steps
         bag_pipe = MyPipeline(best_estimator.steps)
-        
+
         bag_clf = BaggingClassifier(
             estimator=bag_pipe,
             n_estimators=int(bagging[0]),
@@ -165,12 +165,12 @@ def clf_hyper_fit(
             max_features=float(bagging[2]),
             n_jobs=n_jobs,
         )
-        
+
         # Fit the bagging classifier
         bag_clf = bag_clf.fit(feature_data, label, **fit_params)
-        
+
         # Return as a pipeline
         return Pipeline([("bag", bag_clf)])
-    
+
     # 5. Return the best estimator found
     return gs.best_estimator_

@@ -11,6 +11,7 @@ from torch import Tensor
 import numpy as np
 from typing import Tuple, Optional, Union
 
+
 class Equation:
     """
     Base class for defining PDE-related functions.
@@ -28,9 +29,9 @@ class Equation:
             - 'total_time': Total time horizon (float)
             - 'num_time_interval': Number of time steps (int)
         """
-        self.dim: int = eqn_config['dim']
-        self.total_time: float = eqn_config['total_time']
-        self.num_time_interval: int = eqn_config['num_time_interval']
+        self.dim: int = eqn_config["dim"]
+        self.total_time: float = eqn_config["total_time"]
+        self.num_time_interval: int = eqn_config["num_time_interval"]
         self.delta_t: float = self.total_time / self.num_time_interval
         self.sqrt_delta_t: float = np.sqrt(self.delta_t)
         self.y_init: Optional[float] = None
@@ -115,11 +116,11 @@ class Equation:
             Terminal payoff value [batch_size, 1].
         """
         raise NotImplementedError
-        
+
     def sigma_matrix(self, x: Tensor) -> Tensor:
         """Helper to get the volatility matrix sigma(x)."""
         raise NotImplementedError
-        
+
     def terminal_for_sample(self, x: Tensor) -> Tensor:
         """Terminal condition for a multi-sample path."""
         raise NotImplementedError
@@ -129,11 +130,12 @@ class PricingDefaultRisk(Equation):
     """
     PDE for pricing with default risk.
     """
+
     def __init__(self, eqn_config: dict):
         super(PricingDefaultRisk, self).__init__(eqn_config)
         self.x_init = np.ones(self.dim) * 100.0
         self.sigma = 0.2
-        self.rate = 0.02   # R
+        self.rate = 0.02  # R
         self.delta = 2.0 / 3
         self.gammah = 0.2
         self.gammal = 0.02
@@ -144,9 +146,10 @@ class PricingDefaultRisk(Equation):
         self.slope = (self.gammah - self.gammal) / (self.vh - self.vl)
 
     def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
-        dw_sample = np.random.normal(
-            size=[num_sample, self.dim, self.num_time_interval]
-        ) * self.sqrt_delta_t
+        dw_sample = (
+            np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
+            * self.sqrt_delta_t
+        )
         x_sample = np.zeros([num_sample, self.dim, self.num_time_interval + 1])
         x_sample[:, :, 0] = np.ones([num_sample, self.dim]) * self.x_init
         for i in range(self.num_time_interval):
@@ -156,9 +159,10 @@ class PricingDefaultRisk(Equation):
         return dw_sample, x_sample
 
     def r_u(self, t: float, x: Tensor, y: Tensor, z: Tensor) -> Tensor:
-        piecewise_linear = nn.ReLU()(
-            nn.ReLU()(y - self.vh) * self.slope + self.gammah - self.gammal
-        ) + self.gammal
+        piecewise_linear = (
+            nn.ReLU()(nn.ReLU()(y - self.vh) * self.slope + self.gammah - self.gammal)
+            + self.gammal
+        )
         return (1 - self.delta) * piecewise_linear + self.rate
 
     def h_z(self, t: float, x: Tensor, y: Tensor, z: Tensor) -> Tensor:
@@ -179,6 +183,7 @@ class HJBLQ(Equation):
     """
     Hamilton-Jacobi-Bellman (HJB) equation with Linear-Quadratic (LQ) cost.
     """
+
     def __init__(self, eqn_config: dict):
         super(HJBLQ, self).__init__(eqn_config)
         self.x_init = np.zeros(self.dim)
@@ -186,9 +191,10 @@ class HJBLQ(Equation):
         self.lambd = 1.0
 
     def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
-        dw_sample = np.random.normal(
-            size=[num_sample, self.dim, self.num_time_interval]
-        ) * self.sqrt_delta_t
+        dw_sample = (
+            np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
+            * self.sqrt_delta_t
+        )
         x_sample = np.zeros([num_sample, self.dim, self.num_time_interval + 1])
         x_sample[:, :, 0] = np.ones([num_sample, self.dim]) * self.x_init
         for i in range(self.num_time_interval):
@@ -202,31 +208,35 @@ class HJBLQ(Equation):
         return torch.sum(torch.square(z), dim=1, keepdim=True) / (self.sigma**2)
 
     def terminal(self, t: float, x: Tensor) -> Tensor:
-        return torch.log(0.5 * (1 + torch.norm(x, p=2, dim=1, keepdim=True)**2))
+        return torch.log(0.5 * (1 + torch.norm(x, p=2, dim=1, keepdim=True) ** 2))
 
     def sigma_matrix(self, x: Union[np.ndarray, Tensor]) -> float:
         return self.sigma
-        
+
     def terminal_for_sample(self, x: Tensor) -> Tensor:
         # Used by Monte-Carlo solver, needs to match HJB terminal
-        return torch.log(0.5 * (1 + torch.norm(x, p=2, dim=2, keepdim=True)**2))
+        return torch.log(0.5 * (1 + torch.norm(x, p=2, dim=2, keepdim=True) ** 2))
 
 
 class BlackScholesBarenblatt(Equation):
     """
     Black-Scholes-Barenblatt equation.
     """
+
     def __init__(self, eqn_config: dict):
         super(BlackScholesBarenblatt, self).__init__(eqn_config)
-        self.x_init = np.ones(self.dim) * np.array([1.0 / (1.0 + i % 2) for i in range(self.dim)])
+        self.x_init = np.ones(self.dim) * np.array(
+            [1.0 / (1.0 + i % 2) for i in range(self.dim)]
+        )
         self.sigma = 0.4
-        self.rate = 0.05   # interest rate R
+        self.rate = 0.05  # interest rate R
         self.mu_bar = 0.0
 
     def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
-        dw_sample = np.random.normal(
-            size=(num_sample, self.dim, self.num_time_interval)
-        ) * self.sqrt_delta_t
+        dw_sample = (
+            np.random.normal(size=(num_sample, self.dim, self.num_time_interval))
+            * self.sqrt_delta_t
+        )
         x_sample = np.zeros((num_sample, self.dim, self.num_time_interval + 1))
         x_sample[:, :, 0] = np.ones((num_sample, self.dim)) * self.x_init
         for i in range(self.num_time_interval):
@@ -242,13 +252,13 @@ class BlackScholesBarenblatt(Equation):
         return -1 * torch.sum(z, dim=1, keepdim=True) * self.rate / self.sigma
 
     def terminal(self, t: float, x: Tensor) -> Tensor:
-        return torch.sum(x ** 2, dim=1, keepdim=True)
+        return torch.sum(x**2, dim=1, keepdim=True)
 
     def sigma_matrix(self, x: Union[np.ndarray, Tensor]) -> Union[np.ndarray, Tensor]:
         return self.sigma * x
 
     def terminal_for_sample(self, x: Tensor) -> Tensor:
-        return torch.sum(x ** 2, dim=2, keepdim=True)
+        return torch.sum(x**2, dim=2, keepdim=True)
 
 
 class PricingDiffRate(Equation):
@@ -256,6 +266,7 @@ class PricingDiffRate(Equation):
     Nonlinear Black-Scholes with different interest rates for
     borrowing and lending.
     """
+
     def __init__(self, eqn_config: dict):
         super(PricingDiffRate, self).__init__(eqn_config)
         self.x_init = np.ones(self.dim) * 100
@@ -266,9 +277,10 @@ class PricingDiffRate(Equation):
         self.alpha = 1.0 / self.dim
 
     def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
-        dw_sample = np.random.normal(
-            size=[num_sample, self.dim, self.num_time_interval]
-        ) * self.sqrt_delta_t
+        dw_sample = (
+            np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
+            * self.sqrt_delta_t
+        )
         x_sample = np.zeros([num_sample, self.dim, self.num_time_interval + 1])
         x_sample[:, :, 0] = np.ones([num_sample, self.dim]) * self.x_init
         factor = np.exp((self.mu_bar - (self.sigma**2) / 2) * self.delta_t)

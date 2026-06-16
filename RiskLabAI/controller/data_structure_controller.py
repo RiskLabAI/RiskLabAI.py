@@ -5,6 +5,7 @@ This class reads data in batches from CSVs or DataFrames and
 uses the BarsInitializerController to construct bars based on
 a specified method.
 """
+
 import logging
 
 import pandas as pd
@@ -14,20 +15,38 @@ from typing import Iterable, Optional, Generator, Union, Dict, Any, List
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import (
-    DATE_TIME, TICK_NUMBER, OPEN_PRICE, HIGH_PRICE,
-    LOW_PRICE, CLOSE_PRICE, CUMULATIVE_VOLUME,
-    CUMULATIVE_BUY_VOLUME, CUMULATIVE_SELL_VOLUME,
-    CUMULATIVE_TICKS, CUMULATIVE_DOLLAR, THRESHOLD
+    DATE_TIME,
+    TICK_NUMBER,
+    OPEN_PRICE,
+    HIGH_PRICE,
+    LOW_PRICE,
+    CLOSE_PRICE,
+    CUMULATIVE_VOLUME,
+    CUMULATIVE_BUY_VOLUME,
+    CUMULATIVE_SELL_VOLUME,
+    CUMULATIVE_TICKS,
+    CUMULATIVE_DOLLAR,
+    THRESHOLD,
 )
 
 logger = logging.getLogger(__name__)
 
 # Define the bar column schema
 BAR_COLUMNS = [
-    DATE_TIME, TICK_NUMBER, OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE,
-    CUMULATIVE_VOLUME, CUMULATIVE_BUY_VOLUME, CUMULATIVE_SELL_VOLUME,
-    CUMULATIVE_TICKS, CUMULATIVE_DOLLAR, THRESHOLD
+    DATE_TIME,
+    TICK_NUMBER,
+    OPEN_PRICE,
+    HIGH_PRICE,
+    LOW_PRICE,
+    CLOSE_PRICE,
+    CUMULATIVE_VOLUME,
+    CUMULATIVE_BUY_VOLUME,
+    CUMULATIVE_SELL_VOLUME,
+    CUMULATIVE_TICKS,
+    CUMULATIVE_DOLLAR,
+    THRESHOLD,
 ]
+
 
 class Controller:
     """
@@ -46,7 +65,7 @@ class Controller:
         method_arguments: Dict[str, Any],
         input_data: Union[str, pd.DataFrame],
         output_path: Optional[str] = None,
-        batch_size: int = 1_000_000
+        batch_size: int = 1_000_000,
     ) -> pd.DataFrame:
         """
         Handles the command to initialize a bar generator and process data.
@@ -54,21 +73,26 @@ class Controller:
         """
         # 1. Initialize the bar generator
         try:
-            initializer_method = self.bars_initializer.method_name_to_method[method_name]
+            initializer_method = self.bars_initializer.method_name_to_method[
+                method_name
+            ]
         except KeyError:
             valid_methods = list(self.bars_initializer.method_name_to_method.keys())
             logger.error(
                 "Bar method '%s' not found. Valid methods are: %s",
-                method_name, valid_methods,
+                method_name,
+                valid_methods,
             )
             return pd.DataFrame(columns=BAR_COLUMNS)
-            
+
         try:
             bar_generator: AbstractBars = initializer_method(**method_arguments)
         except TypeError as e:
             logger.error(
                 "Error initializing bar method '%s' with arguments %s: %s",
-                method_name, method_arguments, e,
+                method_name,
+                method_arguments,
+                e,
             )
             return pd.DataFrame(columns=BAR_COLUMNS)
 
@@ -81,7 +105,7 @@ class Controller:
             raise TypeError("input_data must be a string (path) or pd.DataFrame")
 
         all_bars: List[List[Any]] = []
-        
+
         # 3. Process data in batches
         logger.info("Processing data in batches...")
         try:
@@ -93,7 +117,8 @@ class Controller:
         except Exception as e:
             logger.warning(
                 "Error during bar construction: %s. Returning DataFrame with "
-                "bars constructed so far.", e,
+                "bars constructed so far.",
+                e,
             )
             # Continue to return whatever was processed
 
@@ -114,8 +139,7 @@ class Controller:
 
     @staticmethod
     def read_batches_from_string(
-        input_path: str,
-        batch_size: int
+        input_path: str, batch_size: int
     ) -> Generator[pd.DataFrame, None, None]:
         """
         Reads data in batches from a CSV file efficiently.
@@ -135,9 +159,7 @@ class Controller:
         try:
             # Use a generator to read the file in chunks
             # This is more memory-efficient and avoids reading the file twice.
-            for batch in pd.read_csv(
-                input_path, chunksize=batch_size, parse_dates=[0]
-            ):
+            for batch in pd.read_csv(input_path, chunksize=batch_size, parse_dates=[0]):
                 yield batch
         except FileNotFoundError:
             logger.error("File not found at %s", input_path)
@@ -151,11 +173,9 @@ class Controller:
             )
             return
 
-
     @staticmethod
     def read_batches_from_dataframe(
-        input_data: pd.DataFrame,
-        batch_size: int
+        input_data: pd.DataFrame, batch_size: int
     ) -> Generator[pd.DataFrame, None, None]:
         """
         Reads data in batches from a DataFrame.
@@ -163,7 +183,7 @@ class Controller:
         n_rows = input_data.shape[0]
         if n_rows == 0:
             return
-            
+
         for start_row in range(0, n_rows, batch_size):
             end_row = min(start_row + batch_size, n_rows)
             yield input_data.iloc[start_row:end_row]

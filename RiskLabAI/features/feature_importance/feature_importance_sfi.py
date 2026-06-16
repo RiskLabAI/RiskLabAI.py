@@ -9,6 +9,7 @@ from sklearn.model_selection import KFold
 from typing import List, Optional, Union, Any
 from .feature_importance_strategy import FeatureImportanceStrategy
 
+
 class FeatureImportanceSFI(FeatureImportanceStrategy):
     """
     Computes Single Feature Importance (SFI).
@@ -59,9 +60,9 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
             DataFrame with "FeatureName", "Mean", and "StandardDeviation"
             of the SFI scores.
         """
-        train_sample_weights = kwargs.get('train_sample_weights')
-        score_sample_weights = kwargs.get('score_sample_weights')
-        
+        train_sample_weights = kwargs.get("train_sample_weights")
+        score_sample_weights = kwargs.get("score_sample_weights")
+
         if train_sample_weights is None:
             train_sample_weights = np.ones(x.shape[0])
         if score_sample_weights is None:
@@ -99,9 +100,7 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
                     )
                 elif self.scoring == "accuracy":
                     pred = self.classifier.predict(x_test)
-                    score = accuracy_score(
-                        y_test, pred, sample_weight=w_test
-                    )
+                    score = accuracy_score(y_test, pred, sample_weight=w_test)
                 else:
                     raise ValueError(f"'{self.scoring}' method not defined.")
 
@@ -111,8 +110,7 @@ class FeatureImportanceSFI(FeatureImportanceStrategy):
                 {
                     "FeatureName": feature_name,
                     "Mean": np.mean(scores),
-                    "StandardDeviation": np.std(scores, ddof=1)
-                    * (len(scores) ** -0.5),
+                    "StandardDeviation": np.std(scores, ddof=1) * (len(scores) ** -0.5),
                 }
             )
 

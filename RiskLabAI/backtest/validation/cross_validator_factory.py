@@ -12,28 +12,26 @@ from .kfold import KFold
 from .purged_kfold import PurgedKFold
 from .walk_forward import WalkForward
 
+
 class CrossValidatorFactory:
     """
     Factory class for creating cross-validator objects.
-    
+
     This class uses a static method to encapsulate the logic for
     instantiating different cross-validator strategies.
     """
 
     VALIDATORS = {
-        'kfold': KFold,
-        'walkforward': WalkForward,
-        'purgedkfold': PurgedKFold,
-        'combinatorialpurged': CombinatorialPurged,
-        'baggedcombinatorialpurged': BaggedCombinatorialPurged,
-        'adaptivecombinatorialpurged': AdaptiveCombinatorialPurged,
+        "kfold": KFold,
+        "walkforward": WalkForward,
+        "purgedkfold": PurgedKFold,
+        "combinatorialpurged": CombinatorialPurged,
+        "baggedcombinatorialpurged": BaggedCombinatorialPurged,
+        "adaptivecombinatorialpurged": AdaptiveCombinatorialPurged,
     }
 
     @staticmethod
-    def create_cross_validator(
-            validator_type: str,
-            **kwargs: Any
-    ) -> CrossValidator:
+    def create_cross_validator(validator_type: str, **kwargs: Any) -> CrossValidator:
         """
         Factory method to create and return an instance of a cross-validator.
 
@@ -62,9 +60,7 @@ class CrossValidatorFactory:
 
         if validator_class:
             sig = inspect.signature(validator_class.__init__)
-            valid_kwargs = {
-                k: v for k, v in kwargs.items() if k in sig.parameters
-            }
+            valid_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
             return validator_class(**valid_kwargs)
 
         raise ValueError(

@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 
+
 def _compute_eigenvectors(
     dot_product: np.ndarray, explained_variance_threshold: float
 ) -> pd.DataFrame:
@@ -48,7 +49,7 @@ def _compute_eigenvectors(
 
     # Find the index where cumulative variance crosses the threshold
     index = cumulative_variance.searchsorted(explained_variance_threshold)
-    
+
     # Keep components up to and including the one that crosses the threshold
     eigen_dataframe = eigen_dataframe.iloc[: index + 1, :]
 
@@ -76,11 +77,11 @@ def orthogonal_features(
     """
     # 1. Normalize features (z-score)
     normalized_features = (features - features.mean(axis=0)) / features.std(axis=0)
-    normalized_features = normalized_features.dropna(axis=1) # Drop constant cols
-    
+    normalized_features = normalized_features.dropna(axis=1)  # Drop constant cols
+
     # 2. Compute dot product (proportional to covariance)
     dot_product = normalized_features.T @ normalized_features
-    
+
     # 3. Get principal components
     eigen_dataframe = _compute_eigenvectors(dot_product, variance_threshold)
 
@@ -89,7 +90,7 @@ def orthogonal_features(
 
     # 5. Transform features
     orthogonal_features_arr = normalized_features.values @ transformation_matrix
-    
+
     orthogonal_features_df = pd.DataFrame(
         orthogonal_features_arr,
         index=features.index,

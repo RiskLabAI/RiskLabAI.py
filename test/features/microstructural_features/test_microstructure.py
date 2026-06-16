@@ -16,6 +16,7 @@ from RiskLabAI.features.microstructural_features.bekker_parkinson_volatility_est
     bekker_parkinson_volatility_estimates,
 )
 
+
 @pytest.fixture
 def sample_hl_prices():
     """Fixture for high/low price series."""
@@ -24,11 +25,12 @@ def sample_hl_prices():
     low = pd.Series([9.9, 10.1, 10.0, 10.2, 10.3])
     return high, low
 
+
 def test_corwin_schultz(sample_hl_prices):
     """Test the Corwin-Schultz estimator end-to-end."""
     high, low = sample_hl_prices
     window = 2
-    
+
     # 1. Beta
     beta = beta_estimates(high, low, window)
     # log(H/L)^2
@@ -55,18 +57,19 @@ def test_corwin_schultz(sample_hl_prices):
 
     # 3. Alpha
     alpha = alpha_estimates(beta, gamma)
-    assert alpha.iloc[2] >= 0 # Should be floored at 0
-    
+    assert alpha.iloc[2] >= 0  # Should be floored at 0
+
     # 4. Spread
     spread = corwin_schultz_estimator(high, low, window)
     assert not spread.isna().all()
     assert spread.iloc[-1] >= 0
 
+
 def test_bekker_parkinson(sample_hl_prices):
     """Test the Bekker-Parkinson estimator."""
     high, low = sample_hl_prices
     window = 2
-    
+
     vol = bekker_parkinson_volatility_estimates(high, low, window)
     assert not vol.isna().all()
     assert vol.iloc[-1] >= 0

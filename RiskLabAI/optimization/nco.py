@@ -10,9 +10,8 @@ import pandas as pd
 from typing import Optional, Tuple, Dict, List
 
 # Import canonical implementations instead of duplicating
-from RiskLabAI.cluster.clustering import (
-    cluster_k_means_base, covariance_to_correlation
-)
+from RiskLabAI.cluster.clustering import cluster_k_means_base, covariance_to_correlation
+
 
 def get_optimal_portfolio_weights(
     covariance: np.ndarray, mu: Optional[np.ndarray] = None
@@ -40,7 +39,7 @@ def get_optimal_portfolio_weights(
 
     if mu is None:
         mu = ones  # For GMV portfolio
-    
+
     weights = np.dot(inverse_covariance, mu)
     weights /= np.dot(ones.T, weights)  # Normalize weights to sum to 1
     return weights
@@ -77,13 +76,13 @@ def get_optimal_portfolio_weights_nco(
     """
     covariance = pd.DataFrame(covariance)
     correlation = covariance_to_correlation(covariance.to_numpy())
-    correlation = pd.DataFrame(correlation, 
-                             index=covariance.index, 
-                             columns=covariance.columns)
-    
+    correlation = pd.DataFrame(
+        correlation, index=covariance.index, columns=covariance.columns
+    )
+
     if mu is not None:
         mu = pd.Series(mu.flatten(), index=covariance.index)
-        
+
     if number_clusters is None:
         number_clusters = int(correlation.shape[0] / 2)
 
@@ -98,14 +97,14 @@ def get_optimal_portfolio_weights_nco(
     )
     for i, cluster_assets in clusters.items():
         cov_intra = covariance.loc[cluster_assets, cluster_assets].values
-        
+
         mu_intra = None
         if mu is not None:
             mu_intra = mu.loc[cluster_assets].values.reshape(-1, 1)
-            
-        weights_intra_cluster.loc[cluster_assets, i] = (
-            get_optimal_portfolio_weights(cov_intra, mu_intra).flatten()
-        )
+
+        weights_intra_cluster.loc[cluster_assets, i] = get_optimal_portfolio_weights(
+            cov_intra, mu_intra
+        ).flatten()
 
     # 3. Compute inter-cluster weights
     # Reduce covariance matrix using intra-cluster weights
@@ -126,7 +125,5 @@ def get_optimal_portfolio_weights_nco(
     )
 
     # 4. Combine weights
-    weights_nco = weights_intra_cluster.mul(weights_inter_cluster, axis=1).sum(
-        axis=1
-    )
+    weights_nco = weights_intra_cluster.mul(weights_inter_cluster, axis=1).sum(axis=1)
     return weights_nco.values.reshape(-1, 1)

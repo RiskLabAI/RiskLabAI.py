@@ -182,15 +182,22 @@ class Registry:
         if obj is None and callable(key) and not isinstance(key, str):
             target = key
             self._register(
-                target.__name__, target, aliases=aliases,
-                metadata=metadata, override=override,
+                target.__name__,
+                target,
+                aliases=aliases,
+                metadata=metadata,
+                override=override,
             )
             return target
 
         # Direct call: reg.register("name", obj)
         if obj is not None:
             self._register(
-                key, obj, aliases=aliases, metadata=metadata, override=override,
+                key,
+                obj,
+                aliases=aliases,
+                metadata=metadata,
+                override=override,
             )
             return obj
 
@@ -198,8 +205,11 @@ class Registry:
         def decorator(target: Factory) -> Factory:
             resolved_key = key if isinstance(key, str) else target.__name__
             self._register(
-                resolved_key, target, aliases=aliases,
-                metadata=metadata, override=override,
+                resolved_key,
+                target,
+                aliases=aliases,
+                metadata=metadata,
+                override=override,
             )
             return target
 
@@ -227,8 +237,12 @@ class Registry:
             See :meth:`register`.
         """
         self._register(
-            key, None, lazy_target=target, aliases=aliases,
-            metadata=metadata, override=override,
+            key,
+            None,
+            lazy_target=target,
+            aliases=aliases,
+            metadata=metadata,
+            override=override,
         )
 
     def _register(
@@ -242,9 +256,7 @@ class Registry:
         override: bool = False,
     ) -> None:
         if not isinstance(key, str) or not key:
-            raise TypeError(
-                f"Registry key must be a non-empty string, got {key!r}."
-            )
+            raise TypeError(f"Registry key must be a non-empty string, got {key!r}.")
         lower = key.lower()
         if lower in self._index and not override:
             existing = self._index[lower]
@@ -257,12 +269,13 @@ class Registry:
         if override and lower in self._index:
             old_canonical = self._index[lower]
             self._entries.pop(old_canonical, None)
-            self._index = {
-                k: v for k, v in self._index.items() if v != old_canonical
-            }
+            self._index = {k: v for k, v in self._index.items() if v != old_canonical}
 
         self._entries[key] = _Entry(
-            key, obj=obj, lazy_target=lazy_target, metadata=metadata,
+            key,
+            obj=obj,
+            lazy_target=lazy_target,
+            metadata=metadata,
         )
         self._index[lower] = key
         for alias in aliases:

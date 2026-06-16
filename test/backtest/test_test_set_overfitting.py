@@ -16,18 +16,18 @@ from RiskLabAI.backtest.test_set_overfitting import (
     strategy_type2_error_probability,
 )
 
+
 def test_expected_max_sharpe_ratio():
     """Test E[max SR] calculation."""
     # With 1 trial, E[max SR] = mean SR
-    assert np.isclose(
-        expected_max_sharpe_ratio(1, 0.5, 1.0), 0.5
-    )
-    
+    assert np.isclose(expected_max_sharpe_ratio(1, 0.5, 1.0), 0.5)
+
     # With N trials, E[max SR] > mean SR
     assert expected_max_sharpe_ratio(10, 0.5, 1.0) > 0.5
-    
+
     # Test with 0 trials
     assert np.isclose(expected_max_sharpe_ratio(0, 0.5, 1.0), 0.0)
+
 
 def test_generate_max_sharpe_ratios():
     """Test the simulation of max SRs."""
@@ -37,16 +37,19 @@ def test_generate_max_sharpe_ratios():
         n_sims=n_sims,
         n_trials_list=n_trials_list,
         std_sharpe_ratio=1.0,
-        mean_sharpe_ratio=0.0
+        mean_sharpe_ratio=0.0,
     )
-    
+
     assert df.shape == (n_sims * len(n_trials_list), 2)
-    assert df['n_trials'].value_counts()[10] == n_sims
-    assert df['n_trials'].value_counts()[20] == n_sims
-    
+    assert df["n_trials"].value_counts()[10] == n_sims
+    assert df["n_trials"].value_counts()[20] == n_sims
+
     # E[max SR] for N=20 should be > E[max SR] for N=10
-    assert df[df['n_trials'] == 20]['max_SR'].mean() > \
-           df[df['n_trials'] == 10]['max_SR'].mean()
+    assert (
+        df[df["n_trials"] == 20]["max_SR"].mean()
+        > df[df["n_trials"] == 10]["max_SR"].mean()
+    )
+
 
 def test_mean_std_error():
     """Test the mean_std_error function."""
@@ -55,14 +58,15 @@ def test_mean_std_error():
         n_sims1=10,
         n_trials=[10, 20],
         std_sharpe_ratio=1.0,
-        mean_sharpe_ratio=0.0
+        mean_sharpe_ratio=0.0,
     )
-    
+
     assert df.shape == (2, 2)
-    assert 'meanErr' in df.columns
-    assert 'stdErr' in df.columns
+    assert "meanErr" in df.columns
+    assert "stdErr" in df.columns
     assert 10 in df.index
     assert 20 in df.index
+
 
 def test_z_statistics_and_errors():
     """Test Z-stat and error probability functions."""
@@ -73,22 +77,20 @@ def test_z_statistics_and_errors():
     # Z = (1.96 - 0) * sqrt(999) / sqrt(1 - 0 + (3-1)/4 * 1.96**2)
     # Z = 61.95 / sqrt(1 + 0.5 * 3.8416)
     # Z = 61.95 / sqrt(2.9208) = 36.248...
-    assert np.isclose(z, 36.248321866, atol=1e-5) # <-- CORRECTED VALUE
+    assert np.isclose(z, 36.248321866, atol=1e-5)  # <-- CORRECTED VALUE
 
     # 2. Type 1 Error
     # For z=1.96, alpha should be 0.025 (one-sided)
     alpha_1 = strategy_type1_error_probability(z=1.96, k=1)
     assert np.isclose(alpha_1, 1 - norm.cdf(1.96), atol=1e-4)
     assert np.isclose(alpha_1, 0.025, atol=1e-3)
-    
+
     # For k=2, alpha_k = 1 - (1-0.025)^2 = 0.049375
     alpha_2 = strategy_type1_error_probability(z=1.96, k=2)
-    assert np.isclose(alpha_2, 1 - (1 - alpha_1)**2, atol=1e-4)
+    assert np.isclose(alpha_2, 1 - (1 - alpha_1) ** 2, atol=1e-4)
 
     # 3. Theta
-    theta = theta_for_type2_error(
-        sharpe_ratio=1.0, t=100, true_sharpe_ratio=0.5
-    )
+    theta = theta_for_type2_error(sharpe_ratio=1.0, t=100, true_sharpe_ratio=0.5)
     # Assert against the correct calculated value
     assert np.isclose(theta, 4.0620192, atol=1e-5)
 

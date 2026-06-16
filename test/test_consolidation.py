@@ -39,8 +39,9 @@ def test_lin_parts_matches_linear_partitions_numerically():
 
     # Same partition boundaries for representative inputs.
     np.testing.assert_array_equal(lin_parts(100, 4), np.array([0, 25, 50, 75, 100]))
-    np.testing.assert_array_equal(lin_parts(10, 3), np.ceil(
-        np.linspace(0, 10, min(3, 10) + 1)).astype(int))
+    np.testing.assert_array_equal(
+        lin_parts(10, 3), np.ceil(np.linspace(0, 10, min(3, 10) + 1)).astype(int)
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -70,8 +71,7 @@ def test_clustering_cov_to_corr_delegates_and_matches():
         # Delegates to the canonical implementation.
         np.testing.assert_allclose(out, cov_to_corr(cov), rtol=0, atol=1e-12)
         # And matches an independent reference.
-        np.testing.assert_allclose(out, _reference_cov_to_corr(cov),
-                                   rtol=0, atol=1e-12)
+        np.testing.assert_allclose(out, _reference_cov_to_corr(cov), rtol=0, atol=1e-12)
         # Correlation diagonal is exactly 1.
         np.testing.assert_allclose(np.diag(out), np.ones(n), rtol=0, atol=1e-12)
 
