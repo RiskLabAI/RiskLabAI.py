@@ -42,6 +42,13 @@ def mock_data():
     return X, y, classifier, clusters
 
 
+def test_controller_is_deprecated(mock_data):
+    """The controller is deprecated in 2.0.0 (delegates to the core registry)."""
+    _, _, classifier, _ = mock_data
+    with pytest.warns(DeprecationWarning, match="2.1.0"):
+        FeatureImportanceController("MDI", classifier=classifier)
+
+
 def test_controller_mdi(mock_data):
     """Test MDI via the controller."""
     X, y, classifier, _ = mock_data

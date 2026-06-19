@@ -6,7 +6,11 @@ import pandas as pd
 import pytest
 
 from RiskLabAI.data.structures.standard_bars import StandardBars
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    CUMULATIVE_DOLLAR,
+    CUMULATIVE_TICKS,
+    CUMULATIVE_VOLUME,
+)
 
 
 @pytest.fixture

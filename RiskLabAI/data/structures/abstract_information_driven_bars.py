@@ -8,7 +8,10 @@ from typing import Optional
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    EXPECTED_IMBALANCE_WINDOW,
+    EXPECTED_TICKS_NUMBER,
+)
 from RiskLabAI.utils.ewma import ewma
 
 

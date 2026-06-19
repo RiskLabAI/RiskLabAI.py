@@ -9,7 +9,10 @@ from typing import Optional
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_run_bars import AbstractRunBars
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    EXPECTED_TICKS_NUMBER,
+    PREVIOUS_BARS_N_TICKS_LIST,
+)
 from RiskLabAI.utils.ewma import ewma
 
 

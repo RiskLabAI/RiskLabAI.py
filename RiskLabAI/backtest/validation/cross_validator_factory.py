@@ -1,8 +1,13 @@
 """
-Factory for creating cross-validator instances.
+Deprecated factory for creating cross-validator instances.
+
+The core component registry (:data:`RiskLabAI.core.CROSS_VALIDATORS`) is now the
+single source of truth for creating cross-validators. This factory is retained
+for backward compatibility and simply delegates to that registry; it is removed
+in 2.1.0.
 """
 
-import inspect
+import warnings
 from typing import Any
 
 from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
@@ -16,10 +21,11 @@ from .walk_forward import WalkForward
 
 class CrossValidatorFactory:
     """
-    Factory class for creating cross-validator objects.
+    Deprecated. Use ``RiskLabAI.core.CROSS_VALIDATORS.create(...)`` instead.
 
-    This class uses a static method to encapsulate the logic for
-    instantiating different cross-validator strategies.
+    Retained for backward compatibility (removed in 2.1.0). ``VALIDATORS`` is
+    kept so existing introspection keeps working; ``create_cross_validator``
+    now delegates to the core registry.
     """
 
     VALIDATORS = {
@@ -34,37 +40,35 @@ class CrossValidatorFactory:
     @staticmethod
     def create_cross_validator(validator_type: str, **kwargs: Any) -> CrossValidator:
         """
-        Factory method to create and return an instance of a cross-validator.
+        Deprecated. Create a cross-validator via the core registry.
 
         Parameters
         ----------
         validator_type : str
-            Type of cross-validator to create. Must be one of:
-            'kfold', 'walkforward', 'purgedkfold', 'combinatorialpurged',
-            'baggedcombinatorialpurged', 'adaptivecombinatorialpurged'.
+            One of the keys in :attr:`VALIDATORS` (case-insensitive).
         **kwargs : Any
-            Keyword arguments to be passed to the cross-validator's
-            constructor.
-
-        Returns
-        -------
-        CrossValidator
-            An instance of the specified cross-validator.
+            Forwarded to the validator's constructor; arguments it does not
+            accept are dropped (matching the historical behaviour).
 
         Raises
         ------
         ValueError
-            If an invalid `validator_type` is provided.
+            If ``validator_type`` is not a known validator.
         """
-        validator_type = validator_type.lower()
-        validator_class = CrossValidatorFactory.VALIDATORS.get(validator_type)
+        warnings.warn(
+            "CrossValidatorFactory is deprecated and will be removed in 2.1.0; "
+            "use RiskLabAI.core.CROSS_VALIDATORS.create(validator_type, ...) "
+            "instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        from RiskLabAI.core import CROSS_VALIDATORS
 
-        if validator_class:
-            sig = inspect.signature(validator_class.__init__)
-            valid_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-            return validator_class(**valid_kwargs)
-
-        raise ValueError(
-            f"Invalid validator_type: {validator_type}. "
-            f"Valid types are: {list(CrossValidatorFactory.VALIDATORS.keys())}"
+        if validator_type.lower() not in CROSS_VALIDATORS:
+            raise ValueError(
+                f"Invalid validator_type: {validator_type}. "
+                f"Valid types are: {list(CrossValidatorFactory.VALIDATORS.keys())}"
+            )
+        return CROSS_VALIDATORS.create(
+            validator_type, filter_unknown_kwargs=True, **kwargs
         )

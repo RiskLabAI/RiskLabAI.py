@@ -1,45 +1,38 @@
 """
-Controller to simplify the creation and use of cross-validators.
+Deprecated controller for creating and holding a cross-validator.
+
+Use the core component registry (:data:`RiskLabAI.core.CROSS_VALIDATORS`)
+directly instead. This controller is retained for backward compatibility and
+delegates to that registry; it is removed in 2.1.0.
 """
 
+import warnings
 from typing import Any
 
-from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 
 
 class CrossValidatorController:
     """
-    Controller class to handle the cross-validation process.
+    Deprecated. Use ``RiskLabAI.core.CROSS_VALIDATORS.create(...)`` instead.
 
-    This class acts as a high-level interface, simplifying the
-    creation and access to a specific cross-validator using the factory.
+    Removed in 2.1.0.
     """
 
     def __init__(self, validator_type: str, **kwargs: Any):
-        """
-        Initializes the CrossValidatorController.
+        warnings.warn(
+            "CrossValidatorController is deprecated and will be removed in "
+            "2.1.0; use RiskLabAI.core.CROSS_VALIDATORS.create(validator_type, "
+            "...) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        from RiskLabAI.core import CROSS_VALIDATORS
 
-        Parameters
-        ----------
-        validator_type : str
-            Type of cross-validator to create (e.g., 'kfold',
-            'combinatorialpurged'). This is passed to the factory.
-        **kwargs : Any
-            Additional keyword arguments to be passed to the
-            cross-validator's constructor.
-        """
-        self.cross_validator: CrossValidator = (
-            CrossValidatorFactory.create_cross_validator(validator_type, **kwargs)
+        self.cross_validator: CrossValidator = CROSS_VALIDATORS.create(
+            validator_type, filter_unknown_kwargs=True, **kwargs
         )
 
     def get_validator(self) -> CrossValidator:
-        """
-        Get the created cross-validator instance.
-
-        Returns
-        -------
-        CrossValidator
-            The underlying cross-validator instance.
-        """
+        """Return the created cross-validator instance."""
         return self.cross_validator

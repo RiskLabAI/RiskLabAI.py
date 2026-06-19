@@ -11,6 +11,8 @@ including:
 - Publication-quality Matplotlib plotting
 """
 
+from RiskLabAI._deprecation import warn_deprecated_name
+
 from .constants import *
 from .ewma import ewma
 from .momentum_mean_reverting_strategy_sides import determine_strategy_side
@@ -26,6 +28,16 @@ _LAZY_PLOTTING = {
 }
 
 
+# Deprecated non-ASCII constant identifiers -> their ASCII replacements.
+# Accessing these via RiskLabAI.utils warns and returns the new value; the
+# identifiers are removed in 2.1.0 (string values are unchanged regardless).
+_DEPRECATED_CONSTANTS = {
+    "CUMULATIVE_θ": "CUMULATIVE_THETA",
+    "CUMULATIVE_BUY_θ": "CUMULATIVE_BUY_THETA",
+    "CUMULATIVE_SELL_θ": "CUMULATIVE_SELL_THETA",
+}
+
+
 def __getattr__(name):
     if name in _LAZY_PLOTTING:
         from importlib import import_module
@@ -34,6 +46,10 @@ def __getattr__(name):
         value = getattr(import_module(f".{module_name}", __name__), attr)
         globals()[name] = value
         return value
+    if name in _DEPRECATED_CONSTANTS:
+        new = _DEPRECATED_CONSTANTS[name]
+        warn_deprecated_name(name, new, removed_in="2.1.0")
+        return globals()[new]
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -58,9 +74,9 @@ __all__ = [
     "CUMULATIVE_VOLUME",
     "CUMULATIVE_BUY_VOLUME",
     "CUMULATIVE_SELL_VOLUME",
-    "CUMULATIVE_θ",
-    "CUMULATIVE_BUY_θ",
-    "CUMULATIVE_SELL_θ",
+    "CUMULATIVE_THETA",
+    "CUMULATIVE_BUY_THETA",
+    "CUMULATIVE_SELL_THETA",
     "EXPECTED_IMBALANCE",
     "EXPECTED_TICKS_NUMBER",
     "EXPECTED_BUY_IMBALANCE",

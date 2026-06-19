@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RiskLabAI"
-version = "1.0.9"
+version = "2.0.0"
 authors = [
     { name = "RiskLab", email = "arian@risklab.ai" },
 ]
@@ -96,21 +96,12 @@ ignore = ["E501"]
 [tool.ruff.lint.per-file-ignores]
 # Package __init__ files exist to re-export their submodules' public API.
 "__init__.py" = ["F401", "F403", "F405"]
-# The bars stack consumes the column-name constants via `from ...constants
-# import *`. Replacing these with explicit imports is tracked for 2.0.0
-# (see NAMING_CANON_2.0.0.md, "Replace ... import * in the bars stack").
-"RiskLabAI/data/structures/abstract_bars.py" = ["F403", "F405"]
-"RiskLabAI/data/structures/abstract_imbalance_bars.py" = ["F403", "F405"]
-"RiskLabAI/data/structures/abstract_information_driven_bars.py" = ["F403", "F405"]
-"RiskLabAI/data/structures/abstract_run_bars.py" = ["F403", "F405"]
-"RiskLabAI/data/structures/imbalance_bars.py" = ["F403", "F405"]
-"RiskLabAI/data/structures/run_bars.py" = ["F403", "F405"]
+# pde/solver builds the networks from `from ...model import *`; the torch-only
+# model module is intentionally left star-imported.
 "RiskLabAI/pde/solver.py" = ["F403", "F405"]
 # base.py re-exports the canonical interfaces lazily via module __getattr__,
 # so the names listed in __all__ are resolved on access, not at definition.
 "RiskLabAI/core/base.py" = ["F822"]
-# Tests import the constants namespace wholesale for readability.
-"test/data/structures/test_standard_bars.py" = ["F403", "F405"]
 # importorskip("torch") must execute before the torch-dependent imports below
 # it, so module-level imports cannot all sit at the top of the file.
 "test/pde/test_pde_solver.py" = ["E402"]

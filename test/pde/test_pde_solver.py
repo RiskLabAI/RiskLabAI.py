@@ -8,7 +8,13 @@ torch = pytest.importorskip("torch")
 
 # Import the main components
 from RiskLabAI.pde.equation import HJBLQ
-from RiskLabAI.pde.solver import FBSDESolver
+from RiskLabAI.pde.solver import FBSDESolver, FBSNNolver, FBSNNSolver
+
+
+def test_fbsnnolver_is_deprecated_alias():
+    """FBSNNolver is a deprecated subclass of the renamed FBSNNSolver."""
+    assert issubclass(FBSNNolver, FBSNNSolver)
+    assert FBSNNolver is not FBSNNSolver
 
 
 @pytest.fixture

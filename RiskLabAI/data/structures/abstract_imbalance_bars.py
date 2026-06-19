@@ -12,7 +12,15 @@ from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars,
 )
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    CUMULATIVE_THETA,
+    CUMULATIVE_TICKS,
+    EXPECTED_IMBALANCE,
+    EXPECTED_IMBALANCE_WINDOW,
+    EXPECTED_TICKS_NUMBER,
+    PREVIOUS_BARS_N_TICKS_LIST,
+    PREVIOUS_TICK_IMBALANCES_LIST,
+)
 
 
 class AbstractImbalanceBars(AbstractInformationDrivenBars):
@@ -46,7 +54,7 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
         )
 
         self.imbalance_bars_statistics = {
-            CUMULATIVE_θ: 0.0,
+            CUMULATIVE_THETA: 0.0,
             EXPECTED_IMBALANCE: np.nan,
             PREVIOUS_BARS_N_TICKS_LIST: [],
             PREVIOUS_TICK_IMBALANCES_LIST: [],
@@ -80,7 +88,7 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
             self.imbalance_bars_statistics[PREVIOUS_TICK_IMBALANCES_LIST].append(
                 imbalance
             )
-            self.imbalance_bars_statistics[CUMULATIVE_θ] += imbalance
+            self.imbalance_bars_statistics[CUMULATIVE_THETA] += imbalance
 
             # Warm-up E[b] if it's the first time
             if np.isnan(self.imbalance_bars_statistics[EXPECTED_IMBALANCE]):
@@ -156,13 +164,13 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
         if np.isnan(threshold) or np.isinf(threshold):
             return False
 
-        cumulative_theta = self.imbalance_bars_statistics[CUMULATIVE_θ]
+        cumulative_theta = self.imbalance_bars_statistics[CUMULATIVE_THETA]
         return np.abs(cumulative_theta) >= threshold
 
     def _reset_cached_fields(self):
         """Reset base fields and cumulative theta."""
         super()._reset_cached_fields()
-        self.imbalance_bars_statistics[CUMULATIVE_θ] = 0.0
+        self.imbalance_bars_statistics[CUMULATIVE_THETA] = 0.0
 
     @abstractmethod
     def _expected_number_of_ticks(self) -> float:

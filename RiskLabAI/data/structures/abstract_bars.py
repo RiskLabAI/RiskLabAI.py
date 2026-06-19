@@ -9,7 +9,14 @@ from typing import Any, Optional, Union
 
 import numpy as np
 
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    CUMULATIVE_BUY_VOLUME,
+    CUMULATIVE_DOLLAR,
+    CUMULATIVE_TICKS,
+    CUMULATIVE_VOLUME,
+    N_TICKS_ON_BAR_FORMATION,
+    PREVIOUS_TICK_RULE,
+)
 
 # Type hint for a single tick: (datetime, price, volume)
 TickData = Union[list[Any], tuple[Any, ...], np.ndarray]

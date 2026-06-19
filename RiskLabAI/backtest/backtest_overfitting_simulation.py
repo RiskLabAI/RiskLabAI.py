@@ -29,7 +29,7 @@ from scipy.stats import kendalltau
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
-from RiskLabAI.backtest.validation import CrossValidatorController
+from RiskLabAI.core import CROSS_VALIDATORS
 from RiskLabAI.data.differentiation import fractionally_differentiated_log_price
 from RiskLabAI.data.labeling import (
     cusum_filter_events_dynamic_threshold,
@@ -47,6 +47,16 @@ from .probabilistic_sharpe_ratio import (
     probabilistic_sharpe_ratio,
 )
 from .probability_of_backtest_overfitting import probability_of_backtest_overfitting
+
+
+def _create_cross_validator(validator_type, **kwargs):
+    """
+    Build a cross-validator from the core registry (the 2.0.0 single source).
+
+    Mirrors the old ``_create_cross_validator(...)`` behaviour,
+    including dropping keyword arguments a given validator does not accept.
+    """
+    return CROSS_VALIDATORS.create(validator_type, filter_unknown_kwargs=True, **kwargs)
 
 
 def financial_features_backtest_overfitting_simulation(
@@ -357,20 +367,20 @@ def overall_backtest_overfitting_simulation(
     """
 
     cross_validators = {
-        "Walk-Forward": CrossValidatorController(
+        "Walk-Forward": _create_cross_validator(
             "walkforward",
             n_splits=4,
-        ).cross_validator,
-        "K-Fold": CrossValidatorController(
+        ),
+        "K-Fold": _create_cross_validator(
             "kfold",
             n_splits=4,
-        ).cross_validator,
-        "Purged K-Fold": CrossValidatorController(
+        ),
+        "Purged K-Fold": _create_cross_validator(
             "purgedkfold", n_splits=4, times=None, embargo=0.02
-        ).cross_validator,
-        "Combinatorial Purged": CrossValidatorController(
+        ),
+        "Combinatorial Purged": _create_cross_validator(
             "combinatorialpurged", n_splits=8, n_test_groups=2, times=None, embargo=0.02
-        ).cross_validator,
+        ),
     }
 
     results = backtest_overfitting_simulation_results(
@@ -432,20 +442,20 @@ def temporal_backtest_overfitting_simulation(
         Tuple[Dict[str, List[float]], Dict[str, List[float]]]: A tuple containing two dictionaries, one for the Probability of Backtest Overfitting (PBO) and the other for the Deflated Sharpe Ratio (DSR), for each cross-validation method tested.
     """
     cross_validators = {
-        "Walk-Forward": CrossValidatorController(
+        "Walk-Forward": _create_cross_validator(
             "walkforward",
             n_splits=4,
-        ).cross_validator,
-        "K-Fold": CrossValidatorController(
+        ),
+        "K-Fold": _create_cross_validator(
             "kfold",
             n_splits=4,
-        ).cross_validator,
-        "Purged K-Fold": CrossValidatorController(
+        ),
+        "Purged K-Fold": _create_cross_validator(
             "purgedkfold", n_splits=4, times=None, embargo=0.02
-        ).cross_validator,
-        "Combinatorial Purged": CrossValidatorController(
+        ),
+        "Combinatorial Purged": _create_cross_validator(
             "combinatorialpurged", n_splits=8, n_test_groups=2, times=None, embargo=0.02
-        ).cross_validator,
+        ),
     }
 
     results = backtest_overfitting_simulation_results(
@@ -506,20 +516,20 @@ def time_temporal_backtest_overfitting_simulation(
         Tuple[Dict[str, pd.Series], Dict[str, pd.Series]]: A tuple containing two dictionaries, one for the Probability of Backtest Overfitting (PBO) and the other for the Deflated Sharpe Ratio (DSR), for each cross-validation method tested, indexed by time.
     """
     cross_validators = {
-        "Walk-Forward": CrossValidatorController(
+        "Walk-Forward": _create_cross_validator(
             "walkforward",
             n_splits=4,
-        ).cross_validator,
-        "K-Fold": CrossValidatorController(
+        ),
+        "K-Fold": _create_cross_validator(
             "kfold",
             n_splits=4,
-        ).cross_validator,
-        "Purged K-Fold": CrossValidatorController(
+        ),
+        "Purged K-Fold": _create_cross_validator(
             "purgedkfold", n_splits=4, times=None, embargo=0.02
-        ).cross_validator,
-        "Combinatorial Purged": CrossValidatorController(
+        ),
+        "Combinatorial Purged": _create_cross_validator(
             "combinatorialpurged", n_splits=8, n_test_groups=2, times=None, embargo=0.02
-        ).cross_validator,
+        ),
     }
 
     results = backtest_overfitting_simulation_results(
@@ -602,16 +612,16 @@ def varying_embargo_backtest_overfitting_simulation(
         }
 
         cross_validators = {
-            "Purged K-Fold": CrossValidatorController(
+            "Purged K-Fold": _create_cross_validator(
                 "purgedkfold", n_splits=4, times=None, embargo=embargo
-            ).cross_validator,
-            "Combinatorial Purged": CrossValidatorController(
+            ),
+            "Combinatorial Purged": _create_cross_validator(
                 "combinatorialpurged",
                 n_splits=8,
                 n_test_groups=2,
                 times=None,
                 embargo=embargo,
-            ).cross_validator,
+            ),
         }
 
         # Iterate over each strategy parameter combination
@@ -813,20 +823,20 @@ def backtest_overfitting_simulation_financial_metrics_rank_correlation(
     """
     # Run the backtest overfitting simulation to get results
     cross_validators = {
-        "Walk-Forward": CrossValidatorController(
+        "Walk-Forward": _create_cross_validator(
             "walkforward",
             n_splits=4,
-        ).cross_validator,
-        "K-Fold": CrossValidatorController(
+        ),
+        "K-Fold": _create_cross_validator(
             "kfold",
             n_splits=4,
-        ).cross_validator,
-        "Purged K-Fold": CrossValidatorController(
+        ),
+        "Purged K-Fold": _create_cross_validator(
             "purgedkfold", n_splits=4, times=None, embargo=0.02
-        ).cross_validator,
-        "Combinatorial Purged": CrossValidatorController(
+        ),
+        "Combinatorial Purged": _create_cross_validator(
             "combinatorialpurged", n_splits=8, n_test_groups=2, times=None, embargo=0.02
-        ).cross_validator,
+        ),
     }
 
     results = backtest_overfitting_simulation_results(
@@ -965,13 +975,13 @@ def backtest_overfitting_simulation_model_complexity(
             times = labels.loc[index]["End Time"]
 
             cross_validators = {
-                "Combinatorial Purged": CrossValidatorController(
+                "Combinatorial Purged": _create_cross_validator(
                     "combinatorialpurged",
                     n_splits=8,
                     n_test_groups=2,
                     times=times,
                     embargo=0.02,
-                ).cross_validator,
+                ),
             }
 
             for cross_validator_type, cross_validator in cross_validators.items():
@@ -1119,24 +1129,24 @@ def overall_novel_methods_backtest_overfitting_simulation(
     """
 
     cross_validators = {
-        "Combinatorial Purged": CrossValidatorController(
+        "Combinatorial Purged": _create_cross_validator(
             "combinatorialpurged", n_splits=8, n_test_groups=2, times=None, embargo=0.02
-        ).cross_validator,
-        "Bagged Combinatorial Purged": CrossValidatorController(
+        ),
+        "Bagged Combinatorial Purged": _create_cross_validator(
             "baggedcombinatorialpurged",
             n_splits=8,
             n_test_groups=2,
             times=None,
             embargo=0.02,
             random_state=random_state,
-        ).cross_validator,
-        "Adaptive Combinatorial Purged": CrossValidatorController(
+        ),
+        "Adaptive Combinatorial Purged": _create_cross_validator(
             "adaptivecombinatorialpurged",
             n_splits=8,
             n_test_groups=2,
             times=None,
             embargo=0.02,
-        ).cross_validator,
+        ),
     }
 
     results = backtest_overfitting_simulation_results(
@@ -1329,9 +1339,9 @@ def measure_cpcv_parallelization(
     model = LogisticRegression(penalty=None, solver="lbfgs", max_iter=10000)
 
     # Define the CPCV cross-validator
-    cpcv_cross_validator = CrossValidatorController(
+    cpcv_cross_validator = _create_cross_validator(
         "combinatorialpurged", n_splits=8, n_test_groups=2, times=times, embargo=0.02
-    ).cross_validator
+    )
 
     # Measure computational requirements with and without parallelization
     results = {}
@@ -1383,13 +1393,13 @@ def measure_cpcv_scalability(
             data, target, weights, times = generate_random_data(n_samples, n_features)
 
             # Define the CPCV cross-validator
-            cpcv_cross_validator = CrossValidatorController(
+            cpcv_cross_validator = _create_cross_validator(
                 "combinatorialpurged",
                 n_splits=8,
                 n_test_groups=2,
                 times=times,
                 embargo=0.02,
-            ).cross_validator
+            )
 
             # Measure computational requirements
             result = measure_computational_requirements(

@@ -1,6 +1,8 @@
 # RiskLabAI.py 2.0.0 — Naming Canon (proposal)
 
-Status: **proposal, awaiting approval.** No code changes yet. This is the
+Status: **approved and implemented in 2.0.0.** All §2 renames were approved
+(remove aliases in 2.1.0; keep the `θ` string values; scope folded in the
+star-import cleanup and the controller/factory→registry refactor). This is the
 breaking API cleanup from `IMPROVEMENT_PLAN.md` Phase 3, scoped to Python and
 written so that **no existing user breaks on upgrade** — every renamed name
 keeps working (with a `DeprecationWarning`) for one minor cycle before removal.

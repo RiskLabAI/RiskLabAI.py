@@ -10,7 +10,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from RiskLabAI.optimization.hyper_parameter_tuning import MyPipeline, clf_hyper_fit
+from RiskLabAI.optimization.hyper_parameter_tuning import (
+    MyPipeline,
+    SampleWeightedPipeline,
+    clf_hyper_fit,
+)
 
 
 @pytest.fixture
@@ -36,7 +40,7 @@ def test_my_pipeline_fit_sample_weight(mock_data):
             self.fit_kwargs = kwargs
             super().fit(X, y)
 
-    pipe = MyPipeline([("scaler", StandardScaler()), ("clf", MockLR())])
+    pipe = SampleWeightedPipeline([("scaler", StandardScaler()), ("clf", MockLR())])
 
     pipe.fit(X, y, sample_weight=sample_weight)
 
@@ -46,11 +50,21 @@ def test_my_pipeline_fit_sample_weight(mock_data):
     )
 
 
+def test_my_pipeline_deprecated_alias_warns():
+    """MyPipeline is a deprecated subclass of SampleWeightedPipeline."""
+    assert issubclass(MyPipeline, SampleWeightedPipeline)
+    with pytest.warns(DeprecationWarning, match="MyPipeline.*2.1.0"):
+        pipe = MyPipeline([("clf", LogisticRegression())])
+    assert isinstance(pipe, SampleWeightedPipeline)
+
+
 def test_clf_hyper_fit_gridsearch(mock_data):
     """Test the grid search functionality."""
     X, y, times = mock_data
 
-    pipe_clf = MyPipeline([("scaler", StandardScaler()), ("clf", LogisticRegression())])
+    pipe_clf = SampleWeightedPipeline(
+        [("scaler", StandardScaler()), ("clf", LogisticRegression())]
+    )
 
     param_grid = {"clf__C": [0.1, 1.0]}
 
@@ -77,7 +91,7 @@ def test_clf_hyper_fit_bagging(mock_data):
     """Test the bagging functionality."""
     X, y, times = mock_data
 
-    pipe_clf = MyPipeline([("clf", LogisticRegression())])
+    pipe_clf = SampleWeightedPipeline([("clf", LogisticRegression())])
     param_grid = {"clf__C": [1.0]}
     validator_params = {"n_splits": 3}
 

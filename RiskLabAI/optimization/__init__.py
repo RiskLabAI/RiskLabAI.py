@@ -18,7 +18,8 @@ from .hrp import (
     recursive_bisection,
 )
 from .hyper_parameter_tuning import (
-    MyPipeline,
+    MyPipeline,  # deprecated alias (removed in 2.1.0)
+    SampleWeightedPipeline,
     clf_hyper_fit,
 )
 from .nco import (
@@ -41,6 +42,7 @@ __all__ = [
     # hedging.py
     "pca_weights",
     # hyper_parameter_tuning.py
-    "MyPipeline",
+    "SampleWeightedPipeline",
+    "MyPipeline",  # deprecated alias (removed in 2.1.0)
     "clf_hyper_fit",
 ]

@@ -1,20 +1,22 @@
 """
-Factory class for creating feature importance strategy objects.
+Deprecated factory for creating feature-importance strategy objects.
+
+The core component registry (:data:`RiskLabAI.core.FEATURE_IMPORTANCE`) is now
+the single source of truth. This factory is retained for backward compatibility
+and delegates to that registry; it is removed in 2.1.0.
 """
 
+import warnings
 from typing import Any
 
-from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
-from .clustered_feature_importance_mdi import ClusteredFeatureImportanceMDI
-from .feature_importance_mda import FeatureImportanceMDA
-from .feature_importance_mdi import FeatureImportanceMDI
-from .feature_importance_sfi import FeatureImportanceSFI
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 
 class FeatureImportanceFactory:
     """
-    Factory class to create feature importance strategy instances.
+    Deprecated. Use ``RiskLabAI.core.FEATURE_IMPORTANCE.create(...)`` instead.
+
+    Removed in 2.1.0.
     """
 
     @staticmethod
@@ -22,49 +24,27 @@ class FeatureImportanceFactory:
         strategy_type: str, **kwargs: Any
     ) -> FeatureImportanceStrategy:
         """
-        Factory method to create and return an instance of a feature
-        importance strategy.
-
-        Parameters
-        ----------
-        strategy_type : str
-            Type of strategy to create. Options include:
-            'MDI', 'ClusteredMDI', 'MDA', 'ClusteredMDA', 'SFI'.
-        **kwargs : Any
-            Keyword arguments to be passed to the strategy's
-            constructor (e.g., `classifier`, `clusters`, `n_splits`).
-
-        Returns
-        -------
-        FeatureImportanceStrategy
-            An instance of the specified strategy.
+        Deprecated. Create a feature-importance strategy via the core registry.
 
         Raises
         ------
         ValueError
-            If an invalid `strategy_type` is provided.
+            If ``strategy_type`` is not a known strategy.
         """
+        warnings.warn(
+            "FeatureImportanceFactory is deprecated and will be removed in "
+            "2.1.0; use RiskLabAI.core.FEATURE_IMPORTANCE.create(strategy_type, "
+            "...) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        from RiskLabAI.core import FEATURE_IMPORTANCE
 
-        strategies: dict[str, type[FeatureImportanceStrategy]] = {
-            "MDI": FeatureImportanceMDI,
-            "ClusteredMDI": ClusteredFeatureImportanceMDI,
-            "MDA": FeatureImportanceMDA,
-            "ClusteredMDA": ClusteredFeatureImportanceMDA,
-            "SFI": FeatureImportanceSFI,
-        }
-
-        strategy_class = strategies.get(strategy_type)
-
-        if strategy_class:
-            # Pass only the relevant arguments to the constructor
-            # This uses introspection to be robust
-            import inspect
-
-            sig = inspect.signature(strategy_class.__init__)
-            valid_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-            return strategy_class(**valid_kwargs)
-
-        raise ValueError(
-            f"Invalid strategy_type: {strategy_type}. "
-            f"Valid types are: {list(strategies.keys())}"
+        if strategy_type.lower() not in FEATURE_IMPORTANCE:
+            valid = list(FEATURE_IMPORTANCE.available())
+            raise ValueError(
+                f"Invalid strategy_type: {strategy_type}. Valid types are: {valid}"
+            )
+        return FEATURE_IMPORTANCE.create(
+            strategy_type, filter_unknown_kwargs=True, **kwargs
         )

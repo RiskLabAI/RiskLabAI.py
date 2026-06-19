@@ -42,7 +42,8 @@ from .model import (
 )
 from .solver import (
     FBSDESolver,
-    FBSNNolver,  # Note: Typo in original filename?
+    FBSNNolver,  # deprecated alias (removed in 2.1.0)
+    FBSNNSolver,
     initialize_weights,
 )
 
@@ -69,5 +70,6 @@ __all__ = [
     # Solvers
     "initialize_weights",
     "FBSDESolver",
-    "FBSNNolver",
+    "FBSNNSolver",
+    "FBSNNolver",  # deprecated alias (removed in 2.1.0)
 ]

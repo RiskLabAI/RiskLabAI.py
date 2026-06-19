@@ -11,7 +11,7 @@ both trade sides, and no-touch paths).
 import numpy as np
 import pandas as pd
 
-from RiskLabAI.backtest.bet_sizing import mpAvgActiveSignals
+from RiskLabAI.backtest.bet_sizing import mp_avg_active_signals
 from RiskLabAI.data.differentiation.differentiation import (
     calculate_weights_std,
     fractional_difference_std,
@@ -94,7 +94,7 @@ def test_mp_avg_active_signals_matches_reference():
 
     time_points = sorted(set(signals["t1"].dropna().values).union(signals.index.values))
 
-    fast = mpAvgActiveSignals(signals, time_points)
+    fast = mp_avg_active_signals(signals, time_points)
     reference = _avg_active_reference(signals, time_points)
 
     assert np.allclose(fast.values, reference.values, atol=1e-12, equal_nan=True)
@@ -105,7 +105,7 @@ def test_mp_avg_active_signals_empty_molecule():
         {"t1": [pd.Timestamp("2020-01-02")], "signal": [1.0]},
         index=[pd.Timestamp("2020-01-01")],
     )
-    assert len(mpAvgActiveSignals(signals, [])) == 0
+    assert len(mp_avg_active_signals(signals, [])) == 0
 
 
 # --------------------------------------------------------------------------- #

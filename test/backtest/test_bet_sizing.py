@@ -4,22 +4,23 @@ Tests for bet_sizing.py
 
 import numpy as np
 import pandas as pd
+import pytest
 from scipy.stats import norm
 
 from RiskLabAI.backtest.bet_sizing import (
-    TPos,
     average_bet_sizes,
-    avgActiveSignals,
-    betSize,
-    getW,
+    avg_active_signals,
+    bet_size_sigmoid,
+    compute_sigmoid_width,
     probability_bet_size,
     strategy_bet_sizing,
+    target_position,
 )
 
 
 def test_avg_active_signals():
     """
-    Regression test: avgActiveSignals used to silently return an empty
+    Regression test: avg_active_signals used to silently return an empty
     DataFrame because of a broken `mpPandasObj` import (the placeholder
     fallback always took over). Verifies real averaged values are returned.
     """
@@ -32,9 +33,9 @@ def test_avg_active_signals():
         index=idx,
     )
 
-    out = avgActiveSignals(signals, nThreads=1)
+    out = avg_active_signals(signals, n_threads=1)
 
-    assert len(out) > 0, "avgActiveSignals returned an empty result"
+    assert len(out) > 0, "avg_active_signals returned an empty result"
     out = out.sort_index()
     # At 2020-01-02: signals 1 (active, t1=01-03) and 2 (starts 01-02) -> (1.0+0.5)/2
     assert np.isclose(out.loc[pd.Timestamp("2020-01-02")], 0.75)
@@ -126,16 +127,40 @@ def test_desprado_bet_sizing_snippets():
     """Test snippets 10.4 from de Prado."""
     w = 1.0
     x = 0.5  # divergence
-    m = betSize(w, x)
+    m = bet_size_sigmoid(w, x)
     # m = 0.5 / sqrt(1 + 0.25) = 0.5 / sqrt(1.25) = 0.4472
     assert np.isclose(m, 0.44721359)
 
-    # Test getW
-    w_calc = getW(x, m)
+    # Test compute_sigmoid_width
+    w_calc = compute_sigmoid_width(x, m)
     assert np.isclose(w, w_calc)
 
-    # Test TPos
-    pos = TPos(w=1.0, f=10.5, acctualPrice=10.0, maximumPositionSize=100)
+    # Test target_position
+    pos = target_position(w=1.0, f=10.5, actual_price=10.0, maximum_position_size=100)
     # x = 0.5, m = 0.4472...
     # pos = int(0.4472 * 100) = 44
     assert pos == 44
+
+
+def test_deprecated_bet_sizing_aliases_still_work_and_warn():
+    """Every renamed bet_sizing function keeps a working, warning alias."""
+    from RiskLabAI.backtest.bet_sizing import (
+        TPos,
+        betSize,
+        getW,
+    )
+
+    w, x = 1.0, 0.5
+    with pytest.warns(DeprecationWarning):
+        m = betSize(w, x)
+    assert np.isclose(m, bet_size_sigmoid(w, x))
+
+    with pytest.warns(DeprecationWarning):
+        w_calc = getW(x, m)
+    assert np.isclose(w_calc, compute_sigmoid_width(x, m))
+
+    # Parameter names were also snake_cased in 2.0.0, so the alias preserves
+    # positional calls (documented in the release notes).
+    with pytest.warns(DeprecationWarning):
+        pos = TPos(1.0, 10.5, 10.0, 100)
+    assert pos == target_position(1.0, 10.5, 10.0, 100)

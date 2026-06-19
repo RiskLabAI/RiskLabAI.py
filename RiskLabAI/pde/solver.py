@@ -9,6 +9,7 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 
+from RiskLabAI._deprecation import deprecated_class
 from RiskLabAI.pde.equation import Equation
 from RiskLabAI.pde.model import *
 
@@ -243,7 +244,7 @@ class FBSDESolver:
         return losses, inits
 
 
-class FBSNNolver:
+class FBSNNSolver:
     """
     Solver for FBSNN (Forward-Backward Stochastic Neural Network).
 
@@ -405,3 +406,7 @@ class FBSNNolver:
                 logger.info("Loss: %.4f, Y_0: %.4f", val_loss.item(), y0_mean)
 
         return losses, inits
+
+
+# Deprecated alias for the misspelled original name; removed in 2.1.0.
+FBSNNolver = deprecated_class(FBSNNSolver, "FBSNNolver", removed_in="2.1.0")

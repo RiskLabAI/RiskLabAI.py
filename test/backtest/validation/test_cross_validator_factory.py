@@ -87,3 +87,10 @@ def test_factory_invalid_type():
     with pytest.raises(ValueError) as exc_info:
         CrossValidatorFactory.create_cross_validator("invalid_type")
     assert "Invalid validator_type: invalid_type" in str(exc_info.value)
+
+
+def test_factory_is_deprecated():
+    """The factory is deprecated in 2.0.0 (delegates to the core registry)."""
+    with pytest.warns(DeprecationWarning, match="2.1.0"):
+        cv = CrossValidatorFactory.create_cross_validator("kfold", n_splits=5)
+    assert isinstance(cv, KFold)

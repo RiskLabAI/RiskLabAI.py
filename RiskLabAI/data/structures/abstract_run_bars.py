@@ -12,7 +12,21 @@ from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars,
 )
-from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.constants import (
+    BUY_TICKS_NUMBER,
+    CUMULATIVE_BUY_THETA,
+    CUMULATIVE_SELL_THETA,
+    CUMULATIVE_TICKS,
+    EXPECTED_BUY_IMBALANCE,
+    EXPECTED_BUY_TICKS_PROPORTION,
+    EXPECTED_IMBALANCE_WINDOW,
+    EXPECTED_SELL_IMBALANCE,
+    EXPECTED_TICKS_NUMBER,
+    PREVIOUS_BARS_BUY_TICKS_PROPORTIONS_LIST,
+    PREVIOUS_BARS_N_TICKS_LIST,
+    PREVIOUS_TICK_IMBALANCES_BUY_LIST,
+    PREVIOUS_TICK_IMBALANCES_SELL_LIST,
+)
 from RiskLabAI.utils.ewma import ewma
 
 
@@ -42,8 +56,8 @@ class AbstractRunBars(AbstractInformationDrivenBars):
         )
 
         self.run_bars_statistics = {
-            CUMULATIVE_BUY_θ: 0.0,
-            CUMULATIVE_SELL_θ: 0.0,
+            CUMULATIVE_BUY_THETA: 0.0,
+            CUMULATIVE_SELL_THETA: 0.0,
             EXPECTED_BUY_IMBALANCE: np.nan,
             EXPECTED_SELL_IMBALANCE: np.nan,
             EXPECTED_BUY_TICKS_PROPORTION: np.nan,
@@ -84,13 +98,13 @@ class AbstractRunBars(AbstractInformationDrivenBars):
                 self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_BUY_LIST].append(
                     imbalance
                 )
-                self.run_bars_statistics[CUMULATIVE_BUY_θ] += imbalance
+                self.run_bars_statistics[CUMULATIVE_BUY_THETA] += imbalance
                 self.run_bars_statistics[BUY_TICKS_NUMBER] += 1
             elif imbalance < 0:
                 self.run_bars_statistics[PREVIOUS_TICK_IMBALANCES_SELL_LIST].append(
                     -imbalance
                 )
-                self.run_bars_statistics[CUMULATIVE_SELL_θ] += -imbalance
+                self.run_bars_statistics[CUMULATIVE_SELL_THETA] += -imbalance
 
             # Warm-up E[theta_buy], E[theta_sell], and P[buy]
             warm_up_stats = [
@@ -229,16 +243,16 @@ class AbstractRunBars(AbstractInformationDrivenBars):
             return False
 
         max_theta = max(
-            self.run_bars_statistics[CUMULATIVE_BUY_θ],
-            self.run_bars_statistics[CUMULATIVE_SELL_θ],
+            self.run_bars_statistics[CUMULATIVE_BUY_THETA],
+            self.run_bars_statistics[CUMULATIVE_SELL_THETA],
         )
         return max_theta >= threshold
 
     def _reset_cached_fields(self):
         """Reset base fields and cumulative run counters."""
         super()._reset_cached_fields()
-        self.run_bars_statistics[CUMULATIVE_BUY_θ] = 0.0
-        self.run_bars_statistics[CUMULATIVE_SELL_θ] = 0.0
+        self.run_bars_statistics[CUMULATIVE_BUY_THETA] = 0.0
+        self.run_bars_statistics[CUMULATIVE_SELL_THETA] = 0.0
         self.run_bars_statistics[BUY_TICKS_NUMBER] = 0
 
     @abstractmethod

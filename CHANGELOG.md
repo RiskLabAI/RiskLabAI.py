@@ -3,7 +3,44 @@
 All notable changes to RiskLabAI.py are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [2.0.0]
+
+A **breaking** release that standardises the public API on PEP 8 names and makes
+the core component registry the single way to construct cross-validators and
+feature-importance strategies. **Every** renamed name keeps working with a
+`DeprecationWarning` until 2.1.0, so existing code does not break on upgrade —
+see `NAMING_CANON_2.0.0.md`.
+
+### Changed (BREAKING)
+- `backtest.bet_sizing` functions renamed to snake_case:
+  `avgActiveSignals`→`avg_active_signals`,
+  `mpAvgActiveSignals`→`mp_avg_active_signals`,
+  `discreteSignal`→`discrete_signal`, `Signal`→`generate_signal`,
+  `betSize`→`bet_size_sigmoid`, `getW`→`compute_sigmoid_width`,
+  `TPos`→`target_position`, `inversePrice`→`inverse_price`,
+  `limitPrice`→`limit_price`. Their parameters are snake_case too (e.g.
+  `nThreads`→`n_threads`, `stepSize`→`step_size`, `acctualPrice`→`actual_price`,
+  `maximumPositionSize`→`maximum_position_size`). Keyword-argument callers must
+  update parameter names; positional calls are unaffected.
+- Classes renamed: `pde.FBSNNolver`→`FBSNNSolver` (typo fix);
+  `optimization.MyPipeline`→`SampleWeightedPipeline`.
+- Constants given ASCII identifiers — the string *values* are unchanged, so
+  stored data and internal dict keys are unaffected: `CUMULATIVE_θ`→
+  `CUMULATIVE_THETA`, `CUMULATIVE_BUY_θ`→`CUMULATIVE_BUY_THETA`,
+  `CUMULATIVE_SELL_θ`→`CUMULATIVE_SELL_THETA`.
+- The core registries (`RiskLabAI.core.CROSS_VALIDATORS`, `FEATURE_IMPORTANCE`)
+  are now the single way to construct those components. The bars stack imports
+  its column-name constants explicitly (no more `from ...constants import *`).
+
+### Deprecated
+The following keep working until **2.1.0**, emitting a `DeprecationWarning`
+that names the replacement:
+- The old `bet_sizing` camelCase function names, `FBSNNolver`, `MyPipeline`,
+  and the `CUMULATIVE_*θ` constant identifiers (accessed via `RiskLabAI.utils`).
+- `CrossValidatorFactory`, `CrossValidatorController`,
+  `FeatureImportanceFactory`, and `FeatureImportanceController` — use
+  `RiskLabAI.core.CROSS_VALIDATORS.create(...)` /
+  `RiskLabAI.core.FEATURE_IMPORTANCE.create(...)` instead.
 
 ### Added
 - `RiskLabAI.core`: a non-breaking extension layer that makes the library easier

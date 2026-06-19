@@ -51,3 +51,10 @@ def test_controller_public_attribute(dummy_args):
         validator_type="combinatorialpurged", **dummy_args
     )
     assert isinstance(controller.cross_validator, CombinatorialPurged)
+
+
+def test_controller_is_deprecated():
+    """The controller is deprecated in 2.0.0 (delegates to the core registry)."""
+    with pytest.warns(DeprecationWarning, match="2.1.0"):
+        controller = CrossValidatorController(validator_type="kfold", n_splits=5)
+    assert isinstance(controller.get_validator(), KFold)

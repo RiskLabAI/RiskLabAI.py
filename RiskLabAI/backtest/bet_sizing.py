@@ -10,6 +10,7 @@ import pandas as pd
 from numba import jit
 from scipy.stats import norm
 
+from RiskLabAI._deprecation import deprecated_alias
 from RiskLabAI.hpc import mp_pandas_obj
 
 
@@ -143,11 +144,10 @@ def strategy_bet_sizing(
     return pd.Series(avg_bet_sizes_arr, index=price_timestamps)
 
 
-# --- The following functions appear to be from de Prado (2018) ---
-# --- Naming convention (camelCase) is preserved for reference. ---
+# --- Bet-sizing functions from de Prado (2018), AFML Chapter 10. ---
 
 
-def avgActiveSignals(signals: pd.DataFrame, nThreads: int) -> pd.DataFrame:
+def avg_active_signals(signals: pd.DataFrame, n_threads: int) -> pd.DataFrame:
     """
     Calculate the average signal among active signals using parallel processing.
 
@@ -159,7 +159,7 @@ def avgActiveSignals(signals: pd.DataFrame, nThreads: int) -> pd.DataFrame:
     signals : pd.DataFrame
         DataFrame with signal start times as index, and columns 't1' (end time)
         and 'signal' (signal value).
-    nThreads : int
+    n_threads : int
         Number of threads to use for parallel execution via `mp_pandas_obj`.
 
     Returns
@@ -168,24 +168,24 @@ def avgActiveSignals(signals: pd.DataFrame, nThreads: int) -> pd.DataFrame:
         DataFrame containing the average active signal at each time point.
     """
     # 1) time points where signals change (either one starts or one ends)
-    timePoints = set(signals["t1"].dropna().values)
-    timePoints = timePoints.union(signals.index.values)
-    timePoints = list(timePoints)
-    timePoints.sort()
+    time_points = set(signals["t1"].dropna().values)
+    time_points = time_points.union(signals.index.values)
+    time_points = list(time_points)
+    time_points.sort()
 
     # 2) call parallel function
     out = mp_pandas_obj(
-        mpAvgActiveSignals,
-        ("molecule", timePoints),
-        nThreads,
+        mp_avg_active_signals,
+        ("molecule", time_points),
+        n_threads,
         signals=signals,
     )
     return out
 
 
-def mpAvgActiveSignals(signals: pd.DataFrame, molecule: list) -> pd.Series:
+def mp_avg_active_signals(signals: pd.DataFrame, molecule: list) -> pd.Series:
     """
-    Worker function for `avgActiveSignals`.
+    Worker function for `avg_active_signals`.
 
     At time `loc`, average signal among those still active.
     Signal is active if:
@@ -246,7 +246,7 @@ def mpAvgActiveSignals(signals: pd.DataFrame, molecule: list) -> pd.Series:
     return pd.Series(averages, index=molecule_list)
 
 
-def discreteSignal(signal: pd.Series, stepSize: float) -> pd.Series:
+def discrete_signal(signal: pd.Series, step_size: float) -> pd.Series:
     """
     Discretize a signal to a specific step size, capping at +/- 1.
 
@@ -257,7 +257,7 @@ def discreteSignal(signal: pd.Series, stepSize: float) -> pd.Series:
     ----------
     signal : pd.Series
         The continuous signal values (e.g., from -1 to 1).
-    stepSize : float
+    step_size : float
         The step size for discretization (e.g., 0.1).
 
     Returns
@@ -265,19 +265,19 @@ def discreteSignal(signal: pd.Series, stepSize: float) -> pd.Series:
     pd.Series
         The discretized signal.
     """
-    discretized = (signal / stepSize).round() * stepSize
+    discretized = (signal / step_size).round() * step_size
     discretized[discretized > 1] = 1.0
     discretized[discretized < -1] = -1.0
     return discretized
 
 
-def Signal(
+def generate_signal(
     events: pd.DataFrame,
-    stepSize: float,
+    step_size: float,
     probability: pd.Series,
     prediction: pd.Series,
-    nClasses: int,
-    nThreads: int,
+    n_classes: int,
+    n_threads: int,
 ) -> pd.Series:
     """
     Generate a discretized, averaged signal from model predictions.
@@ -290,16 +290,16 @@ def Signal(
     events : pd.DataFrame
         DataFrame of events, must include 't1' (end times) and
         optionally 'side' (for meta-labeling).
-    stepSize : float
+    step_size : float
         The step size for final signal discretization.
     probability : pd.Series
         Probability of class 1 (e.g., from `predict_proba`).
     prediction : pd.Series
         The predicted class (e.g., 1 or -1).
-    nClasses : int
+    n_classes : int
         Number of classes in the prediction.
-    nThreads : int
-        Number of threads for `avgActiveSignals`.
+    n_threads : int
+        Number of threads for `avg_active_signals`.
 
     Returns
     -------
@@ -311,7 +311,7 @@ def Signal(
 
     # 1) generate signals from multinomial classification (one-vs-rest, OvR)
     # t-value of OvR
-    t_value = (probability - 1.0 / nClasses) / (
+    t_value = (probability - 1.0 / n_classes) / (
         (probability * (1.0 - probability)) ** 0.5
     )
     signal = prediction * (2 * norm.cdf(t_value) - 1)  # signal = side * size
@@ -321,14 +321,14 @@ def Signal(
 
     # 2) compute average signal among those concurrently open
     signal_df = signal.to_frame("signal").join(events[["t1"]], how="left")
-    avg_signal = avgActiveSignals(signal_df, nThreads)
+    avg_signal = avg_active_signals(signal_df, n_threads)
 
     # 3) discretize signal
-    discretized_signal = discreteSignal(signal=avg_signal, stepSize=stepSize)
+    discretized_signal = discrete_signal(signal=avg_signal, step_size=step_size)
     return discretized_signal
 
 
-def betSize(w: float, x: float) -> float:
+def bet_size_sigmoid(w: float, x: float) -> float:
     """
     Calculate bet size using a sigmoid function.
 
@@ -350,7 +350,9 @@ def betSize(w: float, x: float) -> float:
     return x / np.sqrt(w + x**2)
 
 
-def TPos(w: float, f: float, acctualPrice: float, maximumPositionSize: int) -> int:
+def target_position(
+    w: float, f: float, actual_price: float, maximum_position_size: int
+) -> int:
     """
     Calculate the target position size.
 
@@ -363,9 +365,9 @@ def TPos(w: float, f: float, acctualPrice: float, maximumPositionSize: int) -> i
         Coefficient regulating the sigmoid width.
     f : float
         Forecasted price.
-    acctualPrice : float
+    actual_price : float
         Actual (current) market price.
-    maximumPositionSize : int
+    maximum_position_size : int
         Maximum absolute position size.
 
     Returns
@@ -373,10 +375,10 @@ def TPos(w: float, f: float, acctualPrice: float, maximumPositionSize: int) -> i
     int
         The target position size (integer).
     """
-    return int(betSize(w, f - acctualPrice) * maximumPositionSize)
+    return int(bet_size_sigmoid(w, f - actual_price) * maximum_position_size)
 
 
-def inversePrice(f: float, w: float, m: float) -> float:
+def inverse_price(f: float, w: float, m: float) -> float:
     """
     Calculates the inverse price given a bet size.
 
@@ -402,12 +404,12 @@ def inversePrice(f: float, w: float, m: float) -> float:
     return f - m * np.sqrt(w / (1 - m**2))
 
 
-def limitPrice(
-    targetPositionSize: int,
-    cPosition: int,
+def limit_price(
+    target_position_size: int,
+    current_position: int,
     f: float,
     w: float,
-    maximumPositionSize: int,
+    maximum_position_size: int,
 ) -> float:
     """
     Calculate the limit price for adjusting position.
@@ -417,15 +419,15 @@ def limitPrice(
 
     Parameters
     ----------
-    targetPositionSize : int
+    target_position_size : int
         The target position size.
-    cPosition : int
+    current_position : int
         The current position size.
     f : float
         Forecasted price.
     w : float
         Coefficient regulating the sigmoid width.
-    maximumPositionSize : int
+    maximum_position_size : int
         Maximum absolute position size.
 
     Returns
@@ -433,21 +435,21 @@ def limitPrice(
     float
         The average limit price.
     """
-    if targetPositionSize == cPosition:
+    if target_position_size == current_position:
         return f  # No change
 
-    sgn = np.sign(targetPositionSize - cPosition)
-    lP = 0.0
+    sgn = np.sign(target_position_size - current_position)
+    limit = 0.0
 
     # Average price from current to target position
-    for i in range(abs(cPosition + sgn), abs(targetPositionSize + sgn)):
-        lP += inversePrice(f, w, i / float(maximumPositionSize))
+    for i in range(abs(current_position + sgn), abs(target_position_size + sgn)):
+        limit += inverse_price(f, w, i / float(maximum_position_size))
 
-    lP /= abs(targetPositionSize - cPosition)
-    return lP
+    limit /= abs(target_position_size - current_position)
+    return limit
 
 
-def getW(x: float, m: float) -> float:
+def compute_sigmoid_width(x: float, m: float) -> float:
     """
     Get the 'w' coefficient implied by a divergence and bet size.
 
@@ -469,3 +471,23 @@ def getW(x: float, m: float) -> float:
     if m == 0.0 or m == 1.0 or m == -1.0:
         return np.inf  # w is undefined
     return x**2 * ((1 / m**2) - 1)
+
+
+# --------------------------------------------------------------------------- #
+# Deprecated camelCase aliases (the historical AFML-style names). Each keeps
+# working and emits a DeprecationWarning; scheduled for removal in 2.1.0.
+# See NAMING_CANON_2.0.0.md.
+# --------------------------------------------------------------------------- #
+avgActiveSignals = deprecated_alias(
+    avg_active_signals, "avgActiveSignals", removed_in="2.1.0"
+)
+mpAvgActiveSignals = deprecated_alias(
+    mp_avg_active_signals, "mpAvgActiveSignals", removed_in="2.1.0"
+)
+discreteSignal = deprecated_alias(discrete_signal, "discreteSignal", removed_in="2.1.0")
+Signal = deprecated_alias(generate_signal, "Signal", removed_in="2.1.0")
+betSize = deprecated_alias(bet_size_sigmoid, "betSize", removed_in="2.1.0")
+TPos = deprecated_alias(target_position, "TPos", removed_in="2.1.0")
+inversePrice = deprecated_alias(inverse_price, "inversePrice", removed_in="2.1.0")
+limitPrice = deprecated_alias(limit_price, "limitPrice", removed_in="2.1.0")
+getW = deprecated_alias(compute_sigmoid_width, "getW", removed_in="2.1.0")
