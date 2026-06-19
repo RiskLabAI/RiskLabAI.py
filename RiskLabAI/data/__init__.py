@@ -13,13 +13,15 @@ including:
 """
 
 # Import sub-packages
-from . import denoise
-from . import differentiation
-from . import distance
-from . import labeling
-from . import structures
-from . import synthetic_data
-from . import weights
+from . import (
+    denoise,
+    differentiation,
+    distance,
+    labeling,
+    structures,
+    synthetic_data,
+    weights,
+)
 
 __all__ = [
     "denoise",

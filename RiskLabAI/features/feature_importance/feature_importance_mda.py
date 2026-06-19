@@ -3,11 +3,13 @@ Computes Mean Decrease Accuracy (MDA) feature importance.
 """
 
 import logging
+from typing import Any
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss
 from sklearn.model_selection import KFold
-from typing import List, Optional, Any, Callable
+
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 logger = logging.getLogger(__name__)

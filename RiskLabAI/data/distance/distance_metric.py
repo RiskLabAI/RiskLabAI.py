@@ -13,10 +13,11 @@ Reference:
     John Wiley & Sons, Chapter 3.
 """
 
+from typing import Optional
+
 import numpy as np
 import scipy.stats as ss
 from sklearn.metrics import mutual_info_score
-from typing import Optional
 
 
 def calculate_variation_of_information(

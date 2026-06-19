@@ -3,8 +3,9 @@ Abstract Base Class for feature importance strategies.
 """
 
 from abc import ABC, abstractmethod
-import pandas as pd
 from typing import Any
+
+import pandas as pd
 
 
 class FeatureImportanceStrategy(ABC):

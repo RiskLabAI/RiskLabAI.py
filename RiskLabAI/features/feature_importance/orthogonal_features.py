@@ -5,9 +5,8 @@ Reference:
     De Prado, M. (2018) Advances in financial machine learning.
 """
 
-import pandas as pd
 import numpy as np
-from typing import Tuple
+import pandas as pd
 
 
 def _compute_eigenvectors(
@@ -58,7 +57,7 @@ def _compute_eigenvectors(
 
 def orthogonal_features(
     features: pd.DataFrame, variance_threshold: float = 0.95
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Compute orthogonal features using PCA.
 

@@ -2,8 +2,8 @@
 Tests for ensemble/bagging_classifier_accuracy.py
 """
 
-import pytest
 import numpy as np
+
 from RiskLabAI.ensemble.bagging_classifier_accuracy import bagging_classifier_accuracy
 
 

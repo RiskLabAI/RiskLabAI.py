@@ -2,11 +2,12 @@
 Computes Mean Decrease Impurity (MDI) feature importance.
 """
 
-import pandas as pd
+from typing import Any
+
 import numpy as np
-from typing import List, Optional, Union, Any
+import pandas as pd
 from sklearn.ensemble import BaseEnsemble
-from sklearn.ensemble import BaseEnsemble
+
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 

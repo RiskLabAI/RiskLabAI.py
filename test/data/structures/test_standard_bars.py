@@ -2,9 +2,9 @@
 Tests for data/structures/standard_bars.py
 """
 
-import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.data.structures.standard_bars import StandardBars
 from RiskLabAI.utils.constants import *
 

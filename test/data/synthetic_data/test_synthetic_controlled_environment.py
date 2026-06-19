@@ -5,6 +5,7 @@ Tests for data/synthetic_data/synthetic_controlled_environment.py
 import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.data.synthetic_data.synthetic_controlled_environment import (
     align_params_length,
     generate_prices_from_regimes,
@@ -34,9 +35,8 @@ def sample_regimes():
             "rho": -0.8,
             "lam": 0.2,
             "m": -0.05,
-            "v": 0.1,
-            # Test list-based params
-            "v": [0.1, 0.15],  # 2-step regime
+            # List-based param: 2-step regime
+            "v": [0.1, 0.15],
         },
     }
     # P(calm->calm)=0.9, P(crisis->crisis)=0.8

@@ -2,16 +2,15 @@
 Tests for optimization/hrp.py
 """
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
+
 from RiskLabAI.optimization.hrp import (
-    inverse_variance_weights,
     cluster_variance,
-    quasi_diagonal,
     hrp,
+    inverse_variance_weights,
 )
-import scipy.cluster.hierarchy as sch
 
 
 @pytest.fixture

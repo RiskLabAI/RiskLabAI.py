@@ -3,16 +3,17 @@ Tests for backtest_overfitting_simulation.py
 """
 
 import platform
-from pyexpat import features
+
 import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.backtest.backtest_overfitting_simulation import (
-    sharpe_ratio,
-    sortino_ratio,
     expected_shortfall,
     financial_features_backtest_overfitting_simulation,
     get_cpu_info,
+    sharpe_ratio,
+    sortino_ratio,
 )
 
 

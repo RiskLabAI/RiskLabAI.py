@@ -9,7 +9,6 @@ Reference:
 
 import numpy as np
 import pandas as pd
-from typing import Optional
 
 
 def expand_label_for_meta_labeling(

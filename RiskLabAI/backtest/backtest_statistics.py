@@ -9,7 +9,6 @@ concentration, and drawdowns.
       wraps the Numba `sharpe_ratio` and scales it by sqrt(freq).
 """
 
-from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 from numba import jit
@@ -87,7 +86,7 @@ dtype='datetime64[ns]', freq=None)
 
 def calculate_holding_period(
     target_positions: pd.Series,
-) -> Tuple[pd.DataFrame, float]:
+) -> tuple[pd.DataFrame, float]:
     """
     Derive the average holding period in days.
 
@@ -192,7 +191,7 @@ def calculate_hhi(bet_returns: pd.Series) -> float:
     return hhi_normalized
 
 
-def calculate_hhi_concentration(returns: pd.Series) -> Tuple[float, float, float]:
+def calculate_hhi_concentration(returns: pd.Series) -> tuple[float, float, float]:
     """
     Calculate HHI concentration for positive, negative, and monthly returns.
 
@@ -220,7 +219,7 @@ def calculate_hhi_concentration(returns: pd.Series) -> Tuple[float, float, float
 
 def compute_drawdowns_time_under_water(
     pnl_series: pd.Series, dollars: bool = False
-) -> Tuple[pd.Series, pd.Series]:
+) -> tuple[pd.Series, pd.Series]:
     """
     Compute series of drawdowns and the time under water.
 

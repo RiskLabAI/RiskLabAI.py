@@ -5,7 +5,6 @@ Tests for CrossValidatorController.
 import pandas as pd
 import pytest
 
-
 from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged
 from RiskLabAI.backtest.validation.cross_validator_controller import (
     CrossValidatorController,

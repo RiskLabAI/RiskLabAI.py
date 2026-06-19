@@ -3,12 +3,11 @@ Implements the Probability Mass Function (PMF) calculation.
 """
 
 from collections import Counter
-from typing import Dict
 
 
 def probability_mass_function(
     message: str, approximate_word_length: int
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Calculate the Probability Mass Function (PMF) of n-grams.
 

@@ -2,10 +2,12 @@
 Tests for controller/data_structure_controller.py
 """
 
-import pytest
-import pandas as pd
-import numpy as np
 import io
+
+import numpy as np
+import pandas as pd
+import pytest
+
 from RiskLabAI.controller.data_structure_controller import Controller
 
 
@@ -51,7 +53,7 @@ def test_controller_read_from_string():
     csv_data = "datetime,price,volume\n" + "2020-01-01T00:00:00,100,10\n" * 7
 
     # Use io.StringIO to simulate a file
-    csv_file = io.StringIO(csv_data)
+    io.StringIO(csv_data)
 
     # We need to mock 'open' to return our string file
     # This is advanced, so for now we'll test the dataframe method

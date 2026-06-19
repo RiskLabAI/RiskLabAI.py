@@ -2,11 +2,13 @@
 Computes Single Feature Importance (SFI).
 """
 
-import pandas as pd
+from typing import Any
+
 import numpy as np
-from sklearn.metrics import log_loss, accuracy_score
+import pandas as pd
+from sklearn.metrics import accuracy_score, log_loss
 from sklearn.model_selection import KFold
-from typing import List, Optional, Union, Any
+
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 

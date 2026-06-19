@@ -4,16 +4,16 @@ precision, binomial Sharpe ratio, and probability of failure.
 """
 
 import logging
-from typing import Tuple
+
 import numpy as np
 import scipy.stats as ss
 import sympy
-from sympy import symbols, factor
+from sympy import factor, symbols
 
 logger = logging.getLogger(__name__)
 
 
-def sharpe_ratio_trials(p: float, n_run: int) -> Tuple[float, float, float]:
+def sharpe_ratio_trials(p: float, n_run: int) -> tuple[float, float, float]:
     r"""
     Simulate binomial trials to estimate mean, std dev, and Sharpe ratio.
 

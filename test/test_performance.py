@@ -11,11 +11,11 @@ both trade sides, and no-touch paths).
 import numpy as np
 import pandas as pd
 
-from RiskLabAI.data.differentiation.differentiation import (
-    fractional_difference_std,
-    calculate_weights_std,
-)
 from RiskLabAI.backtest.bet_sizing import mpAvgActiveSignals
+from RiskLabAI.data.differentiation.differentiation import (
+    calculate_weights_std,
+    fractional_difference_std,
+)
 from RiskLabAI.data.labeling.labeling import triple_barrier
 
 

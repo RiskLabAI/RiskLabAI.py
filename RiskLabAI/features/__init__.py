@@ -1,4 +1,6 @@
-from . import entropy_features
-from . import feature_importance
-from . import microstructural_features
-from . import structural_breaks
+from . import (
+    entropy_features,
+    feature_importance,
+    microstructural_features,
+    structural_breaks,
+)

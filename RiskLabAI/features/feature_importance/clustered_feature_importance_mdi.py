@@ -2,10 +2,12 @@
 Computes Clustered Mean Decrease Impurity (MDI) feature importance.
 """
 
-import pandas as pd
+from typing import Any
+
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import BaseEnsemble
-from typing import Dict, List, Any
+
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 
@@ -19,7 +21,7 @@ class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
     def __init__(
         self,
         classifier: BaseEnsemble,
-        clusters: Dict[str, List[str]],
+        clusters: dict[str, list[str]],
     ):
         """
         Initialize the strategy.
@@ -38,7 +40,7 @@ class ClusteredFeatureImportanceMDI(FeatureImportanceStrategy):
         self.clusters = clusters
 
     def _group_mean_std(
-        self, dataframe: pd.DataFrame, clusters: Dict[str, List[str]]
+        self, dataframe: pd.DataFrame, clusters: dict[str, list[str]]
     ) -> pd.DataFrame:
         """
         Calculate the mean and standard deviation for cluster importances.

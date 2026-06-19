@@ -27,12 +27,6 @@ True
 
 from __future__ import annotations
 
-from .base import (
-    BaseBetSizer,
-    BaseLabeler,
-    BasePortfolioOptimizer,
-    Estimator,
-)
 from ._builtins import (
     BARS,
     BET_SIZERS,
@@ -43,6 +37,12 @@ from ._builtins import (
     REGISTRIES,
     get_registry,
     list_components,
+)
+from .base import (
+    BaseBetSizer,
+    BaseLabeler,
+    BasePortfolioOptimizer,
+    Estimator,
 )
 from .registry import Registry
 

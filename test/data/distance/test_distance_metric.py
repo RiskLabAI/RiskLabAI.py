@@ -4,11 +4,12 @@ Tests for data/distance/distance_metric.py
 
 import numpy as np
 import pytest
+
 from RiskLabAI.data.distance import (
+    calculate_distance,
+    calculate_mutual_information,
     calculate_number_of_bins,
     calculate_variation_of_information,
-    calculate_mutual_information,
-    calculate_distance,
 )
 
 

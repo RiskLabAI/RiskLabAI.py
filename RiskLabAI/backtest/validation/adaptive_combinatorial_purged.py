@@ -5,9 +5,9 @@ which adjusts split boundaries based on an external feature.
 
 import warnings
 from collections import ChainMap
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
-
+from collections.abc import Generator
 from itertools import combinations
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -62,10 +62,10 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         self,
         n_splits: int,
         n_test_groups: int,
-        times: Union[pd.Series, Dict[str, pd.Series]],
+        times: Union[pd.Series, dict[str, pd.Series]],
         embargo: float = 0,
         n_subsplits: int = 3,
-        external_feature: Union[pd.Series, Dict[str, pd.Series]] = None,
+        external_feature: Union[pd.Series, dict[str, pd.Series]] = None,
         lower_quantile: float = 0.25,
         upper_quantile: float = 0.75,
         subtract_border_adjustments: bool = True,
@@ -113,7 +113,7 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
 
     def _single_adaptive_split_segments(
         self, indices: np.ndarray, single_external_feature: pd.Series
-    ) -> List[np.ndarray]:
+    ) -> list[np.ndarray]:
         """
         Adaptively split data indices based on the external feature.
 
@@ -185,7 +185,7 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         self,
         single_data: pd.DataFrame,
         single_external_feature: Optional[pd.Series] = None,
-    ) -> List[np.ndarray]:
+    ) -> list[np.ndarray]:
         """Override to use adaptive splitting."""
         if single_external_feature is None:
             raise ValueError("_get_split_segments requires external_feature")
@@ -198,7 +198,7 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         single_times: pd.Series,
         single_data: pd.DataFrame,
         single_external_feature: Optional[pd.Series] = None,
-    ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
+    ) -> Generator[tuple[np.ndarray, np.ndarray], None, None]:
         """
         Split a single dataset into C(n, k) adaptively purged indices.
         """
@@ -222,12 +222,12 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
 
     def split(
         self,
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-        labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
+        labels: Optional[Union[pd.Series, dict[str, pd.Series]]] = None,
         groups: Optional[np.ndarray] = None,
     ) -> Union[
-        Generator[Tuple[np.ndarray, np.ndarray], None, None],
-        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None],
+        Generator[tuple[np.ndarray, np.ndarray], None, None],
+        Generator[tuple[str, tuple[np.ndarray, np.ndarray]], None, None],
     ]:
         """
         Split data (or dictionary of data) into adaptively purged indices.
@@ -250,8 +250,8 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
 
     def _combinations_and_path_locations_and_split_segments(
         self, data: pd.DataFrame, single_external_feature: Optional[pd.Series] = None
-    ) -> Tuple[
-        List[Tuple[int, ...]], Dict[int, List[Tuple[int, int]]], List[np.ndarray]
+    ) -> tuple[
+        list[tuple[int, ...]], dict[int, list[tuple[int, int]]], list[np.ndarray]
     ]:
         """Helper to compute all components, now including adaptive splits."""
         if single_external_feature is None:
@@ -268,7 +268,7 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         single_times: pd.Series,
         single_data: pd.DataFrame,
         single_external_feature: Optional[pd.Series] = None,
-    ) -> Dict[str, List[Dict[str, np.ndarray]]]:
+    ) -> dict[str, list[dict[str, np.ndarray]]]:
         """
         Generate all adaptive combinatorial backtest paths.
         """
@@ -309,10 +309,10 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
 
     def backtest_paths(
         self,
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
     ) -> Union[
-        Dict[str, List[Dict[str, np.ndarray]]],
-        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]],
+        dict[str, list[dict[str, np.ndarray]]],
+        dict[str, dict[str, list[dict[str, np.ndarray]]]],
     ]:
         """
         Generate adaptive backtest paths for data or a dictionary of data.
@@ -341,7 +341,7 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         single_external_feature: Optional[pd.Series] = None,  # New arg
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Obtain backtest predictions for all A-CPCV paths.
         """
@@ -388,8 +388,8 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
         )
 
         def get_path_data(
-            path_num: int, locs: List[Tuple[int, int]]
-        ) -> Dict[str, np.ndarray]:
+            path_num: int, locs: list[tuple[int, int]]
+        ) -> dict[str, np.ndarray]:
             """Assemble predictions for one path."""
             path_predictions = []
             for group_idx, split_idx in locs:
@@ -417,13 +417,13 @@ class AdaptiveCombinatorialPurged(CombinatorialPurged):
 
     def backtest_predictions(
         self,
-        estimator: Union[Estimator, Dict[str, Estimator]],
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-        labels: Union[pd.Series, Dict[str, pd.Series]],
-        sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]] = None,
+        estimator: Union[Estimator, dict[str, Estimator]],
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
+        labels: Union[pd.Series, dict[str, pd.Series]],
+        sample_weights: Optional[Union[np.ndarray, dict[str, np.ndarray]]] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Union[Dict[str, np.ndarray], Dict[str, Dict[str, np.ndarray]]]:
+    ) -> Union[dict[str, np.ndarray], dict[str, dict[str, np.ndarray]]]:
         """
         Generate adaptive backtest predictions.
         """

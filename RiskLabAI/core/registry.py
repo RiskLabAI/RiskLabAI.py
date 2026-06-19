@@ -30,14 +30,10 @@ from __future__ import annotations
 import importlib
 import inspect
 import logging
+from collections.abc import Iterator
 from typing import (
     Any,
     Callable,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,14 +53,14 @@ class _Entry:
     def __init__(
         self,
         key: str,
-        obj: Optional[Factory] = None,
-        lazy_target: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        obj: Factory | None = None,
+        lazy_target: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         self.key = key
         self._obj = obj
         self._lazy_target = lazy_target
-        self.metadata: Dict[str, Any] = dict(metadata or {})
+        self.metadata: dict[str, Any] = dict(metadata or {})
 
     @property
     def is_lazy(self) -> bool:
@@ -121,13 +117,13 @@ class Registry:
     'woof'
     """
 
-    def __init__(self, name: str, *, base: Optional[type] = None) -> None:
+    def __init__(self, name: str, *, base: type | None = None) -> None:
         self.name = name
         self.base = base
         # canonical key -> entry
-        self._entries: Dict[str, _Entry] = {}
+        self._entries: dict[str, _Entry] = {}
         # lower-cased key OR alias -> canonical key
-        self._index: Dict[str, str] = {}
+        self._index: dict[str, str] = {}
 
     # ------------------------------------------------------------------ #
     # Registration
@@ -135,10 +131,10 @@ class Registry:
     def register(
         self,
         key: Any = None,
-        obj: Optional[Factory] = None,
+        obj: Factory | None = None,
         *,
-        aliases: Tuple[str, ...] = (),
-        metadata: Optional[Dict[str, Any]] = None,
+        aliases: tuple[str, ...] = (),
+        metadata: dict[str, Any] | None = None,
         override: bool = False,
     ) -> Any:
         """
@@ -220,8 +216,8 @@ class Registry:
         key: str,
         target: str,
         *,
-        aliases: Tuple[str, ...] = (),
-        metadata: Optional[Dict[str, Any]] = None,
+        aliases: tuple[str, ...] = (),
+        metadata: dict[str, Any] | None = None,
         override: bool = False,
     ) -> None:
         """
@@ -248,11 +244,11 @@ class Registry:
     def _register(
         self,
         key: str,
-        obj: Optional[Factory],
+        obj: Factory | None,
         *,
-        lazy_target: Optional[str] = None,
-        aliases: Tuple[str, ...] = (),
-        metadata: Optional[Dict[str, Any]] = None,
+        lazy_target: str | None = None,
+        aliases: tuple[str, ...] = (),
+        metadata: dict[str, Any] | None = None,
         override: bool = False,
     ) -> None:
         if not isinstance(key, str) or not key:
@@ -326,7 +322,7 @@ class Registry:
             kwargs = _filter_kwargs(factory, kwargs)
         return factory(*args, **kwargs)
 
-    def metadata(self, key: str) -> Dict[str, Any]:
+    def metadata(self, key: str) -> dict[str, Any]:
         """Return the metadata dict registered alongside ``key``."""
         return dict(self._lookup(key).metadata)
 
@@ -356,15 +352,15 @@ class Registry:
     # ------------------------------------------------------------------ #
     # Introspection / mapping protocol
     # ------------------------------------------------------------------ #
-    def available(self) -> List[str]:
+    def available(self) -> list[str]:
         """Sorted list of canonical keys."""
         return sorted(self._entries.keys())
 
-    def keys(self) -> List[str]:
+    def keys(self) -> list[str]:
         """Alias for :meth:`available` (mapping-like access)."""
         return self.available()
 
-    def aliases(self) -> Dict[str, str]:
+    def aliases(self) -> dict[str, str]:
         """Mapping of alias -> canonical key (excludes canonical keys themselves)."""
         return {
             alias: canonical
@@ -388,7 +384,7 @@ class Registry:
         return f"<Registry {self.name!r}: {len(self)} components>"
 
 
-def _filter_kwargs(factory: Factory, kwargs: Dict[str, Any]) -> Dict[str, Any]:
+def _filter_kwargs(factory: Factory, kwargs: dict[str, Any]) -> dict[str, Any]:
     """
     Drop keyword arguments the factory's signature does not accept.
 

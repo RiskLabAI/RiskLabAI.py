@@ -12,11 +12,12 @@ Reference:
     John Wiley & Sons, Chapter 2.
 """
 
-import pandas as pd
+from typing import Optional
+
 import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 from sklearn.neighbors import KernelDensity
-from typing import Tuple, Union, Optional, Dict, Any
 
 # --- FIX 5: Removed unused imports for LedoitWolf and block_diag ---
 
@@ -135,7 +136,7 @@ def _mp_pdf_fit_error(
 
 def find_max_eval(
     eigenvalues: np.ndarray, q: float, bandwidth: float
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     r"""
     Find the maximum theoretical eigenvalue (\(\lambda_{max}\))
     by fitting the Marcenko-Pastur distribution.
@@ -163,9 +164,8 @@ def find_max_eval(
 
     # Minimize the SSE to find the best-fit variance
     # --- FIX 2: Pass bandwidth to the objective function ---
-    objective_func = lambda *args: _mp_pdf_fit_error(
-        args[0], q, eigenvalues_1d, bandwidth
-    )
+    def objective_func(*args):
+        return _mp_pdf_fit_error(args[0], q, eigenvalues_1d, bandwidth)
 
     optimizer_result = minimize(
         objective_func,
@@ -242,7 +242,7 @@ def denoised_corr(
 # --- Utility Functions ---
 
 
-def pca(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def pca(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Computes the principal component analysis of a Hermitian matrix.
     Ensures eigenvalues are sorted descending.

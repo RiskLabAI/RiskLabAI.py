@@ -9,7 +9,6 @@ as described by Marcos Lopez de Prado.
       easily plot the PSR curve.
 """
 
-from typing import List
 import numpy as np
 from scipy import stats as ss
 
@@ -97,7 +96,7 @@ def probabilistic_sharpe_ratio(
     return ss.norm.cdf(test_statistic)
 
 
-def benchmark_sharpe_ratio(sharpe_ratio_estimates: List[float]) -> float:
+def benchmark_sharpe_ratio(sharpe_ratio_estimates: list[float]) -> float:
     r"""
     Calculate the expected maximum Sharpe Ratio (Benchmark SR).
 

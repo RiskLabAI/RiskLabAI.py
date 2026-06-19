@@ -3,7 +3,7 @@ Tests for data/synthetic_data/drift_burst_hypothesis.py
 """
 
 import numpy as np
-import pytest
+
 from RiskLabAI.data.synthetic_data.drift_burst_hypothesis import drift_volatility_burst
 
 

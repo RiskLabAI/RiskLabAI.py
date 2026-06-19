@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 import pytest
 from statsmodels.tsa.stattools import adfuller
+
 from RiskLabAI.data.differentiation import (
-    calculate_weights_std,
     calculate_weights_ffd,
-    fractional_difference_std,
+    calculate_weights_std,
     fractional_difference_fixed,
     fractional_difference_fixed_single,
+    fractional_difference_std,
     fractionally_differentiated_log_price,
 )
 

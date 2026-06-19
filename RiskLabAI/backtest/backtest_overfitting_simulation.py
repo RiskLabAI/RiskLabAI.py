@@ -14,38 +14,39 @@ including PBO, DSR, and hardware performance profiling.
       to reduce this module's responsibilities.
 """
 
-import platform
+import itertools
+import subprocess
 import time
+import warnings
+from math import ceil
+from typing import Any, Optional, Union
+
 import numpy as np
 import pandas as pd
-from math import ceil
+import ta
 from scipy import stats as ss
+from scipy.stats import kendalltau
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
-import ta
-import itertools
-import warnings
-from typing import Dict, Union, Tuple, List, Any, Optional
-from scipy.stats import kendalltau
-import subprocess
 
+from RiskLabAI.backtest.validation import CrossValidatorController
 from RiskLabAI.data.differentiation import fractionally_differentiated_log_price
 from RiskLabAI.data.labeling import (
-    daily_volatility_with_log_returns,
     cusum_filter_events_dynamic_threshold,
-    vertical_barrier,
+    daily_volatility_with_log_returns,
     meta_events,
     meta_labeling,
+    vertical_barrier,
 )
 from RiskLabAI.data.weights import sample_weight_absolute_return_meta_labeling
 from RiskLabAI.utils import determine_strategy_side
-from RiskLabAI.backtest.validation import CrossValidatorController
-from .probability_of_backtest_overfitting import probability_of_backtest_overfitting
-from .probabilistic_sharpe_ratio import (
-    probabilistic_sharpe_ratio,
-    benchmark_sharpe_ratio,
-)
+
 from .bet_sizing import strategy_bet_sizing
+from .probabilistic_sharpe_ratio import (
+    benchmark_sharpe_ratio,
+    probabilistic_sharpe_ratio,
+)
+from .probability_of_backtest_overfitting import probability_of_backtest_overfitting
 
 
 def financial_features_backtest_overfitting_simulation(
@@ -180,13 +181,13 @@ def financial_features_backtest_overfitting_simulation(
 
 def backtest_overfitting_simulation_results(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
-    cross_validators: Dict[str, Any],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
+    cross_validators: dict[str, Any],
     noise_scale: float = 0.0,
     random_state: int = None,
     n_jobs: int = 1,
-) -> Dict[str, List[Dict[str, Any]]]:
+) -> dict[str, list[dict[str, Any]]]:
     """
     Conducts a simulation to evaluate the performance of trading strategies and models.
 
@@ -332,13 +333,13 @@ def backtest_overfitting_simulation_results(
 
 def overall_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
     noise_scale: float = 0.0,
     random_state: int = None,
     n_jobs: int = 1,
-) -> Tuple[Dict[str, float], Dict[str, float]]:
+) -> tuple[dict[str, float], dict[str, float]]:
     """
     Conducts an overall backtest overfitting simulation to calculate the metrics.
 
@@ -410,12 +411,12 @@ def overall_backtest_overfitting_simulation(
 
 def temporal_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
     overfitting_partitions_length: int,
     n_jobs: int = 1,
-) -> Tuple[Dict[str, List[float]], Dict[str, List[float]]]:
+) -> tuple[dict[str, list[float]], dict[str, list[float]]]:
     """
     Conducts a temporal backtest overfitting simulation to calculate the metrics in chunks.
 
@@ -484,12 +485,12 @@ def temporal_backtest_overfitting_simulation(
 
 def time_temporal_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
     overfitting_partitions_duration: str = "A",  # Annual grouping by default
     n_jobs: int = 1,
-) -> Tuple[Dict[str, pd.Series], Dict[str, pd.Series]]:
+) -> tuple[dict[str, pd.Series], dict[str, pd.Series]]:
     """
     Conducts a time-temporal backtest overfitting simulation to calculate the metrics in time-indexed chunks.
 
@@ -558,12 +559,12 @@ def time_temporal_backtest_overfitting_simulation(
 
 def varying_embargo_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
-    embargo_values: List[float],
+    embargo_values: list[float],
     n_jobs: int = 1,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Conducts a backtest overfitting simulation with varying embargo values to calculate the metrics.
 
@@ -792,8 +793,8 @@ def expected_shortfall(returns, step_risk_free_rate, confidence_level=0.05):
 
 def backtest_overfitting_simulation_financial_metrics_rank_correlation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
     n_jobs: int = 1,
 ) -> pd.DataFrame:
@@ -851,13 +852,13 @@ def backtest_overfitting_simulation_financial_metrics_rank_correlation(
         # Calculate the metrics for each half
         first_half_metrics = {
             metric_name: first_half.apply(
-                lambda x: metric_func(x, step_risk_free_rate), axis=0
+                lambda x, fn=metric_func: fn(x, step_risk_free_rate), axis=0
             )
             for metric_name, metric_func in metrics.items()
         }
         second_half_metrics = {
             metric_name: second_half.apply(
-                lambda x: metric_func(x, step_risk_free_rate), axis=0
+                lambda x, fn=metric_func: fn(x, step_risk_free_rate), axis=0
             )
             for metric_name, metric_func in metrics.items()
         }
@@ -887,11 +888,11 @@ def backtest_overfitting_simulation_financial_metrics_rank_correlation(
 
 def backtest_overfitting_simulation_model_complexity(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Any],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, Any],
     step_risk_free_rate: float,
     n_jobs: int = 1,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Conducts a backtest overfitting simulation to compare the PBO and DSR values of each CV method for simple and complex models.
 
@@ -1040,13 +1041,13 @@ def backtest_overfitting_simulation_model_complexity(
 
 def noised_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
-    noise_scales: List[float],
+    noise_scales: list[float],
     random_state: int = None,
     n_jobs: int = 1,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Conducts a noised backtest overfitting simulation to compare the new PBO/DSR values for different noise scales.
 
@@ -1094,13 +1095,13 @@ def noised_backtest_overfitting_simulation(
 
 def overall_novel_methods_backtest_overfitting_simulation(
     prices: pd.Series,
-    strategy_parameters: Dict[str, Union[List[int], List[float], List[bool]]],
-    models: Dict[str, Dict[str, Any]],
+    strategy_parameters: dict[str, Union[list[int], list[float], list[bool]]],
+    models: dict[str, dict[str, Any]],
     step_risk_free_rate: float,
     noise_scale: float = 0.0,
     random_state: int = None,
     n_jobs: int = 1,
-) -> Tuple[Dict[str, float], Dict[str, float]]:
+) -> tuple[dict[str, float], dict[str, float]]:
     """
     Conducts an overall backtest overfitting simulation to calculate the metrics for the novel CPCV methods.
 
@@ -1231,7 +1232,7 @@ def format_cpu_info(cpu_info):
 # Function to generate random data, target, weights, and times
 def generate_random_data(
     n_samples: int, n_features: int
-) -> Tuple[pd.DataFrame, pd.Series, np.ndarray, pd.Series]:
+) -> tuple[pd.DataFrame, pd.Series, np.ndarray, pd.Series]:
     date_range = pd.date_range(start="1980-01-01", periods=n_samples, freq="1h")
     data = pd.DataFrame(
         np.random.randn(n_samples, n_features),
@@ -1248,7 +1249,7 @@ def generate_random_data(
 # Function to measure computational requirements
 def measure_computational_requirements(
     cross_validator, model, data, target, weights, n_jobs: int = 1
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     from memory_profiler import memory_usage  # optional dependency: RiskLabAI[dev]
 
     start_time = time.time()
@@ -1266,7 +1267,7 @@ def measure_computational_requirements(
 
 # Main function to measure computational requirements for all CV methods
 def measure_all_cv_computational_requirements(
-    cross_validators: Dict[str, Any],
+    cross_validators: dict[str, Any],
     n_samples: int = 40 * 252,
     n_features: int = 22,
     n_jobs: int = 1,
@@ -1312,11 +1313,14 @@ def measure_all_cv_computational_requirements(
     return results_df
 
 
+_DEFAULT_N_JOBS_LIST = list(range(1, 9))
+
+
 def measure_cpcv_parallelization(
     n_samples: int = 40 * 252,
     n_features: int = 22,
     n_repeats: int = 30,
-    n_jobs_list: List[int] = range(1, 9),
+    n_jobs_list: list[int] = _DEFAULT_N_JOBS_LIST,
 ) -> pd.DataFrame:
     # Generate random data, target, weights, and times
     data, target, weights, times = generate_random_data(n_samples, n_features)
@@ -1359,8 +1363,8 @@ def measure_cpcv_parallelization(
 
 
 def measure_cpcv_scalability(
-    sample_sizes: List[int],
-    feature_sizes: List[int],
+    sample_sizes: list[int],
+    feature_sizes: list[int],
     n_repeats: int = 1,
     n_jobs: int = 1,
 ) -> pd.DataFrame:

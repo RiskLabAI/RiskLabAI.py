@@ -3,12 +3,12 @@ Tests for probabilistic_sharpe_ratio.py
 """
 
 import numpy as np
-import pytest
 from scipy import stats as ss
 from scipy.stats import norm
+
 from RiskLabAI.backtest.probabilistic_sharpe_ratio import (
-    probabilistic_sharpe_ratio,
     benchmark_sharpe_ratio,
+    probabilistic_sharpe_ratio,
 )
 
 

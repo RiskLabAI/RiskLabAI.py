@@ -2,13 +2,14 @@
 Factory class for creating feature importance strategy objects.
 """
 
-from typing import Any, Dict, List, Type
-from .feature_importance_strategy import FeatureImportanceStrategy
-from .feature_importance_mdi import FeatureImportanceMDI
+from typing import Any
+
+from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
 from .clustered_feature_importance_mdi import ClusteredFeatureImportanceMDI
 from .feature_importance_mda import FeatureImportanceMDA
-from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
+from .feature_importance_mdi import FeatureImportanceMDI
 from .feature_importance_sfi import FeatureImportanceSFI
+from .feature_importance_strategy import FeatureImportanceStrategy
 
 
 class FeatureImportanceFactory:
@@ -44,7 +45,7 @@ class FeatureImportanceFactory:
             If an invalid `strategy_type` is provided.
         """
 
-        strategies: Dict[str, Type[FeatureImportanceStrategy]] = {
+        strategies: dict[str, type[FeatureImportanceStrategy]] = {
             "MDI": FeatureImportanceMDI,
             "ClusteredMDI": ClusteredFeatureImportanceMDI,
             "MDA": FeatureImportanceMDA,

@@ -7,13 +7,13 @@ algorithm described by de Prado.
 """
 
 from .clustering import (
-    covariance_to_correlation,
     cluster_k_means_base,
-    make_new_outputs,
     cluster_k_means_top,
-    random_covariance_sub,
-    random_block_covariance,
+    covariance_to_correlation,
+    make_new_outputs,
     random_block_correlation,
+    random_block_covariance,
+    random_covariance_sub,
 )
 
 __all__ = [

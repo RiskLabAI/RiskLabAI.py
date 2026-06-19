@@ -12,22 +12,22 @@ Reference:
     John Wiley & Sons, Chapters 3 & 4.
 """
 
-from .labeling import (
-    cusum_filter_events_dynamic_threshold,
-    symmetric_cusum_filter,
-    daily_volatility_with_log_returns,
-    vertical_barrier,
-    triple_barrier,
-    meta_events,
-    meta_labeling,
-    lin_parts,
-    process_jobs,
-    expand_call,
-    report_progress,
-)
 from .financial_labels import (
     calculate_t_value_linear_regression,
     find_trend_using_trend_scanning,
+)
+from .labeling import (
+    cusum_filter_events_dynamic_threshold,
+    daily_volatility_with_log_returns,
+    expand_call,
+    lin_parts,
+    meta_events,
+    meta_labeling,
+    process_jobs,
+    report_progress,
+    symmetric_cusum_filter,
+    triple_barrier,
+    vertical_barrier,
 )
 
 __all__ = [

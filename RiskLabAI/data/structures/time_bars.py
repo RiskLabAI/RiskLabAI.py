@@ -2,9 +2,12 @@
 Implements Time Bars.
 """
 
-from typing import Union, List, Any, Iterable
+from collections.abc import Iterable
+from typing import Any
+
 import numpy as np
 import pandas as pd
+
 from RiskLabAI.data.structures.abstract_bars import AbstractBars, TickData
 
 
@@ -50,7 +53,7 @@ class TimeBars(AbstractBars):
         self.current_bar_timestamp = np.nan
         self.current_bar_end_timestamp = np.nan
 
-    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> list[list[Any]]:
         """
         Constructs time bars from input tick data.
 
@@ -76,11 +79,11 @@ class TimeBars(AbstractBars):
             # Get tick timestamp in seconds
             try:
                 tick_timestamp_sec = date_time.timestamp()
-            except AttributeError:
+            except AttributeError as err:
                 raise TypeError(
                     "TimeBars require `date_time` to be a pandas Timestamp "
                     "or datetime object with a .timestamp() method."
-                )
+                ) from err
 
             # Determine the "floor" timestamp for this bar
             bar_start_timestamp_sec = (

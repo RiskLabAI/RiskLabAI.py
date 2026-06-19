@@ -4,12 +4,12 @@ Concrete implementations of Run Bars:
 - FixedRunBars
 """
 
-from typing import Union, Iterable, List, Optional, Tuple
+from typing import Optional
+
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_run_bars import AbstractRunBars
 from RiskLabAI.utils.constants import *
-
 from RiskLabAI.utils.ewma import ewma
 
 
@@ -25,7 +25,7 @@ class ExpectedRunBars(AbstractRunBars):
         window_size_for_expected_n_ticks_estimation: int,
         initial_estimate_of_expected_n_ticks_in_bar: int,
         window_size_for_expected_imbalance_estimation: int,
-        expected_ticks_number_bounds: Optional[Tuple[float, float]] = None,
+        expected_ticks_number_bounds: Optional[tuple[float, float]] = None,
         analyse_thresholds: bool = False,
     ):
         """

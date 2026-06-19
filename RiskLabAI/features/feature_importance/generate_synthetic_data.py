@@ -7,7 +7,6 @@ Based on the method from De Prado (2018).
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
-from typing import Tuple
 
 
 def get_test_dataset(
@@ -17,7 +16,7 @@ def get_test_dataset(
     n_samples: int = 10000,
     random_state: int = 0,
     sigma_std: float = 0.0,
-) -> Tuple[pd.DataFrame, pd.Series]:
+) -> tuple[pd.DataFrame, pd.Series]:
     """
     Generate a synthetic dataset with informative, redundant, and noise features.
 

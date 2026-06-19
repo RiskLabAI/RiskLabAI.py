@@ -6,13 +6,14 @@ Reference:
     De Prado, M. (2020) Advances in financial machine learning. John Wiley & Sons.
 """
 
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 from scipy.linalg import block_diag
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
 from sklearn.utils import check_random_state
-from typing import Tuple, Dict, List, Optional
 
 
 def covariance_to_correlation(covariance: np.ndarray) -> np.ndarray:
@@ -50,7 +51,7 @@ def cluster_k_means_base(
     max_clusters: int = 10,
     iterations: int = 10,
     random_state: Optional[int] = None,
-) -> Tuple[pd.DataFrame, Dict[int, List[str]], pd.Series]:
+) -> tuple[pd.DataFrame, dict[int, list[str]], pd.Series]:
     """
     Perform the base K-Means clustering step.
 
@@ -138,9 +139,9 @@ def cluster_k_means_base(
 
 def make_new_outputs(
     correlation: pd.DataFrame,
-    clusters_1: Dict[int, List[str]],
-    clusters_2: Dict[int, List[str]],
-) -> Tuple[pd.DataFrame, Dict[int, List[str]], pd.Series]:
+    clusters_1: dict[int, list[str]],
+    clusters_2: dict[int, list[str]],
+) -> tuple[pd.DataFrame, dict[int, list[str]], pd.Series]:
     """
     Merge two disjoint sets of clusters and re-calculate metrics.
 
@@ -195,7 +196,7 @@ def cluster_k_means_top(
     max_clusters: Optional[int] = None,
     iterations: int = 10,
     random_state: Optional[int] = None,
-) -> Tuple[pd.DataFrame, Dict[int, List[str]], pd.Series]:
+) -> tuple[pd.DataFrame, dict[int, list[str]], pd.Series]:
     """
     Perform Optimized Nested Clustering (ONC).
 

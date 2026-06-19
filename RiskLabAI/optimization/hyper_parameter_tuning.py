@@ -3,12 +3,13 @@ Hyperparameter tuning module that integrates with scikit-learn
 and the custom PurgedKFold cross-validators.
 """
 
+from typing import Any, Optional, Union
+
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import BaggingClassifier
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
-from typing import Dict, Any, List, Optional, Union
 
 # Import the controller from the refactored validation module
 from RiskLabAI.backtest.validation import CrossValidatorController
@@ -59,10 +60,10 @@ def clf_hyper_fit(
     label: pd.Series,
     times: pd.Series,
     pipe_clf: Pipeline,
-    param_grid: Dict[str, Any],
+    param_grid: dict[str, Any],
     validator_type: str = "purgedkfold",
-    validator_params: Optional[Dict[str, Any]] = None,
-    bagging: Optional[List[Union[int, float]]] = None,
+    validator_params: Optional[dict[str, Any]] = None,
+    bagging: Optional[list[Union[int, float]]] = None,
     rnd_search_iter: int = 0,
     n_jobs: int = -1,
     **fit_params,

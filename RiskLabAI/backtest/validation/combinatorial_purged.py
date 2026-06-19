@@ -5,10 +5,11 @@ Marcos Lopez de Prado.
 
 import warnings
 from collections import ChainMap, defaultdict
+from collections.abc import Generator
 from copy import deepcopy
 from itertools import combinations
 from math import comb
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -49,8 +50,8 @@ class CombinatorialPurged(PurgedKFold):
 
     @staticmethod
     def _path_locations(
-        n_splits: int, combinations_list: List[Tuple[int, ...]]
-    ) -> Dict[int, List[Tuple[int, int]]]:
+        n_splits: int, combinations_list: list[tuple[int, ...]]
+    ) -> dict[int, list[tuple[int, int]]]:
         """
         Generate a labeled path matrix to map splits to backtest paths.
 
@@ -101,7 +102,7 @@ class CombinatorialPurged(PurgedKFold):
 
     @staticmethod
     def _combinatorial_splits(
-        combinations_list: List[Tuple[int, ...]], split_segments: List[np.ndarray]
+        combinations_list: list[tuple[int, ...]], split_segments: list[np.ndarray]
     ) -> Generator[np.ndarray, None, None]:
         """
         Generate combinatorial test sets.
@@ -129,7 +130,7 @@ class CombinatorialPurged(PurgedKFold):
         self,
         n_splits: int,
         n_test_groups: int,
-        times: Union[pd.Series, Dict[str, pd.Series]],
+        times: Union[pd.Series, dict[str, pd.Series]],
         embargo: float = 0,
     ) -> None:
         """
@@ -153,8 +154,8 @@ class CombinatorialPurged(PurgedKFold):
 
     def get_n_splits(
         self,
-        data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
-        labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
+        data: Optional[Union[pd.DataFrame, dict[str, pd.DataFrame]]] = None,
+        labels: Optional[Union[pd.Series, dict[str, pd.Series]]] = None,
         groups: Optional[np.ndarray] = None,
     ) -> int:
         """
@@ -178,7 +179,7 @@ class CombinatorialPurged(PurgedKFold):
         """
         return comb(self.n_splits, self.n_test_groups)
 
-    def _get_split_segments(self, single_data: pd.DataFrame) -> List[np.ndarray]:
+    def _get_split_segments(self, single_data: pd.DataFrame) -> list[np.ndarray]:
         """Helper to get the base K-Fold segments."""
         indices = np.arange(single_data.shape[0])
         return np.array_split(indices, self.n_splits)
@@ -187,7 +188,7 @@ class CombinatorialPurged(PurgedKFold):
         self,
         single_times: pd.Series,
         single_data: pd.DataFrame,
-    ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
+    ) -> Generator[tuple[np.ndarray, np.ndarray], None, None]:
         """
         Split a single dataset into C(n, k) purged train-test indices.
 
@@ -222,8 +223,8 @@ class CombinatorialPurged(PurgedKFold):
 
     def _combinations_and_path_locations_and_split_segments(
         self, data: pd.DataFrame
-    ) -> Tuple[
-        List[Tuple[int, ...]], Dict[int, List[Tuple[int, int]]], List[np.ndarray]
+    ) -> tuple[
+        list[tuple[int, ...]], dict[int, list[tuple[int, int]]], list[np.ndarray]
     ]:
         """
         Helper to compute all necessary components for CPCV.
@@ -250,7 +251,7 @@ class CombinatorialPurged(PurgedKFold):
         self,
         single_times: pd.Series,
         single_data: pd.DataFrame,
-    ) -> Dict[str, List[Dict[str, np.ndarray]]]:
+    ) -> dict[str, list[dict[str, np.ndarray]]]:
         """
         Generate all combinatorial backtest paths for a single dataset.
 
@@ -313,7 +314,7 @@ class CombinatorialPurged(PurgedKFold):
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Obtain backtest predictions for all CPCV paths.
 
@@ -379,8 +380,8 @@ class CombinatorialPurged(PurgedKFold):
         )
 
         def get_path_data(
-            path_num: int, locs: List[Tuple[int, int]]
-        ) -> Dict[str, np.ndarray]:
+            path_num: int, locs: list[tuple[int, int]]
+        ) -> dict[str, np.ndarray]:
             """Assemble predictions for one path."""
             path_predictions = []
 

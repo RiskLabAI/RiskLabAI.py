@@ -10,10 +10,14 @@ Reference:
     John Wiley & Sons, Chapter 5.
 """
 
+from typing import TYPE_CHECKING, Optional
+
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.stattools import adfuller
-from typing import Tuple, Optional
+
+if TYPE_CHECKING:
+    import matplotlib.pyplot as plt  # type hints only; optional at runtime
 
 
 def calculate_weights_std(degree: float, size: int) -> np.ndarray:
@@ -223,7 +227,7 @@ def fractional_difference_fixed_single(
 
 
 def plot_weights(
-    degree_range: Tuple[float, float],
+    degree_range: tuple[float, float],
     number_degrees: int,
     size: int,
     ax: Optional["plt.Axes"] = None,

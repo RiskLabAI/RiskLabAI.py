@@ -11,15 +11,15 @@ This module is built on an AbstractCrossValidator interface and
 a CrossValidatorFactory for easy instantiation.
 """
 
+from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
+from .bagged_combinatorial_purged import BaggedCombinatorialPurged
+from .combinatorial_purged import CombinatorialPurged
+from .cross_validator_controller import CrossValidatorController
+from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 from .kfold import KFold
 from .purged_kfold import PurgedKFold
 from .walk_forward import WalkForward
-from .combinatorial_purged import CombinatorialPurged
-from .bagged_combinatorial_purged import BaggedCombinatorialPurged
-from .adaptive_combinatorial_purged import AdaptiveCombinatorialPurged
-from .cross_validator_factory import CrossValidatorFactory
-from .cross_validator_controller import CrossValidatorController
 
 __all__ = [
     # Interface

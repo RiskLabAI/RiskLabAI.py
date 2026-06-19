@@ -2,8 +2,8 @@
 Tests for weighted_tau.py
 """
 
-import pytest
 import numpy as np
+
 from RiskLabAI.features.feature_importance.weighted_tau import calculate_weighted_tau
 
 

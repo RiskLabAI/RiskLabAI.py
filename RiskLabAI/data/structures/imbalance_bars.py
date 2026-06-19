@@ -4,12 +4,12 @@ Concrete implementations of Imbalance Bars:
 - FixedImbalanceBars
 """
 
-from typing import Tuple, Union, Optional
+from typing import Optional
+
 import numpy as np
 
 from RiskLabAI.data.structures.abstract_imbalance_bars import AbstractImbalanceBars
 from RiskLabAI.utils.constants import *
-
 from RiskLabAI.utils.ewma import ewma
 
 
@@ -25,7 +25,7 @@ class ExpectedImbalanceBars(AbstractImbalanceBars):
         window_size_for_expected_n_ticks_estimation: int = 10000,
         initial_estimate_of_expected_n_ticks_in_bar: int = 20000,
         window_size_for_expected_imbalance_estimation: int = 10000,
-        expected_ticks_number_bounds: Optional[Tuple[float, float]] = None,
+        expected_ticks_number_bounds: Optional[tuple[float, float]] = None,
         analyse_thresholds: bool = False,
     ):
         """

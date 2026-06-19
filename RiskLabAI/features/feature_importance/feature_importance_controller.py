@@ -2,8 +2,10 @@
 Controller class to manage various feature importance strategies.
 """
 
-from typing import Any, Dict
+from typing import Any
+
 import pandas as pd
+
 from .feature_importance_factory import FeatureImportanceFactory
 from .feature_importance_strategy import FeatureImportanceStrategy
 

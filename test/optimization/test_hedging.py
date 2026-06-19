@@ -4,6 +4,7 @@ Tests for hedging.py
 
 import numpy as np
 import pytest
+
 from RiskLabAI.optimization.hedging import pca_weights
 
 

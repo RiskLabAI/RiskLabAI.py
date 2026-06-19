@@ -6,17 +6,17 @@ Provides 6 themes and a configuration-based saving function.
 """
 
 import logging
-
-import matplotlib.pyplot as plt
-import matplotlib.figure as fig  # For type hinting
-import seaborn as sns
 import os
-from typing import Optional, Dict, Any
+from typing import Any, Optional
+
+import matplotlib.figure as fig  # For type hinting
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 logger = logging.getLogger(__name__)
 
 # [THEMES dictionary remains the same]
-THEMES: Dict[str, Dict[str, Any]] = {
+THEMES: dict[str, dict[str, Any]] = {
     "light": {
         "figure.facecolor": "#FFFFFF",
         "axes.facecolor": "#FFFFFF",

@@ -5,14 +5,16 @@ Provides a set of functions to parallelize operations, especially
 on pandas objects, using Python's multiprocessing and Joblib.
 """
 
+import datetime as dt
 import logging
 import multiprocessing as mp
-import pandas as pd
-import numpy as np
-import datetime as dt
 import time
+from collections.abc import Iterable
+from typing import Any, Callable, Optional, Union
+
 import joblib  # <-- Added missing import
-from typing import List, Dict, Any, Callable, Tuple, Union, Iterable, Optional
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ def parallel_run(
     num_cpus: int = -1,
     lin_partition: bool = False,
     **kwargs,
-) -> List[Any]:
+) -> list[Any]:
     """
     Executes a function in parallel over an iterable using Joblib.
 
@@ -121,7 +123,7 @@ def report_progress(
     logger.info(message)
 
 
-def expand_call(kargs: Dict[str, Any]) -> Any:
+def expand_call(kargs: dict[str, Any]) -> Any:
     """
     Wrapper function to expand keyword arguments for a callback.
 
@@ -144,8 +146,8 @@ def expand_call(kargs: Dict[str, Any]) -> Any:
 
 
 def process_jobs(
-    jobs: List[Dict[str, Any]], task: Optional[str] = None, num_threads: int = -1
-) -> List[Any]:
+    jobs: list[dict[str, Any]], task: Optional[str] = None, num_threads: int = -1
+) -> list[Any]:
     """
     Process a list of jobs in parallel using multiprocessing.
 
@@ -194,7 +196,7 @@ def process_jobs(
     return outputs
 
 
-def process_jobs_sequential(jobs: List[Dict[str, Any]]) -> List[Any]:
+def process_jobs_sequential(jobs: list[dict[str, Any]]) -> list[Any]:
     """
     Run jobs sequentially (single-thread). Useful for debugging.
 
@@ -301,12 +303,12 @@ def nested_partitions(
 
 def mp_pandas_obj(
     func: Callable[..., pd.Series],
-    pandas_object: Tuple[str, pd.Index],
+    pandas_object: tuple[str, pd.Index],
     num_threads: int = -1,
     mp_batches: int = 1,
     linear_partition: bool = True,
     **kwargs: Any,
-) -> Union[pd.DataFrame, pd.Series, List[Any]]:
+) -> Union[pd.DataFrame, pd.Series, list[Any]]:
     """
     Parallelize a function call on a pandas object (DataFrame/Series).
 

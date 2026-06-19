@@ -15,8 +15,8 @@ import numpy as np
 # labeling helpers are now single-sourced from RiskLabAI.hpc
 # --------------------------------------------------------------------------- #
 def test_labeling_helpers_are_reexported_from_hpc():
-    from RiskLabAI.data import labeling
     from RiskLabAI import hpc
+    from RiskLabAI.data import labeling
 
     # Public names still import (backward compatibility).
     assert labeling.process_jobs is hpc.process_jobs

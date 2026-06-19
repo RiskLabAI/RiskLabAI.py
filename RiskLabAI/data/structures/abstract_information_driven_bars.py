@@ -3,12 +3,13 @@ Abstract base class for Information-Driven Bars (Imbalance and Run bars).
 """
 
 from abc import abstractmethod
-from typing import Union, List, Optional
+from typing import Optional
+
 import numpy as np
 
-from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.ewma import ewma
 
 
 class AbstractInformationDrivenBars(AbstractBars):

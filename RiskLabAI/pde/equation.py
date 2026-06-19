@@ -5,11 +5,12 @@ Base class and concrete implementations for Partial Differential Equations
 Based on: https://github.com/frankhan91/DeepBSDE
 """
 
+from typing import Optional, Union
+
+import numpy as np
 import torch
 import torch.nn as nn
 from torch import Tensor
-import numpy as np
-from typing import Tuple, Optional, Union
 
 
 class Equation:
@@ -36,7 +37,7 @@ class Equation:
         self.sqrt_delta_t: float = np.sqrt(self.delta_t)
         self.y_init: Optional[float] = None
 
-    def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
+    def sample(self, num_sample: int) -> tuple[np.ndarray, np.ndarray]:
         """
         Sample the forward SDE (e.g., the underlying asset path).
 
@@ -132,7 +133,7 @@ class PricingDefaultRisk(Equation):
     """
 
     def __init__(self, eqn_config: dict):
-        super(PricingDefaultRisk, self).__init__(eqn_config)
+        super().__init__(eqn_config)
         self.x_init = np.ones(self.dim) * 100.0
         self.sigma = 0.2
         self.rate = 0.02  # R
@@ -145,7 +146,7 @@ class PricingDefaultRisk(Equation):
         self.vl = 70.0
         self.slope = (self.gammah - self.gammal) / (self.vh - self.vl)
 
-    def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
+    def sample(self, num_sample: int) -> tuple[np.ndarray, np.ndarray]:
         dw_sample = (
             np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
             * self.sqrt_delta_t
@@ -185,12 +186,12 @@ class HJBLQ(Equation):
     """
 
     def __init__(self, eqn_config: dict):
-        super(HJBLQ, self).__init__(eqn_config)
+        super().__init__(eqn_config)
         self.x_init = np.zeros(self.dim)
         self.sigma = np.sqrt(2.0)
         self.lambd = 1.0
 
-    def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
+    def sample(self, num_sample: int) -> tuple[np.ndarray, np.ndarray]:
         dw_sample = (
             np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
             * self.sqrt_delta_t
@@ -224,7 +225,7 @@ class BlackScholesBarenblatt(Equation):
     """
 
     def __init__(self, eqn_config: dict):
-        super(BlackScholesBarenblatt, self).__init__(eqn_config)
+        super().__init__(eqn_config)
         self.x_init = np.ones(self.dim) * np.array(
             [1.0 / (1.0 + i % 2) for i in range(self.dim)]
         )
@@ -232,7 +233,7 @@ class BlackScholesBarenblatt(Equation):
         self.rate = 0.05  # interest rate R
         self.mu_bar = 0.0
 
-    def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
+    def sample(self, num_sample: int) -> tuple[np.ndarray, np.ndarray]:
         dw_sample = (
             np.random.normal(size=(num_sample, self.dim, self.num_time_interval))
             * self.sqrt_delta_t
@@ -268,7 +269,7 @@ class PricingDiffRate(Equation):
     """
 
     def __init__(self, eqn_config: dict):
-        super(PricingDiffRate, self).__init__(eqn_config)
+        super().__init__(eqn_config)
         self.x_init = np.ones(self.dim) * 100
         self.sigma = 0.2
         self.mu_bar = 0.06
@@ -276,7 +277,7 @@ class PricingDiffRate(Equation):
         self.rb = 0.06
         self.alpha = 1.0 / self.dim
 
-    def sample(self, num_sample: int) -> Tuple[np.ndarray, np.ndarray]:
+    def sample(self, num_sample: int) -> tuple[np.ndarray, np.ndarray]:
         dw_sample = (
             np.random.normal(size=[num_sample, self.dim, self.num_time_interval])
             * self.sqrt_delta_t

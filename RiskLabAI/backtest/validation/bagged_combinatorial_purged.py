@@ -4,7 +4,7 @@ Implements Bagged Combinatorial Purged Cross-Validation (B-CPCV).
 
 import warnings
 from collections import ChainMap
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -12,8 +12,6 @@ from joblib import Parallel, delayed
 from sklearn.base import clone
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
 from sklearn.exceptions import ConvergenceWarning
-
-from typing import List, Tuple
 
 from .combinatorial_purged import CombinatorialPurged
 
@@ -60,7 +58,7 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         self,
         n_splits: int,
         n_test_groups: int,
-        times: Union[pd.Series, Dict[str, pd.Series]],
+        times: Union[pd.Series, dict[str, pd.Series]],
         embargo: float = 0,
         classifier: bool = True,
         n_estimators: int = 10,
@@ -91,7 +89,7 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Obtain backtest predictions for all B-CPCV paths.
 
@@ -222,8 +220,8 @@ class BaggedCombinatorialPurged(CombinatorialPurged):
 
         # 2. Assemble predictions (this is fast, can be serial or parallel)
         def get_path_data(
-            path_num: int, locs: List[Tuple[int, int]]
-        ) -> Dict[str, np.ndarray]:
+            path_num: int, locs: list[tuple[int, int]]
+        ) -> dict[str, np.ndarray]:
             """Assemble predictions for one path."""
             path_predictions = []
             for group_idx, split_idx in locs:

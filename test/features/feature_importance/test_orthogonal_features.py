@@ -2,9 +2,10 @@
 Tests for orthogonal_features.py
 """
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
 from RiskLabAI.features.feature_importance.orthogonal_features import (
     orthogonal_features,
 )

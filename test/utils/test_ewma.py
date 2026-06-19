@@ -2,9 +2,9 @@
 Tests for utils/ewma.py
 """
 
-import pytest
 import numpy as np
 import pandas as pd
+
 from RiskLabAI.utils.ewma import ewma
 
 

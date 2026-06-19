@@ -2,14 +2,15 @@
 Tests for CombinatorialPurged cross-validator.
 """
 
+from itertools import combinations
+from math import comb
+
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
-from math import comb
 
 from RiskLabAI.backtest.validation.combinatorial_purged import CombinatorialPurged
-from itertools import combinations
 
 
 # Re-use the purged k-fold fixture

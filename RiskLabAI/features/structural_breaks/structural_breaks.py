@@ -7,13 +7,14 @@ Reference:
     John Wiley & Sons, Chapter 17.
 """
 
+from typing import Any, Union
+
 import numpy as np
 import pandas as pd
-from typing import List, Union, Tuple, Dict, Any
 
 
 def lag_dataframe(
-    market_data: pd.DataFrame, lags: Union[int, List[int]]
+    market_data: pd.DataFrame, lags: Union[int, list[int]]
 ) -> pd.DataFrame:
     """
     Apply lags to a DataFrame.
@@ -51,7 +52,7 @@ def lag_dataframe(
 
 def prepare_data(
     log_price_series: pd.Series, constant: str, lags: int
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prepare the y and X matrices for ADF regression.
 
@@ -116,7 +117,7 @@ def prepare_data(
 
 def compute_beta(
     y_window: np.ndarray, x_window: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Compute OLS beta coefficients and their variance.
 
@@ -217,7 +218,7 @@ def get_bsadf_statistic(
     min_sample_length: int,
     constant: str,
     lags: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute the Backward Supremum ADF (BSADF) statistic.
 

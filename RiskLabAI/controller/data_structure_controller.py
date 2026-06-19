@@ -7,26 +7,26 @@ a specified method.
 """
 
 import logging
+from collections.abc import Generator
+from typing import Any, Optional, Union
 
 import pandas as pd
-import numpy as np
-from typing import Iterable, Optional, Generator, Union, Dict, Any, List
 
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
 from RiskLabAI.data.structures.abstract_bars import AbstractBars
 from RiskLabAI.utils.constants import (
-    DATE_TIME,
-    TICK_NUMBER,
-    OPEN_PRICE,
-    HIGH_PRICE,
-    LOW_PRICE,
     CLOSE_PRICE,
-    CUMULATIVE_VOLUME,
     CUMULATIVE_BUY_VOLUME,
+    CUMULATIVE_DOLLAR,
     CUMULATIVE_SELL_VOLUME,
     CUMULATIVE_TICKS,
-    CUMULATIVE_DOLLAR,
+    CUMULATIVE_VOLUME,
+    DATE_TIME,
+    HIGH_PRICE,
+    LOW_PRICE,
+    OPEN_PRICE,
     THRESHOLD,
+    TICK_NUMBER,
 )
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ class Controller:
     def handle_input_command(
         self,
         method_name: str,
-        method_arguments: Dict[str, Any],
+        method_arguments: dict[str, Any],
         input_data: Union[str, pd.DataFrame],
         output_path: Optional[str] = None,
         batch_size: int = 1_000_000,
@@ -104,7 +104,7 @@ class Controller:
         else:
             raise TypeError("input_data must be a string (path) or pd.DataFrame")
 
-        all_bars: List[List[Any]] = []
+        all_bars: list[list[Any]] = []
 
         # 3. Process data in batches
         logger.info("Processing data in batches...")
@@ -159,8 +159,7 @@ class Controller:
         try:
             # Use a generator to read the file in chunks
             # This is more memory-efficient and avoids reading the file twice.
-            for batch in pd.read_csv(input_path, chunksize=batch_size, parse_dates=[0]):
-                yield batch
+            yield from pd.read_csv(input_path, chunksize=batch_size, parse_dates=[0])
         except FileNotFoundError:
             logger.error("File not found at %s", input_path)
             return

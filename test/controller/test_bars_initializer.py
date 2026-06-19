@@ -3,6 +3,7 @@ Tests for controller/bars_initializer.py
 """
 
 import pytest
+
 from RiskLabAI.controller.bars_initializer import BarsInitializerController
 
 # Import all bar types to check instance

@@ -2,12 +2,12 @@
 Tests for data/structures/imbalance_bars.py
 """
 
-import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.data.structures.imbalance_bars import (
-    FixedImbalanceBars,
     ExpectedImbalanceBars,
+    FixedImbalanceBars,
 )
 
 

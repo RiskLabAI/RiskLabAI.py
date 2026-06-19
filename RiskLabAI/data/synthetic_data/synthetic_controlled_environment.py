@@ -3,15 +3,15 @@ Generates synthetic price data using a Heston-Merton model
 with Markov-switching regimes.
 """
 
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
-from numba import jit
 from joblib import Parallel, delayed
+from numba import jit
 
 # Type hint for regime parameters
-RegimeParams = Dict[str, Union[float, List[float]]]
+RegimeParams = dict[str, Union[float, list[float]]]
 
 
 @jit(nopython=True)
@@ -213,7 +213,7 @@ def heston_merton_log_returns(
 
 def align_params_length(
     regime_params: RegimeParams,
-) -> Tuple[Dict[str, List[float]], int]:
+) -> tuple[dict[str, list[float]], int]:
     """
     Align the parameter lists within a regime to be the same length.
 
@@ -234,7 +234,7 @@ def align_params_length(
     """
     max_len = max(len(v) if isinstance(v, list) else 1 for v in regime_params.values())
 
-    aligned_params: Dict[str, List[float]] = {}
+    aligned_params: dict[str, list[float]] = {}
     for key, value in regime_params.items():
         if isinstance(value, list):
             if len(value) < max_len:
@@ -250,12 +250,12 @@ def align_params_length(
 
 
 def generate_prices_from_regimes(
-    regimes: Dict[str, RegimeParams],
+    regimes: dict[str, RegimeParams],
     transition_matrix: np.ndarray,
     total_time: float,
     n_steps: int,
     random_state: Optional[int] = None,
-) -> Tuple[pd.Series, np.ndarray]:
+) -> tuple[pd.Series, np.ndarray]:
     """
     Generate a price series from a Markov-switching regime model.
 
@@ -288,7 +288,7 @@ def generate_prices_from_regimes(
     simulated_regimes = markov_chain.simulate(ts_length=n_steps, random_state=rng)
 
     # 2. Unpack parameters based on simulated regimes
-    param_lists: Dict[str, List[float]] = {
+    param_lists: dict[str, list[float]] = {
         "mu": [],
         "kappa": [],
         "theta": [],
@@ -316,7 +316,7 @@ def generate_prices_from_regimes(
 
     # 3. Finalize parameter arrays and regime path
     simulated_regimes_final = np.array(regime_path_expanded)
-    param_arrays: Dict[str, np.ndarray] = {
+    param_arrays: dict[str, np.ndarray] = {
         key: np.array(val) for key, val in param_lists.items()
     }
 
@@ -355,13 +355,13 @@ def generate_prices_from_regimes(
 
 def parallel_generate_prices(
     number_of_paths: int,
-    regimes: Dict[str, RegimeParams],
+    regimes: dict[str, RegimeParams],
     transition_matrix: np.ndarray,
     total_time: float,
     n_steps: int,
     random_state: Optional[int] = None,
     n_jobs: int = 1,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Parallel generation of price paths.
 

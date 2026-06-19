@@ -5,11 +5,11 @@ Tests for backtest_statistics.py
 import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.backtest.backtest_statistics import (
     bet_timing,
-    calculate_holding_period,
     calculate_hhi,
-    calculate_hhi_concentration,
+    calculate_holding_period,
     compute_drawdowns_time_under_water,
 )
 

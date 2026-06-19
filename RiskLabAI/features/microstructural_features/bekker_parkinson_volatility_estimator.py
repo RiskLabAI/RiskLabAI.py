@@ -8,9 +8,11 @@ Reference:
 """
 
 from math import pi
-import pandas as pd
+
 import numpy as np
-from .corwin_schultz import beta_estimates, gamma_estimates, _DENOMINATOR
+import pandas as pd
+
+from .corwin_schultz import _DENOMINATOR, beta_estimates, gamma_estimates
 
 
 def sigma_estimates(beta: pd.Series, gamma: pd.Series) -> pd.Series:

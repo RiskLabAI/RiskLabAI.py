@@ -3,13 +3,15 @@ Abstract base class for Imbalance Bars (Fixed and Expected).
 """
 
 from abc import abstractmethod
-from typing import Union, List, Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any, Optional
+
 import numpy as np
 
+from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars,
 )
-from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.utils.constants import *
 
 
@@ -52,7 +54,7 @@ class AbstractImbalanceBars(AbstractInformationDrivenBars):
 
         self.analyse_thresholds = [] if analyse_thresholds else None
 
-    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> list[list[Any]]:
         """
         Constructs imbalance bars from input tick data.
         (Parameters same as original)

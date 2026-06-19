@@ -6,7 +6,6 @@ featuring an "explosion" at the midpoint.
 """
 
 import numpy as np
-from typing import Tuple
 
 
 def drift_volatility_burst(
@@ -18,7 +17,7 @@ def drift_volatility_burst(
     alpha: float,
     beta: float,
     explosion_filter_width: float = 0.1,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Compute the drift and volatility for a DBH burst scenario.
 

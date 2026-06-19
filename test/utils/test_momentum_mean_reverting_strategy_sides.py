@@ -2,9 +2,9 @@
 Tests for utils/momentum_mean_reverting_strategy_sides.py
 """
 
-import pytest
 import pandas as pd
-import numpy as np
+import pytest
+
 from RiskLabAI.utils.momentum_mean_reverting_strategy_sides import (
     determine_strategy_side,
 )

@@ -2,8 +2,9 @@
 Implements Standard Bars (Tick, Volume, Dollar).
 """
 
-from typing import Union, List, Any, Iterable
-import numpy as np
+from collections.abc import Iterable
+from typing import Any
+
 from RiskLabAI.data.structures.abstract_bars import AbstractBars, TickData
 
 
@@ -30,7 +31,7 @@ class StandardBars(AbstractBars):
         super().__init__(bar_type)
         self.threshold = threshold
 
-    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> list[list[Any]]:
         """
         Constructs standard bars from input tick data.
 

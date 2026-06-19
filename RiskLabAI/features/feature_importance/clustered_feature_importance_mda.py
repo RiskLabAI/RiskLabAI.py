@@ -3,12 +3,13 @@ Computes Clustered Mean Decrease Accuracy (MDA) feature importance.
 """
 
 import logging
-from typing import Dict, Tuple, List, Any
+from typing import Any
+
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
 from sklearn.metrics import log_loss
+from sklearn.model_selection import KFold
+
 from .feature_importance_strategy import FeatureImportanceStrategy
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class ClusteredFeatureImportanceMDA(FeatureImportanceStrategy):
     def __init__(
         self,
         classifier: object,
-        clusters: Dict[str, List[str]],
+        clusters: dict[str, list[str]],
         n_splits: int = 10,
         random_state: int = 42,
     ):

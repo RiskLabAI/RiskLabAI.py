@@ -4,8 +4,9 @@ in financial time-series data.
 """
 
 import warnings
+from collections.abc import Generator
 from copy import deepcopy
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -84,7 +85,7 @@ class PurgedKFold(CrossValidator):
             training data (i.e., observations that do not overlap with
             test + embargo).
         """
-        indices_to_drop: Set[int] = set()
+        indices_to_drop: set[int] = set()
         embargo_length = int(len(data_info_range) * embargo_fraction)
 
         if test_time_range.empty:
@@ -157,7 +158,7 @@ class PurgedKFold(CrossValidator):
     def __init__(
         self,
         n_splits: int,
-        times: Union[pd.Series, Dict[str, pd.Series]],
+        times: Union[pd.Series, dict[str, pd.Series]],
         embargo: float = 0,
     ) -> None:
         """
@@ -180,8 +181,8 @@ class PurgedKFold(CrossValidator):
 
     def get_n_splits(
         self,
-        data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
-        labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
+        data: Optional[Union[pd.DataFrame, dict[str, pd.DataFrame]]] = None,
+        labels: Optional[Union[pd.Series, dict[str, pd.Series]]] = None,
         groups: Optional[np.ndarray] = None,
     ) -> int:
         """
@@ -250,7 +251,7 @@ class PurgedKFold(CrossValidator):
         self,
         single_times: pd.Series,
         single_data: pd.DataFrame,
-    ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
+    ) -> Generator[tuple[np.ndarray, np.ndarray], None, None]:
         """
         Split a single dataset into purged train-test indices.
 
@@ -276,12 +277,12 @@ class PurgedKFold(CrossValidator):
 
     def split(
         self,
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-        labels: Optional[Union[pd.Series, Dict[str, pd.Series]]] = None,
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
+        labels: Optional[Union[pd.Series, dict[str, pd.Series]]] = None,
         groups: Optional[np.ndarray] = None,
     ) -> Union[
-        Generator[Tuple[np.ndarray, np.ndarray], None, None],
-        Generator[Tuple[str, Tuple[np.ndarray, np.ndarray]], None, None],
+        Generator[tuple[np.ndarray, np.ndarray], None, None],
+        Generator[tuple[str, tuple[np.ndarray, np.ndarray]], None, None],
     ]:
         """
         Split data (or dictionary of data) into purged train-test indices.
@@ -319,7 +320,7 @@ class PurgedKFold(CrossValidator):
         self,
         single_times: pd.Series,
         single_data: pd.DataFrame,
-    ) -> Dict[str, List[Dict[str, np.ndarray]]]:
+    ) -> dict[str, list[dict[str, np.ndarray]]]:
         """
         Generate backtest paths for a single dataset.
         For PurgedKFold, there is only one "path".
@@ -357,10 +358,10 @@ class PurgedKFold(CrossValidator):
 
     def backtest_paths(
         self,
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
     ) -> Union[
-        Dict[str, List[Dict[str, np.ndarray]]],
-        Dict[str, Dict[str, List[Dict[str, np.ndarray]]]],
+        dict[str, list[dict[str, np.ndarray]]],
+        dict[str, dict[str, list[dict[str, np.ndarray]]]],
     ]:
         """
         Generate backtest paths for data or a dictionary of data.
@@ -399,7 +400,7 @@ class PurgedKFold(CrossValidator):
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Obtain backtest predictions for a single dataset.
 
@@ -468,13 +469,13 @@ class PurgedKFold(CrossValidator):
 
     def backtest_predictions(
         self,
-        estimator: Union[Estimator, Dict[str, Estimator]],
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-        labels: Union[pd.Series, Dict[str, pd.Series]],
-        sample_weights: Optional[Union[np.ndarray, Dict[str, np.ndarray]]] = None,
+        estimator: Union[Estimator, dict[str, Estimator]],
+        data: Union[pd.DataFrame, dict[str, pd.DataFrame]],
+        labels: Union[pd.Series, dict[str, pd.Series]],
+        sample_weights: Optional[Union[np.ndarray, dict[str, np.ndarray]]] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Union[Dict[str, np.ndarray], Dict[str, Dict[str, np.ndarray]]]:
+    ) -> Union[dict[str, np.ndarray], dict[str, dict[str, np.ndarray]]]:
         """
         Generate backtest predictions for single or multiple datasets.
 

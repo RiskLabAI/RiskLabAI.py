@@ -2,10 +2,11 @@
 Tests for the features/feature_importance module.
 """
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 from sklearn.ensemble import RandomForestClassifier
+
 from RiskLabAI.features.feature_importance.feature_importance_controller import (
     FeatureImportanceController,
 )

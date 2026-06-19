@@ -9,13 +9,13 @@ Includes:
 Set-Transformer code based on: https://github.com/juho-lee/set_transformer
 """
 
+import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
-from torch.nn import Module, Linear, BatchNorm1d, Tanh, ReLU
-import math
-from typing import List
+from torch.nn import BatchNorm1d, Linear, Module, ReLU, Tanh
 
 # --- Set Transformer Components ---
 
@@ -26,7 +26,7 @@ class MAB(Module):
     def __init__(
         self, dim_q: int, dim_k: int, dim_v: int, num_heads: int, ln: bool = False
     ):
-        super(MAB, self).__init__()
+        super().__init__()
         self.dim_v = dim_v
         self.num_heads = num_heads
         self.fc_q = Linear(dim_q, dim_v)
@@ -58,7 +58,7 @@ class SAB(Module):
     """Self-Attention Block (SAB)."""
 
     def __init__(self, dim_in: int, dim_out: int, num_heads: int, ln: bool = False):
-        super(SAB, self).__init__()
+        super().__init__()
         self.mab = MAB(dim_in, dim_in, dim_out, num_heads, ln=ln)
 
     def forward(self, x: Tensor) -> Tensor:
@@ -71,7 +71,7 @@ class ISAB(Module):
     def __init__(
         self, dim_in: int, dim_out: int, num_heads: int, num_inds: int, ln: bool = False
     ):
-        super(ISAB, self).__init__()
+        super().__init__()
         self.i = nn.Parameter(torch.Tensor(1, num_inds, dim_out))
         nn.init.xavier_uniform_(self.i)
         self.mab0 = MAB(dim_out, dim_in, dim_out, num_heads, ln=ln)
@@ -86,7 +86,7 @@ class PMA(Module):
     """Pooling Multi-Head Attention (PMA)."""
 
     def __init__(self, dim: int, num_heads: int, num_seeds: int, ln: bool = False):
-        super(PMA, self).__init__()
+        super().__init__()
         self.s = nn.Parameter(torch.Tensor(1, num_seeds, dim))
         nn.init.xavier_uniform_(self.s)
         self.mab = MAB(dim, dim, dim, num_heads, ln=ln)
@@ -104,7 +104,7 @@ class TimeNetForSet(Module):
     """
 
     def __init__(self, in_features: int = 1, out_features: int = 64):
-        super(TimeNetForSet, self).__init__()
+        super().__init__()
         self.feature_layer = Linear(in_features, out_features)
 
         self.time_layer1 = Linear(1, 10)
@@ -131,7 +131,7 @@ class DeepTimeSetTransformer(Module):
     """
 
     def __init__(self, input_dim: int):
-        super(DeepTimeSetTransformer, self).__init__()
+        super().__init__()
 
         # Feature extractor layers
         self.layer1 = Linear(input_dim, 32)
@@ -183,7 +183,7 @@ class TimeNet(Module):
     """Simple feed-forward network for time features."""
 
     def __init__(self, output_dim: int):
-        super(TimeNet, self).__init__()
+        super().__init__()
         self.layers = nn.ModuleList(
             [
                 Linear(4, 100),
@@ -206,7 +206,7 @@ class Net1(Module):
     """A simple Linear + BatchNorm layer."""
 
     def __init__(self, input_dim: int, output_dim: int):
-        super(Net1, self).__init__()
+        super().__init__()
         self.layer = Linear(input_dim, output_dim)
         self.bn = BatchNorm1d(output_dim)  # Note: bn is not used in forward
 
@@ -220,8 +220,8 @@ class Net1(Module):
 class FBSNNNetwork(Module):
     """Feed-forward network for the FBSNN solver."""
 
-    def __init__(self, layer_sizes: List[int]):
-        super(FBSNNNetwork, self).__init__()
+    def __init__(self, layer_sizes: list[int]):
+        super().__init__()
         self.n_layer = len(layer_sizes) - 1
         self.layers = nn.ModuleList([])
 
@@ -239,8 +239,8 @@ class FBSNNNetwork(Module):
 class DeepBSDE(Module):
     """Network for the Deep BSDE method (one net per time step)."""
 
-    def __init__(self, layer_sizes: List[int]):
-        super(DeepBSDE, self).__init__()
+    def __init__(self, layer_sizes: list[int]):
+        super().__init__()
         self.n_layer = len(layer_sizes) - 1
         self.layers = nn.ModuleList([])
         self.batch_layer = nn.ModuleList([])
@@ -269,8 +269,8 @@ class DeepBSDE(Module):
 class TimeDependentNetwork(Module):
     """Time-dependent network for BSDE solver."""
 
-    def __init__(self, indim: int, layersize: List[int], outdim: int):
-        super(TimeDependentNetwork, self).__init__()
+    def __init__(self, indim: int, layersize: list[int], outdim: int):
+        super().__init__()
         self.n_layer = len(layersize)
         self.layers = nn.ModuleList([])
         self.time_layer = nn.ModuleList([])
@@ -314,8 +314,8 @@ class TimeDependentNetwork(Module):
 class TimeDependentNetworkMonteCarlo(Module):
     """Time-dependent network for BSDE solver with Monte Carlo gradient."""
 
-    def __init__(self, indim: int, layersize: List[int], outdim: int, sigma: float):
-        super(TimeDependentNetworkMonteCarlo, self).__init__()
+    def __init__(self, indim: int, layersize: list[int], outdim: int, sigma: float):
+        super().__init__()
         self.n_layer = len(layersize)
         self.layers = nn.ModuleList([])
         self.time_layer = nn.ModuleList([])

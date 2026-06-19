@@ -4,7 +4,6 @@ Provides a simple terminal-style progress bar.
 
 import sys
 import time
-from typing import Optional
 
 
 def progress_bar(

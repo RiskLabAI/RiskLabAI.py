@@ -5,14 +5,18 @@ as described in "Advances in Financial Machine Learning" by de Prado (2018),
 Chapter 6, Section 6.5, pp. 91-92.
 """
 
+from typing import TYPE_CHECKING, Optional
+
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import BaggingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.exceptions import NotFittedError
 from scipy.stats import norm
-from typing import List, Optional, Tuple, Dict, Any
+
+if TYPE_CHECKING:
+    import matplotlib.pyplot as plt  # type hints only; optional at runtime
+from sklearn.ensemble import BaggingClassifier
+from sklearn.exceptions import NotFittedError
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 
 
 class BaggingClassifierAccuracy:
@@ -136,7 +140,7 @@ class BaggingClassifierAccuracy:
         self.c_i_scores_ = np.array(c_i_scores)
         return self.c_i_scores_
 
-    def calculate_weights(self, X: pd.DataFrame, y: pd.Series) -> Dict[str, np.ndarray]:
+    def calculate_weights(self, X: pd.DataFrame, y: pd.Series) -> dict[str, np.ndarray]:
         """
         Calculates weights for each estimator based on three schemes:
         1. Uniform (w_i = 1/N)
@@ -236,7 +240,7 @@ class BaggingClassifierAccuracy:
         y_test: pd.Series,
         X_train: pd.DataFrame,
         y_train: pd.Series,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Fits, calculates weights, and evaluates accuracy for all
         three weighting schemes.
@@ -277,7 +281,7 @@ class BaggingClassifierAccuracy:
 
 def calculate_bootstrap_accuracy(
     clf: BaggingClassifier, X: pd.DataFrame, y: pd.Series, n_bootstraps: int = 1000
-) -> Tuple[np.ndarray, float, float]:
+) -> tuple[np.ndarray, float, float]:
     """
     Calculates the accuracy of a bagging classifier over multiple
     bootstrapped samples of the test set.

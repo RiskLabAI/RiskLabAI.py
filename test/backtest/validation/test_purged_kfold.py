@@ -5,7 +5,6 @@ Tests for PurgedKFold cross-validator.
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.linear_model import LogisticRegression
 
 from RiskLabAI.backtest.validation.purged_kfold import PurgedKFold
 

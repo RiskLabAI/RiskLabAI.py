@@ -2,15 +2,16 @@
 Tests for features/structural_breaks/structural_breaks.py
 """
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 import statsmodels.api as sm
+
 from RiskLabAI.features.structural_breaks.structural_breaks import (
-    lag_dataframe,
-    prepare_data,
     compute_beta,
     get_bsadf_statistic,
+    lag_dataframe,
+    prepare_data,
 )
 
 

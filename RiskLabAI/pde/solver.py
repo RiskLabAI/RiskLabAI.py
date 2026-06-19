@@ -6,13 +6,11 @@ Equation) solver classes.
 import logging
 
 import torch
-import torch.nn as nn
 import torch.autograd as autograd
-import numpy as np
-from typing import List, Tuple, Any
+import torch.nn as nn
 
-from RiskLabAI.pde.model import *
 from RiskLabAI.pde.equation import Equation
+from RiskLabAI.pde.model import *
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +37,7 @@ class FBSDESolver:
     def __init__(
         self,
         pde: Equation,
-        layer_sizes: List[int],
+        layer_sizes: list[int],
         learning_rate: float,
         solving_method: str,
         device: torch.device,
@@ -98,7 +96,7 @@ class FBSDESolver:
 
     def compute_loss(
         self, y_path: Tensor, dw_path: Tensor, t: Tensor, init_y: Tensor, init_z: Tensor
-    ) -> Tuple[Tensor, ...]:
+    ) -> tuple[Tensor, ...]:
         """
         Compute the loss for a single batch.
         """
@@ -159,7 +157,7 @@ class FBSDESolver:
 
     def solve(
         self, num_iterations: int, batch_size: int, init_y: float
-    ) -> Tuple[List[float], List[float]]:
+    ) -> tuple[list[float], list[float]]:
         """
         Solves the PDE.
 
@@ -257,7 +255,7 @@ class FBSNNolver:
     def __init__(
         self,
         pde: Equation,
-        layer_sizes: List[int],
+        layer_sizes: list[int],
         learning_rate: float,
         device: torch.device,
     ):
@@ -292,7 +290,7 @@ class FBSNNolver:
         Compute the loss for the FBSNN method.
         """
         batch_size = y_path.size()[0]
-        y_terminal = init_y.expand(batch_size, 1)  # Not used, but kept for signature
+        init_y.expand(batch_size, 1)  # Not used, but kept for signature
         loss = torch.tensor(0.0, device=self.device)
 
         for z in range(self.pde.num_time_interval):
@@ -344,7 +342,7 @@ class FBSNNolver:
         num_iterations: int,
         batch_size: int,
         init_y: float,  # Note: init_y is not used by FBSNN, but kept for API
-    ) -> Tuple[List[float], List[float]]:
+    ) -> tuple[list[float], list[float]]:
         """
         Solves the PDE using the FBSNN method.
 

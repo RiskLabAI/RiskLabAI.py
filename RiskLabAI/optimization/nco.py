@@ -5,9 +5,10 @@ Reference:
     De Prado, M. (2018) Advances in financial machine learning.
 """
 
+from typing import Optional
+
 import numpy as np
 import pandas as pd
-from typing import Optional, Tuple, Dict, List
 
 # Import canonical implementations instead of duplicating
 from RiskLabAI.cluster.clustering import cluster_k_means_base, covariance_to_correlation

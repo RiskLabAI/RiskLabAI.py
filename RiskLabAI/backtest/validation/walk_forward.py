@@ -3,8 +3,9 @@ Implements a Walk-Forward cross-validator for time-series data.
 """
 
 import warnings
+from collections.abc import Generator
 from copy import deepcopy
-from typing import Any, Dict, Generator, Optional, Tuple
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -65,7 +66,7 @@ class WalkForward(KFold):
     def _single_split(
         self,
         single_data: pd.DataFrame,
-    ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
+    ) -> Generator[tuple[np.ndarray, np.ndarray], None, None]:
         """
         Split a single dataset into walk-forward train-test indices.
 
@@ -109,7 +110,7 @@ class WalkForward(KFold):
         single_weights: Optional[np.ndarray] = None,
         predict_probability: bool = False,
         n_jobs: int = 1,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Obtain backtest predictions for a single dataset.
 

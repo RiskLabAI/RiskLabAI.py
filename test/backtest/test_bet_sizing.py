@@ -4,16 +4,16 @@ Tests for bet_sizing.py
 
 import numpy as np
 import pandas as pd
-import pytest
 from scipy.stats import norm
+
 from RiskLabAI.backtest.bet_sizing import (
-    probability_bet_size,
+    TPos,
     average_bet_sizes,
-    strategy_bet_sizing,
     avgActiveSignals,
     betSize,
-    TPos,
     getW,
+    probability_bet_size,
+    strategy_bet_sizing,
 )
 
 

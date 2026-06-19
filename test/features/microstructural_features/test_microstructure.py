@@ -5,15 +5,15 @@ Tests for modules in features/microstructural_features/
 import numpy as np
 import pandas as pd
 import pytest
-from RiskLabAI.features.microstructural_features.corwin_schultz import (
-    beta_estimates,
-    gamma_estimates,
-    alpha_estimates,
-    corwin_schultz_estimator,
-)
+
 from RiskLabAI.features.microstructural_features.bekker_parkinson_volatility_estimator import (
-    sigma_estimates,
     bekker_parkinson_volatility_estimates,
+)
+from RiskLabAI.features.microstructural_features.corwin_schultz import (
+    alpha_estimates,
+    beta_estimates,
+    corwin_schultz_estimator,
+    gamma_estimates,
 )
 
 

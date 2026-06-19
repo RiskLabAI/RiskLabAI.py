@@ -2,14 +2,14 @@
 Tests for optimization/hyper_parameter_tuning.py
 """
 
-from os import pipe
-import pytest
-import pandas as pd
 import numpy as np
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
+import pytest
 from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
 from RiskLabAI.optimization.hyper_parameter_tuning import MyPipeline, clf_hyper_fit
 
 

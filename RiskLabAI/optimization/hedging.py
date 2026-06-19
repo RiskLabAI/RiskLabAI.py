@@ -2,8 +2,9 @@
 Implements PCA-based portfolio hedging techniques.
 """
 
-import numpy as np
 from typing import Optional
+
+import numpy as np
 
 
 def pca_weights(

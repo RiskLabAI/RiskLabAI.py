@@ -2,9 +2,9 @@
 Tests for data/structures/time_bars.py
 """
 
-import numpy as np
 import pandas as pd
 import pytest
+
 from RiskLabAI.data.structures.time_bars import TimeBars
 
 

@@ -56,10 +56,10 @@ def test_concrete_labeler_satisfies_contract():
 # Lazy re-exports of the canonical interfaces
 # --------------------------------------------------------------------------- #
 def test_lazy_reexports_resolve_to_real_interfaces():
-    from RiskLabAI.data.structures.abstract_bars import AbstractBars
     from RiskLabAI.backtest.validation.cross_validator_interface import (
         CrossValidator,
     )
+    from RiskLabAI.data.structures.abstract_bars import AbstractBars
     from RiskLabAI.features.feature_importance.feature_importance_strategy import (
         FeatureImportanceStrategy,
     )

@@ -3,15 +3,17 @@ Abstract base class for Run Bars (Fixed and Expected).
 """
 
 from abc import abstractmethod
-from typing import Union, List, Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any, Optional
+
 import numpy as np
 
+from RiskLabAI.data.structures.abstract_bars import TickData
 from RiskLabAI.data.structures.abstract_information_driven_bars import (
     AbstractInformationDrivenBars,
 )
-from RiskLabAI.data.structures.abstract_bars import TickData
-from RiskLabAI.utils.ewma import ewma
 from RiskLabAI.utils.constants import *
+from RiskLabAI.utils.ewma import ewma
 
 
 class AbstractRunBars(AbstractInformationDrivenBars):
@@ -54,7 +56,7 @@ class AbstractRunBars(AbstractInformationDrivenBars):
 
         self.analyse_thresholds = [] if analyse_thresholds else None
 
-    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> list[list[Any]]:
         """
         Constructs run bars from input tick data.
         (Parameters same as original)

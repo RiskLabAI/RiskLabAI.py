@@ -12,7 +12,7 @@ Reference:
 """
 
 from concurrent.futures import ProcessPoolExecutor
-from typing import List, Optional
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -22,11 +22,11 @@ import pandas as pd
 # under their historical names for backward compatibility. `lin_parts` maps to
 # hpc's `linear_partitions` (identical for valid inputs, with an added guard).
 from RiskLabAI.hpc import (  # noqa: F401  (re-exported for backward compat)
-    process_jobs,
     expand_call,
+    process_jobs,
     report_progress,
-    linear_partitions as lin_parts,
 )
+from RiskLabAI.hpc import linear_partitions as lin_parts  # noqa: F401
 
 
 def cusum_filter_events_dynamic_threshold(
@@ -193,8 +193,8 @@ def vertical_barrier(
 def triple_barrier(
     close: pd.Series,
     events: pd.DataFrame,
-    ptsl: List[float],
-    molecule: List[pd.Timestamp],
+    ptsl: list[float],
+    molecule: list[pd.Timestamp],
 ) -> pd.DataFrame:
     """
     Apply the triple-barrier method for a subset of events.
@@ -303,7 +303,7 @@ def triple_barrier(
 def meta_events(
     close: pd.Series,
     time_events: pd.DatetimeIndex,
-    ptsl: List[float],
+    ptsl: list[float],
     target: pd.Series,
     return_min: float,
     num_threads: int,

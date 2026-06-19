@@ -20,8 +20,6 @@ in sync with those factories so the two cannot silently drift apart.
 
 from __future__ import annotations
 
-from typing import Dict, List
-
 from .registry import Registry
 
 __all__ = [
@@ -149,7 +147,7 @@ PORTFOLIO_OPTIMIZERS = Registry("portfolio_optimizers")
 # --------------------------------------------------------------------------- #
 # Family name -> registry, for discovery and a unified catalogue.
 # --------------------------------------------------------------------------- #
-REGISTRIES: Dict[str, Registry] = {
+REGISTRIES: dict[str, Registry] = {
     "bars": BARS,
     "cross_validators": CROSS_VALIDATORS,
     "feature_importance": FEATURE_IMPORTANCE,
@@ -183,7 +181,7 @@ def get_registry(family: str) -> Registry:
         ) from None
 
 
-def list_components() -> Dict[str, List[str]]:
+def list_components() -> dict[str, list[str]]:
     """
     Return a catalogue mapping each family name to its available component keys.
 

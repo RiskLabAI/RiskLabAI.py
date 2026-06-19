@@ -5,11 +5,11 @@ Provides various entropy estimators for financial time series, such
 as Shannon, Lempel-Ziv, and Kontoyiannis.
 """
 
-from .shannon import shannon_entropy
-from .lempel_ziv import lempel_ziv_entropy
-from .pmf import probability_mass_function
-from .plug_in import plug_in_entropy_estimator
 from .kontoyiannis import kontoyiannis_entropy, longest_match_length
+from .lempel_ziv import lempel_ziv_entropy
+from .plug_in import plug_in_entropy_estimator
+from .pmf import probability_mass_function
+from .shannon import shannon_entropy
 
 __all__ = [
     "shannon_entropy",

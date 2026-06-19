@@ -2,9 +2,9 @@
 Tests for optimization/nco.py
 """
 
-import pytest
 import numpy as np
-import pandas as pd
+import pytest
+
 from RiskLabAI.optimization.nco import (
     get_optimal_portfolio_weights,
     get_optimal_portfolio_weights_nco,

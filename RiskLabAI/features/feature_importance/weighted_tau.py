@@ -2,8 +2,8 @@
 Calculates the weighted Kendall's tau.
 """
 
-import scipy.stats as stats
 import numpy as np
+import scipy.stats as stats
 
 
 def calculate_weighted_tau(

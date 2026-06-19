@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from scipy.linalg import block_diag
 from sklearn.covariance import LedoitWolf
-from typing import Tuple
 
 # Import the utility from the denoising module
 from RiskLabAI.data.denoise.denoising import corr_to_cov
@@ -54,7 +53,7 @@ def form_block_matrix(
 
 def form_true_matrix(
     n_blocks: int, block_size: int, block_correlation: float
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Forms a shuffled block diagonal correlation matrix and the
     corresponding covariance matrix.
@@ -82,7 +81,7 @@ def form_true_matrix(
 
 def simulates_cov_mu(
     mu0: np.ndarray, cov0: np.ndarray, n_obs: int, shrink: bool = False
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Simulates multivariate normal observations and computes the
     sample mean and covariance.

@@ -11,10 +11,10 @@ Implements the Probability of Backtest Overfitting (PBO) calculation.
       original notebook).
 """
 
-from typing import Tuple, Callable, List, Optional
 from itertools import combinations
+from typing import Callable, Optional
+
 import numpy as np
-from numba import jit
 from joblib import Parallel, delayed
 
 from .backtest_statistics import sharpe_ratio
@@ -26,7 +26,7 @@ def performance_evaluation(
     n_strategies: int,
     metric: Callable[[np.ndarray, float], float],
     risk_free_return: float,
-) -> Tuple[bool, float]:
+) -> tuple[bool, float]:
     """
     Evaluate strategy performance on train/test splits.
 
@@ -83,7 +83,7 @@ def probability_of_backtest_overfitting(
     risk_free_return: float = 0.0,
     metric: Optional[Callable[[np.ndarray, float], float]] = None,
     n_jobs: int = 1,
-) -> Tuple[float, np.ndarray]:
+) -> tuple[float, np.ndarray]:
     r"""
     Compute the Probability of Backtest Overfitting (PBO).
 

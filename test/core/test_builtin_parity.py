@@ -13,8 +13,8 @@ from RiskLabAI.core import (
     FEATURE_IMPORTANCE,
     LABELERS,
     PORTFOLIO_OPTIMIZERS,
-    list_components,
     get_registry,
+    list_components,
 )
 from RiskLabAI.core.base import CrossValidator
 
@@ -46,8 +46,8 @@ def test_cross_validator_create_end_to_end():
 # Feature importance
 # --------------------------------------------------------------------------- #
 def test_feature_importance_registry_matches_implementations():
-    from RiskLabAI.features.feature_importance.feature_importance_mdi import (
-        FeatureImportanceMDI,
+    from RiskLabAI.features.feature_importance.clustered_feature_importance_mda import (
+        ClusteredFeatureImportanceMDA,
     )
     from RiskLabAI.features.feature_importance.clustered_feature_importance_mdi import (
         ClusteredFeatureImportanceMDI,
@@ -55,8 +55,8 @@ def test_feature_importance_registry_matches_implementations():
     from RiskLabAI.features.feature_importance.feature_importance_mda import (
         FeatureImportanceMDA,
     )
-    from RiskLabAI.features.feature_importance.clustered_feature_importance_mda import (
-        ClusteredFeatureImportanceMDA,
+    from RiskLabAI.features.feature_importance.feature_importance_mdi import (
+        FeatureImportanceMDI,
     )
     from RiskLabAI.features.feature_importance.feature_importance_sfi import (
         FeatureImportanceSFI,
@@ -78,8 +78,6 @@ def test_feature_importance_registry_matches_implementations():
 # Bars
 # --------------------------------------------------------------------------- #
 def test_bars_registry_matches_bar_classes():
-    from RiskLabAI.data.structures.standard_bars import StandardBars
-    from RiskLabAI.data.structures.time_bars import TimeBars
     from RiskLabAI.data.structures.imbalance_bars import (
         ExpectedImbalanceBars,
         FixedImbalanceBars,
@@ -88,6 +86,8 @@ def test_bars_registry_matches_bar_classes():
         ExpectedRunBars,
         FixedRunBars,
     )
+    from RiskLabAI.data.structures.standard_bars import StandardBars
+    from RiskLabAI.data.structures.time_bars import TimeBars
 
     expected = {
         "standard_bars": StandardBars,

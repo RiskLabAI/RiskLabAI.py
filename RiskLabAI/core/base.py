@@ -26,7 +26,7 @@ already expects.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import pandas as pd
 
@@ -75,7 +75,7 @@ class BaseLabeler(ABC):
     def label(
         self,
         prices: pd.Series,
-        events: Optional[pd.DataFrame] = None,
+        events: pd.DataFrame | None = None,
         **kwargs: Any,
     ) -> pd.DataFrame:
         """

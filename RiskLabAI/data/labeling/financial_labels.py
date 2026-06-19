@@ -13,7 +13,6 @@ Reference:
 import numpy as np
 import pandas as pd
 from scipy import stats
-from typing import List, Tuple, Optional
 
 
 def calculate_t_value_linear_regression(prices: pd.Series) -> float:
@@ -50,7 +49,7 @@ def calculate_t_value_linear_regression(prices: pd.Series) -> float:
 
 
 def find_trend_using_trend_scanning(
-    molecule: pd.Index, close: pd.Series, span: Tuple[int, int]
+    molecule: pd.Index, close: pd.Series, span: tuple[int, int]
 ) -> pd.DataFrame:
     """
     Implement the trend-scanning method.

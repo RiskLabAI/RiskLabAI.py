@@ -3,7 +3,6 @@ Functions for calculating metrics related to test-set overfitting,
 including the expected maximum Sharpe Ratio and Type I/II errors.
 """
 
-from typing import List
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
@@ -59,7 +58,7 @@ def expected_max_sharpe_ratio(
 
 def generate_max_sharpe_ratios(
     n_sims: int,
-    n_trials_list: List[int],
+    n_trials_list: list[int],
     std_sharpe_ratio: float,
     mean_sharpe_ratio: float,
 ) -> pd.DataFrame:
@@ -109,7 +108,7 @@ def generate_max_sharpe_ratios(
 def mean_std_error(
     n_sims0: int,
     n_sims1: int,
-    n_trials: List[int],
+    n_trials: list[int],
     std_sharpe_ratio: float = 1.0,
     mean_sharpe_ratio: float = 0.0,
 ) -> pd.DataFrame:

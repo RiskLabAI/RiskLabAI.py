@@ -4,12 +4,15 @@ classes, to minimise duplicated code.
 """
 
 from abc import ABC, abstractmethod
-from typing import Tuple, Union, List, Any, Dict, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any, Optional, Union
+
 import numpy as np
+
 from RiskLabAI.utils.constants import *
 
 # Type hint for a single tick: (datetime, price, volume)
-TickData = Union[List[Any], Tuple[Any, ...], np.ndarray]
+TickData = Union[list[Any], tuple[Any, ...], np.ndarray]
 
 
 class AbstractBars(ABC):
@@ -41,7 +44,7 @@ class AbstractBars(ABC):
         self.high_price: float = -np.inf
         self.low_price: float = np.inf
 
-        self.base_statistics: Dict[str, Union[int, float]] = {
+        self.base_statistics: dict[str, Union[int, float]] = {
             PREVIOUS_TICK_RULE: 0,
             CUMULATIVE_TICKS: 0,
             CUMULATIVE_DOLLAR: 0,
@@ -51,7 +54,7 @@ class AbstractBars(ABC):
         }
 
     @abstractmethod
-    def construct_bars_from_data(self, data: Iterable[TickData]) -> List[List[Any]]:
+    def construct_bars_from_data(self, data: Iterable[TickData]) -> list[list[Any]]:
         """
         Constructs bars from input tick data.
 
@@ -162,7 +165,7 @@ class AbstractBars(ABC):
         self.previous_tick_price = price
         return signed_tick
 
-    def _high_and_low_price_update(self, price: float) -> Tuple[float, float]:
+    def _high_and_low_price_update(self, price: float) -> tuple[float, float]:
         """
         Update the high and low prices for the current bar.
 
@@ -188,7 +191,7 @@ class AbstractBars(ABC):
         high_price: float,
         low_price: float,
         threshold: float,
-    ) -> List[Any]:
+    ) -> list[Any]:
         """
         Format and return the newly constructed bar.
 

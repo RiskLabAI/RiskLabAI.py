@@ -5,8 +5,7 @@ Tests for BaggedCombinatorialPurged cross-validator.
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from typing import List
+from sklearn.linear_model import LinearRegression, LogisticRegression
 
 from RiskLabAI.backtest.validation.bagged_combinatorial_purged import (
     BaggedCombinatorialPurged,

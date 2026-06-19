@@ -2,8 +2,8 @@
 Tests for utils/progress.py
 """
 
-import pytest
 import time
+
 from RiskLabAI.utils.progress import progress_bar
 
 

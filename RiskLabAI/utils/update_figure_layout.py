@@ -4,7 +4,6 @@ to Plotly figures.
 """
 
 import plotly.graph_objects as go
-from typing import Optional
 
 
 def update_figure_layout(

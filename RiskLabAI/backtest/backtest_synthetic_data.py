@@ -5,9 +5,11 @@ Ornstein-Uhlenbeck (OU) process.
 
 from itertools import product
 from random import gauss
-from typing import List, Tuple
 
 import numpy as np
+
+_DEFAULT_PROFIT_TAKING_RANGE = np.linspace(0.5, 10, 20)
+_DEFAULT_STOP_LOSS_RANGE = np.linspace(0.5, 10, 20)
 
 
 def synthetic_back_testing(
@@ -16,10 +18,10 @@ def synthetic_back_testing(
     sigma: float,
     n_iteration: int = 100000,
     maximum_holding_period: int = 100,
-    profit_taking_range: np.ndarray = np.linspace(0.5, 10, 20),
-    stop_loss_range: np.ndarray = np.linspace(0.5, 10, 20),
+    profit_taking_range: np.ndarray = _DEFAULT_PROFIT_TAKING_RANGE,
+    stop_loss_range: np.ndarray = _DEFAULT_STOP_LOSS_RANGE,
     seed: int = 0,
-) -> List[Tuple[float, float, float, float, float]]:
+) -> list[tuple[float, float, float, float, float]]:
     r"""
     Perform backtesting on synthetic price data from an OU process.
 

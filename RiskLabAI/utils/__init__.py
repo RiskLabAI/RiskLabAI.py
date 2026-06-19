@@ -13,8 +13,8 @@ including:
 
 from .constants import *
 from .ewma import ewma
-from .progress import progress_bar
 from .momentum_mean_reverting_strategy_sides import determine_strategy_side
+from .progress import progress_bar
 
 # Plotting helpers are imported lazily (PEP 562) so that the base install
 # does not require matplotlib/seaborn/plotly (RiskLabAI[plot] extra).

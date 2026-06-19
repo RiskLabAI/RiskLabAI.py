@@ -3,7 +3,7 @@ Implements the Plug-in Entropy estimator.
 """
 
 from math import log2
-from typing import Dict
+
 from .pmf import probability_mass_function
 
 

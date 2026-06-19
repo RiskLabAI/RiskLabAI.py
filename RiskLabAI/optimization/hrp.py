@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as scd
-from typing import List
 
 
 def inverse_variance_weights(covariance_matrix: pd.DataFrame) -> np.ndarray:
@@ -33,7 +32,7 @@ def inverse_variance_weights(covariance_matrix: pd.DataFrame) -> np.ndarray:
 
 
 def cluster_variance(
-    covariance_matrix: pd.DataFrame, clustered_items: List[str]
+    covariance_matrix: pd.DataFrame, clustered_items: list[str]
 ) -> float:
     """
     Compute the variance of a cluster using inverse-variance weighting.
@@ -58,7 +57,7 @@ def cluster_variance(
     return cluster_var
 
 
-def quasi_diagonal(linkage_matrix: np.ndarray) -> List[int]:
+def quasi_diagonal(linkage_matrix: np.ndarray) -> list[int]:
     """
     Return a sorted list of original item indices for a quasi-diagonal matrix.
 
@@ -96,7 +95,7 @@ def quasi_diagonal(linkage_matrix: np.ndarray) -> List[int]:
 
 
 def recursive_bisection(
-    covariance_matrix: pd.DataFrame, sorted_items: List[str]
+    covariance_matrix: pd.DataFrame, sorted_items: list[str]
 ) -> pd.Series:
     """
     Compute the Hierarchical Risk Parity (HRP) weights

@@ -7,11 +7,11 @@ as described by de Prado.
 """
 
 from .structural_breaks import (
+    compute_beta,
+    get_bsadf_statistic,
+    get_expanding_window_adf,
     lag_dataframe,
     prepare_data,
-    compute_beta,
-    get_expanding_window_adf,
-    get_bsadf_statistic,
 )
 
 __all__ = [

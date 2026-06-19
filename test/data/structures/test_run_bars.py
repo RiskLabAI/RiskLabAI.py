@@ -2,10 +2,10 @@
 Tests for data/structures/run_bars.py
 """
 
-import numpy as np
 import pandas as pd
 import pytest
-from RiskLabAI.data.structures.run_bars import FixedRunBars, ExpectedRunBars
+
+from RiskLabAI.data.structures.run_bars import FixedRunBars
 
 
 @pytest.fixture

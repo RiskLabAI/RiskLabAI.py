@@ -64,12 +64,8 @@ jobs:
       - run: black --check RiskLabAI test
 
   lint:
-    name: ruff (advisory until cleanup lands)
+    name: ruff
     runs-on: ubuntu-latest
-    # Advisory until the dedicated ruff-cleanup pass lands (Dict->dict
-    # modernization, star-import removal, unused-import pruning); then remove
-    # continue-on-error to enforce.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

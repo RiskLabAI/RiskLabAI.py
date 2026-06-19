@@ -3,14 +3,13 @@ Tests for strategy_risk.py
 """
 
 import numpy as np
-import pytest
+
 from RiskLabAI.backtest.strategy_risk import (
-    sharpe_ratio_trials,
-    implied_precision,
     bin_frequency,
     binomial_sharpe_ratio,
+    implied_precision,
     mix_gaussians,
-    failure_probability,
+    sharpe_ratio_trials,
 )
 
 
@@ -66,7 +65,7 @@ def test_implied_precision_and_bin_frequency():
     assert np.isclose(freq, 252, atol=0.01)  # <-- TIGHTENED TOLERANCE
 
     # Test implied_precision with sl=0.01 (positive)
-    prec = implied_precision(
+    implied_precision(
         stop_loss=0.01,  # Positive
         profit_taking=0.01,
         frequency=252,
