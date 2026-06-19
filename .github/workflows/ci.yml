@@ -60,7 +60,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install black
+      - run: pip install "black==26.5.1"
       - run: black --check RiskLabAI test
 
   lint:
@@ -71,5 +71,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install ruff
+      - run: pip install "ruff==0.15.17"
       - run: ruff check RiskLabAI test

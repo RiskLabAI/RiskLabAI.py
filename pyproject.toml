@@ -61,6 +61,9 @@ dev = [
     "torchvision", # Often needed with torch
     "torchaudio",  # Often needed with torch
     "pytest",
+    # Linters pinned to match CI exactly (.github/workflows/ci.yml).
+    "black==26.5.1",
+    "ruff==0.15.17",
 ]
 all = [
     "RiskLabAI[pde]",

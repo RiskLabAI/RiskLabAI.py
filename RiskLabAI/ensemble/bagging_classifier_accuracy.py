@@ -4,6 +4,7 @@ Implements the theoretical accuracy of a bagging classifier,
 as described in "Advances in Financial Machine Learning" by de Prado (2018),
 Chapter 6, Section 6.2, p. 86.
 """
+
 # import numpy as np  <-- Removed unused import
 from scipy.stats import binom
 
