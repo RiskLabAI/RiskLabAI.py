@@ -88,3 +88,27 @@ def test_hrp(mock_cov_matrix):
     pd.testing.assert_series_equal(
         weights, expected_weights, atol=1e-5, check_names=False
     )
+
+
+def test_hrp_asymmetric_correlation():
+    """A correlation matrix that is only symmetric to floating-point tolerance
+    (as produced by ``cov_to_corr`` or denoising) must not break ``hrp``.
+
+    Regression test: ``squareform`` previously rejected the tiny asymmetry with
+    "Distance matrix must be symmetric"."""
+    rng = np.random.default_rng(0)
+    n = 8
+    a = rng.normal(size=(n, n))
+    corr = np.corrcoef(a @ a.T)
+    # Inject a sub-epsilon asymmetry, the kind cov_to_corr leaves behind.
+    corr[0, 1] += 1e-15
+    names = [f"A{i}" for i in range(n)]
+    corr_df = pd.DataFrame(corr, index=names, columns=names)
+    cov_df = corr_df  # unit variances → cov == corr
+
+    assert (corr != corr.T).any()  # genuinely asymmetric (not bit-identical)
+    weights = hrp(cov_df, corr_df)
+    assert isinstance(weights, pd.Series)
+    assert weights.shape == (n,)
+    assert np.isclose(weights.sum(), 1.0)
+    assert (weights >= 0).all()

@@ -3,6 +3,16 @@
 All notable changes to RiskLabAI.py are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [2.0.1]
+
+### Fixed
+- `optimization.hrp.hrp` no longer raises `ValueError: Distance matrix must be
+  symmetric` when the correlation matrix is only symmetric to floating-point
+  tolerance (as produced by `cov_to_corr` or by denoising). The correlation
+  distance is now symmetrised (`(d + dᵀ)/2`, zero diagonal) before
+  `squareform`. Regression test added (`test_hrp_asymmetric_correlation`).
+  Mirrors the same fix in RiskLabAI.jl v0.5.1.
+
 ## [2.0.0]
 
 A **breaking** release that standardises the public API on PEP 8 names and makes

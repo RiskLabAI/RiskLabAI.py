@@ -193,6 +193,13 @@ def hrp(cov: pd.DataFrame, corr: pd.DataFrame) -> pd.Series:
     # 1. Calculate distance
     distance = distance_corr(corr_df.values)
 
+    # Enforce exact symmetry: a correlation matrix produced by ``cov_to_corr`` or
+    # by denoising can be asymmetric at the floating-point level, which makes
+    # ``squareform`` reject it ("Distance matrix must be symmetric"). Averaging
+    # with the transpose removes that asymmetry without changing the clustering.
+    distance = (distance + distance.T) / 2.0
+    np.fill_diagonal(distance, 0.0)
+
     dist_condensed = scd.squareform(distance, force="tovector")
 
     # 2. Cluster
