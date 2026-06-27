@@ -18,6 +18,10 @@ from .cross_validator_controller import CrossValidatorController
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 from .kfold import KFold
+from .path_bagged_cpcv import (
+    bagged_probability_of_backtest_overfitting,
+    moving_block_bootstrap_indices,
+)
 from .purged_kfold import PurgedKFold
 from .walk_forward import WalkForward
 
@@ -31,6 +35,9 @@ __all__ = [
     "CombinatorialPurged",  # <-- Fix
     "BaggedCombinatorialPurged",  # <-- Fix
     "AdaptiveCombinatorialPurged",  # <-- Fix
+    # Path-level bagged CPCV PBO (Appraisal 09)
+    "bagged_probability_of_backtest_overfitting",
+    "moving_block_bootstrap_indices",
     # Utilities
     "CrossValidatorFactory",
     "CrossValidatorController",
