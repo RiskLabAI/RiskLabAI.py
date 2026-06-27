@@ -9,9 +9,16 @@ import statsmodels.api as sm
 
 from RiskLabAI.features.structural_breaks.structural_breaks import (
     compute_beta,
+    get_bsadf_sequence,
     get_bsadf_statistic,
+    get_bubble_episodes,
+    get_expanding_window_adf,
+    get_gsadf_statistic,
+    get_sadf_sequence,
     lag_dataframe,
     prepare_data,
+    psy_minimum_window,
+    simulate_psy_critical_values,
 )
 
 
@@ -130,3 +137,141 @@ def test_adf_function(random_walk_series):
     assert isinstance(results["Time"], int)
     assert isinstance(results["bsadf"], float)
     assert np.isfinite(results["bsadf"])
+
+
+# ---------------------------------------------------------------------------------
+# GSADF / BSADF (Phillips-Shi-Yu 2015)
+# ---------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def random_walk():
+    """A plain random walk (no bubble), as a level series."""
+    rng = np.random.default_rng(7)
+    return pd.Series(np.cumsum(rng.standard_normal(200)))
+
+
+@pytest.fixture
+def single_bubble():
+    """A random walk with one embedded mildly-explosive episode over t=120..150."""
+    rng = np.random.default_rng(0)
+    y = np.cumsum(rng.standard_normal(200))
+    for t in range(120, 150):
+        y[t] = 1.06 * y[t - 1] + rng.standard_normal()
+    return pd.Series(y)
+
+
+def test_psy_minimum_window():
+    """PSY rule r0 = 0.01 + 1.8/sqrt(T), rounded, at least 3."""
+    assert psy_minimum_window(200) == round((0.01 + 1.8 / 200**0.5) * 200)
+    assert psy_minimum_window(10) >= 3
+
+
+def test_bsadf_sequence_matches_get_bsadf_statistic(random_walk):
+    """
+    Replication: the fast BSADF sequence agrees with the validated per-endpoint
+    ``get_bsadf_statistic`` on shared windows (the appraisal saw ~1e-14).
+    """
+    nmin = psy_minimum_window(len(random_walk))
+    seq = get_bsadf_sequence(random_walk, nmin)
+    for r2 in (nmin, 60, 120, 199):
+        ref = get_bsadf_statistic(random_walk.iloc[: r2 + 1], nmin, "c", 0)["bsadf"]
+        assert np.isclose(seq.loc[r2], ref, atol=1e-9, rtol=0)
+
+
+def test_sadf_sequence_matches_expanding_window(random_walk):
+    """The SADF date-stamp sequence equals the origin-anchored expanding-window ADF."""
+    nmin = psy_minimum_window(len(random_walk))
+    seq = get_sadf_sequence(random_walk, nmin)
+    ref = get_expanding_window_adf(random_walk, nmin, "c", 0)
+    assert np.allclose(seq.values, ref.values, atol=1e-9, rtol=0)
+
+
+def test_gsadf_is_supremum_of_bsadf_sequence(single_bubble):
+    """GSADF is the supremum of the BSADF sequence over all flexible windows."""
+    nmin = psy_minimum_window(len(single_bubble))
+    seq = get_bsadf_sequence(single_bubble, nmin)
+    assert np.isclose(
+        get_gsadf_statistic(single_bubble, nmin), np.nanmax(seq.values), atol=1e-12
+    )
+
+
+def test_critical_values_reproduce_psy_range():
+    """
+    Replication: simulated finite-sample GSADF 95% critical values fall in the
+    Phillips-Shi-Yu range (~1.9-2.2 for the intercept-only spec) and exceed the
+    single-window SADF critical value; the simulator is cached and deterministic.
+    """
+    prev = None
+    for t_len in (100, 200, 400):
+        cv = simulate_psy_critical_values(t_len, n_simulations=600, seed=123)
+        assert 1.7 <= cv["gsadf_global_cv"] <= 2.5
+        assert cv["gsadf_global_cv"] > cv["sadf_global_cv"]
+        # GSADF critical value grows weakly with the sample length.
+        if prev is not None:
+            assert cv["gsadf_global_cv"] >= prev - 0.1
+        prev = cv["gsadf_global_cv"]
+    # Deterministic + cached: a second identical call returns the same object.
+    a = simulate_psy_critical_values(100, n_simulations=600, seed=123)
+    b = simulate_psy_critical_values(100, n_simulations=600, seed=123)
+    assert a is b
+
+
+def test_single_bubble_detected_and_dated(single_bubble):
+    """A single embedded explosive episode is detected and roughly date-stamped."""
+    nmin = psy_minimum_window(len(single_bubble))
+    cv = simulate_psy_critical_values(
+        len(single_bubble), nmin, n_simulations=300, seed=1
+    )
+    gsadf = get_gsadf_statistic(single_bubble, nmin)
+    assert gsadf > cv["gsadf_global_cv"]  # bubble detected
+
+    bsadf_seq = get_bsadf_sequence(single_bubble, nmin)
+    episodes = get_bubble_episodes(bsadf_seq, cv["bsadf_sequence_cv"], min_duration=3)
+    assert episodes  # at least one episode found
+    # An episode brackets the true explosive window (t=120..150), within a tolerance.
+    assert any(100 <= origination <= 140 for origination, _collapse in episodes)
+
+
+def test_no_bubble_controls_size(random_walk):
+    """Under a pure random walk no episode is flagged at the nominal level."""
+    nmin = psy_minimum_window(len(random_walk))
+    cv = simulate_psy_critical_values(len(random_walk), nmin, n_simulations=400, seed=5)
+    bsadf_seq = get_bsadf_sequence(random_walk, nmin)
+    episodes = get_bubble_episodes(
+        bsadf_seq, cv["bsadf_sequence_cv"], min_duration=nmin
+    )
+    assert episodes == []
+
+
+def test_short_series_returns_empty(random_walk):
+    """A series shorter than the minimum window yields an empty sequence and NaN GSADF."""
+    short = random_walk.iloc[:5]
+    nmin = psy_minimum_window(200)  # far larger than the series
+    seq = get_bsadf_sequence(short, nmin)
+    assert len(seq) == 0
+    assert np.isnan(get_gsadf_statistic(short, nmin))
+
+
+def test_nan_values_are_filtered():
+    """NaN values (e.g. FRED holiday gaps) are dropped before the test is run."""
+    rng = np.random.default_rng(3)
+    y = np.cumsum(rng.standard_normal(120))
+    series = pd.Series(y)
+    series.iloc[10] = np.nan
+    series.iloc[50] = np.nan
+    nmin = psy_minimum_window(series.dropna().shape[0])
+    gsadf = get_gsadf_statistic(series, nmin)
+    assert np.isfinite(gsadf)
+    # Equals the result on the explicitly cleaned series.
+    assert np.isclose(gsadf, get_gsadf_statistic(series.dropna(), nmin))
+
+
+def test_get_bubble_episodes_scalar_critical_value(single_bubble):
+    """A scalar critical value is broadcast across the sequence."""
+    nmin = psy_minimum_window(len(single_bubble))
+    bsadf_seq = get_bsadf_sequence(single_bubble, nmin)
+    episodes = get_bubble_episodes(bsadf_seq, 2.0, min_duration=3)
+    assert episodes
+    for origination, collapse in episodes:
+        assert origination <= collapse
