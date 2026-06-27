@@ -43,7 +43,7 @@ Since 2.0.0 the public API follows standard Python naming (see
   (`compute_sigmoid_width`, not `getW`). Accepted short forms: `cov`, `corr`,
   `vol`, `min`, `max`.
 
-Public renames must follow the deprecation policy in `CLAUDE.md`: never break
+Public renames must follow the project's deprecation policy: never break
 the public API without a major version bump and a deprecation shim that keeps
 the old name working (with a `DeprecationWarning`) for one minor cycle.
 

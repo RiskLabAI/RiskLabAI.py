@@ -146,7 +146,7 @@ When you add a new model:
       comes from.
 - [ ] **Keep the public API stable.** Adding new names is always fine; renaming
       or removing existing public names is a breaking change and needs a major
-      version bump (see `CHANGELOG.md` and `CLAUDE.md`).
+      version bump (see `CHANGELOG.md`).
 - [ ] **Write tests** with hand-computed numeric assertions (the existing suite
       sets the bar — bar OHLC values, exact HRP weights, purge boundaries).
 - [ ] **Cross-language parity.** If this model also belongs in `RiskLabAI.jl`,

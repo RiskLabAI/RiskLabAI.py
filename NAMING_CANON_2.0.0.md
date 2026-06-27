@@ -7,7 +7,7 @@ breaking API cleanup from `IMPROVEMENT_PLAN.md` Phase 3, scoped to Python and
 written so that **no existing user breaks on upgrade** — every renamed name
 keeps working (with a `DeprecationWarning`) for one minor cycle before removal.
 
-Governance (`CLAUDE.md`): "never break the public API without a major bump and a
+Governance policy: "never break the public API without a major bump and a
 deprecation note." This document is that note. It needs sign-off before any
 code lands, because it changes public names.
 
