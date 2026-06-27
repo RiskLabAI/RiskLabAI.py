@@ -17,6 +17,10 @@ from RiskLabAI.data.synthetic_data.simulation import (
 
 from .clustered_feature_importance_mda import ClusteredFeatureImportanceMDA
 from .clustered_feature_importance_mdi import ClusteredFeatureImportanceMDI
+from .debiased_importance import (
+    conditional_predictive_impact,
+    mdi_plus_importance,
+)
 from .feature_importance_controller import FeatureImportanceController
 from .feature_importance_factory import FeatureImportanceFactory
 from .feature_importance_mda import FeatureImportanceMDA
@@ -47,6 +51,9 @@ __all__ = [
     "FeatureImportanceMDA",
     "ClusteredFeatureImportanceMDA",
     "FeatureImportanceSFI",
+    # Debiased / conditional importance (Appraisal 10)
+    "mdi_plus_importance",
+    "conditional_predictive_impact",
     # Imported utilities from *other* modules
     "cluster_k_means_top",
     "random_block_correlation",
