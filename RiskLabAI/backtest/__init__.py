@@ -59,6 +59,12 @@ from .bet_sizing import (
     strategy_bet_sizing,
     target_position,
 )
+from .multiple_testing import (
+    benjamini_hochberg_yekutieli_adjusted_p_values,
+    haircut_sharpe_ratios,
+    holm_adjusted_p_values,
+    sharpe_ratio_p_values,
+)
 from .probabilistic_sharpe_ratio import (
     benchmark_sharpe_ratio,
     probabilistic_sharpe_ratio,
@@ -145,6 +151,11 @@ __all__ = [
     # from probabilistic_sharpe_ratio
     "probabilistic_sharpe_ratio",
     "benchmark_sharpe_ratio",
+    # from multiple_testing
+    "sharpe_ratio_p_values",
+    "holm_adjusted_p_values",
+    "benjamini_hochberg_yekutieli_adjusted_p_values",
+    "haircut_sharpe_ratios",
     # from backtest_overfitting_..._simulation
     "overall_backtest_overfitting_simulation",
     "temporal_backtest_overfitting_simulation",
