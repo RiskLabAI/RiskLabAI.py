@@ -18,6 +18,10 @@ from .cross_validator_controller import CrossValidatorController
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 from .kfold import KFold
+from .path_adaptive_cpcv import (
+    adaptive_probability_of_backtest_overfitting,
+    estimate_volatility_regimes,
+)
 from .path_bagged_cpcv import (
     bagged_probability_of_backtest_overfitting,
     moving_block_bootstrap_indices,
@@ -38,6 +42,9 @@ __all__ = [
     # Path-level bagged CPCV PBO (Appraisal 09)
     "bagged_probability_of_backtest_overfitting",
     "moving_block_bootstrap_indices",
+    # Path-level adaptive (regime-weighted) CPCV PBO (Appraisal 09b)
+    "adaptive_probability_of_backtest_overfitting",
+    "estimate_volatility_regimes",
     # Utilities
     "CrossValidatorFactory",
     "CrossValidatorController",
