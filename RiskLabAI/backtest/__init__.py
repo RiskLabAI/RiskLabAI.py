@@ -69,6 +69,12 @@ from .probabilistic_sharpe_ratio import (
     benchmark_sharpe_ratio,
     probabilistic_sharpe_ratio,
 )
+from .sharpe_inference import (
+    lplz_sharpe_inference,
+    newey_west_automatic_lag,
+    newey_west_long_run_variance,
+    sharpe_ratio_influence_function,
+)
 from .probability_of_backtest_overfitting import (
     performance_evaluation,
     probability_of_backtest_overfitting,
@@ -156,6 +162,11 @@ __all__ = [
     "holm_adjusted_p_values",
     "benjamini_hochberg_yekutieli_adjusted_p_values",
     "haircut_sharpe_ratios",
+    # from sharpe_inference
+    "sharpe_ratio_influence_function",
+    "newey_west_long_run_variance",
+    "newey_west_automatic_lag",
+    "lplz_sharpe_inference",
     # from backtest_overfitting_..._simulation
     "overall_backtest_overfitting_simulation",
     "temporal_backtest_overfitting_simulation",
