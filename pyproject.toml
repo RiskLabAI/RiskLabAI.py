@@ -77,8 +77,16 @@ Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
 "Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
 Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/blob/main/CHANGELOG.md"
 
+# Package only the library; the repo root also holds local-only appraisal
+# harnesses under bench/, which must never be discovered or shipped.
+[tool.setuptools.packages.find]
+include = ["RiskLabAI*"]
+
 [tool.pytest.ini_options]
 testpaths = ["test"]
+# Resolve `import RiskLabAI` from the repo root so a bare `pytest` works without
+# an editable install (and regardless of any untracked bench/ working tree).
+pythonpath = ["."]
 
 [tool.black]
 line-length = 88

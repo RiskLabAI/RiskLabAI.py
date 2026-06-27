@@ -11,3 +11,6 @@ build/
 htmlcov/
 .venv/
 venv/
+
+# Local-only appraisal harnesses (throwaway; never part of the package)
+bench/
