@@ -18,6 +18,7 @@ from .cross_validator_controller import CrossValidatorController
 from .cross_validator_factory import CrossValidatorFactory
 from .cross_validator_interface import CrossValidator
 from .kfold import KFold
+from .leakage_aware_hpo import deflated_sharpe_gate, leakage_aware_hpo
 from .path_adaptive_cpcv import (
     adaptive_probability_of_backtest_overfitting,
     estimate_volatility_regimes,
@@ -45,6 +46,9 @@ __all__ = [
     # Path-level adaptive (regime-weighted) CPCV PBO (Appraisal 09b)
     "adaptive_probability_of_backtest_overfitting",
     "estimate_volatility_regimes",
+    # Leakage-aware HPO methodology (Appraisal 20)
+    "leakage_aware_hpo",
+    "deflated_sharpe_gate",
     # Utilities
     "CrossValidatorFactory",
     "CrossValidatorController",

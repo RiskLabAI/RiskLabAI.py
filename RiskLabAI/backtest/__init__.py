@@ -9,6 +9,12 @@ This package provides tools for:
 """
 
 from . import validation
+from .advanced_bet_sizing import (
+    PlattCalibrator,
+    distributionally_robust_kelly_fraction,
+    expected_calibration_error,
+    kelly_bet_fraction,
+)
 from .backtest_overfitting_simulation import (
     backtest_overfitting_simulation_financial_metrics_rank_correlation,
     backtest_overfitting_simulation_model_complexity,
@@ -65,19 +71,28 @@ from .multiple_testing import (
     holm_adjusted_p_values,
     sharpe_ratio_p_values,
 )
+from .ou_trading_rules import (
+    fit_ornstein_uhlenbeck,
+    optimal_ou_trading_rule,
+    ou_rule_metrics,
+)
 from .probabilistic_sharpe_ratio import (
     benchmark_sharpe_ratio,
     probabilistic_sharpe_ratio,
+)
+from .probability_of_backtest_overfitting import (
+    performance_evaluation,
+    probability_of_backtest_overfitting,
+)
+from .robust_statistics import (
+    conditional_expected_drawdown,
+    sharpe_difference_test,
 )
 from .sharpe_inference import (
     lplz_sharpe_inference,
     newey_west_automatic_lag,
     newey_west_long_run_variance,
     sharpe_ratio_influence_function,
-)
-from .probability_of_backtest_overfitting import (
-    performance_evaluation,
-    probability_of_backtest_overfitting,
 )
 from .strategy_risk import (
     bin_frequency,
@@ -102,6 +117,17 @@ from .test_set_overfitting import (
 # Define what `from RiskLabAI.backtest import *` will import
 __all__ = [
     "validation",
+    # from advanced_bet_sizing (Appraisal 18 admits)
+    "PlattCalibrator",
+    "distributionally_robust_kelly_fraction",
+    "expected_calibration_error",
+    "kelly_bet_fraction",
+    # from robust_statistics + ou_trading_rules (Appraisal 22, 23 admits)
+    "conditional_expected_drawdown",
+    "sharpe_difference_test",
+    "optimal_ou_trading_rule",
+    "ou_rule_metrics",
+    "fit_ornstein_uhlenbeck",
     # from backtest_statistics
     "bet_timing",
     "calculate_holding_period",
