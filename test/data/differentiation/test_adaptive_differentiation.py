@@ -4,11 +4,13 @@ Tests for data/differentiation/adaptive_differentiation.py (Adaptive Fractional 
 
 import numpy as np
 import pandas as pd
+import pytest
 from scipy.signal import fftconvolve
 from statsmodels.tsa.stattools import adfuller
 
 from RiskLabAI.data.differentiation.adaptive_differentiation import (
     DEFAULT_DELTA_GRID,
+    _HAS_PYWT,
     adaptive_differencing_order,
     adaptive_fractional_difference,
     rescaled_range_hurst,
@@ -48,10 +50,13 @@ def _arfima_increments(d, n, rng, burn=512):
 
 def test_hurst_sanity_on_known_d():
     """Validation: ARFIMA(0,d,0) increments with d=0.3 give a Hurst estimate near d + 0.5 = 0.8."""
+    if not _HAS_PYWT:
+        pytest.skip("PyWavelets not installed")
     rng = np.random.default_rng(0)
     increments = _arfima_increments(0.3, 4000, rng)
     h_rs = rescaled_range_hurst(increments)
     h_wave = wavelet_variance_hurst(increments)
+    assert np.isfinite(h_wave)
     assert abs(0.5 * (h_rs + h_wave) - 0.8) < 0.12
     assert abs(adaptive_differencing_order(increments) - 0.3) < 0.15
 
