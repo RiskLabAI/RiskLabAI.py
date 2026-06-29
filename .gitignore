@@ -18,3 +18,4 @@ bench/
 # Local-only agent operating notes — never tracked or published
 CLAUDE.md
 .githooks/
+WAVE*_RUNLOG.md

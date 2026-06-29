@@ -7,6 +7,7 @@ as described by de Prado, plus the Phillips-Shi-Yu (2015) GSADF / BSADF
 multiple-bubble detector and date-stamping.
 """
 
+from .pelt_change_points import pelt_change_points
 from .structural_breaks import (
     compute_beta,
     get_bsadf_sequence,
@@ -20,6 +21,7 @@ from .structural_breaks import (
     psy_minimum_window,
     simulate_psy_critical_values,
 )
+from .volatility_robust_sadf import volatility_robust_sadf
 
 __all__ = [
     "lag_dataframe",
@@ -33,4 +35,7 @@ __all__ = [
     "get_gsadf_statistic",
     "get_bubble_episodes",
     "simulate_psy_critical_values",
+    # Appraisal 26 admits (alongside SADF/GSADF/CUSUM)
+    "volatility_robust_sadf",
+    "pelt_change_points",
 ]

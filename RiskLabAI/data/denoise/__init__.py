@@ -21,6 +21,7 @@ from .denoising import (
     optimal_portfolio,
     pca,
 )
+from .nercome import nercome_denoised_covariance
 
 __all__ = [
     "marcenko_pastur_pdf",
@@ -33,4 +34,6 @@ __all__ = [
     "corr_to_cov",
     "denoise_cov",
     "optimal_portfolio",
+    # NERCOME (Appraisal 24 admit)
+    "nercome_denoised_covariance",
 ]

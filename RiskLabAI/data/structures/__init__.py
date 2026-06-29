@@ -13,6 +13,12 @@ from .standard_bars import StandardBars
 # Exports from time_bars.py
 from .time_bars import TimeBars
 
+# Hardened (anti-degeneracy) information-driven bars (Appraisal 19 robustness fix)
+from .hardened_information_driven_bars import (
+    HardenedExpectedImbalanceBars,
+    HardenedExpectedRunBars,
+)
+
 # Note: Removed 'pca_weights' from here as it belongs in 'optimization',
 # not 'data.structures'.
 
@@ -24,4 +30,6 @@ __all__ = [
     "FixedImbalanceBars",
     "ExpectedRunBars",
     "FixedRunBars",
+    "HardenedExpectedImbalanceBars",
+    "HardenedExpectedRunBars",
 ]
