@@ -1,8 +1,9 @@
 """
 RiskLabAI Microstructural Features Module
 
-Implements estimators for market microstructure features,
-such as the Corwin-Schultz spread and Bekker-Parkinson volatility.
+Implements estimators for market microstructure features, such as the
+Corwin-Schultz spread, the Bekker-Parkinson volatility, and the EDGE
+effective bid-ask spread estimator.
 """
 
 from .bekker_parkinson_volatility_estimator import (
@@ -15,6 +16,7 @@ from .corwin_schultz import (
     corwin_schultz_estimator,
     gamma_estimates,
 )
+from .edge import edge_estimator
 
 __all__ = [
     "beta_estimates",
@@ -23,4 +25,5 @@ __all__ = [
     "corwin_schultz_estimator",
     "sigma_estimates",
     "bekker_parkinson_volatility_estimates",
+    "edge_estimator",
 ]
