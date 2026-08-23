@@ -1,0 +1,576 @@
+{
+  "schema_version": 1,
+  "document_type": "RISKLABAI_PYTHON_TEST_INVENTORY",
+  "product": "RiskLabAI",
+  "language": "Python",
+  "version": "3.0.0",
+  "runner": "pytest",
+  "file_count": 78,
+  "file_groups": {
+    "CAUSAL_FACTOR_ANALYSIS": 7,
+    "PRESERVED_LIBRARY": 70,
+    "TECHNICAL_INDICATOR_ORACLES": 1
+  },
+  "collected_cases_in_reference_full_feature_environment": {
+    "preserved_library": 343,
+    "causal_factor_analysis": 341,
+    "technical_indicator_oracles": 8,
+    "total": 692
+  },
+  "verified_required_matrix_cases_per_lane": {
+    "preserved_library_applicable": 331,
+    "causal_factor_analysis": 341,
+    "technical_indicator_oracles": 8,
+    "total_applicable": 680
+  },
+  "required_lane_count": 6,
+  "required_lane_case_total": 4080,
+  "files": [
+    {
+      "path": "test/backtest/test_advanced_bet_sizing.py",
+      "size": 3755,
+      "sha256": "F6AF65AA18989A2C3BBB4B43698719227F2199B825366553A7D177D1642572C2",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 8
+    },
+    {
+      "path": "test/backtest/test_backtest_overfitting_simulation.py",
+      "size": 2489,
+      "sha256": "195EE1482CC4C4F1EC9346D1C8C0A600EBB14898D331BC7E37F0FB29D3E1A68A",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/backtest/test_backtest_statistics.py",
+      "size": 4198,
+      "sha256": "16185AE1BEC34431ECD85EE1BE4E1A49C622C9CDB8B59CA4427148B1B6C2BA0A",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/backtest/test_backtest_synthetic_data.py",
+      "size": 2147,
+      "sha256": "4E81268462F0321FDE82215768BC6ACAD07D5F70F881C5D74CCE0991A1BD6435",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 2
+    },
+    {
+      "path": "test/backtest/test_bet_sizing.py",
+      "size": 5392,
+      "sha256": "7CA2E228BD7421C87F15BFABFD6C79E529D239F34A685ACBF5AEE1620EE1898C",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/backtest/test_multiple_testing.py",
+      "size": 3034,
+      "sha256": "AA6E928AD7A211C4C3D38525CC6FAFF1DF4D5F513C8EA97927D3DEFBF1672802",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 7
+    },
+    {
+      "path": "test/backtest/test_ou_trading_rules.py",
+      "size": 4403,
+      "sha256": "12498715145DA0BF5CEC21CFBCFF8EA206B7F82C01CEC15F05292C94F47A1C15",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/test_probabilistic_sharpe_ratio.py",
+      "size": 3242,
+      "sha256": "A62D3309AE74178AA80065FF9CFF4A96CE33A701AEB2D6F54127074875F91CC7",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/test_probability_of_backtest_overfitting.py",
+      "size": 3715,
+      "sha256": "178F73E2D1E3175C51EDCC0D990DFA49FB21C2843E4CF15D3726E370A42DBCBA",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/backtest/test_robust_statistics.py",
+      "size": 4672,
+      "sha256": "4954FF5BB03F7E6B040CAE874D10E04EE937DB1EEA85E7F0719FCD01A3DBA0FC",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/backtest/test_sharpe_inference.py",
+      "size": 3456,
+      "sha256": "814021459A2904B6B5C5C9ADC90EB9E503D5437C1764CFDA431291132ED692E2",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/backtest/test_strategy_risk.py",
+      "size": 3708,
+      "sha256": "E9696D0CDA4EAAFF01F536AD31E611658B36236BCADB5F470F0949EE4CE33820",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/backtest/test_technical_indicators.py",
+      "size": 3947,
+      "sha256": "63D92133A4731E007902E5FD73344F4B2FD6D3238E3124E2B3BD2C44B967B38C",
+      "group": "TECHNICAL_INDICATOR_ORACLES",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/test_test_set_overfitting.py",
+      "size": 3145,
+      "sha256": "C9E6DF7D60DA22FFC20FD9C4386B25A83DE9C2F24BAA7C2EC6985FF0B91949FC",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/backtest/validation/test_adaptive_combinatorial_purged.py",
+      "size": 3326,
+      "sha256": "E63E3168B1C24A68A7A9B97BD6AE86D653781CABBB75B612973D6E526F74A576",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/backtest/validation/test_bagged_combinatorial_purged.py",
+      "size": 2500,
+      "sha256": "36CD1050290F37C76B94776F7EF62D883205350373B2C251963EB3D8F424A8D5",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/backtest/validation/test_combinatorial_purged.py",
+      "size": 4996,
+      "sha256": "2A7176CB64BC3117914123472650C2E28675E127AF721507FEC708A977AB014E",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/validation/test_cross_validator_controller.py",
+      "size": 1836,
+      "sha256": "B27F524D6BFF839D9D11A2AF3C6F69C4E8725149DA3FF4BE7D47EE4ACFF78664",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/backtest/validation/test_cross_validator_factory.py",
+      "size": 3073,
+      "sha256": "059213105205BA8A4B1EADD6923C513980EB38E7D48AF2ED9261841819E7AD04",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 9
+    },
+    {
+      "path": "test/backtest/validation/test_kfold.py",
+      "size": 4242,
+      "sha256": "42FFA8774B3398D0B2D4F6ABCEEE8934D9A600AA7A2C859E56F958F3291B2409",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/backtest/validation/test_leakage_aware_hpo.py",
+      "size": 3941,
+      "sha256": "C36A724AA150622F41C083A6C4370AF51E791D5FB27A1109F2F3A7F52B4F1CB2",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/validation/test_path_adaptive_cpcv.py",
+      "size": 8956,
+      "sha256": "5DDCF270F911FD61C06898BFBBF32E524711F035DBE27044E3137EED3BBC57DF",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 10
+    },
+    {
+      "path": "test/backtest/validation/test_path_bagged_cpcv.py",
+      "size": 3965,
+      "sha256": "A040B21C906867C5CA0B196755CDC8C3F4F79032E9E6E5A045C779AEB43197B1",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/backtest/validation/test_purged_kfold.py",
+      "size": 5007,
+      "sha256": "C64CB49639B8AB7E3878AE0A541F42CE3D3853405E8763B9331F6A2A0EA3153D",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/backtest/validation/test_walk_forward.py",
+      "size": 4290,
+      "sha256": "DB6846CCB5C99C47B07F2C54C405C28F2E903E4D5EAB68405DAD4F7B37C27564",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
+      "size": 3672,
+      "sha256": "6A840BBD03FC9C098455C0DAE641ACA279D6C8E8A4F70B040DB2A555D7E50078",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 7
+    },
+    {
+      "path": "test/causal_factor_analysis/test_factor_mirage.py",
+      "size": 16394,
+      "sha256": "268DB559600AF1D56EDADEEB0FC20DCF642D4FF5AF4DBBBD4517CC5EE4F94DFF",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 32
+    },
+    {
+      "path": "test/causal_factor_analysis/test_graph_identification.py",
+      "size": 35186,
+      "sha256": "64D386BDD80E76CEAA4762D429B5E3ADE083AB7E509BE348A7A632B9C11E4C35",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 47
+    },
+    {
+      "path": "test/causal_factor_analysis/test_minimum_variance.py",
+      "size": 15983,
+      "sha256": "954E52279A50DADEAE6519B2CF6679B7AB4CE0C3F01CE70AC81AD829E9423F16",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 32
+    },
+    {
+      "path": "test/causal_factor_analysis/test_protocol.py",
+      "size": 39100,
+      "sha256": "8781036062F8734967F115FA63A52F66A14552B1EA56CB9B422A71B1E25070B2",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 43
+    },
+    {
+      "path": "test/causal_factor_analysis/test_specification_diagnostics.py",
+      "size": 9096,
+      "sha256": "DDED9E16AA02CBA5284BACE5B61E4CA53CBB1FBC2A72E665F289CD252E81930E",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 10
+    },
+    {
+      "path": "test/causal_factor_analysis/test_treatment_effects.py",
+      "size": 5969,
+      "sha256": "0B67456180473825489748AD99098C8BFCE6D15293EFE136546785AC19FE836E",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 12
+    },
+    {
+      "path": "test/cluster/test_clustering.py",
+      "size": 3269,
+      "sha256": "33F301B160E90B4FA6BA369524E6A3D30F3BB63887B4898D6DC6708CCD900A7A",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/controller/test_bars_initializer.py",
+      "size": 2484,
+      "sha256": "13B2E36A9D10E25284C3CDCE19F04320524623790BE64F79C851D31703D3724C",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/controller/test_data_structure_controller.py",
+      "size": 2833,
+      "sha256": "9510A0FBD3B714FE87742519A9200CBFD0D6CEB99C14A9ED369F51EA7E3AAA56",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/core/test_base.py",
+      "size": 2701,
+      "sha256": "0BFC387B4C7A94205708140A7485F1AF1D3BFA1FC9472A1898ACBCEABA2DFE64",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/core/test_builtin_parity.py",
+      "size": 5095,
+      "sha256": "560CB3D389459FEA8572E7C71B5F66563A1EF17C4545B782A989CD8A67FCAD64",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 8
+    },
+    {
+      "path": "test/core/test_registry.py",
+      "size": 5789,
+      "sha256": "C6F667A94DB9803219591A3E4E8F963E820E5508C996A9850386BD4E8A8FED03",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 18
+    },
+    {
+      "path": "test/data/denoise/test_denoising.py",
+      "size": 2818,
+      "sha256": "DAC2EA0D49203308445314A87BBBD73EDA875C197996D75F88C7F5074C4E9D33",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/data/denoise/test_nercome.py",
+      "size": 4263,
+      "sha256": "9B3799A2EB458510D869EE2624B525C2746D923E09BB11C5FB4EBDFA6385FA8C",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/data/differentiation/test_adaptive_differentiation.py",
+      "size": 3832,
+      "sha256": "63AF31E69F26F186EA26B531189FEEDFEC653055DC6FA954E714F92F0A419CA5",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/data/differentiation/test_differentiation.py",
+      "size": 3712,
+      "sha256": "C95ECCBBC869053624EB81A990F91003C835B4CCB1ABFEA56B01ECA347C54C33",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/data/distance/test_codependence.py",
+      "size": 3364,
+      "sha256": "1E206FE53D4C899011C33D2B08E5CA5D8A0CFAD47391E4EAD5A08FD24DEA78FF",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 7
+    },
+    {
+      "path": "test/data/distance/test_distance_metric.py",
+      "size": 2758,
+      "sha256": "C20662C35D3253A3C0157456B3385523DDF6042D74C0BD031CF0DAE168D57589",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/data/labeling/test_financial_labels.py",
+      "size": 2624,
+      "sha256": "5B194D19D2565708359FB005A22336DD9C82F6BEED562D8B5E91DCE08387F8FD",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 2
+    },
+    {
+      "path": "test/data/labeling/test_labeling.py",
+      "size": 4598,
+      "sha256": "571BEBC1BBD55A1E1F3F2163B79C1B5D2BB3F07F355A850B5E11106EA28B33E3",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/data/structures/test_hardened_information_driven_bars.py",
+      "size": 4756,
+      "sha256": "EC65CE1DDC9C43C72569E0E2087203309EC4C557F06FBDAA6DE4A88BF74C6650",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/data/structures/test_imbalance_bars.py",
+      "size": 3432,
+      "sha256": "95B11988BA1E13F67868EDB84E361290E8206214E67A2ADD368EC50A04035678",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 2
+    },
+    {
+      "path": "test/data/structures/test_run_bars.py",
+      "size": 2298,
+      "sha256": "AA84352C3434FA6BE5B36E1E04506FFFB04A71B723F52D1E76E3684AB76F5FD5",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/data/structures/test_standard_bars.py",
+      "size": 2573,
+      "sha256": "7FBDEE31397875FD3CD6AA0755F79376C8298C623EDCEFEC62FCBE02801FDE81",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/data/structures/test_time_bars.py",
+      "size": 1948,
+      "sha256": "777F07CBF7B1285660BE260CF28DAEDD8409119B580220789C06C571E83012A9",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/data/synthetic_data/test_drift_burst_hypothesis.py",
+      "size": 2496,
+      "sha256": "D36F02ED24979C2AC250DA8F78DCF00E84AC15629A66FF0F49B864DC7F29234F",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/data/synthetic_data/test_synthetic_controlled_environment.py",
+      "size": 2706,
+      "sha256": "3EDD684CD47C177AC3B14201D00F92D58B653F80015FBBF5FE8B199681A9CFF3",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/data/weights/test_sample_weights.py",
+      "size": 3920,
+      "sha256": "6A682B9C8273A9480CC40EDEF503F4ADB254FDE03A7C6846A6576B2844177DA5",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/ensemble/test_bagging_classifier_accuracy.py",
+      "size": 1055,
+      "sha256": "B9E9FCDEC62CCA57773D775874B1A49FE9FFDBA70AE75C1A5B44D21BE5F42F70",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/features/entropy_features/test_entropy.py",
+      "size": 8265,
+      "sha256": "EB0639713017FA205239818CF5EB33B37488D1F5015E41BE572DF9B3DC4B92A3",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 14
+    },
+    {
+      "path": "test/features/feature_importance/test_debiased_importance.py",
+      "size": 3135,
+      "sha256": "9CB7F3A10AADC4263C5A3BC18952A832C61DD1E106E7C6D97E44480D9B77E303",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/features/feature_importance/test_feature_importance.py",
+      "size": 4539,
+      "sha256": "1CC36BB1739EEDBA96BC9CFE6C784F4B10796AD8B7030D2423BFADDA83AC4BBC",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/features/feature_importance/test_generate_synthetic_data.py",
+      "size": 1297,
+      "sha256": "60E8710D8FB14D2DB9C8A8561B760A7C82E78A40B58D050DE4B454FAD9D09A19",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/features/feature_importance/test_orthogonal_features.py",
+      "size": 1377,
+      "sha256": "2FFF242081857CAE3677849ED9615F812C02C4F8142C2BE3F165EB7F6163E43F",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/features/feature_importance/test_weighted_tau.py",
+      "size": 717,
+      "sha256": "DE4E792D04BE710A70F0531FB3BA4CF6F4FD281CD1CCB0AF66775B2AFF9DEB5B",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/features/microstructural_features/test_edge.py",
+      "size": 2005,
+      "sha256": "E7F97BFC152F1ABC9CDA7ABACCAA96F424E2F5F60178AB358B282944AF7BB1CE",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/features/microstructural_features/test_microstructure.py",
+      "size": 2089,
+      "sha256": "FAF86E2B87ED6C052039270C8FDD500399B71AFFAB9B3833ABD01C2EB7065A93",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 2
+    },
+    {
+      "path": "test/features/structural_breaks/test_pelt_change_points.py",
+      "size": 2480,
+      "sha256": "41D6A781C71F971EDF58728FC9C7F963C751CA07B23B8ADA7F640542EBA80DEF",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/features/structural_breaks/test_structural_breaks.py",
+      "size": 9740,
+      "sha256": "3AB71A45767135BA7B3104135A86E45C301F2131FCEB190695FCAA7B5FD34872",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 14
+    },
+    {
+      "path": "test/features/structural_breaks/test_volatility_robust_sadf.py",
+      "size": 2732,
+      "sha256": "F098186FFD06AC96600F32986039804A177193313D1E237F2EE97264968E7BB8",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/hpc/test_hpc.py",
+      "size": 2213,
+      "sha256": "2E3414DD74A72FD86FED54059515E2A088F99F4C23492A1992A55A5F311F09A8",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/optimization/test_hedging.py",
+      "size": 2026,
+      "sha256": "C34C92CCD66E0B895140B2D45270AC94803AB408532888E04C6FABC9C444BC22",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/optimization/test_hrp.py",
+      "size": 3689,
+      "sha256": "08A03D26DDCA53A9793C46D76AFEC5EA2D1203B8A833895A93C29E0EBCD6A4C7",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/optimization/test_hyper_parameter_tuning.py",
+      "size": 3405,
+      "sha256": "C756502F9BA1FFC0EAFCF2F0EE3E73F500CB07D956378FFADE018CC610AEC650",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/optimization/test_nco.py",
+      "size": 1875,
+      "sha256": "07393543334EED0500954A475403AFDF68BFDB5D9AEC14768E5D21D91E41A2AE",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/pde/test_pde_solver.py",
+      "size": 1764,
+      "sha256": "9606F9460D87E1268B55A2EC5FC8AD7BE92B4E9DB64F219E0C444343CDB763DD",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 2
+    },
+    {
+      "path": "test/test_consolidation.py",
+      "size": 3427,
+      "sha256": "653D2C917A29D41030CE835E18736ED607BCBBC9E7A75B1A16FEFC286F391F8F",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/test_deprecation.py",
+      "size": 1746,
+      "sha256": "1318D33E6B9790C48F3E366568733FB14574D0D7ECCF7086D5EF5D8BE8545930",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/test_performance.py",
+      "size": 6986,
+      "sha256": "857264FBB2C1507995BB18CBD2E9081849D9C3F4EECA73F58FBC0371FAE42F73",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/utils/test_ewma.py",
+      "size": 920,
+      "sha256": "A75275626813BC8DFE6A0A792370FC1B013ED8A5398232468CE7E871137F70D6",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    },
+    {
+      "path": "test/utils/test_momentum_mean_reverting_strategy_sides.py",
+      "size": 2321,
+      "sha256": "EEBBFAC83B87A3A2BF72C9D9B203DB11D8794D9CBE7CA5125DEBE141C10E3889",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/utils/test_progress.py",
+      "size": 1022,
+      "sha256": "2CC8FBD465B007948A09C0E8975288A13D46590113FB9DA6AA441C07C55F23BA",
+      "group": "PRESERVED_LIBRARY",
+      "declared_test_functions": 3
+    }
+  ]
+}

@@ -91,6 +91,6 @@ def test_factory_invalid_type():
 
 def test_factory_is_deprecated():
     """The factory is deprecated in 2.0.0 (delegates to the core registry)."""
-    with pytest.warns(DeprecationWarning, match="2.1.0"):
+    with pytest.warns(DeprecationWarning, match="4.0.0"):
         cv = CrossValidatorFactory.create_cross_validator("kfold", n_splits=5)
     assert isinstance(cv, KFold)

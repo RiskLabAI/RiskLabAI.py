@@ -53,7 +53,7 @@ def test_my_pipeline_fit_sample_weight(mock_data):
 def test_my_pipeline_deprecated_alias_warns():
     """MyPipeline is a deprecated subclass of SampleWeightedPipeline."""
     assert issubclass(MyPipeline, SampleWeightedPipeline)
-    with pytest.warns(DeprecationWarning, match="MyPipeline.*2.1.0"):
+    with pytest.warns(DeprecationWarning, match="MyPipeline.*4.0.0"):
         pipe = MyPipeline([("clf", LogisticRegression())])
     assert isinstance(pipe, SampleWeightedPipeline)
 

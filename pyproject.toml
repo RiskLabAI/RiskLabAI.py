@@ -1,115 +1,106 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77", "wheel>=0.45"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "RiskLabAI"
-version = "2.0.3"
-authors = [
-    { name = "RiskLab", email = "arian@risklab.ai" },
-]
-description = "Financial AI using Python, based on 'Advances in Financial Machine Learning' and 'Machine Learning for Asset Managers'."
+version = "3.0.0"
+description = "Financial machine-learning and causal-factor analysis tools for research and model validation."
 readme = "README.md"
-license = { file = "LICENSE" }
-requires-python = ">=3.9"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: BSD License",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Financial and Insurance Industry",
-    "Intended Audience :: Science/Research",
-    "Operating System :: OS Independent",
-    "Topic :: Office/Business :: Financial",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+requires-python = ">=3.12,<3.15"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Hamid Arian", email = "arian@risklab.ai" },
+]
+maintainers = [
+  { name = "Hamid Arian", email = "arian@risklab.ai" },
 ]
 keywords = [
-    "finance",
-    "machine learning",
-    "quantitative finance",
-    "fintech",
-    "de prado",
-    "backtesting",
+  "causal inference",
+  "factor investing",
+  "financial machine learning",
+  "quantitative finance",
+  "risk management",
 ]
-
-# --- CORE DEPENDENCIES ---
-# These are fast to install and essential for the library's main functions.
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+]
 dependencies = [
-    "numpy>=1.22,<3",
-    "pandas>=1.5",
-    "scipy>=1.8",
-    "scikit-learn>=1.1",
-    "statsmodels>=0.13",
-    "numba>=0.57",
-    "joblib>=1.1",
-    "ta>=0.10",
-    "tqdm>=4.60",
-    "sympy>=1.10",
+  "numpy>=2.2,<3",
+  "pandas>=2.3,<4",
+  "scipy>=1.15,<2",
+  "scikit-learn>=1.6,<2",
+  "statsmodels>=0.14.6,<0.15",
+  "joblib>=1.4,<2; python_version < '3.14'",
+  "joblib>=1.5.2,<2; python_version >= '3.14'",
+  "PyWavelets>=1.9,<2",
 ]
 
-# --- OPTIONAL DEPENDENCIES ---
-# These are installed on-demand by users, e.g., pip install RiskLabAI[pde]
 [project.optional-dependencies]
-pde = ["torch"]
-synth = ["quantecon"]
-plot = ["matplotlib", "seaborn" , "plotly"]
-dev = [
-    "yfinance",
-    "memory_profiler",
-    "jupyterlab",
-    "stable-baselines3",
-    "gymnasium",
-    "torchvision", # Often needed with torch
-    "torchaudio",  # Often needed with torch
-    "pytest",
-    # Linters pinned to match CI exactly (.github/workflows/ci.yml).
-    "black==26.5.1",
-    "ruff==0.15.17",
+speed = [
+  "numba>=0.67,<0.68",
+  "numpy>=2.2,<2.6",
 ]
-all = [
-    "RiskLabAI[pde]",
-    "RiskLabAI[synth]",
-    "RiskLabAI[plot]",
+pde = ["torch>=2.10,<3"]
+synth = ["quantecon>=0.11.4,<0.12"]
+hpo = ["optuna>=4.9,<5"]
+plot = [
+  "matplotlib>=3.10,<4",
+  "seaborn>=0.13.2,<0.14",
+  "plotly>=6,<7",
 ]
-
+symbolic = ["sympy>=1.14,<2"]
+profile = ["memory-profiler==0.61.0"]
+simulation = ["tqdm>=4.70,<5"]
+changepoints = ["ruptures==1.1.10; python_version < '3.14'"]
+test = ["pytest>=8.4,<10"]
 
 [project.urls]
-Homepage = "https://github.com/RiskLabAI/RiskLabAI.py"
-"Bug Tracker" = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
-Changelog = "https://github.com/RiskLabAI/RiskLabAI.py/blob/main/CHANGELOG.md"
+Repository = "https://github.com/RiskLabAI/RiskLabAI.py"
+Issues = "https://github.com/RiskLabAI/RiskLabAI.py/issues"
+Documentation = "https://github.com/RiskLabAI/RiskLabAI.py#readme"
 
-# Package only the library; the repo root also holds local-only appraisal
-# harnesses under bench/, which must never be discovered or shipped.
-[tool.setuptools.packages.find]
-include = ["RiskLabAI*"]
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = [
+  "RiskLabAI",
+  "RiskLabAI.backtest",
+  "RiskLabAI.backtest.validation",
+  "RiskLabAI.causal_factor_analysis",
+  "RiskLabAI.cluster",
+  "RiskLabAI.controller",
+  "RiskLabAI.core",
+  "RiskLabAI.data",
+  "RiskLabAI.data.denoise",
+  "RiskLabAI.data.differentiation",
+  "RiskLabAI.data.distance",
+  "RiskLabAI.data.labeling",
+  "RiskLabAI.data.structures",
+  "RiskLabAI.data.synthetic_data",
+  "RiskLabAI.data.weights",
+  "RiskLabAI.ensemble",
+  "RiskLabAI.features",
+  "RiskLabAI.features.entropy_features",
+  "RiskLabAI.features.feature_importance",
+  "RiskLabAI.features.microstructural_features",
+  "RiskLabAI.features.structural_breaks",
+  "RiskLabAI.hpc",
+  "RiskLabAI.optimization",
+  "RiskLabAI.pde",
+  "RiskLabAI.utils",
+]
+include-package-data = false
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
-# Resolve `import RiskLabAI` from the repo root so a bare `pytest` works without
-# an editable install (and regardless of any untracked bench/ working tree).
-pythonpath = ["."]
-
-[tool.black]
-line-length = 88
-target-version = ["py39"]
-
-[tool.ruff]
-line-length = 88
-target-version = "py39"
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B"]
-# E501 deferred until the mechanical black formatting pass lands
-ignore = ["E501"]
-
-[tool.ruff.lint.per-file-ignores]
-# Package __init__ files exist to re-export their submodules' public API.
-"__init__.py" = ["F401", "F403", "F405"]
-# pde/solver builds the networks from `from ...model import *`; the torch-only
-# model module is intentionally left star-imported.
-"RiskLabAI/pde/solver.py" = ["F403", "F405"]
-# base.py re-exports the canonical interfaces lazily via module __getattr__,
-# so the names listed in __all__ are resolved on access, not at definition.
-"RiskLabAI/core/base.py" = ["F822"]
-# importorskip("torch") must execute before the torch-dependent imports below
-# it, so module-level imports cannot all sit at the top of the file.
-"test/pde/test_pde_solver.py" = ["E402"]
+addopts = "-ra --strict-config --strict-markers"

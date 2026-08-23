@@ -58,6 +58,7 @@ def test_align_params_length():
 
 def test_generate_prices_from_regimes(sample_regimes):
     """Test the single-path price generation."""
+    pytest.importorskip("quantecon", reason="requires RiskLabAI[synth]")
     regimes, tm = sample_regimes
     n_steps = 100
 
@@ -76,6 +77,7 @@ def test_generate_prices_from_regimes(sample_regimes):
 
 def test_parallel_generate_prices(sample_regimes):
     """Test the parallel price generation."""
+    pytest.importorskip("quantecon", reason="requires RiskLabAI[synth]")
     regimes, tm = sample_regimes
     n_steps = 50
     n_paths = 4
