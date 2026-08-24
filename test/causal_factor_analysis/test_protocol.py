@@ -271,16 +271,13 @@ def test_wrong_stage_record_type_is_rejected():
 def test_boundary_touching_horizons_are_not_overlapping():
     report = _valid_report()
     horizons = tuple(
-        EventHorizon(f"b{index}", float(index), float(index + 1))
-        for index in range(6)
+        EventHorizon(f"b{index}", float(index), float(index + 1)) for index in range(6)
     )
     validation = replace(
         report.variable_selection.validation,
         event_horizons=horizons,
         folds=(
-            _fold(
-                "b1", "bp", ("b2", "b3", "b4", "b5"), ("b0", "b1"), "br1"
-            ),
+            _fold("b1", "bp", ("b2", "b3", "b4", "b5"), ("b0", "b1"), "br1"),
             _fold("b2", "bp", ("b0", "b1", "b4", "b5"), ("b2", "b3"), "br2"),
             _fold("b3", "bp", ("b0", "b1", "b2", "b3"), ("b4", "b5"), "br3"),
         ),
@@ -354,9 +351,7 @@ def test_in_sample_stage1_methods_do_not_require_temporal_folds_without_guards()
         strong_time_dependence=False,
         validation=None,
     )
-    validate_causal_factor_protocol(
-        replace(report, variable_selection=selection)
-    )
+    validate_causal_factor_protocol(replace(report, variable_selection=selection))
 
     with pytest.raises(ValueError, match="Stage 1"):
         validate_causal_factor_protocol(
@@ -401,7 +396,9 @@ def test_refit_id_cannot_represent_different_training_sets():
     second = replace(validation.folds[1], refit_id=validation.folds[0].refit_id)
     stage = replace(
         report.causal_explanatory_and_predictive_power,
-        validation=replace(validation, folds=(validation.folds[0], second, validation.folds[2])),
+        validation=replace(
+            validation, folds=(validation.folds[0], second, validation.folds[2])
+        ),
     )
     with pytest.raises(ValueError, match="Stage 4"):
         _validate_with(report, causal_explanatory_and_predictive_power=stage)
@@ -421,7 +418,9 @@ def test_temporal_overlap_and_embargo_leakage_are_rejected():
     horizons = tuple(
         EventHorizon(item.observation_id, item.start, item.end)
         for item in validation.event_horizons
-    ) + (EventHorizon("embargoed", 3.5, 3.8),)
+    ) + (
+        EventHorizon("embargoed", 3.5, 3.8),
+    )
     embargo_fold = _fold("bad2", "p3", ("embargoed", "o3"), ("o1", "o2"), "bad2-refit")
     bad_validation = replace(validation, event_horizons=horizons, folds=(embargo_fold,))
     stage = replace(
@@ -571,9 +570,7 @@ def test_instrumental_variables_requires_all_identification_premises():
         instrument_exclusion_satisfied=True,
         instrument_exogeneity_satisfied=True,
     )
-    validate_causal_factor_protocol(
-        replace(report, causal_adjustment_set=adjustment)
-    )
+    validate_causal_factor_protocol(replace(report, causal_adjustment_set=adjustment))
     for field in (
         "instrument_relevance_satisfied",
         "instrument_exclusion_satisfied",
@@ -711,9 +708,7 @@ def test_graph_implied_confounders_cannot_be_omitted_or_used_as_instruments():
         control_justifications=(),
     )
     with pytest.raises(ValueError, match="Stage 3"):
-        validate_causal_factor_protocol(
-            replace(report, causal_adjustment_set=omitted)
-        )
+        validate_causal_factor_protocol(replace(report, causal_adjustment_set=omitted))
 
     invalid_instrument = replace(
         report.causal_adjustment_set,

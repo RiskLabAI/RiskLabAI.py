@@ -8,8 +8,9 @@
     "wheel",
     "source_distribution"
   ],
-  "candidate_file_count": 215,
+  "candidate_file_count": 216,
   "candidate_files": [
+    ".github/workflows/ci.yml",
     "LICENSE",
     "MANIFEST.in",
     "PACKAGE_FILES.json",
@@ -229,8 +230,9 @@
   "local_control_files_excluded_from_artifacts": [
     "PACKAGE_IDENTITY.json"
   ],
-  "release_source_file_count": 214,
+  "release_source_file_count": 215,
   "release_source_files": [
+    ".github/workflows/ci.yml",
     "LICENSE",
     "MANIFEST.in",
     "PACKAGE_FILES.json",

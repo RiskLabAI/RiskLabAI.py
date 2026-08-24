@@ -95,9 +95,7 @@ def test_equation_9_frontdoor_probability_matches_nested_hand_sum():
         ),
         treatment_probabilities=(0.6, 0.4),
     )
-    expected = 0.25 * (0.1 * 0.6 + 0.5 * 0.4) + 0.75 * (
-        0.4 * 0.6 + 0.8 * 0.4
-    )
+    expected = 0.25 * (0.1 * 0.6 + 0.5 * 0.4) + 0.75 * (0.4 * 0.6 + 0.8 * 0.4)
     assert result == pytest.approx(expected, abs=1.0e-15)
 
 

@@ -1116,8 +1116,8 @@
       "path": "src/RiskLabAI/causal_factor_analysis/protocol.py",
       "module": "RiskLabAI.causal_factor_analysis.protocol",
       "module_kind": "module",
-      "sha256": "75CC2191038FAEBBDE7AD5AB38B8842FF9B9FE3772E732FB4F0764B83C432F4D",
-      "size": 63829,
+      "sha256": "97A78E100A01192A9C7511DC8C18CF54300F46BF36187A87E3FF607A5C91011B",
+      "size": 64712,
       "defined_public_names": [
         "BacktestStage",
         "CausalAdjustmentSetStage",
@@ -1199,8 +1199,8 @@
       "path": "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
       "module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
       "module_kind": "module",
-      "sha256": "EB8066295C2C6374E817AE2A1EA4459443CF76B1F84692CB11EEC6B66A687429",
-      "size": 9661,
+      "sha256": "5AF8F882F798FF9D0AC8F3955A9A2C9533589AA328B929030CF16930FA28FA65",
+      "size": 9595,
       "defined_public_names": [
         "PopulationRegressionDiagnostics",
         "RegressionDiagnostics",
@@ -1270,8 +1270,8 @@
       "path": "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
       "module": "RiskLabAI.causal_factor_analysis.treatment_effects",
       "module_kind": "module",
-      "sha256": "692B945C0B44FA3B87FE23957B4400E717F4D27903ACBC12003C44528A6F6919",
-      "size": 11888,
+      "sha256": "B3D980B969803C12F0F3C5A6C6C55C37D844827131F45924F53E629F02A1E980",
+      "size": 11832,
       "defined_public_names": [
         "DifferenceInDifferencesEstimate",
         "TreatmentEffectDecomposition",

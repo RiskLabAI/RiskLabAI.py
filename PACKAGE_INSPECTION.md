@@ -22,7 +22,8 @@ The wheel may contain only the 124 declared Python runtime modules plus the
 standard metadata directory created for RiskLabAI 3.0.0. Tests, examples,
 local readiness controls, caches, bytecode, credentials, and undeclared data
 must not be present in the wheel. The source distribution must contain exactly
-the release-source members declared in `PACKAGE_FILES.json` plus only the
+the 215 release-source members declared in `PACKAGE_FILES.json`, including the
+governed `.github/workflows/ci.yml`, plus only the
 backend-generated metadata members that the inspection record enumerates and
 hashes explicitly.
 
@@ -46,6 +47,8 @@ lane, verify the exact module origins, `RiskLabAI.__version__ == "3.0.0"`, the
 complete 57-feature causal API. Run the exact package-scoped test inventory and
 the valid optional-feature lanes. Confirm that optional groups do not become
 base dependencies and that changepoints alone is unavailable on Python 3.14.
+Run installed-package tests outside the source checkout and reject any import
+whose resolved path remains inside the repository.
 
 ## Final review
 

@@ -59,9 +59,7 @@ def test_figure_8_hypothetical_factor_mechanism_has_backdoor_and_frontdoor_sets(
         ("OI", "PC"),
     )
     observed_graph = _dag(("HML", "MOM", "OI", "PC"), edges)
-    assert minimal_backdoor_adjustment_sets(observed_graph, "HML", "PC") == (
-        ("MOM",),
-    )
+    assert minimal_backdoor_adjustment_sets(observed_graph, "HML", "PC") == (("MOM",),)
 
     latent_graph = _dag(
         ("HML", "MOM", "OI", "PC"),
@@ -69,9 +67,7 @@ def test_figure_8_hypothetical_factor_mechanism_has_backdoor_and_frontdoor_sets(
         observed=("HML", "OI", "PC"),
     )
     assert minimal_backdoor_adjustment_sets(latent_graph, "HML", "PC") == ()
-    assert minimal_frontdoor_adjustment_sets(latent_graph, "HML", "PC") == (
-        ("OI",),
-    )
+    assert minimal_frontdoor_adjustment_sets(latent_graph, "HML", "PC") == (("OI",),)
 
 
 def test_figures_16_to_18_conditioning_on_collider_opens_the_path():

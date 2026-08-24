@@ -168,9 +168,7 @@ def fork_population_diagnostics() -> SpecificationPopulationResult:
     return SpecificationPopulationResult(
         structure="fork",
         conditioning_variable_role="confounder",
-        unconditioned=_population_regression(
-            ("intercept", "X"), (0.0, 0.5), 0.25
-        ),
+        unconditioned=_population_regression(("intercept", "X"), (0.0, 0.5), 0.25),
         conditioned=_population_regression(
             ("intercept", "X", "Z"), (0.0, 0.0, 1.0), 0.5
         ),
@@ -183,9 +181,7 @@ def collider_population_diagnostics() -> SpecificationPopulationResult:
     return SpecificationPopulationResult(
         structure="collider",
         conditioning_variable_role="collider",
-        unconditioned=_population_regression(
-            ("intercept", "X"), (0.0, 0.0), 0.0
-        ),
+        unconditioned=_population_regression(("intercept", "X"), (0.0, 0.0), 0.0),
         conditioned=_population_regression(
             ("intercept", "X", "Z"), (0.0, -0.5, 0.5), 0.5
         ),
@@ -198,9 +194,7 @@ def confounded_mediator_population_diagnostics() -> SpecificationPopulationResul
     return SpecificationPopulationResult(
         structure="confounded_mediator",
         conditioning_variable_role="confounded_mediator",
-        unconditioned=_population_regression(
-            ("intercept", "X"), (0.0, 1.0), 1.0 / 7.0
-        ),
+        unconditioned=_population_regression(("intercept", "X"), (0.0, 1.0), 1.0 / 7.0),
         conditioned=_population_regression(
             ("intercept", "X", "Z"),
             (0.0, -0.5, 1.5),

@@ -124,15 +124,11 @@ def treatment_effect_decomposition(
         "counterfactual_control_mean_for_treated",
         counterfactual_control_mean_for_treated,
     )
-    observed_difference = _as_finite_real(
-        "observed_difference", treated - control
-    )
+    observed_difference = _as_finite_real("observed_difference", treated - control)
     effect_on_treated = _as_finite_real(
         "average_treatment_effect_on_treated", treated - counterfactual
     )
-    selection_bias = _as_finite_real(
-        "sample_selection_bias", counterfactual - control
-    )
+    selection_bias = _as_finite_real("sample_selection_bias", counterfactual - control)
     return TreatmentEffectDecomposition(
         observed_difference=observed_difference,
         average_treatment_effect_on_treated=effect_on_treated,
@@ -218,12 +214,8 @@ def backdoor_adjusted_average_treatment_effect(
 ) -> float:
     """Return the standardized average treatment effect in Equation 7."""
 
-    treated = _as_finite_vector(
-        "treated_conditional_means", treated_conditional_means
-    )
-    control = _as_finite_vector(
-        "control_conditional_means", control_conditional_means
-    )
+    treated = _as_finite_vector("treated_conditional_means", treated_conditional_means)
+    control = _as_finite_vector("control_conditional_means", control_conditional_means)
     probabilities = _as_probability_vector(
         "adjustment_probabilities", adjustment_probabilities
     )

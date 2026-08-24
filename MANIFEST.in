@@ -5,6 +5,7 @@ include PUBLIC_API.json
 include TEST_INVENTORY.json
 include PACKAGE_FILES.json
 include PACKAGE_INSPECTION.md
+include .github/workflows/ci.yml
 recursive-include src *.py
 recursive-include test *.py
 recursive-include docs *.md

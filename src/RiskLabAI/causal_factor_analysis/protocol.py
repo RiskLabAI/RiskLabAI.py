@@ -188,8 +188,12 @@ class ValidationEvidence:
     embargo: Real = 0.0
 
     def __post_init__(self):
-        _store_normalized_field(self, "method_labels", _freeze_tuple(self.method_labels))
-        _store_normalized_field(self, "event_horizons", _freeze_tuple(self.event_horizons))
+        _store_normalized_field(
+            self, "method_labels", _freeze_tuple(self.method_labels)
+        )
+        _store_normalized_field(
+            self, "event_horizons", _freeze_tuple(self.event_horizons)
+        )
         _store_normalized_field(self, "folds", _freeze_tuple(self.folds))
 
 
@@ -208,7 +212,9 @@ class VariableSelectionStage:
         _store_normalized_field(
             self, "selected_variables", _freeze_tuple(self.selected_variables)
         )
-        _store_normalized_field(self, "method_labels", _freeze_tuple(self.method_labels))
+        _store_normalized_field(
+            self, "method_labels", _freeze_tuple(self.method_labels)
+        )
 
 
 @dataclass(frozen=True)
@@ -224,7 +230,9 @@ class CausalDiscoveryStage:
     assumptions: tuple[str, ...]
 
     def __post_init__(self):
-        _store_normalized_field(self, "method_labels", _freeze_tuple(self.method_labels))
+        _store_normalized_field(
+            self, "method_labels", _freeze_tuple(self.method_labels)
+        )
         _store_normalized_field(self, "graph_nodes", _freeze_tuple(self.graph_nodes))
         _store_normalized_field(
             self, "directed_edges", _freeze_nested_tuple(self.directed_edges)
@@ -343,7 +351,9 @@ class BacktestStage:
     monte_carlo_dgp: Optional[str] = None
 
     def __post_init__(self):
-        _store_normalized_field(self, "method_labels", _freeze_tuple(self.method_labels))
+        _store_normalized_field(
+            self, "method_labels", _freeze_tuple(self.method_labels)
+        )
         _store_normalized_field(
             self, "declared_trial_ids", _freeze_tuple(self.declared_trial_ids)
         )
@@ -370,7 +380,9 @@ class MultipleTestingAdjustmentsStage:
     selection_bias_evidence_id: Optional[str] = None
 
     def __post_init__(self):
-        _store_normalized_field(self, "method_labels", _freeze_tuple(self.method_labels))
+        _store_normalized_field(
+            self, "method_labels", _freeze_tuple(self.method_labels)
+        )
         _store_normalized_field(
             self, "declared_trial_ids", _freeze_tuple(self.declared_trial_ids)
         )
@@ -434,9 +446,7 @@ def _nonblank(value) -> bool:
 
 
 def _safe_label_set(value) -> set[str]:
-    if not isinstance(value, tuple) or not all(
-        isinstance(item, str) for item in value
-    ):
+    if not isinstance(value, tuple) or not all(isinstance(item, str) for item in value):
         return set()
     return set(value)
 
@@ -527,15 +537,15 @@ def _validate_event_horizons(
         start = float(horizon.start)
         end = float(horizon.end)
         if not start < end:
-            _add_error(errors, f"{stage}: every event horizon must have positive length.")
+            _add_error(
+                errors, f"{stage}: every event horizon must have positive length."
+            )
             continue
         result[horizon.observation_id] = (start, end)
     return result
 
 
-def _intervals_overlap(
-    left: tuple[float, float], right: tuple[float, float]
-) -> bool:
+def _intervals_overlap(left: tuple[float, float], right: tuple[float, float]) -> bool:
     return left[0] < right[1] and right[0] < left[1]
 
 
@@ -630,7 +640,9 @@ def _validate_fold_evidence(
         fit_set = set(fold.fit_ids)
         prediction_set = set(fold.prediction_ids)
         if train_set.intersection(test_set):
-            _add_error(errors, f"{stage}: training and test membership must be disjoint.")
+            _add_error(
+                errors, f"{stage}: training and test membership must be disjoint."
+            )
         if fit_set != train_set or fit_set.intersection(test_set):
             _add_error(
                 errors,
@@ -639,10 +651,10 @@ def _validate_fold_evidence(
         if prediction_set != test_set:
             _add_error(errors, f"{stage}: predictions must match the test membership.")
         if not (train_set | test_set | fit_set | prediction_set).issubset(known_ids):
-            _add_error(errors, f"{stage}: every fold identifier must have an event horizon.")
-        if validation_methods.intersection(
-            {"PURGED_CROSS_VALIDATION", "WALK_FORWARD"}
-        ):
+            _add_error(
+                errors, f"{stage}: every fold identifier must have an event horizon."
+            )
+        if validation_methods.intersection({"PURGED_CROSS_VALIDATION", "WALK_FORWARD"}):
             if nonresampled_test_ids.intersection(test_set):
                 _add_error(
                     errors,
@@ -715,7 +727,9 @@ def _validate_fold_evidence(
             tuple(sorted(partition)) for partition in path_partitions.values()
         ]
         if len(set(partition_signatures)) != len(partition_signatures):
-            _add_error(errors, f"{stage}: CPCV paths must have distinct test partitions.")
+            _add_error(
+                errors, f"{stage}: CPCV paths must have distinct test partitions."
+            )
     if (
         "PURGED_CROSS_VALIDATION" in validation_methods
         and known_ids
@@ -896,7 +910,9 @@ def _validate_discovery(
     if edges_valid:
         for source, target in stage.directed_edges:
             if source not in nodes or target not in nodes:
-                _add_error(errors, f"{label}: every directed edge must use graph nodes.")
+                _add_error(
+                    errors, f"{label}: every directed edge must use graph nodes."
+                )
             if source == target:
                 _add_error(errors, f"{label}: directed self-loops are not admissible.")
         if nodes and not _is_acyclic(nodes, stage.directed_edges):
@@ -907,7 +923,9 @@ def _validate_discovery(
         _add_error(errors, f"{label}: ambiguous edges must be a tuple.")
     elif stage.ambiguous_edges:
         _valid_edge_tuple(stage.ambiguous_edges, label, "ambiguous edges", errors)
-        _add_error(errors, f"{label}: identification-relevant ambiguity must be resolved.")
+        _add_error(
+            errors, f"{label}: identification-relevant ambiguity must be resolved."
+        )
     _validate_string_tuple(stage.assumptions, label, "graph assumptions", errors)
     safe_edges = stage.directed_edges if edges_valid else ()
     return nodes, _adjacency(nodes, safe_edges), safe_edges
@@ -975,7 +993,10 @@ def _validate_adjustment(
         _add_error(errors, f"{label}: treatment and outcome must be distinct.")
     if treatment not in graph_nodes or outcome not in graph_nodes:
         _add_error(errors, f"{label}: treatment and outcome must be graph nodes.")
-    if not _nonblank(stage.method_label) or stage.method_label not in _ADJUSTMENT_METHODS:
+    if (
+        not _nonblank(stage.method_label)
+        or stage.method_label not in _ADJUSTMENT_METHODS
+    ):
         _add_error(errors, f"{label}: adjustment method is not source-listed.")
     if not isinstance(stage.identified, bool) or not stage.identified:
         _add_error(errors, f"{label}: the causal effect must be identified.")
@@ -1006,14 +1027,16 @@ def _validate_adjustment(
         ("instruments", "instruments"),
     ):
         value = getattr(stage, field_name)
-        valid = _validate_string_tuple(
-            value, label, subject, errors, allow_empty=True
-        )
+        valid = _validate_string_tuple(value, label, subject, errors, allow_empty=True)
         role_names[field_name] = set(value) if valid else set()
         if valid and not set(value).issubset(graph_nodes):
-            _add_error(errors, f"{label}: every declared causal role must be a graph node.")
+            _add_error(
+                errors, f"{label}: every declared causal role must be a graph node."
+            )
         if valid and {treatment, outcome}.intersection(value):
-            _add_error(errors, f"{label}: treatment and outcome cannot be role variables.")
+            _add_error(
+                errors, f"{label}: treatment and outcome cannot be role variables."
+            )
 
     computed_descendants = _reachable(adjacency, treatment)
     computed_descendants.discard(outcome)
@@ -1026,7 +1049,9 @@ def _validate_adjustment(
         if mediator not in computed_descendants or outcome not in _reachable(
             adjacency, mediator
         ):
-            _add_error(errors, f"{label}: declared mediators must lie on a causal path.")
+            _add_error(
+                errors, f"{label}: declared mediators must lie on a causal path."
+            )
     incoming = {node: 0 for node in graph_nodes}
     for targets in adjacency.values():
         for target in targets:
@@ -1034,7 +1059,9 @@ def _validate_adjustment(
     if any(incoming.get(collider, 0) < 2 for collider in role_names["colliders"]):
         _add_error(errors, f"{label}: declared colliders must have converging arrows.")
     if outcome not in _reachable(adjacency, treatment):
-        _add_error(errors, f"{label}: the graph must retain a treatment-to-outcome path.")
+        _add_error(
+            errors, f"{label}: the graph must retain a treatment-to-outcome path."
+        )
 
     graph_confounders = {
         node
@@ -1073,9 +1100,7 @@ def _validate_adjustment(
             errors,
             f"{label}: a variable cannot be both a confounder and an instrument.",
         )
-    instrument_edges = tuple(
-        edge for edge in directed_edges if edge[0] != treatment
-    )
+    instrument_edges = tuple(edge for edge in directed_edges if edge[0] != treatment)
     for instrument in role_names["instruments"]:
         if treatment not in _reachable_avoiding(adjacency, instrument, selected):
             _add_error(
@@ -1179,8 +1204,13 @@ def _validate_adjustment(
                 f"{label}: selected controls must block every graph-implied backdoor path.",
             )
     elif stage.method_label == "FRONT_DOOR_ADJUSTMENT":
-        if not role_names["mediators"] or stage.frontdoor_criteria_satisfied is not True:
-            _add_error(errors, f"{label}: front-door criteria must be explicitly satisfied.")
+        if (
+            not role_names["mediators"]
+            or stage.frontdoor_criteria_satisfied is not True
+        ):
+            _add_error(
+                errors, f"{label}: front-door criteria must be explicitly satisfied."
+            )
         elif outcome in _reachable_avoiding(
             adjacency, treatment, role_names["mediators"]
         ):
@@ -1202,7 +1232,9 @@ def _validate_adjustment(
         if not role_names["instruments"] or any(
             value is not True for value in instrument_premises
         ):
-            _add_error(errors, f"{label}: instrumental-variable premises must all hold.")
+            _add_error(
+                errors, f"{label}: instrumental-variable premises must all hold."
+            )
 
 
 def _same_horizons(
@@ -1274,9 +1306,7 @@ def validate_causal_factor_protocol(
     selected_valid = _validate_string_tuple(
         selection.selected_variables, label, "selected variables", errors
     )
-    selected_variables = (
-        set(selection.selected_variables) if selected_valid else set()
-    )
+    selected_variables = set(selection.selected_variables) if selected_valid else set()
     selection_methods_valid = _validate_labels(
         selection.method_labels,
         _VARIABLE_SELECTION_METHODS,
@@ -1303,7 +1333,9 @@ def validate_causal_factor_protocol(
                 f"{label}: the declared selection design requires temporal validation.",
             )
     elif not isinstance(selection.validation, ValidationEvidence):
-        _add_error(errors, f"{label}: temporal validation evidence has an invalid type.")
+        _add_error(
+            errors, f"{label}: temporal validation evidence has an invalid type."
+        )
         selection_horizons = {}
     else:
         selection_horizons = _validate_fold_evidence(
@@ -1316,12 +1348,16 @@ def validate_causal_factor_protocol(
         if isinstance(selection.overlapping_returns, bool) and (
             selection.overlapping_returns != actual_overlap
         ):
-            _add_error(errors, f"{label}: overlap declaration must match event horizons.")
+            _add_error(
+                errors, f"{label}: overlap declaration must match event horizons."
+            )
         validation_methods = _safe_label_set(selection.validation.method_labels)
         if actual_overlap and not validation_methods.intersection(
             _PURGED_VALIDATION_METHODS
         ):
-            _add_error(errors, f"{label}: overlapping returns require purged validation.")
+            _add_error(
+                errors, f"{label}: overlapping returns require purged validation."
+            )
         if selection.strong_time_dependence and (
             not _finite_real(selection.validation.embargo)
             or float(selection.validation.embargo) <= 0.0
@@ -1394,7 +1430,9 @@ def validate_causal_factor_protocol(
     if has_explanatory and not _nonblank(stage4.explanatory_evidence_id):
         _add_error(errors, f"{label}: explanatory evidence identifier is required.")
     if not has_explanatory and stage4.explanatory_evidence_id is not None:
-        _add_error(errors, f"{label}: explanatory evidence must match reported metrics.")
+        _add_error(
+            errors, f"{label}: explanatory evidence must match reported metrics."
+        )
     if has_predictive and not _nonblank(stage4.predictive_evidence_id):
         _add_error(errors, f"{label}: predictive evidence identifier is required.")
     if not has_predictive and stage4.predictive_evidence_id is not None:
@@ -1416,11 +1454,17 @@ def validate_causal_factor_protocol(
         and has_predictive
         and stage4.explanatory_evidence_id == stage4.predictive_evidence_id
     ):
-        _add_error(errors, f"{label}: explanatory and predictive evidence must be separate.")
+        _add_error(
+            errors, f"{label}: explanatory and predictive evidence must be separate."
+        )
     if selection.purpose == "CAUSAL_ATTRIBUTION" and not has_explanatory:
-        _add_error(errors, f"{label}: causal attribution requires explanatory evidence.")
+        _add_error(
+            errors, f"{label}: causal attribution requires explanatory evidence."
+        )
     if selection.purpose == "RISK_PREMIA_HARVESTING" and not has_predictive:
-        _add_error(errors, f"{label}: risk-premia harvesting requires predictive evidence.")
+        _add_error(
+            errors, f"{label}: risk-premia harvesting requires predictive evidence."
+        )
     if not _nonblank(stage4.naive_benchmark_id):
         _add_error(errors, f"{label}: a naive benchmark identifier is required.")
     multiclass_fields = (stage4.multiclass_encoding, stage4.averaging_method)
@@ -1430,14 +1474,15 @@ def validate_causal_factor_protocol(
         ):
             _add_error(errors, f"{label}: multiclass encoding is not source-listed.")
         if not isinstance(stage4.averaging_method, str) or (
-            stage4.averaging_method
-            not in {"MICRO", "MACRO", "WEIGHTED", "SAMPLES"}
+            stage4.averaging_method not in {"MICRO", "MACRO", "WEIGHTED", "SAMPLES"}
         ):
             _add_error(errors, f"{label}: multiclass averaging is not source-listed.")
         if not _safe_label_set(stage4.task_types).intersection(
             {"PROBABILITY", "RANKING"}
         ):
-            _add_error(errors, f"{label}: multiclass settings require a classification task.")
+            _add_error(
+                errors, f"{label}: multiclass settings require a classification task."
+            )
     if not isinstance(stage4.validation, ValidationEvidence):
         _add_error(errors, f"{label}: purged validation evidence is required.")
     else:
@@ -1471,7 +1516,9 @@ def validate_causal_factor_protocol(
         errors,
     )
     if portfolio_labels_valid and set(portfolio.method_labels) != _PORTFOLIO_METHODS:
-        _add_error(errors, f"{label}: all source portfolio considerations are required.")
+        _add_error(
+            errors, f"{label}: all source portfolio considerations are required."
+        )
     causal_valid = _validate_string_tuple(
         portfolio.causal_exposures, label, "causal exposures", errors
     )
@@ -1503,9 +1550,13 @@ def validate_causal_factor_protocol(
         )
     safe_treatment = adjustment.treatment if _nonblank(adjustment.treatment) else ""
     if safe_treatment not in causal_exposures:
-        _add_error(errors, f"{label}: the target causal factor must drive position sizing.")
+        _add_error(
+            errors, f"{label}: the target causal factor must drive position sizing."
+        )
     if causal_exposures.intersection(neutral_exposures):
-        _add_error(errors, f"{label}: causal and neutralized exposures must be disjoint.")
+        _add_error(
+            errors, f"{label}: causal and neutralized exposures must be disjoint."
+        )
     declared_colliders = _safe_label_set(adjustment.colliders)
     if not declared_colliders.issubset(neutral_exposures):
         _add_error(errors, f"{label}: declared colliders must be neutralized.")
@@ -1550,7 +1601,9 @@ def validate_causal_factor_protocol(
     )
     if non_monte_carlo:
         if not isinstance(backtest.validation, ValidationEvidence):
-            _add_error(errors, f"{label}: temporal backtests require validation evidence.")
+            _add_error(
+                errors, f"{label}: temporal backtests require validation evidence."
+            )
         else:
             _validate_fold_evidence(
                 backtest.validation,
@@ -1582,7 +1635,9 @@ def validate_causal_factor_protocol(
         if not _nonblank(backtest.monte_carlo_dgp):
             _add_error(errors, f"{label}: Monte Carlo requires an explicit DGP.")
     elif backtest.monte_carlo_dgp is not None:
-        _add_error(errors, f"{label}: a Monte Carlo DGP requires the Monte Carlo method.")
+        _add_error(
+            errors, f"{label}: a Monte Carlo DGP requires the Monte Carlo method."
+        )
 
     multiple_testing = report.multiple_testing_adjustments
     label = "Stage 7"
@@ -1613,7 +1668,9 @@ def validate_causal_factor_protocol(
                 _add_error(errors, f"{label}: a family partition is invalid.")
                 continue
             if partition[0] in partition_ids:
-                _add_error(errors, f"{label}: family partition identifiers must be unique.")
+                _add_error(
+                    errors, f"{label}: family partition identifiers must be unique."
+                )
             partition_ids.add(partition[0])
             if not _validate_string_tuple(
                 partition[1], label, "partition trial identifiers", errors
@@ -1624,12 +1681,17 @@ def validate_causal_factor_protocol(
                     _add_error(errors, f"{label}: family partitions must be disjoint.")
                 covered_trials.add(trial_id)
         if trials_valid and covered_trials != set(report.declared_trial_ids):
-            _add_error(errors, f"{label}: family partitions must cover declared trials exactly.")
+            _add_error(
+                errors,
+                f"{label}: family partitions must cover declared trials exactly.",
+            )
 
     if not _finite_real(multiple_testing.alpha) or not (
         0.0 < float(multiple_testing.alpha) < 1.0
     ):
-        _add_error(errors, f"{label}: alpha must be a finite number between zero and one.")
+        _add_error(
+            errors, f"{label}: alpha must be a finite number between zero and one."
+        )
     if not isinstance(multiple_testing.backtests_independent, bool):
         _add_error(errors, f"{label}: backtest-dependence flag must be boolean.")
     elif multiple_testing.backtests_independent:
@@ -1670,9 +1732,7 @@ def validate_causal_factor_protocol(
         ):
             _add_error(errors, f"{label}: positive Sharpe-ratio variance is required.")
         if not _finite_real(multiple_testing.effective_trials) or not (
-            1.0
-            <= float(multiple_testing.effective_trials)
-            < trial_count
+            1.0 <= float(multiple_testing.effective_trials) < trial_count
         ):
             _add_error(errors, f"{label}: effective trials must be below total trials.")
         if (
@@ -1683,10 +1743,13 @@ def validate_causal_factor_protocol(
             _add_error(errors, f"{label}: sample length must be an integer above one.")
         if not _finite_real(multiple_testing.skewness):
             _add_error(errors, f"{label}: skewness must be finite.")
-        if not _finite_real(multiple_testing.kurtosis) or float(
-            multiple_testing.kurtosis
-        ) < 1.0:
-            _add_error(errors, f"{label}: Pearson kurtosis must be finite and at least one.")
+        if (
+            not _finite_real(multiple_testing.kurtosis)
+            or float(multiple_testing.kurtosis) < 1.0
+        ):
+            _add_error(
+                errors, f"{label}: Pearson kurtosis must be finite and at least one."
+            )
         elif _finite_real(multiple_testing.skewness) and abs(
             float(multiple_testing.skewness)
         ) > math.sqrt(float(multiple_testing.kurtosis) - 1.0):

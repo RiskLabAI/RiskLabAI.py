@@ -4,7 +4,7 @@
   "product": "RiskLabAI",
   "language": "Python",
   "version": "3.0.0",
-  "runner": "pytest",
+  "runner": "pytest / six base lanes / three optional-feature lanes",
   "file_count": 78,
   "file_groups": {
     "CAUSAL_FACTOR_ANALYSIS": 7,
@@ -23,6 +23,9 @@
     "technical_indicator_oracles": 8,
     "total_applicable": 680
   },
+  "base_lane_count": 6,
+  "optional_feature_lane_count": 3,
+  "ci_execution_count": 9,
   "required_lane_count": 6,
   "required_lane_case_total": 4080,
   "files": [
@@ -203,8 +206,8 @@
     },
     {
       "path": "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
-      "size": 3672,
-      "sha256": "6A840BBD03FC9C098455C0DAE641ACA279D6C8E8A4F70B040DB2A555D7E50078",
+      "size": 3644,
+      "sha256": "195A3291A6CB6EAEE929F02951BAA45BD6E933AB751CCC30469402BBDA12DE9A",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 7
     },
@@ -231,22 +234,22 @@
     },
     {
       "path": "test/causal_factor_analysis/test_protocol.py",
-      "size": 39100,
-      "sha256": "8781036062F8734967F115FA63A52F66A14552B1EA56CB9B422A71B1E25070B2",
+      "size": 39048,
+      "sha256": "1CAACE494F327A7B135E3A0D8F38BC15EBEA57BBC2D2CB77CB9D6BA6B8E17930",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 43
     },
     {
       "path": "test/causal_factor_analysis/test_specification_diagnostics.py",
-      "size": 9096,
-      "sha256": "DDED9E16AA02CBA5284BACE5B61E4CA53CBB1FBC2A72E665F289CD252E81930E",
+      "size": 9088,
+      "sha256": "6FD3A8C9F1DFDC665AE9DCD80E41798D5D1EAE48BB9B2F4EE5AAB61B1B3393D4",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 10
     },
     {
       "path": "test/causal_factor_analysis/test_treatment_effects.py",
-      "size": 5969,
-      "sha256": "0B67456180473825489748AD99098C8BFCE6D15293EFE136546785AC19FE836E",
+      "size": 5955,
+      "sha256": "434750E2D2889FA64E49BAE08372D0E08C9DC145BE88AB5CD58B942B4D1F5B6B",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 12
     },

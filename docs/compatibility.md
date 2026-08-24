@@ -66,6 +66,24 @@ The financial-feature simulation no longer relies on the stale `ta` package.
 ADX, RSI, CCI, stochastic momentum, ROC, ATR, and Ichimoku lines are computed
 internally from standard definitions and have hand-calculated oracle tests.
 
+## Continuous integration contract
+
+The governed CI workflow installs the distribution non-editably before every
+runtime test. Import-origin probes run outside the repository checkout and
+reject any `RiskLabAI` module resolved from the preserved repository root.
+
+The base matrix contains six valid interpreter/NumPy combinations: the lowest
+supported NumPy binary and the latest supported NumPy 2.x release on each of
+CPython 3.12, 3.13, and 3.14. Three additional optional-feature lanes install
+the feature-specific groups on those interpreter lines. The `speed` group
+keeps its narrower NumPy `<2.6` constraint, and the Python 3.14 lane verifies
+that only the unavailable changepoint backend is skipped.
+
+Pinned Black and Ruff checks cover the independently maintained clean causal
+source and tests. Preserved source and regression tests remain governed by the
+complete installed-package runtime matrix and are not rewritten solely to
+satisfy a new style tool.
+
 ## Deprecation policy
 
 Public compatibility aliases retained in RiskLabAI 3.0.0 remain callable and
@@ -104,7 +122,8 @@ did not import or reintroduce the excluded legacy causal implementation.
 
 ## Remaining release gates
 
-The metadata, public surface, tests, and source allowlists are complete. No
-package has been built or installed. Temporary artifact inspection and separate
-human authorization for version-control, publication, and release remain
-outstanding.
+The metadata, public surface, tests, source allowlists, installed-origin probes,
+and CI contract are complete. Source installs used isolated verification
+environments and retained no wheel or source-distribution artifact. Formal
+artifact inspection and separate human authorization for version-control,
+publication, and release remain outstanding.

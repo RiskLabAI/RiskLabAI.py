@@ -55,8 +55,7 @@ def test_appendix_equations_54_to_61_give_exact_conditional_gaussian_moments():
     variance_z = np.array([[3.0]])
     conditional_mean_coefficient = covariance_xy_z @ np.linalg.inv(variance_z)
     conditional_covariance = (
-        covariance_xy
-        - conditional_mean_coefficient @ covariance_xy_z.T
+        covariance_xy - conditional_mean_coefficient @ covariance_xy_z.T
     )
     np.testing.assert_allclose(
         conditional_mean_coefficient,

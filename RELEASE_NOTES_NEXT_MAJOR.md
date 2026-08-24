@@ -18,12 +18,19 @@ Compatibility aliases that remain present in 3.0.0 now consistently warn of
 removal in 4.0.0. No alias is silently deleted, and the warning contract is
 locked by package-scoped tests.
 
+The release metadata uses the PEP 639 `BSD-3-Clause` expression and license
+file without the superseded license classifier. The governed CI workflow now
+installs the distribution, rejects imports shadowed by the preserved repository
+root, tests the six approved base runtime/NumPy combinations, exercises
+feature-specific optional lanes, and isolates the Python 3.14 changepoint
+limitation. Pinned static checks cover the clean causal source and tests.
+
 No source-conflicted causal result is admitted. The metadata contract is
 complete; artifacts, publication, upload, and release remain blocked.
 
 The static distributable metadata, exact 124-module runtime inventory,
 78-file package-scoped test inventory, public API inventory, documentation,
-examples, dependency groups, and intended package file list are now frozen.
-No package artifact has been created. The remaining gates are future artifact
-inspection and separate human authorization for version-control, publication,
-and release actions.
+examples, dependency groups, governed CI workflow, and 215-file intended
+source-distribution list are now frozen. No retained package artifact has been
+created. The remaining gates are future artifact inspection and separate human
+authorization for version-control, publication, and release actions.
