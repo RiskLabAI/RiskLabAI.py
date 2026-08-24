@@ -78,6 +78,22 @@ def test_eq5_square_solution_is_covariance_independent():
         np.testing.assert_allclose(weights, expected, rtol=0.0, atol=1e-13)
 
 
+def test_eq5_square_solution_does_not_use_qr(monkeypatch):
+    def fail_if_called(*_args, **_kwargs):
+        raise AssertionError("square exposure systems must use the Equation (5) solve")
+
+    monkeypatch.setattr(np.linalg, "qr", fail_if_called)
+    exposures = np.array([[1.0, 1.0], [1.0, 1.0 + 1e-9]])
+    targets = np.array([1.0, 0.0])
+
+    weights = minimum_variance_factor_weights(np.eye(2), exposures, targets)
+
+    np.testing.assert_allclose(
+        weights, np.linalg.solve(exposures.T, targets), rtol=5e-8, atol=0.0
+    )
+    np.testing.assert_allclose(exposures.T @ weights, targets, rtol=0.0, atol=1e-12)
+
+
 def test_eq6_single_factor_solution():
     covariance = np.array([[2.0, 0.5], [0.5, 1.0]])
     exposures = np.array([[1.0], [1.0]])

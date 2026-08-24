@@ -67,8 +67,8 @@
       "path": "src/RiskLabAI/backtest/__init__.py",
       "module": "RiskLabAI.backtest",
       "module_kind": "package",
-      "sha256": "6AE9F8763745BD3331A53D77441E4AB76BA51727916F8516C3181CC7F88590FB",
-      "size": 6381,
+      "sha256": "BC1D1DB5707902C0C61EFBB1DB1CDC88101388B065BCA30FE7A8CA621667058C",
+      "size": 6172,
       "defined_public_names": [],
       "definitions": []
     },
@@ -289,8 +289,8 @@
       "path": "src/RiskLabAI/backtest/backtest_synthetic_data.py",
       "module": "RiskLabAI.backtest.backtest_synthetic_data",
       "module_kind": "module",
-      "sha256": "9ACDA6D9D81702F611CBC4EBE11899C31463DA899709D9975931F592CD59AF39",
-      "size": 3523,
+      "sha256": "F67B8239A8E5F9EF5BA73F84938614F211C71197CD87AAFCFE10A8EDEBABC627",
+      "size": 3424,
       "defined_public_names": [
         "synthetic_back_testing"
       ],
@@ -693,8 +693,8 @@
       "path": "src/RiskLabAI/backtest/validation/__init__.py",
       "module": "RiskLabAI.backtest.validation",
       "module_kind": "package",
-      "sha256": "503E9653E49B6606D1534CD677A731F1D5EB07563ED39AE62B64CF39F4BED5B1",
-      "size": 1951,
+      "sha256": "88C99E37BE96E2BD23FD54ED0491C962F2BDEDD696E97F9B2627A410D1F8660F",
+      "size": 1896,
       "defined_public_names": [],
       "definitions": []
     },
@@ -787,8 +787,8 @@
       "path": "src/RiskLabAI/backtest/validation/cross_validator_interface.py",
       "module": "RiskLabAI.backtest.validation.cross_validator_interface",
       "module_kind": "module",
-      "sha256": "9BB6CFBFF867C8F863CF0CA0B1FF6384463A4385D88C2FD1FEFFA0775B85FD0D",
-      "size": 8202,
+      "sha256": "A6FB69106047B94AF0E7ECCDE88FBDCCB5178BE08ED8EE8E03B04564F8E50A7E",
+      "size": 7967,
       "defined_public_names": [
         "CrossValidator"
       ],
@@ -890,8 +890,8 @@
       "path": "src/RiskLabAI/backtest/validation/purged_kfold.py",
       "module": "RiskLabAI.backtest.validation.purged_kfold",
       "module_kind": "module",
-      "sha256": "86802CB8E32ECDD092A522FBAC196C2BA5F05FAAAF4227091C705EDBD2DBFCD8",
-      "size": 19810,
+      "sha256": "8E2385391624CFB31E3B9C97B0D8E27B774E1985DF6ED5997F59A1D49ACFF902",
+      "size": 19267,
       "defined_public_names": [
         "PurgedKFold"
       ],
@@ -1099,8 +1099,8 @@
       "path": "src/RiskLabAI/causal_factor_analysis/optimizer.py",
       "module": "RiskLabAI.causal_factor_analysis.optimizer",
       "module_kind": "module",
-      "sha256": "9C15ABD41FE232686553E37911A4F123C9FD745F877BC52C03E35CC0D36101A8",
-      "size": 8555,
+      "sha256": "C83DFD2630E82E3D31D45E47E3895FD8926CB2FC67A66842C4C25BDEEF2379A5",
+      "size": 8835,
       "defined_public_names": [
         "minimum_variance_factor_weights"
       ],
@@ -1341,8 +1341,8 @@
       "path": "src/RiskLabAI/cluster/__init__.py",
       "module": "RiskLabAI.cluster",
       "module_kind": "package",
-      "sha256": "CC1993BE2778895842431BD777BFEF3B620341E6DB13B4BEDB5A58891CAF14DC",
-      "size": 669,
+      "sha256": "1313FCD1DFC97508FB0ECAE567B46BAF5CE9997748C302ABACD0AA4606D931B3",
+      "size": 642,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1403,8 +1403,8 @@
       "path": "src/RiskLabAI/controller/__init__.py",
       "module": "RiskLabAI.controller",
       "module_kind": "package",
-      "sha256": "875DCD9EC172311DF8E9DF665C60102BDC0F56218A5CDDE0760E2A081E369230",
-      "size": 75,
+      "sha256": "0DED3F4FAB2B94562CC9337E7D1A170B6ACA95D4F4477C2A6730DF29ABE0A8FF",
+      "size": 73,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1412,8 +1412,8 @@
       "path": "src/RiskLabAI/controller/bars_initializer.py",
       "module": "RiskLabAI.controller.bars_initializer",
       "module_kind": "module",
-      "sha256": "28284D4877900DE9D3582C2B821FC66173E474E1F62C95F27385190C4A88426F",
-      "size": 13999,
+      "sha256": "6C45A2CACEB4BD9AAB6B08EA0EDD240E4144CF823FCE361C5297F2DC9FFF9022",
+      "size": 13700,
       "defined_public_names": [
         "BarsInitializerController"
       ],
@@ -1429,8 +1429,8 @@
       "path": "src/RiskLabAI/controller/data_structure_controller.py",
       "module": "RiskLabAI.controller.data_structure_controller",
       "module_kind": "module",
-      "sha256": "237843F3AD293C366607FA555C218F4F3CD8ACCD881F784030B3AA6B12BC8E23",
-      "size": 6102,
+      "sha256": "4D4CAFBA0B0059A89398A1CD453F57A803E80466C93DC3AC4A0F11BB894DDF8C",
+      "size": 5914,
       "defined_public_names": [
         "BAR_COLUMNS",
         "Controller"
@@ -1538,8 +1538,8 @@
       "path": "src/RiskLabAI/data/__init__.py",
       "module": "RiskLabAI.data",
       "module_kind": "package",
-      "sha256": "F238157F6B54DB5E12E2F910821431BED049AB6E99665B64AD81F95EB7B1488B",
-      "size": 664,
+      "sha256": "BF1701C8581DC602A5D37E10BAE6CDB837D489BD8791781B5F50BA4D067876FD",
+      "size": 630,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1556,8 +1556,8 @@
       "path": "src/RiskLabAI/data/denoise/denoising.py",
       "module": "RiskLabAI.data.denoise.denoising",
       "module_kind": "module",
-      "sha256": "411FFBD20F902E19426506D6C5472570960F9091E67E3D0F8626DE09E63B8B92",
-      "size": 11538,
+      "sha256": "AE33547DD525D4905A7322995E491D8D361D434E05F56CDD1155F7AF04CD7371",
+      "size": 11161,
       "defined_public_names": [
         "corr_to_cov",
         "cov_to_corr",
@@ -1692,8 +1692,8 @@
       "path": "src/RiskLabAI/data/differentiation/differentiation.py",
       "module": "RiskLabAI.data.differentiation.differentiation",
       "module_kind": "module",
-      "sha256": "FD6A1B4247CC3F7B6C794866CD1809770460BD2AFC08375F2F96B02AF0D79E02",
-      "size": 12258,
+      "sha256": "4E9E45C90AEB0B8949E5F6F774D1AF20AA5973188F5FD23FFB4344E6EF5C5E9F",
+      "size": 11859,
       "defined_public_names": [
         "calculate_weights_ffd",
         "calculate_weights_std",
@@ -1783,8 +1783,8 @@
       "path": "src/RiskLabAI/data/distance/distance_metric.py",
       "module": "RiskLabAI.data.distance.distance_metric",
       "module_kind": "module",
-      "sha256": "6399EFDB1E12A82ED3BB6831FF6F985E0EAB18D2420D82670CF1599189D51E73",
-      "size": 8377,
+      "sha256": "89073FAA39E9FF195C7028BEA970410562745534AE52AAFD310C5499E4DC914D",
+      "size": 8073,
       "defined_public_names": [
         "calculate_cross_entropy",
         "calculate_distance",
@@ -1836,8 +1836,8 @@
       "path": "src/RiskLabAI/data/labeling/__init__.py",
       "module": "RiskLabAI.data.labeling",
       "module_kind": "package",
-      "sha256": "E84DB73F915081EF60F6C8441D10BFE5E759037EE7D42945B1AD2FBB77A10CC3",
-      "size": 1193,
+      "sha256": "CBDD997697143DFFD4287A26E568C257FDE2634BDBA325955438353D65DC86F7",
+      "size": 1144,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1947,8 +1947,8 @@
       "path": "src/RiskLabAI/data/structures/abstract_imbalance_bars.py",
       "module": "RiskLabAI.data.structures.abstract_imbalance_bars",
       "module_kind": "module",
-      "sha256": "350535B7AAF4E997E19242E07991EA7AB22BB41C041490D2243F25B2D4D90111",
-      "size": 6388,
+      "sha256": "E7A54B451B412FD1F2463E59E8706131A1D7AD8C84D3FE6CC1E2B5A3DC8B1B99",
+      "size": 6210,
       "defined_public_names": [
         "AbstractImbalanceBars"
       ],
@@ -1964,8 +1964,8 @@
       "path": "src/RiskLabAI/data/structures/abstract_information_driven_bars.py",
       "module": "RiskLabAI.data.structures.abstract_information_driven_bars",
       "module_kind": "module",
-      "sha256": "2035EA576F53B0CF6B7A4A44CEB2DDC64E531BC91E8F6C98ADACF7578A11306A",
-      "size": 4150,
+      "sha256": "8601CD7E405A10F66BF6A82192E8EA261F9D71CA2A8C85E48FFA334EBC00D8DF",
+      "size": 4021,
       "defined_public_names": [
         "AbstractInformationDrivenBars"
       ],
@@ -1981,8 +1981,8 @@
       "path": "src/RiskLabAI/data/structures/abstract_run_bars.py",
       "module": "RiskLabAI.data.structures.abstract_run_bars",
       "module_kind": "module",
-      "sha256": "51DDD1B7C662E2FB2D749C5C8483782C76EF00584ACC36FD8314787239DAFFED",
-      "size": 10204,
+      "sha256": "1B7E12ED9C1B2505F014FE5487CF1AFC938463198C8B40F7360ED1739E035EFD",
+      "size": 9943,
       "defined_public_names": [
         "AbstractRunBars"
       ],
@@ -2212,8 +2212,8 @@
       "path": "src/RiskLabAI/data/weights/sample_weights.py",
       "module": "RiskLabAI.data.weights.sample_weights",
       "module_kind": "module",
-      "sha256": "A1AEBA7541663238C20B3B7A76B8706AB62D6860CD171DB6000E2EF92C492724",
-      "size": 7225,
+      "sha256": "4DA73877840EF49BDFF35B087CE1FC52354D14E9136217D16B1948C5577A9BB4",
+      "size": 6991,
       "defined_public_names": [
         "calculate_average_uniqueness",
         "calculate_time_decay",
@@ -2256,8 +2256,8 @@
       "path": "src/RiskLabAI/ensemble/bagging_classifier_accuracy.py",
       "module": "RiskLabAI.ensemble.bagging_classifier_accuracy",
       "module_kind": "module",
-      "sha256": "DF1570D491B4452412103BE1ECDC6B0C4CFDA3D9AAF55D9DDD7620B611134F92",
-      "size": 1300,
+      "sha256": "9B2150DA7DB358161927137E5E2ED9C3FA0249FF71E86401F29C9F96258B839C",
+      "size": 1255,
       "defined_public_names": [
         "bagging_classifier_accuracy"
       ],
@@ -2302,8 +2302,8 @@
       "path": "src/RiskLabAI/features/__init__.py",
       "module": "RiskLabAI.features",
       "module_kind": "package",
-      "sha256": "8E6EF92F8D1E0E9BCA37E3436806A37308B8B3CB08C221481F4A1261327C5A18",
-      "size": 123,
+      "sha256": "CE30ECC88CBFF140893C4FADFBE38DC90EE954024126EF66F1A5200AE0146C2B",
+      "size": 117,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2349,8 +2349,8 @@
       "path": "src/RiskLabAI/features/entropy_features/kontoyiannis.py",
       "module": "RiskLabAI.features.entropy_features.kontoyiannis",
       "module_kind": "module",
-      "sha256": "08FCF8EEEF1D9C4FFFC4F812A39B77F406050091ED287C9AE1A577E849998A4B",
-      "size": 2902,
+      "sha256": "A69F1FEB3DAC762724F5ED9F17BCAD0E9D9EC88B5946348FA80EA4059AD04119",
+      "size": 2793,
       "defined_public_names": [
         "kontoyiannis_entropy",
         "longest_match_length"
@@ -2372,8 +2372,8 @@
       "path": "src/RiskLabAI/features/entropy_features/lempel_ziv.py",
       "module": "RiskLabAI.features.entropy_features.lempel_ziv",
       "module_kind": "module",
-      "sha256": "295BFA3C0E3970C75C924C6D19E2D0B384E29A2B50AED7C8C08E1723A975BF4F",
-      "size": 1017,
+      "sha256": "1F015F187028C1957CC91BC91D944B10202D7D3EF37F3CAAF29D4CFB238C8FF8",
+      "size": 976,
       "defined_public_names": [
         "lempel_ziv_entropy"
       ],
@@ -2389,8 +2389,8 @@
       "path": "src/RiskLabAI/features/entropy_features/plug_in.py",
       "module": "RiskLabAI.features.entropy_features.plug_in",
       "module_kind": "module",
-      "sha256": "90DB453E95DD416771EAC11232E33584582C7FF1EA9B79DD441588185BADC483",
-      "size": 981,
+      "sha256": "799C9ABB1AD8A864BF15E5F1E3267C5FCB482B83C38A4F0FCF9E4C5F2C81B763",
+      "size": 942,
       "defined_public_names": [
         "plug_in_entropy_estimator"
       ],
@@ -2406,8 +2406,8 @@
       "path": "src/RiskLabAI/features/entropy_features/pmf.py",
       "module": "RiskLabAI.features.entropy_features.pmf",
       "module_kind": "module",
-      "sha256": "649221CC7406A3CF9607DE10CCA44C0F7D661E2B877209626704EBFF93F0BBC9",
-      "size": 1862,
+      "sha256": "55A1BA2FAC7BDC384C15E36B7874E01C0DD0B40D5D8FF6E6113972B81FED8D24",
+      "size": 1798,
       "defined_public_names": [
         "ngram_counts",
         "probability_mass_function"
@@ -2429,8 +2429,8 @@
       "path": "src/RiskLabAI/features/entropy_features/shannon.py",
       "module": "RiskLabAI.features.entropy_features.shannon",
       "module_kind": "module",
-      "sha256": "B594B49278CB1904E605CC44083B0A545F71E14B2BDDA6EF0A2BE03FAE2A2DA8",
-      "size": 723,
+      "sha256": "FBA55BE6A0B6E529ABD77BE038F5F885945B034A04DA042CFFD99A278735B37E",
+      "size": 689,
       "defined_public_names": [
         "shannon_entropy"
       ],
@@ -2446,8 +2446,8 @@
       "path": "src/RiskLabAI/features/feature_importance/__init__.py",
       "module": "RiskLabAI.features.feature_importance",
       "module_kind": "package",
-      "sha256": "AA2D447A39D488D12DBDAA7E54F158AC9F4E94F7839D4F0BE56BBE6F9E0EC27D",
-      "size": 2142,
+      "sha256": "24C80AA3C46B3237D6FBC513C4E4A7EED88A54304C94792E5F24F295A00AFB73",
+      "size": 2076,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2455,8 +2455,8 @@
       "path": "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
       "module": "RiskLabAI.features.feature_importance.clustered_feature_importance_mda",
       "module_kind": "module",
-      "sha256": "656BBC12FE44777CE8557AF6A0F3292DA11A69B23C0F812E10501E9AFF4E2BF1",
-      "size": 5518,
+      "sha256": "7BF977CB4D65189BB478CAA8378D3094E7D0A8FD672C498AC3BD881FF0B818A6",
+      "size": 5361,
       "defined_public_names": [
         "ClusteredFeatureImportanceMDA"
       ],
@@ -2472,8 +2472,8 @@
       "path": "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
       "module": "RiskLabAI.features.feature_importance.clustered_feature_importance_mdi",
       "module_kind": "module",
-      "sha256": "965BFFF4A3EF79239B54C7DD5A09B7590C3EA1DF8F2B2F10695ADFA095CA45C7",
-      "size": 3511,
+      "sha256": "4B2B7A7F98BA4030A8B0B885C2D9077F22445F3D5B07FF470D1E247BF4346516",
+      "size": 3403,
       "defined_public_names": [
         "ClusteredFeatureImportanceMDI"
       ],
@@ -2546,8 +2546,8 @@
       "path": "src/RiskLabAI/features/feature_importance/feature_importance_mda.py",
       "module": "RiskLabAI.features.feature_importance.feature_importance_mda",
       "module_kind": "module",
-      "sha256": "5E22AE26672B9B3A608CC237791625386C5B500FFBF768AEEC5478154F727CF0",
-      "size": 4650,
+      "sha256": "872D141D6D96B4CED9660710ACE3EFBFE4FCCB74065BEEA6FEF5344DF1A61861",
+      "size": 4515,
       "defined_public_names": [
         "FeatureImportanceMDA"
       ],
@@ -2563,8 +2563,8 @@
       "path": "src/RiskLabAI/features/feature_importance/feature_importance_mdi.py",
       "module": "RiskLabAI.features.feature_importance.feature_importance_mdi",
       "module_kind": "module",
-      "sha256": "82F93E0DA408EB9D4984856C3C432704DC8093ADC90FE9DC898D2109E7381A92",
-      "size": 2739,
+      "sha256": "C201C6FA3986268AE49D7D2AFE177DBB468AA4E5D32CD9B9CA805DAEAA9EE5AE",
+      "size": 2651,
       "defined_public_names": [
         "FeatureImportanceMDI"
       ],
@@ -2580,8 +2580,8 @@
       "path": "src/RiskLabAI/features/feature_importance/feature_importance_sfi.py",
       "module": "RiskLabAI.features.feature_importance.feature_importance_sfi",
       "module_kind": "module",
-      "sha256": "67CB65A25ACA73457000C23AC4853A1D281CA3C2DB3CE6614C1262AF51B808BF",
-      "size": 3984,
+      "sha256": "69ED5D5AEA7F977E72459492D278ED5A1A3B0B5A7099CED6C96D1B5EE26C4833",
+      "size": 3865,
       "defined_public_names": [
         "FeatureImportanceSFI"
       ],
@@ -2597,8 +2597,8 @@
       "path": "src/RiskLabAI/features/feature_importance/feature_importance_strategy.py",
       "module": "RiskLabAI.features.feature_importance.feature_importance_strategy",
       "module_kind": "module",
-      "sha256": "E007852540710974A4C56089DB6A5DE46F11B19760690E400BAFCE154156BD1D",
-      "size": 894,
+      "sha256": "0B5BF2F9EA40AEF208FAF010308BE4E0AF32B9378B395A8B555CF2CB1D97CCAA",
+      "size": 857,
       "defined_public_names": [
         "FeatureImportanceStrategy"
       ],
@@ -2665,8 +2665,8 @@
       "path": "src/RiskLabAI/features/microstructural_features/__init__.py",
       "module": "RiskLabAI.features.microstructural_features",
       "module_kind": "package",
-      "sha256": "69C079797912E65103C77DD079B00F420C30479FEFEB7A3C0C3E70AF7BCC855A",
-      "size": 737,
+      "sha256": "5A47422A191048EB40286C2BA1169BA3FF04396BFA08F9582439A26521A06353",
+      "size": 708,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2775,8 +2775,8 @@
       "path": "src/RiskLabAI/features/structural_breaks/structural_breaks.py",
       "module": "RiskLabAI.features.structural_breaks.structural_breaks",
       "module_kind": "module",
-      "sha256": "9F5E690FDAC43FFE12728DBF696DF2B250235B192604F8CA9DDE9BC922E14656",
-      "size": 26104,
+      "sha256": "0C562C044C063DFA0606EB88D74A33B54B08A69FA19A126D1B8DB7FCD3276242",
+      "size": 25396,
       "defined_public_names": [
         "compute_beta",
         "get_bsadf_sequence",
@@ -2878,8 +2878,8 @@
       "path": "src/RiskLabAI/hpc/hpc.py",
       "module": "RiskLabAI.hpc.hpc",
       "module_kind": "module",
-      "sha256": "B5AEFF775459A0AD8A5AD0E10B0806E7FC08137F1CCD0CD85966FFF60D03D1C5",
-      "size": 11685,
+      "sha256": "CC6377F6E22F2BB25D87723DE0D6C36DEB555F4D08C19BDD4B55C64D5FABEED1",
+      "size": 11306,
       "defined_public_names": [
         "expand_call",
         "linear_partitions",
@@ -2937,8 +2937,8 @@
       "path": "src/RiskLabAI/optimization/__init__.py",
       "module": "RiskLabAI.optimization",
       "module_kind": "package",
-      "sha256": "E67CA20C00441769F46EA11BFDC7113646556FF45EFD63C1E748CC2BA93805A1",
-      "size": 1257,
+      "sha256": "8B178E855B01B7AAA4A6988060A26B794A9E4A867CF5E5F3125D1CBC0AE6900C",
+      "size": 1211,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2963,8 +2963,8 @@
       "path": "src/RiskLabAI/optimization/hrp.py",
       "module": "RiskLabAI.optimization.hrp",
       "module_kind": "module",
-      "sha256": "5A5F6F3D3145C9F7870CD1FEE15BD88D11A7C7E707D4A6EDCF83F9F43F92AED1",
-      "size": 6323,
+      "sha256": "5DD1818F65CDCE5C07870D96353627600C325ADE1C4297AAB933AB5954538047",
+      "size": 6108,
       "defined_public_names": [
         "cluster_variance",
         "distance_corr",
@@ -3010,8 +3010,8 @@
       "path": "src/RiskLabAI/optimization/hyper_parameter_tuning.py",
       "module": "RiskLabAI.optimization.hyper_parameter_tuning",
       "module_kind": "module",
-      "sha256": "93619B3E22168D701F2DF2E17ABA0134B3E3BF1345C2B6CF234E14A9A5083A33",
-      "size": 6347,
+      "sha256": "DCAFAFB9A5541BA40FE48FC8DBDD57E804BBD9DC5C22430F7979B0080AD81D29",
+      "size": 6152,
       "defined_public_names": [
         "MyPipeline",
         "SampleWeightedPipeline",
@@ -3039,8 +3039,8 @@
       "path": "src/RiskLabAI/optimization/nco.py",
       "module": "RiskLabAI.optimization.nco",
       "module_kind": "module",
-      "sha256": "96D9A482B49D9E784B6790B46E28EFE706E3C63A262521D721BD75C46A59085A",
-      "size": 4122,
+      "sha256": "4FB1EE548E62CEF2BDD71E289F8F3DAD403F92AEE95820DA2BF1DA9409CAAA53",
+      "size": 3992,
       "defined_public_names": [
         "get_optimal_portfolio_weights",
         "get_optimal_portfolio_weights_nco"
@@ -3233,8 +3233,8 @@
       "path": "src/RiskLabAI/utils/constants.py",
       "module": "RiskLabAI.utils.constants",
       "module_kind": "module",
-      "sha256": "A151D28E3AC9C3860C823F60097360532230864FF049ADDB5524ABBD99A88ABA",
-      "size": 3088,
+      "sha256": "751B87152BF9EABFE4AE5BB9CF35F38FBD56E4FE2691BF52B749CC3DAFAACE5A",
+      "size": 3003,
       "defined_public_names": [
         "BUY_TICKS_NUMBER",
         "CLOSE_PRICE",
@@ -3274,8 +3274,8 @@
       "path": "src/RiskLabAI/utils/ewma.py",
       "module": "RiskLabAI.utils.ewma",
       "module_kind": "module",
-      "sha256": "31C124A43EA1CD2BACE221F76C3EB3518E71C19D6BF547AF20D555DC8ACD97FC",
-      "size": 2173,
+      "sha256": "48306B7F06272DFBABFB0CFE2B147F232038884BFCE77FEE072583A8F8F6355B",
+      "size": 2118,
       "defined_public_names": [
         "ewma"
       ],

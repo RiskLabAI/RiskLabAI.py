@@ -13,21 +13,21 @@
   },
   "collected_cases_in_reference_full_feature_environment": {
     "preserved_library": 343,
-    "causal_factor_analysis": 341,
+    "causal_factor_analysis": 342,
     "technical_indicator_oracles": 8,
-    "total": 692
+    "total": 693
   },
   "verified_required_matrix_cases_per_lane": {
     "preserved_library_applicable": 331,
-    "causal_factor_analysis": 341,
+    "causal_factor_analysis": 342,
     "technical_indicator_oracles": 8,
-    "total_applicable": 680
+    "total_applicable": 681
   },
+  "required_lane_count": 6,
+  "required_lane_case_total": 4086,
   "base_lane_count": 6,
   "optional_feature_lane_count": 3,
   "ci_execution_count": 9,
-  "required_lane_count": 6,
-  "required_lane_case_total": 4080,
   "files": [
     {
       "path": "test/backtest/test_advanced_bet_sizing.py",
@@ -227,10 +227,10 @@
     },
     {
       "path": "test/causal_factor_analysis/test_minimum_variance.py",
-      "size": 15900,
-      "sha256": "F0C7A037F7A2AE1652E2E69362898572095EA6342EAB5699367C8FC84E929D9D",
+      "size": 16521,
+      "sha256": "4DC42E571B7B2485B362366F8257F27CCC8C69B019BA50D1D3D74DC95F5571C7",
       "group": "CAUSAL_FACTOR_ANALYSIS",
-      "declared_test_functions": 32
+      "declared_test_functions": 33
     },
     {
       "path": "test/causal_factor_analysis/test_protocol.py",

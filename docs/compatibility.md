@@ -96,14 +96,14 @@ deleted in this release.
 
 ## Matrix evidence
 
-Every lane passed all 341 frozen causal-factor tests. Across six lanes this is
-2,046 causal assertions with no failures.
+Every required base lane passed all 342 frozen causal-factor tests. Across six
+lanes this is 2,052 causal assertions with no failures.
 
-The final self-contained package test tree collects exactly 692 tests: 343
-preserved-library tests, 341 causal-factor tests, and 8 independent technical-
+The final self-contained package test tree collects exactly 693 tests: 343
+preserved-library tests, 342 causal-factor tests, and 8 independent technical-
 indicator oracles. Its complete Python 3.12 current-dependency run succeeded
-with 691 passes and one declared Windows platform skip. The package inventory
-records both the collected suite and the 680-test applicable base matrix used
+with 692 passes and one declared Windows platform skip. The package inventory
+records both the collected suite and the 681-test applicable base matrix used
 on every supported interpreter/dependency lane.
 
 The complete preserved base suite passed 331 applicable tests per lane. Five

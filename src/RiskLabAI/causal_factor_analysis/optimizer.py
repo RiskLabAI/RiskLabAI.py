@@ -85,14 +85,16 @@ def minimum_variance_factor_weights(
 
     Notes
     -----
-    The published inverse formula is evaluated by Cholesky-whitening the
-    exposures and solving the resulting minimum-norm problem with reduced QR.
-    This avoids both explicit inverses and the condition-number squaring of a
-    normal-equation Gram matrix. Covariance and constraint units are normalized
-    by positive scalars without changing the optimizer, and the requested
-    exposures are verified before return. No diagonal jitter or pseudoinverse
-    is applied: singular covariance matrices and redundant factor constraints
-    are outside the stated assumptions of the model.
+    For square full-rank exposure systems, Equation (5) is evaluated directly
+    by solving :math:`B^\mathsf{T}\omega=c`. Otherwise, the published inverse
+    formula is evaluated by Cholesky-whitening the exposures and solving the
+    resulting minimum-norm problem with reduced QR. This avoids both explicit
+    inverses and the condition-number squaring of a normal-equation Gram matrix.
+    Covariance and constraint units are normalized by positive scalars without
+    changing the optimizer, and the requested exposures are verified before
+    return. No diagonal jitter or pseudoinverse is applied: singular covariance
+    matrices and redundant factor constraints are outside the stated assumptions
+    of the model.
 
     Examples
     --------
@@ -181,12 +183,15 @@ def minimum_variance_factor_weights(
         if np.linalg.matrix_rank(whitened_exposures) != n_factors:
             raise ValueError("factor_exposures must have full column rank")
 
-        orthonormal_basis, triangular_factor = np.linalg.qr(
-            whitened_exposures, mode="reduced"
-        )
-        transformed_targets = np.linalg.solve(triangular_factor.T, scaled_targets)
-        whitened_weights = orthonormal_basis @ transformed_targets
-        weights = np.linalg.solve(covariance_cholesky.T, whitened_weights)
+        if n_factors == n_assets:
+            weights = np.linalg.solve(scaled_exposures.T, scaled_targets)
+        else:
+            orthonormal_basis, triangular_factor = np.linalg.qr(
+                whitened_exposures, mode="reduced"
+            )
+            transformed_targets = np.linalg.solve(triangular_factor.T, scaled_targets)
+            whitened_weights = orthonormal_basis @ transformed_targets
+            weights = np.linalg.solve(covariance_cholesky.T, whitened_weights)
     except np.linalg.LinAlgError as exc:
         raise ValueError("factor_exposures must have full column rank") from exc
 
