@@ -71,6 +71,9 @@ internally from standard definitions and have hand-calculated oracle tests.
 The governed CI workflow installs the distribution non-editably before every
 runtime test. Import-origin probes run outside the repository checkout and
 reject any `RiskLabAI` module resolved from the preserved repository root.
+Tests that launch child interpreters also use clean temporary working
+directories, so a subprocess cannot silently resolve the preserved root
+package in place of the installed `src` distribution.
 
 The base matrix contains six valid interpreter/NumPy combinations: the lowest
 supported NumPy binary and the latest supported NumPy 2.x release on each of

@@ -21,9 +21,10 @@ locked by package-scoped tests.
 The release metadata uses the PEP 639 `BSD-3-Clause` expression and license
 file without the superseded license classifier. The governed CI workflow now
 installs the distribution, rejects imports shadowed by the preserved repository
-root, tests the six approved base runtime/NumPy combinations, exercises
-feature-specific optional lanes, and isolates the Python 3.14 changepoint
-limitation. Pinned static checks cover the clean causal source and tests.
+root in both parent and child interpreters, tests the six approved base
+runtime/NumPy combinations, exercises feature-specific optional lanes, and
+isolates the Python 3.14 changepoint limitation. Pinned static checks cover the
+clean causal source and tests.
 
 No source-conflicted causal result is admitted. The metadata contract is
 complete; artifacts, publication, upload, and release remain blocked.

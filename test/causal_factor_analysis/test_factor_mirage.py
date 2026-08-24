@@ -7,8 +7,6 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError
 from fractions import Fraction
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -366,8 +364,7 @@ def test_result_records_are_frozen():
         diagnostics.correct_r_squared = 0.0
 
 
-def test_public_import_is_isolated_and_source_conflicted_api_is_absent():
-    repository_root = Path(__file__).resolve().parents[2]
+def test_public_import_is_isolated_and_source_conflicted_api_is_absent(tmp_path):
     program = """
 import sys
 import RiskLabAI
@@ -401,7 +398,7 @@ if loaded:
 """
     subprocess.run(
         [sys.executable, "-c", program],
-        cwd=repository_root,
+        cwd=tmp_path,
         check=True,
         capture_output=True,
         text=True,

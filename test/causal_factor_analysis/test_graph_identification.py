@@ -933,8 +933,7 @@ def test_module_is_python39_and_standard_library_only():
     }
 
 
-def test_package_import_does_not_load_legacy_or_private_namespaces():
-    project = Path(__file__).parents[2]
+def test_package_import_does_not_load_legacy_or_private_namespaces(tmp_path):
     public_names = repr(sorted(PUBLIC_NAMES))
     program = f"""
 import sys
@@ -955,7 +954,7 @@ assert not any(name == root or name.startswith(root + '.') for name in sys.modul
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     subprocess.run(
         [sys.executable, "-B", "-c", program],
-        cwd=project,
+        cwd=tmp_path,
         env=environment,
         check=True,
         capture_output=True,

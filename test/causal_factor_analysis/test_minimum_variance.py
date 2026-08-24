@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -394,8 +392,7 @@ def test_final_factor_exposure_feasibility_is_checked(monkeypatch):
         minimum_variance_factor_weights(np.eye(2), np.ones((2, 1)), np.ones(1))
 
 
-def test_public_import_is_isolated_from_other_model_namespaces():
-    repository_root = Path(__file__).resolve().parents[2]
+def test_public_import_is_isolated_from_other_model_namespaces(tmp_path):
     program = """
 import sys
 import RiskLabAI
@@ -418,7 +415,7 @@ if loaded:
 """
     subprocess.run(
         [sys.executable, "-c", program],
-        cwd=repository_root,
+        cwd=tmp_path,
         check=True,
         capture_output=True,
         text=True,

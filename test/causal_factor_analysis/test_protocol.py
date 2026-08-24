@@ -6,8 +6,6 @@ import math
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
-from pathlib import Path
-
 import pytest
 
 from RiskLabAI.causal_factor_analysis.protocol import (
@@ -1137,8 +1135,7 @@ def test_malformed_labels_fail_with_value_error(stage_name, stage):
         _validate_with(_valid_report(), **{stage_name: stage})
 
 
-def test_module_and_package_exports_are_exact_and_isolated():
-    repository_root = Path(__file__).resolve().parents[2]
+def test_module_and_package_exports_are_exact_and_isolated(tmp_path):
     program = f"""
 import sys
 import RiskLabAI.causal_factor_analysis as package
@@ -1161,7 +1158,7 @@ if blocked.intersection(sys.modules):
 """
     subprocess.run(
         [sys.executable, "-c", program],
-        cwd=repository_root,
+        cwd=tmp_path,
         check=True,
         capture_output=True,
         text=True,

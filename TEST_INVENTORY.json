@@ -213,29 +213,29 @@
     },
     {
       "path": "test/causal_factor_analysis/test_factor_mirage.py",
-      "size": 16394,
-      "sha256": "268DB559600AF1D56EDADEEB0FC20DCF642D4FF5AF4DBBBD4517CC5EE4F94DFF",
+      "size": 16311,
+      "sha256": "B64153FE7B39D103022268E503A132F76E967A05DB103D3339A662A9DA0A890C",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 32
     },
     {
       "path": "test/causal_factor_analysis/test_graph_identification.py",
-      "size": 35186,
-      "sha256": "64D386BDD80E76CEAA4762D429B5E3ADE083AB7E509BE348A7A632B9C11E4C35",
+      "size": 35155,
+      "sha256": "16CA24092CF9D05D2A7718FF1BACBF050592EFDDE18C7B7CCF2B20121250F789",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 47
     },
     {
       "path": "test/causal_factor_analysis/test_minimum_variance.py",
-      "size": 15983,
-      "sha256": "954E52279A50DADEAE6519B2CF6679B7AB4CE0C3F01CE70AC81AD829E9423F16",
+      "size": 15900,
+      "sha256": "F0C7A037F7A2AE1652E2E69362898572095EA6342EAB5699367C8FC84E929D9D",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 32
     },
     {
       "path": "test/causal_factor_analysis/test_protocol.py",
-      "size": 39048,
-      "sha256": "1CAACE494F327A7B135E3A0D8F38BC15EBEA57BBC2D2CB77CB9D6BA6B8E17930",
+      "size": 38965,
+      "sha256": "E1E456BE476A5D990F781E240868B6C344FA0345FC78DC3C027BE63271BCA240",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 43
     },

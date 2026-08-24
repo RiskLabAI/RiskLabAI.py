@@ -48,7 +48,9 @@ complete 57-feature causal API. Run the exact package-scoped test inventory and
 the valid optional-feature lanes. Confirm that optional groups do not become
 base dependencies and that changepoints alone is unavailable on Python 3.14.
 Run installed-package tests outside the source checkout and reject any import
-whose resolved path remains inside the repository.
+whose resolved path remains inside the repository. Tests that launch child
+interpreters must give those processes clean temporary working directories and
+apply the same origin rejection.
 
 ## Final review
 
