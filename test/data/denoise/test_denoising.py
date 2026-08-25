@@ -6,10 +6,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import RiskLabAI.data.denoise as denoise
 from RiskLabAI.data.denoise import (
     corr_to_cov,
     cov_to_corr,
     denoise_cov,
+    denoised_corr2,
     marcenko_pastur_pdf,
     optimal_portfolio,
 )
@@ -69,6 +71,82 @@ def test_cov_corr_conversion():
     # Test corr -> cov
     cov_new = corr_to_cov(corr, std)
     assert np.allclose(cov, cov_new)
+
+
+def test_denoise_public_exports_are_bound():
+    """Every advertised denoising name must be bound on the package."""
+    assert all(hasattr(denoise, name) for name in denoise.__all__)
+
+
+def test_denoised_corr2_hand_verifiable_rotation():
+    """Targeted shrinkage matches an exact two-factor calculation."""
+    eigenvalues = np.diag([3.0, 1.0])
+    eigenvectors = np.array([[1.0, 1.0], [1.0, -1.0]]) / np.sqrt(2.0)
+
+    fully_shrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=0.0)
+    half_shrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=0.5)
+    unshrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=1.0)
+
+    assert np.allclose(fully_shrunk, [[2.0, 1.5], [1.5, 2.0]])
+    assert np.allclose(half_shrunk, [[2.0, 1.25], [1.25, 2.0]])
+    assert np.allclose(unshrunk, [[2.0, 1.0], [1.0, 2.0]])
+
+
+def test_denoised_corr2_preserves_diagonal_trace_and_interpolates():
+    """Shrinkage changes only the noise off-diagonal contribution."""
+    eigenvalues = np.diag([4.0, 2.0, 0.5])
+    eigenvectors, _ = np.linalg.qr(
+        np.array([[1.0, 2.0, 3.0], [2.0, -1.0, 1.0], [1.0, 1.0, -1.0]])
+    )
+    original = eigenvectors @ eigenvalues @ eigenvectors.T
+
+    fully_shrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=0.0)
+    partly_shrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=0.25)
+    unshrunk = denoised_corr2(eigenvalues, eigenvectors, 1, alpha=1.0)
+
+    assert np.allclose(unshrunk, original)
+    assert np.allclose(np.diag(fully_shrunk), np.diag(original))
+    assert np.isclose(np.trace(fully_shrunk), np.trace(original))
+    assert np.allclose(partly_shrunk, 0.75 * fully_shrunk + 0.25 * unshrunk)
+
+
+def test_denoised_corr2_factor_count_boundaries():
+    """The all-noise and all-signal partitions have exact meanings."""
+    eigenvalues = np.diag([3.0, 1.0])
+    eigenvectors = np.array([[1.0, 1.0], [1.0, -1.0]]) / np.sqrt(2.0)
+    original = eigenvectors @ eigenvalues @ eigenvectors.T
+
+    assert np.allclose(
+        denoised_corr2(eigenvalues, eigenvectors, 0, alpha=0.0),
+        np.diag(np.diag(original)),
+    )
+    assert np.allclose(
+        denoised_corr2(eigenvalues, eigenvectors, 2, alpha=0.0), original
+    )
+
+
+@pytest.mark.parametrize("alpha", [-0.01, 1.01, np.inf, np.nan])
+def test_denoised_corr2_rejects_invalid_alpha(alpha):
+    eigenvalues = np.diag([2.0, 1.0])
+    eigenvectors = np.eye(2)
+
+    with pytest.raises(ValueError, match="alpha"):
+        denoised_corr2(eigenvalues, eigenvectors, 1, alpha=alpha)
+
+
+@pytest.mark.parametrize("num_factors", [-1, 3])
+def test_denoised_corr2_rejects_invalid_factor_count(num_factors):
+    with pytest.raises(ValueError, match="num_factors"):
+        denoised_corr2(np.diag([2.0, 1.0]), np.eye(2), num_factors)
+
+
+def test_denoised_corr2_rejects_incompatible_inputs():
+    with pytest.raises(ValueError, match="diagonal"):
+        denoised_corr2(np.array([[2.0, 0.1], [0.0, 1.0]]), np.eye(2), 1)
+    with pytest.raises(ValueError, match="match eigenvalues"):
+        denoised_corr2(np.diag([2.0, 1.0]), np.eye(3), 1)
+    with pytest.raises(TypeError, match="num_factors"):
+        denoised_corr2(np.diag([2.0, 1.0]), np.eye(2), 1.0)
 
 
 def test_denoise_cov(noisy_cov_matrix):

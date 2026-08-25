@@ -45,7 +45,7 @@ def mock_data():
 def test_controller_is_deprecated(mock_data):
     """The controller is deprecated in 2.0.0 (delegates to the core registry)."""
     _, _, classifier, _ = mock_data
-    with pytest.warns(DeprecationWarning, match="2.1.0"):
+    with pytest.warns(DeprecationWarning, match="4.0.0"):
         FeatureImportanceController("MDI", classifier=classifier)
 
 
