@@ -12,19 +12,19 @@
     "TECHNICAL_INDICATOR_ORACLES": 1
   },
   "collected_cases_in_reference_full_feature_environment": {
-    "preserved_library": 343,
+    "preserved_library": 354,
     "causal_factor_analysis": 342,
     "technical_indicator_oracles": 8,
-    "total": 693
+    "total": 704
   },
   "verified_required_matrix_cases_per_lane": {
-    "preserved_library_applicable": 331,
+    "preserved_library_applicable": 342,
     "causal_factor_analysis": 342,
     "technical_indicator_oracles": 8,
-    "total_applicable": 681
+    "total_applicable": 692
   },
   "required_lane_count": 6,
-  "required_lane_case_total": 4086,
+  "required_lane_case_total": 4152,
   "base_lane_count": 6,
   "optional_feature_lane_count": 3,
   "ci_execution_count": 9,
@@ -297,10 +297,10 @@
     },
     {
       "path": "test/data/denoise/test_denoising.py",
-      "size": 2818,
-      "sha256": "DAC2EA0D49203308445314A87BBBD73EDA875C197996D75F88C7F5074C4E9D33",
+      "size": 6035,
+      "sha256": "4CAE78A888AEEE68C65C7A4625208E5EFC0CAD101D7DE05C35D2C0B4F0272FFE",
       "group": "PRESERVED_LIBRARY",
-      "declared_test_functions": 4
+      "declared_test_functions": 11
     },
     {
       "path": "test/data/denoise/test_nercome.py",

@@ -99,14 +99,14 @@ deleted in this release.
 Every required base lane passed all 342 frozen causal-factor tests. Across six
 lanes this is 2,052 causal assertions with no failures.
 
-The final self-contained package test tree collects exactly 693 tests: 343
+The final self-contained package test tree collects exactly 704 tests: 354
 preserved-library tests, 342 causal-factor tests, and 8 independent technical-
 indicator oracles. Its complete Python 3.12 current-dependency run succeeded
-with 692 passes and one declared Windows platform skip. The package inventory
-records both the collected suite and the 681-test applicable base matrix used
+with 703 passes and one declared Windows platform skip. The package inventory
+records both the collected suite and the 692-test applicable base matrix used
 on every supported interpreter/dependency lane.
 
-The complete preserved base suite passed 331 applicable tests per lane. Five
+The complete preserved base suite passed 342 applicable tests per lane. Five
 platform or optional-capability cases were skipped by their declared guards;
 the two QuantEcon-dependent cases were exercised separately in the `synth`
 lanes. The new indicator-oracle suite passed 8 tests in every lane. Numba's

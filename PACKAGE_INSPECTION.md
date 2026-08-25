@@ -44,13 +44,16 @@ the reviewed source bytes.
 In fresh, isolated environments for every supported Python and valid NumPy
 lane, verify the exact module origins, `RiskLabAI.__version__ == "3.0.0"`, the
 13 root exports, all module and package exports in `PUBLIC_API.json`, and the
-complete 57-feature causal API. Run the exact package-scoped test inventory and
-the valid optional-feature lanes. Confirm that optional groups do not become
-base dependencies and that changepoints alone is unavailable on Python 3.14.
-Run installed-package tests outside the source checkout and reject any import
-whose resolved path remains inside the repository. Tests that launch child
-interpreters must give those processes clean temporary working directories and
-apply the same origin rejection.
+complete 57-feature causal API. For every module that declares `__all__`,
+require every listed name to be bound on that installed module and resolvable by
+an explicit import; an advertised but unbound name rejects the artifact. Run
+the exact package-scoped test inventory and the valid optional-feature lanes.
+Confirm that optional groups do not become base dependencies and that
+changepoints alone is unavailable on Python 3.14. Run installed-package tests
+outside the source checkout and reject any import whose resolved path remains
+inside the repository. Tests that launch child interpreters must give those
+processes clean temporary working directories and apply the same origin
+rejection.
 
 ## Final review
 

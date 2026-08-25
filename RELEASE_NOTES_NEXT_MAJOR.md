@@ -14,6 +14,12 @@ dependencies, a Python-3.14-specific Joblib floor, and self-contained standard
 technical indicators. Python 3.14 remains supported when the optional
 changepoint backend is unavailable.
 
+The preserved targeted-shrinkage API `RiskLabAI.data.denoise.denoised_corr2`
+is restored after a refactor left its public export without the corresponding
+implementation. Its historical parameter contract and published analytical
+formula are covered by exact matrix, boundary, validation, and export-binding
+tests.
+
 Compatibility aliases that remain present in 3.0.0 now consistently warn of
 removal in 4.0.0. No alias is silently deleted, and the warning contract is
 locked by package-scoped tests.
@@ -33,5 +39,6 @@ The static distributable metadata, exact 124-module runtime inventory,
 78-file package-scoped test inventory, public API inventory, documentation,
 examples, dependency groups, governed CI workflow, and 215-file intended
 source-distribution list are now frozen. No retained package artifact has been
-created. The remaining gates are future artifact inspection and separate human
-authorization for version-control, publication, and release actions.
+created for this corrected source state. The remaining gates are future
+artifact inspection and separate human authorization for version-control,
+publication, and release actions.

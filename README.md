@@ -8,10 +8,11 @@ Python distribution and import namespace remain `RiskLabAI`; the Julia package
 remains `RiskLabAI` with UUID `a72881da-fdaa-49c1-8962-99caf4ccfee8`.
 
 The distributable metadata contract is complete, but no wheel or source
-distribution has been created, installed, published, registered, or released.
-The approved target version is `3.0.0`. The source remains blocked until a
-separately authorized temporary artifact is inspected and the owner separately
-authorizes version-control and release actions.
+distribution exists for this corrected source state, and nothing has been
+published, registered, or released. The approved target version is `3.0.0`.
+The source remains blocked until a separately authorized temporary artifact is
+inspected and the owner separately authorizes version-control and release
+actions.
 
 ## Final Python source scope
 

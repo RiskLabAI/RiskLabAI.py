@@ -12,6 +12,7 @@ Reference:
     John Wiley & Sons, Chapter 2.
 """
 
+from numbers import Integral, Real
 from typing import Optional
 
 import numpy as np
@@ -237,6 +238,102 @@ def denoised_corr(
     corr1 = np.diag(diag_inv_sqrt) @ corr1 @ np.diag(diag_inv_sqrt)
     np.fill_diagonal(corr1, 1.0)  # Clean up numerical errors
     return corr1
+
+
+def denoised_corr2(
+    eigenvalues: np.ndarray,
+    eigenvectors: np.ndarray,
+    num_factors: int,
+    alpha: float = 0.0,
+) -> np.ndarray:
+    r"""Denoise a correlation matrix by targeted eigenvector shrinkage.
+
+    The leading ``num_factors`` eigenpairs are retained as signal. The
+    remaining eigenpairs are treated as noise, and their off-diagonal
+    contribution is multiplied by ``alpha`` while their diagonal contribution
+    is preserved. Thus ``alpha=0`` applies full targeted shrinkage and
+    ``alpha=1`` reconstructs the unshrunk matrix.
+
+    This is the targeted-shrinkage construction in López de Prado (2020),
+    *Machine Learning for Asset Managers*, Section 2.5.2, Code Snippet 2.6.
+
+    Parameters
+    ----------
+    eigenvalues : np.ndarray
+        Square diagonal matrix of eigenvalues, ordered consistently with
+        ``eigenvectors`` and conventionally from largest to smallest.
+    eigenvectors : np.ndarray
+        Square matrix whose columns are the corresponding eigenvectors.
+    num_factors : int
+        Number of leading eigenpairs classified as signal. Values from zero
+        through the matrix dimension are allowed.
+    alpha : float, default=0.0
+        Noise shrinkage intensity in the closed interval ``[0, 1]``.
+
+    Returns
+    -------
+    np.ndarray
+        The targeted-shrinkage matrix.
+
+    Raises
+    ------
+    TypeError
+        If the arrays are not real numeric arrays, ``num_factors`` is not an
+        integer, or ``alpha`` is not real.
+    ValueError
+        If the arrays are empty or incompatible, the eigenvalue matrix is not
+        diagonal, an input is non-finite, or a parameter lies outside its
+        permitted range.
+    """
+    eigenvalues_array = np.asarray(eigenvalues)
+    eigenvectors_array = np.asarray(eigenvectors)
+
+    if (
+        eigenvalues_array.ndim != 2
+        or eigenvalues_array.shape[0] != eigenvalues_array.shape[1]
+    ):
+        raise ValueError("eigenvalues must be a non-empty square diagonal matrix")
+    if eigenvalues_array.shape[0] == 0:
+        raise ValueError("eigenvalues must be a non-empty square diagonal matrix")
+    if eigenvectors_array.shape != eigenvalues_array.shape:
+        raise ValueError("eigenvectors must be square and match eigenvalues")
+
+    for name, array in (
+        ("eigenvalues", eigenvalues_array),
+        ("eigenvectors", eigenvectors_array),
+    ):
+        if not np.issubdtype(array.dtype, np.number) or np.iscomplexobj(array):
+            raise TypeError(f"{name} must be a real numeric array")
+        if not np.all(np.isfinite(array)):
+            raise ValueError(f"{name} must contain only finite values")
+
+    diagonal = np.diag(np.diag(eigenvalues_array))
+    if not np.allclose(eigenvalues_array, diagonal, rtol=0.0, atol=1e-12):
+        raise ValueError("eigenvalues must be a diagonal matrix")
+
+    if isinstance(num_factors, (bool, np.bool_)) or not isinstance(
+        num_factors, Integral
+    ):
+        raise TypeError("num_factors must be an integer")
+    num_factors = int(num_factors)
+    dimension = eigenvalues_array.shape[0]
+    if not 0 <= num_factors <= dimension:
+        raise ValueError("num_factors must be between zero and the matrix dimension")
+
+    if isinstance(alpha, (bool, np.bool_)) or not isinstance(alpha, Real):
+        raise TypeError("alpha must be a real number")
+    alpha = float(alpha)
+    if not np.isfinite(alpha) or not 0.0 <= alpha <= 1.0:
+        raise ValueError("alpha must be finite and between zero and one")
+
+    signal_values = eigenvalues_array[:num_factors, :num_factors]
+    signal_vectors = eigenvectors_array[:, :num_factors]
+    noise_values = eigenvalues_array[num_factors:, num_factors:]
+    noise_vectors = eigenvectors_array[:, num_factors:]
+
+    signal = signal_vectors @ signal_values @ signal_vectors.T
+    noise = noise_vectors @ noise_values @ noise_vectors.T
+    return signal + alpha * noise + (1.0 - alpha) * np.diag(np.diag(noise))
 
 
 # --- Utility Functions ---

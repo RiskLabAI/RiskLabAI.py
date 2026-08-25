@@ -15,6 +15,7 @@ from .denoising import (
     cov_to_corr,
     denoise_cov,
     denoised_corr,
+    denoised_corr2,
     find_max_eval,
     fit_kde,
     marcenko_pastur_pdf,

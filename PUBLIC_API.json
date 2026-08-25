@@ -1547,8 +1547,8 @@
       "path": "src/RiskLabAI/data/denoise/__init__.py",
       "module": "RiskLabAI.data.denoise",
       "module_kind": "package",
-      "sha256": "90FC750BE16266C6625CCA5423D69A3FA734A66B5E81CC294CD7B8450DF36A87",
-      "size": 824,
+      "sha256": "72E4069E071BF4ED278796A6FF14751B99ED9B64D71D0175F57150C1F00427F0",
+      "size": 844,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1556,13 +1556,14 @@
       "path": "src/RiskLabAI/data/denoise/denoising.py",
       "module": "RiskLabAI.data.denoise.denoising",
       "module_kind": "module",
-      "sha256": "AE33547DD525D4905A7322995E491D8D361D434E05F56CDD1155F7AF04CD7371",
-      "size": 11161,
+      "sha256": "4F78D615A8B429309E2840AFBE1429D6340231F5DE73BEAA93C4741545AAA06E",
+      "size": 15138,
       "defined_public_names": [
         "corr_to_cov",
         "cov_to_corr",
         "denoise_cov",
         "denoised_corr",
+        "denoised_corr2",
         "find_max_eval",
         "fit_kde",
         "marcenko_pastur_pdf",
@@ -1586,11 +1587,16 @@
           "kind": "function",
           "signature": "(eigenvalues: np.ndarray, q: float, bandwidth: float)"
         },
-        {
-          "name": "denoised_corr",
-          "kind": "function",
-          "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_facts: int)"
-        },
+      {
+        "name": "denoised_corr",
+        "kind": "function",
+        "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_facts: int)"
+      },
+      {
+        "name": "denoised_corr2",
+        "kind": "function",
+        "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_factors: int, alpha: float=0.0)"
+      },
         {
           "name": "pca",
           "kind": "function",
