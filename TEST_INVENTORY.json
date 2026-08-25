@@ -227,8 +227,8 @@
     },
     {
       "path": "test/causal_factor_analysis/test_minimum_variance.py",
-      "size": 16521,
-      "sha256": "4DC42E571B7B2485B362366F8257F27CCC8C69B019BA50D1D3D74DC95F5571C7",
+      "size": 17057,
+      "sha256": "9B2D772C018F99D358168AF9462DC48E0B7C53C924370A8B564AC1C4C66CE1FB",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 33
     },

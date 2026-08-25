@@ -10,6 +10,18 @@ import pytest
 from RiskLabAI.causal_factor_analysis import minimum_variance_factor_weights
 
 
+def _assert_factor_constraints_within_roundoff(exposures, weights, targets):
+    """Check componentwise residuals against a float64 backward-error bound."""
+    constraint_matrix = exposures.T
+    achieved = constraint_matrix @ weights
+    residuals = np.abs(achieved - targets)
+    roundoff_scales = np.abs(constraint_matrix) @ np.abs(weights) + np.abs(targets)
+    tolerances = (
+        8.0 * constraint_matrix.shape[1] * np.finfo(np.float64).eps * roundoff_scales
+    )
+    np.testing.assert_array_less(residuals, np.nextafter(tolerances, np.inf))
+
+
 def test_eq4_solution_satisfies_exposure_and_kkt_conditions():
     covariance = np.diag([1.0, 2.0, 4.0])
     exposures = np.array(
@@ -91,7 +103,7 @@ def test_eq5_square_solution_does_not_use_qr(monkeypatch):
     np.testing.assert_allclose(
         weights, np.linalg.solve(exposures.T, targets), rtol=5e-8, atol=0.0
     )
-    np.testing.assert_allclose(exposures.T @ weights, targets, rtol=0.0, atol=1e-12)
+    _assert_factor_constraints_within_roundoff(exposures, weights, targets)
 
 
 def test_eq6_single_factor_solution():
@@ -124,7 +136,7 @@ def test_near_collinear_square_constraints_remain_feasible():
     direct_solution = np.linalg.solve(exposures.T, targets)
 
     np.testing.assert_allclose(weights, direct_solution, rtol=5e-8, atol=0.0)
-    np.testing.assert_allclose(exposures.T @ weights, targets, rtol=0.0, atol=1e-12)
+    _assert_factor_constraints_within_roundoff(exposures, weights, targets)
 
 
 def test_extreme_finite_exposure_scale_does_not_overflow():
