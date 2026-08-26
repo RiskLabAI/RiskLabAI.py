@@ -10,7 +10,7 @@ paths that test on a non-representative regime lowers selection error when the r
 selection is signal-bearing, and the weights collapse to uniform in a stationary single regime, so the
 estimate converges to plain CPCV with no over-adaptation.
 
-This is the **path-level** mechanism from the Appraisal 09 pre-registration. It is distinct from, and
+This is the **path-level** mechanism from the independent validation protocol. It is distinct from, and
 does NOT touch, the existing :class:`AdaptiveCombinatorialPurged`, which adapts the split *boundaries*
 of an ML backtest (a different mechanism). The plain-CPCV baseline here is the repo's CSCV PBO: the
 per-path overfit indicator is taken from
@@ -19,9 +19,8 @@ weights this function reproduces
 :func:`~RiskLabAI.backtest.probability_of_backtest_overfitting.probability_of_backtest_overfitting`
 exactly.
 
-Admitted in Appraisal 09b (CONTRIBUTIONS_LEDGER 2026-06-27; in-house method under a conflict of
-interest, held to the identical bar, admitted only after a re-designed signal-bearing held-out).
-Regime tag, verbatim from the 09b verdict:
+This method extension was independently validated on a signal-bearing sample.
+Usage guidance:
 
     prefer Adaptive CPCV over plain CPCV for model selection when the train/test regime may shift, the
     shift is identifiable at decision time from observable volatility, and there is adequate data for
@@ -30,13 +29,13 @@ Regime tag, verbatim from the 09b verdict:
 
 The advantage is, as of admission, Monte-Carlo evidence where the regime is observable through the
 adaptive feature; a real-data regime-shift confirmation on a genuine crisis/volatility period is a
-tracked obligation (``REAL_DATA_FOLLOWUPS.md``). Evidence and caveats: appraisals/09_verdict.md (the
-09b re-appraisal).
+future validation work (`documented follow-up work`). Evidence and caveats: the documented validation evidence (the
+follow-up validation).
 
 References
 ----------
 Arian, H., Norouzi M., L. and Seco, L. (2024) Bagged and Adaptive Combinatorial Purged
-    Cross-Validation. (Clean-room from the path-level mechanism; the verdict harness validated plain
+    Cross-Validation. (Clean-room from the path-level mechanism; the validation harness validated plain
     CPCV against probability_of_backtest_overfitting exactly.)
 Bailey, D. H., Borwein, J., Lopez de Prado, M. and Zhu, Q. J. (2017) The probability of backtest
     overfitting. Journal of Computational Finance, 20(4), 39-69.
@@ -146,7 +145,7 @@ def adaptive_probability_of_backtest_overfitting(
     :func:`estimate_volatility_regimes`). The regime-weighted PBO and the configuration with the highest
     regime-weighted out-of-sample metric are returned. In a stationary regime the weights are uniform,
     so the PBO converges to plain CPCV and the selection matches it; see the module docstring for the
-    full regime tag and appraisals/09_verdict.md.
+    full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

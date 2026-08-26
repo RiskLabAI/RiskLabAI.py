@@ -91,7 +91,7 @@ def test_guard_condition_logic():
 
 def test_well_behaved_unchanged_when_guards_do_not_bind():
     """
-    Replication of the held-out "well-behaved unchanged" criterion: with loose guards the hardened bar
+    Replication of the validation sample "well-behaved unchanged" criterion: with loose guards the hardened bar
     count matches the naive ExpectedImbalanceBars count (the guards never trigger).
     """
     ticks = _synthetic_ticks()

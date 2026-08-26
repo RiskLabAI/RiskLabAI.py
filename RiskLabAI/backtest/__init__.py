@@ -117,12 +117,12 @@ from .test_set_overfitting import (
 # Define what `from RiskLabAI.backtest import *` will import
 __all__ = [
     "validation",
-    # from advanced_bet_sizing (Appraisal 18 admits)
+    # from advanced_bet_sizing (independent validation includes)
     "PlattCalibrator",
     "distributionally_robust_kelly_fraction",
     "expected_calibration_error",
     "kelly_bet_fraction",
-    # from robust_statistics + ou_trading_rules (Appraisal 22, 23 admits)
+    # from robust_statistics + ou_trading_rules (independent validation, validated additions)
     "conditional_expected_drawdown",
     "sharpe_difference_test",
     "optimal_ou_trading_rule",

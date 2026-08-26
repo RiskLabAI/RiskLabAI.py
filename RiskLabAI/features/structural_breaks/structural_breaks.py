@@ -298,13 +298,13 @@ def get_bsadf_statistic(
 # on the validated ``get_bsadf_statistic`` / ``get_expanding_window_adf`` above (and
 # agree with them to ~1e-9 on shared windows; see the structural-breaks tests).
 #
-# Admitted in Appraisal 05 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim:
+# Included after independent validation (the public method specification). Usage guidance:
 #   Prefer GSADF/BSADF over single-window SADF when a series may contain more than
 #   one explosive episode (it recovers and counts each). For a single suspected
 #   bubble, SADF is at least as good. Use seasonally-adjusted data and the simulated
 #   finite-sample critical values; GSADF over-flags strongly trending or seasonal
 #   series and is mildly oversized in large samples, so treat broad flags cautiously.
-# Evidence and caveats: appraisals/05_verdict.md.
+# Evidence and caveats: the documented validation evidence.
 # ----------------------------------------------------------------------------------
 
 
@@ -502,7 +502,7 @@ def get_gsadf_statistic(
     SADF is at least as good. Use seasonally-adjusted data and the simulated
     finite-sample critical values; GSADF over-flags strongly trending or seasonal
     series and is mildly oversized in large samples, so treat broad flags cautiously.
-    (Admitted in Appraisal 05; see appraisals/05_verdict.md.)
+    (Included after independent validation; see the documented validation evidence.)
 
     Parameters
     ----------

@@ -35,7 +35,7 @@ __all__ = [
     "get_gsadf_statistic",
     "get_bubble_episodes",
     "simulate_psy_critical_values",
-    # Appraisal 26 admits (alongside SADF/GSADF/CUSUM)
+    # independent validation includes (alongside SADF/GSADF/CUSUM)
     "volatility_robust_sadf",
     "pelt_change_points",
 ]

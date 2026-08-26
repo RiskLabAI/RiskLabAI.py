@@ -7,7 +7,7 @@ include PACKAGE_FILES.json
 include PACKAGE_INSPECTION.md
 include .github/workflows/ci.yml
 recursive-include src *.py
-recursive-include test *.py
+recursive-include test *.py *.tsv
 recursive-include docs *.md
 recursive-include examples *.py
 global-exclude __pycache__

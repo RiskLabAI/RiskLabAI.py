@@ -2,7 +2,7 @@
 
 ## Supported environments
 
-RiskLabAI 3.0.0 supports:
+RiskLabAI 3.1.0 supports:
 
 - CPython 3.12, 3.13, and 3.14
 - NumPy `>=2.2,<3`

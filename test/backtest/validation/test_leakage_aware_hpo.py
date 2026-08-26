@@ -14,7 +14,7 @@ from RiskLabAI.backtest.validation.leakage_aware_hpo import (
 
 def test_gate_erases_no_edge_series_at_high_trial_count():
     """
-    Replication of the Appraisal 20 honest finding: a no-edge out-of-sample return series does NOT pass
+    Replication of the independent validation honest finding: a no-edge out-of-sample return series does NOT pass
     the Deflated-Sharpe gate once it is deflated by a large HPO trial count (tuning yields no edge).
     """
     rng = np.random.default_rng(0)

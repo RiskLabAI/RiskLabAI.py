@@ -1,7 +1,7 @@
 """
 Tests for backtest/validation/path_adaptive_cpcv.py (path-level Adaptive CPCV PBO).
 
-Covers: plain-CPCV PBO parity with the repo (diff 0), the Appraisal-09b replication (lower selection
+Covers: plain-CPCV PBO parity with the repo (diff 0), the independent validation replication (lower selection
 error than plain CPCV on a signal-bearing switching set; convergence with no over-adaptation on a
 stationary set), and edge cases (single config, degenerate volatility, too few paths).
 """
@@ -43,10 +43,10 @@ def _switching_panel(seed, t_len=480, n_strategies=8, target=0.25):
     return perf, n_strategies - 1
 
 
-# Appraisal-09b Monte-Carlo switching DGP (clean-room from harness.py): K configs with known true
+# independent validation Monte-Carlo switching DGP (clean-room from harness.py): K configs with known true
 # per-regime Sharpes; the forward regime (regime 1, the recent half) is a higher-volatility stress
 # regime, so the shift is observable from volatility. Selection error is the true forward-Sharpe
-# shortfall of the selected config, the continuous metric the appraisal scored.
+# shortfall of the selected config, the continuous metric the independent validation scored.
 def _switching_truth_panel(seed, t_len=960, n_configs=12, spread=0.12):
     rng = np.random.default_rng(seed)
     sr_uncond = np.linspace(-spread, spread, n_configs).copy()
@@ -94,9 +94,9 @@ def test_uniform_weights_converge_to_plain_pbo():
     assert np.isclose(adaptive_pbo, plain_pbo, atol=1e-12)
 
 
-# ------------------------------------------------------------- Appraisal-09b mechanism replication
+# ------------------------------------------------------------- independent validation mechanism replication
 def test_lower_selection_error_on_switching_regime():
-    """Replicates 09b on its Monte-Carlo switching DGP: under a signal-bearing, volatility-observable
+    """Replicates follow-up validation on its Monte-Carlo switching DGP: under a signal-bearing, volatility-observable
     regime shift, the regime-weighted selection has a lower mean true-forward-Sharpe shortfall than plain
     CPCV (which targets the unconditional best), and it is essentially never worse path by path.
     """

@@ -1,44 +1,43 @@
-# RiskLabAI Python next-major release notes — blocked draft
+# RiskLabAI Python 3.1.0 additive causal release notes
 
-Target version: **3.0.0**. The owner approved this exact version, but assigning
-it does not authorize a build, artifact, publication, upload, or release.
+Version: **3.1.0**. The version is frozen for local integration and artifact
+inspection. Version-control, publication, upload, and release actions remain
+human-controlled and are not authorized by this document.
 
-The next major Python release preserves the prior public repository source
-modules and adds the verified 57-concept `RiskLabAI.causal_factor_analysis`
-namespace. It intentionally drops support for Python 3.9-3.11 and NumPy 1.x;
-the supported policy is CPython 3.12-3.14 with NumPy `>=2.2,<3`.
+The candidate starts from RiskLabAI 3.0.0 and preserves its complete public
+library and released 57-name `RiskLabAI.causal_factor_analysis` contract. It
+adds 30 paper-derived names, producing an 87-name causal namespace with a
+matching Julia implementation. No released causal name, signature, default,
+or behavior is removed or silently changed.
 
-Compatibility repairs include NumPy 2 trapezoidal integration, public
-scikit-learn bootstrap logic, optional Numba acceleration, lazy optional
-dependencies, a Python-3.14-specific Joblib floor, and self-contained standard
-technical indicators. Python 3.14 remains supported when the optional
+The support policy remains CPython 3.12-3.14 with NumPy `>=2.2,<3`. The
+additions require no new Python dependency and retain all required and
+feature-specific optional dependency boundaries established in 3.0.0.
+
+The additive analytical families cover general-variance factor-mirage
+coefficients, allocation-misspecification evidence, accepted-DAG factor roles,
+deterministic structural-model evaluation, and family- and selection-level
+false-discovery calculations for searched trials. The two false-discovery
+estimands remain explicitly separate.
+
+Every implemented method is linked to an authoritative public source and checked
+against direct analytical examples, independent mathematical or graph oracles,
+validation boundaries, stability cases, and—in addition—shared numerical
+Python-Julia fixtures. Cross-language agreement is not used as the sole
+correctness authority.
+
+Thirteen method units remain source-blocked because the papers conflict or omit
+necessary mathematics, data, trained assets, or reproducibility settings.
+Those omissions are documented rather than guessed. Excluded legacy causal
+implementations are neither modified nor used as correctness authorities.
+
+The complete preserved library, additive causal tests, formatting and static
+checks, six approved base runtime/NumPy endpoints, and three optional-feature
+runtime lines are verified. Python 3.14 remains supported when the optional
 changepoint backend is unavailable.
 
-The preserved targeted-shrinkage API `RiskLabAI.data.denoise.denoised_corr2`
-is restored after a refactor left its public export without the corresponding
-implementation. Its historical parameter contract and published analytical
-formula are covered by exact matrix, boundary, validation, and export-binding
-tests.
-
-Compatibility aliases that remain present in 3.0.0 now consistently warn of
-removal in 4.0.0. No alias is silently deleted, and the warning contract is
-locked by package-scoped tests.
-
-The release metadata uses the PEP 639 `BSD-3-Clause` expression and license
-file without the superseded license classifier. The governed CI workflow now
-installs the distribution, rejects imports shadowed by the preserved repository
-root in both parent and child interpreters, tests the six approved base
-runtime/NumPy combinations, exercises feature-specific optional lanes, and
-isolates the Python 3.14 changepoint limitation. Pinned static checks cover the
-clean causal source and tests.
-
-No source-conflicted causal result is admitted. The metadata contract is
-complete; artifacts, publication, upload, and release remain blocked.
-
-The static distributable metadata, exact 124-module runtime inventory,
-78-file package-scoped test inventory, public API inventory, documentation,
-examples, dependency groups, governed CI workflow, and 215-file intended
-source-distribution list are now frozen. No retained package artifact has been
-created for this corrected source state. The remaining gates are future
-artifact inspection and separate human authorization for version-control,
-publication, and release actions.
+Package metadata is frozen at 3.1.0 for the exact additive integration
+candidate. The exact inventories, complete compatibility matrix, and temporary
+wheel and source-distribution inspection must all pass before any human Git
+handoff. Version control, publication, upload, and release remain human-only
+and separately authorized.

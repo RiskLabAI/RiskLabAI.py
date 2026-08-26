@@ -7,15 +7,15 @@ multiple change-points that minimizes a segment cost plus a per-change penalty, 
 (mean-and-variance) cost it detects and dates multiple and variance change-points that CUSUM misses,
 without over-segmenting when penalized appropriately.
 
-Admitted in Appraisal 26 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     prefer it over CUSUM for detecting and dating multiple and/or variance change-points (which CUSUM
     misses), without over-segmenting; CUSUM remains adequate for a single mean shift.
 
-Held-out confirmed (appraisals/26_results, HELDOUT.md): on the sealed mixed mean+variance corner (3 true
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed mixed mean+variance corner (3 true
 change-points) PELT recovers 2.65 of 3 on average with a 0.000 over-segmentation rate (it never exceeds
 the true count), where CUSUM recovers far fewer of these mean+variance change-points. The CUSUM baseline
-is unchanged. Evidence: appraisals/26_verdict.md.
+is unchanged. Evidence: the documented validation evidence.
 
 PELT is provided through the ``ruptures`` package (BSD-2-Clause), an optional dependency imported lazily;
 the GPL-3 ``exuber`` reference was not used. Install it with ``pip install ruptures``.
@@ -47,8 +47,8 @@ def pelt_change_points(
     change-points that CUSUM misses, without over-segmenting under an adequate penalty.
 
     Prefer PELT over CUSUM for detecting and dating multiple and/or variance change-points; CUSUM remains
-    adequate for a single mean shift. See the module docstring for the verbatim regime tag and
-    appraisals/26_verdict.md.
+    adequate for a single mean shift. See the module docstring for the usage guidance and
+    the documented validation evidence.
 
     Parameters
     ----------

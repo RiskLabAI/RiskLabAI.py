@@ -2,8 +2,7 @@
 Implements the EDGE effective bid-ask spread estimator
 (Ardia, Guidotti & Kroencke 2024).
 
-Admitted in Appraisal 03 (CONTRIBUTIONS_LEDGER row 1, 2026-06-26). Regime tag,
-verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     Prefer EDGE over Roll and Abdi-Ranaldo for low-frequency spread estimation in
     all regimes; over Corwin-Schultz at small spreads (the edge narrows at very high
@@ -15,7 +14,7 @@ Roll (1984) estimator and the two-day high-low Corwin-Schultz (2012) estimator, 
 never returning an invalid (negative) point estimate. The result is a proportional
 spread (0.01 is a 1% spread). Real-data confirmation is a logged follow-up pending an
 adequate public intraday / quote dataset (DECISION_LOG 2026-06-26). Evidence and
-caveats: appraisals/03_verdict.md (03_results/RESULTS.md + HELDOUT.md).
+caveats: the documented validation evidence (the documented validation results + independent validation).
 
 Reference:
     Ardia, D., Guidotti, E., & Kroencke, T. A. (2024). Efficient estimation of

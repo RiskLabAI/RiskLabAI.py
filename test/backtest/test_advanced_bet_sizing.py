@@ -20,7 +20,7 @@ def test_kelly_fraction_closed_form():
 
 def test_platt_reduces_ece_under_miscalibration():
     """
-    Replication of the Appraisal 18 mechanism: Platt calibration sharply lowers ECE on a miscalibrated
+    Replication of the independent validation mechanism: Platt calibration sharply lowers ECE on a miscalibrated
     probability (the high-miscalibration regime where it should help).
     """
     rng = np.random.default_rng(0)
@@ -36,7 +36,7 @@ def test_platt_reduces_ece_under_miscalibration():
 
 
 def test_platt_is_safe_no_op_on_calibrated_input():
-    """The verdict's no-op side: on already-calibrated probabilities Platt barely changes ECE."""
+    """The documented guidance's no-op side: on already-calibrated probabilities Platt barely changes ECE."""
     rng = np.random.default_rng(1)
     p_hat = rng.uniform(0.05, 0.95, 6000)
     y = (rng.uniform(size=p_hat.size) < p_hat).astype(int)  # calibrated by construction
@@ -63,7 +63,7 @@ def test_dr_kelly_converges_to_full_kelly_with_data():
 
 def test_dr_kelly_lower_drawdown_proxy_than_full_kelly():
     """
-    Replication of the held-out mechanism direction: at small n DR-Kelly sizes strictly below full Kelly
+    Replication of the validation mechanism direction: at small n DR-Kelly sizes strictly below full Kelly
     (a smaller fraction is the lever for its lower from-initial drawdown).
     """
     for p in (0.55, 0.62):

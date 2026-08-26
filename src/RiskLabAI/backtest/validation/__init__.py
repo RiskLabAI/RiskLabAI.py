@@ -40,13 +40,13 @@ __all__ = [
     "CombinatorialPurged",  # <-- Fix
     "BaggedCombinatorialPurged",  # <-- Fix
     "AdaptiveCombinatorialPurged",  # <-- Fix
-    # Path-level bagged CPCV PBO (Appraisal 09)
+    # Path-level bagged CPCV PBO (independent validation)
     "bagged_probability_of_backtest_overfitting",
     "moving_block_bootstrap_indices",
-    # Path-level adaptive (regime-weighted) CPCV PBO (Appraisal 09b)
+    # Path-level adaptive (regime-weighted) CPCV PBO (independent validation)
     "adaptive_probability_of_backtest_overfitting",
     "estimate_volatility_regimes",
-    # Leakage-aware HPO methodology (Appraisal 20)
+    # Leakage-aware HPO methodology (independent validation)
     "leakage_aware_hpo",
     "deflated_sharpe_gate",
     # Utilities

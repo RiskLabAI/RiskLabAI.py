@@ -1,20 +1,377 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "document_type": "RISKLABAI_PYTHON_INTENDED_PACKAGE_FILES",
   "product": "RiskLabAI",
   "language": "Python",
-  "version": "3.0.0",
+  "version": "3.1.0",
+  "version_note": "Final local integration candidate; package artifacts are inspection-only and every version-control and release action remains human-controlled.",
   "artifact_types": [
     "wheel",
     "source_distribution"
   ],
-  "candidate_file_count": 216,
+  "candidate_file_count": 353,
   "candidate_files": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/publish.yml",
+    ".gitignore",
+    "CHANGELOG.md",
+    "EXTENDING.md",
+    "INSTALLATION.md",
+    "LICENSE",
+    "MANIFEST.in",
+    "NAMING_CANON_2.0.0.md",
+    "PACKAGE_FILES.json",
+    "PACKAGE_INSPECTION.md",
+    "PUBLIC_API.json",
+    "README.md",
+    "RELEASE_NOTES_NEXT_MAJOR.md",
+    "RiskLabAI/__init__.py",
+    "RiskLabAI/_deprecation.py",
+    "RiskLabAI/backtest/__init__.py",
+    "RiskLabAI/backtest/advanced_bet_sizing.py",
+    "RiskLabAI/backtest/backtest_overfitting_simulation.py",
+    "RiskLabAI/backtest/backtest_statistics.py",
+    "RiskLabAI/backtest/backtest_synthetic_data.py",
+    "RiskLabAI/backtest/bet_sizing.py",
+    "RiskLabAI/backtest/multiple_testing.py",
+    "RiskLabAI/backtest/ou_trading_rules.py",
+    "RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+    "RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+    "RiskLabAI/backtest/robust_statistics.py",
+    "RiskLabAI/backtest/sharpe_inference.py",
+    "RiskLabAI/backtest/strategy_risk.py",
+    "RiskLabAI/backtest/test_set_overfitting.py",
+    "RiskLabAI/backtest/validation/__init__.py",
+    "RiskLabAI/backtest/validation/adaptive_combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/bagged_combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/cross_validator_controller.py",
+    "RiskLabAI/backtest/validation/cross_validator_factory.py",
+    "RiskLabAI/backtest/validation/cross_validator_interface.py",
+    "RiskLabAI/backtest/validation/kfold.py",
+    "RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+    "RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
+    "RiskLabAI/backtest/validation/path_bagged_cpcv.py",
+    "RiskLabAI/backtest/validation/purged_kfold.py",
+    "RiskLabAI/backtest/validation/walk_forward.py",
+    "RiskLabAI/cluster/__init__.py",
+    "RiskLabAI/cluster/clustering.py",
+    "RiskLabAI/controller/__init__.py",
+    "RiskLabAI/controller/bars_initializer.py",
+    "RiskLabAI/controller/data_structure_controller.py",
+    "RiskLabAI/core/__init__.py",
+    "RiskLabAI/core/_builtins.py",
+    "RiskLabAI/core/base.py",
+    "RiskLabAI/core/registry.py",
+    "RiskLabAI/data/__init__.py",
+    "RiskLabAI/data/denoise/__init__.py",
+    "RiskLabAI/data/denoise/denoising.py",
+    "RiskLabAI/data/denoise/nercome.py",
+    "RiskLabAI/data/differentiation/__init__.py",
+    "RiskLabAI/data/differentiation/adaptive_differentiation.py",
+    "RiskLabAI/data/differentiation/differentiation.py",
+    "RiskLabAI/data/distance/__init__.py",
+    "RiskLabAI/data/distance/codependence.py",
+    "RiskLabAI/data/distance/distance_metric.py",
+    "RiskLabAI/data/labeling/__init__.py",
+    "RiskLabAI/data/labeling/financial_labels.py",
+    "RiskLabAI/data/labeling/labeling.py",
+    "RiskLabAI/data/structures/__init__.py",
+    "RiskLabAI/data/structures/abstract_bars.py",
+    "RiskLabAI/data/structures/abstract_imbalance_bars.py",
+    "RiskLabAI/data/structures/abstract_information_driven_bars.py",
+    "RiskLabAI/data/structures/abstract_run_bars.py",
+    "RiskLabAI/data/structures/hardened_information_driven_bars.py",
+    "RiskLabAI/data/structures/imbalance_bars.py",
+    "RiskLabAI/data/structures/run_bars.py",
+    "RiskLabAI/data/structures/standard_bars.py",
+    "RiskLabAI/data/structures/time_bars.py",
+    "RiskLabAI/data/synthetic_data/__init__.py",
+    "RiskLabAI/data/synthetic_data/drift_burst_hypothesis.py",
+    "RiskLabAI/data/synthetic_data/simulation.py",
+    "RiskLabAI/data/synthetic_data/synthetic_controlled_environment.py",
+    "RiskLabAI/data/weights/__init__.py",
+    "RiskLabAI/data/weights/sample_weights.py",
+    "RiskLabAI/ensemble/__init__.py",
+    "RiskLabAI/ensemble/bagging_classifier_accuracy.py",
+    "RiskLabAI/ensemble/empirical_bagging_accuracy.py",
+    "RiskLabAI/features/__init__.py",
+    "RiskLabAI/features/entropy_features/__init__.py",
+    "RiskLabAI/features/entropy_features/bias_corrected.py",
+    "RiskLabAI/features/entropy_features/kontoyiannis.py",
+    "RiskLabAI/features/entropy_features/lempel_ziv.py",
+    "RiskLabAI/features/entropy_features/plug_in.py",
+    "RiskLabAI/features/entropy_features/pmf.py",
+    "RiskLabAI/features/entropy_features/shannon.py",
+    "RiskLabAI/features/feature_importance/__init__.py",
+    "RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
+    "RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
+    "RiskLabAI/features/feature_importance/debiased_importance.py",
+    "RiskLabAI/features/feature_importance/feature_importance_controller.py",
+    "RiskLabAI/features/feature_importance/feature_importance_factory.py",
+    "RiskLabAI/features/feature_importance/feature_importance_mda.py",
+    "RiskLabAI/features/feature_importance/feature_importance_mdi.py",
+    "RiskLabAI/features/feature_importance/feature_importance_sfi.py",
+    "RiskLabAI/features/feature_importance/feature_importance_strategy.py",
+    "RiskLabAI/features/feature_importance/generate_synthetic_data.py",
+    "RiskLabAI/features/feature_importance/orthogonal_features.py",
+    "RiskLabAI/features/feature_importance/weighted_tau.py",
+    "RiskLabAI/features/microstructural_features/__init__.py",
+    "RiskLabAI/features/microstructural_features/bekker_parkinson_volatility_estimator.py",
+    "RiskLabAI/features/microstructural_features/corwin_schultz.py",
+    "RiskLabAI/features/microstructural_features/edge.py",
+    "RiskLabAI/features/structural_breaks/__init__.py",
+    "RiskLabAI/features/structural_breaks/pelt_change_points.py",
+    "RiskLabAI/features/structural_breaks/structural_breaks.py",
+    "RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
+    "RiskLabAI/hpc/__init__.py",
+    "RiskLabAI/hpc/hpc.py",
+    "RiskLabAI/optimization/__init__.py",
+    "RiskLabAI/optimization/hedging.py",
+    "RiskLabAI/optimization/hrp.py",
+    "RiskLabAI/optimization/hyper_parameter_tuning.py",
+    "RiskLabAI/optimization/nco.py",
+    "RiskLabAI/pde/__init__.py",
+    "RiskLabAI/pde/equation.py",
+    "RiskLabAI/pde/model.py",
+    "RiskLabAI/pde/solver.py",
+    "RiskLabAI/utils/__init__.py",
+    "RiskLabAI/utils/constants.py",
+    "RiskLabAI/utils/ewma.py",
+    "RiskLabAI/utils/momentum_mean_reverting_strategy_sides.py",
+    "RiskLabAI/utils/progress.py",
+    "RiskLabAI/utils/publication_plots.py",
+    "RiskLabAI/utils/update_figure_layout.py",
+    "TEST_INVENTORY.json",
+    "docs/causal_factor_analysis.md",
+    "docs/compatibility.md",
+    "docs/delete",
+    "documenter.py",
+    "examples/causal_factor_analysis_quickstart.py",
+    "pyproject.toml",
+    "src/RiskLabAI/__init__.py",
+    "src/RiskLabAI/_deprecation.py",
+    "src/RiskLabAI/backtest/__init__.py",
+    "src/RiskLabAI/backtest/advanced_bet_sizing.py",
+    "src/RiskLabAI/backtest/backtest_overfitting_simulation.py",
+    "src/RiskLabAI/backtest/backtest_statistics.py",
+    "src/RiskLabAI/backtest/backtest_synthetic_data.py",
+    "src/RiskLabAI/backtest/bet_sizing.py",
+    "src/RiskLabAI/backtest/multiple_testing.py",
+    "src/RiskLabAI/backtest/ou_trading_rules.py",
+    "src/RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+    "src/RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+    "src/RiskLabAI/backtest/robust_statistics.py",
+    "src/RiskLabAI/backtest/sharpe_inference.py",
+    "src/RiskLabAI/backtest/strategy_risk.py",
+    "src/RiskLabAI/backtest/test_set_overfitting.py",
+    "src/RiskLabAI/backtest/validation/__init__.py",
+    "src/RiskLabAI/backtest/validation/adaptive_combinatorial_purged.py",
+    "src/RiskLabAI/backtest/validation/bagged_combinatorial_purged.py",
+    "src/RiskLabAI/backtest/validation/combinatorial_purged.py",
+    "src/RiskLabAI/backtest/validation/cross_validator_controller.py",
+    "src/RiskLabAI/backtest/validation/cross_validator_factory.py",
+    "src/RiskLabAI/backtest/validation/cross_validator_interface.py",
+    "src/RiskLabAI/backtest/validation/kfold.py",
+    "src/RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+    "src/RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
+    "src/RiskLabAI/backtest/validation/path_bagged_cpcv.py",
+    "src/RiskLabAI/backtest/validation/purged_kfold.py",
+    "src/RiskLabAI/backtest/validation/walk_forward.py",
+    "src/RiskLabAI/causal_factor_analysis/__init__.py",
+    "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
+    "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
+    "src/RiskLabAI/causal_factor_analysis/graph_identification.py",
+    "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
+    "src/RiskLabAI/causal_factor_analysis/optimizer.py",
+    "src/RiskLabAI/causal_factor_analysis/protocol.py",
+    "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
+    "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
+    "src/RiskLabAI/causal_factor_analysis/structural_models.py",
+    "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
+    "src/RiskLabAI/cluster/__init__.py",
+    "src/RiskLabAI/cluster/clustering.py",
+    "src/RiskLabAI/controller/__init__.py",
+    "src/RiskLabAI/controller/bars_initializer.py",
+    "src/RiskLabAI/controller/data_structure_controller.py",
+    "src/RiskLabAI/core/__init__.py",
+    "src/RiskLabAI/core/_builtins.py",
+    "src/RiskLabAI/core/base.py",
+    "src/RiskLabAI/core/registry.py",
+    "src/RiskLabAI/data/__init__.py",
+    "src/RiskLabAI/data/denoise/__init__.py",
+    "src/RiskLabAI/data/denoise/denoising.py",
+    "src/RiskLabAI/data/denoise/nercome.py",
+    "src/RiskLabAI/data/differentiation/__init__.py",
+    "src/RiskLabAI/data/differentiation/adaptive_differentiation.py",
+    "src/RiskLabAI/data/differentiation/differentiation.py",
+    "src/RiskLabAI/data/distance/__init__.py",
+    "src/RiskLabAI/data/distance/codependence.py",
+    "src/RiskLabAI/data/distance/distance_metric.py",
+    "src/RiskLabAI/data/labeling/__init__.py",
+    "src/RiskLabAI/data/labeling/financial_labels.py",
+    "src/RiskLabAI/data/labeling/labeling.py",
+    "src/RiskLabAI/data/structures/__init__.py",
+    "src/RiskLabAI/data/structures/abstract_bars.py",
+    "src/RiskLabAI/data/structures/abstract_imbalance_bars.py",
+    "src/RiskLabAI/data/structures/abstract_information_driven_bars.py",
+    "src/RiskLabAI/data/structures/abstract_run_bars.py",
+    "src/RiskLabAI/data/structures/hardened_information_driven_bars.py",
+    "src/RiskLabAI/data/structures/imbalance_bars.py",
+    "src/RiskLabAI/data/structures/run_bars.py",
+    "src/RiskLabAI/data/structures/standard_bars.py",
+    "src/RiskLabAI/data/structures/time_bars.py",
+    "src/RiskLabAI/data/synthetic_data/__init__.py",
+    "src/RiskLabAI/data/synthetic_data/drift_burst_hypothesis.py",
+    "src/RiskLabAI/data/synthetic_data/simulation.py",
+    "src/RiskLabAI/data/synthetic_data/synthetic_controlled_environment.py",
+    "src/RiskLabAI/data/weights/__init__.py",
+    "src/RiskLabAI/data/weights/sample_weights.py",
+    "src/RiskLabAI/ensemble/__init__.py",
+    "src/RiskLabAI/ensemble/bagging_classifier_accuracy.py",
+    "src/RiskLabAI/ensemble/empirical_bagging_accuracy.py",
+    "src/RiskLabAI/features/__init__.py",
+    "src/RiskLabAI/features/entropy_features/__init__.py",
+    "src/RiskLabAI/features/entropy_features/bias_corrected.py",
+    "src/RiskLabAI/features/entropy_features/kontoyiannis.py",
+    "src/RiskLabAI/features/entropy_features/lempel_ziv.py",
+    "src/RiskLabAI/features/entropy_features/plug_in.py",
+    "src/RiskLabAI/features/entropy_features/pmf.py",
+    "src/RiskLabAI/features/entropy_features/shannon.py",
+    "src/RiskLabAI/features/feature_importance/__init__.py",
+    "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
+    "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
+    "src/RiskLabAI/features/feature_importance/debiased_importance.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_controller.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_factory.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_mda.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_mdi.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_sfi.py",
+    "src/RiskLabAI/features/feature_importance/feature_importance_strategy.py",
+    "src/RiskLabAI/features/feature_importance/generate_synthetic_data.py",
+    "src/RiskLabAI/features/feature_importance/orthogonal_features.py",
+    "src/RiskLabAI/features/feature_importance/weighted_tau.py",
+    "src/RiskLabAI/features/microstructural_features/__init__.py",
+    "src/RiskLabAI/features/microstructural_features/bekker_parkinson_volatility_estimator.py",
+    "src/RiskLabAI/features/microstructural_features/corwin_schultz.py",
+    "src/RiskLabAI/features/microstructural_features/edge.py",
+    "src/RiskLabAI/features/structural_breaks/__init__.py",
+    "src/RiskLabAI/features/structural_breaks/pelt_change_points.py",
+    "src/RiskLabAI/features/structural_breaks/structural_breaks.py",
+    "src/RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
+    "src/RiskLabAI/hpc/__init__.py",
+    "src/RiskLabAI/hpc/hpc.py",
+    "src/RiskLabAI/optimization/__init__.py",
+    "src/RiskLabAI/optimization/hedging.py",
+    "src/RiskLabAI/optimization/hrp.py",
+    "src/RiskLabAI/optimization/hyper_parameter_tuning.py",
+    "src/RiskLabAI/optimization/nco.py",
+    "src/RiskLabAI/pde/__init__.py",
+    "src/RiskLabAI/pde/equation.py",
+    "src/RiskLabAI/pde/model.py",
+    "src/RiskLabAI/pde/solver.py",
+    "src/RiskLabAI/utils/__init__.py",
+    "src/RiskLabAI/utils/constants.py",
+    "src/RiskLabAI/utils/ewma.py",
+    "src/RiskLabAI/utils/momentum_mean_reverting_strategy_sides.py",
+    "src/RiskLabAI/utils/progress.py",
+    "src/RiskLabAI/utils/publication_plots.py",
+    "src/RiskLabAI/utils/update_figure_layout.py",
+    "style_guide.md",
+    "test/backtest/test_advanced_bet_sizing.py",
+    "test/backtest/test_backtest_overfitting_simulation.py",
+    "test/backtest/test_backtest_statistics.py",
+    "test/backtest/test_backtest_synthetic_data.py",
+    "test/backtest/test_bet_sizing.py",
+    "test/backtest/test_multiple_testing.py",
+    "test/backtest/test_ou_trading_rules.py",
+    "test/backtest/test_probabilistic_sharpe_ratio.py",
+    "test/backtest/test_probability_of_backtest_overfitting.py",
+    "test/backtest/test_robust_statistics.py",
+    "test/backtest/test_sharpe_inference.py",
+    "test/backtest/test_strategy_risk.py",
+    "test/backtest/test_technical_indicators.py",
+    "test/backtest/test_test_set_overfitting.py",
+    "test/backtest/validation/test_adaptive_combinatorial_purged.py",
+    "test/backtest/validation/test_bagged_combinatorial_purged.py",
+    "test/backtest/validation/test_combinatorial_purged.py",
+    "test/backtest/validation/test_cross_validator_controller.py",
+    "test/backtest/validation/test_cross_validator_factory.py",
+    "test/backtest/validation/test_kfold.py",
+    "test/backtest/validation/test_leakage_aware_hpo.py",
+    "test/backtest/validation/test_path_adaptive_cpcv.py",
+    "test/backtest/validation/test_path_bagged_cpcv.py",
+    "test/backtest/validation/test_purged_kfold.py",
+    "test/backtest/validation/test_walk_forward.py",
+    "test/causal_factor_analysis/fixtures/additive_numeric_parity.tsv",
+    "test/causal_factor_analysis/test_additive_numeric_parity.py",
+    "test/causal_factor_analysis/test_allocation_diagnostics.py",
+    "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
+    "test/causal_factor_analysis/test_factor_mirage.py",
+    "test/causal_factor_analysis/test_generalized_factor_mirage.py",
+    "test/causal_factor_analysis/test_graph_identification.py",
+    "test/causal_factor_analysis/test_graph_roles.py",
+    "test/causal_factor_analysis/test_minimum_variance.py",
+    "test/causal_factor_analysis/test_protocol.py",
+    "test/causal_factor_analysis/test_search_adjusted_fdr.py",
+    "test/causal_factor_analysis/test_specification_diagnostics.py",
+    "test/causal_factor_analysis/test_structural_models.py",
+    "test/causal_factor_analysis/test_treatment_effects.py",
+    "test/cluster/test_clustering.py",
+    "test/controller/test_bars_initializer.py",
+    "test/controller/test_data_structure_controller.py",
+    "test/core/test_base.py",
+    "test/core/test_builtin_parity.py",
+    "test/core/test_registry.py",
+    "test/data/denoise/test_denoising.py",
+    "test/data/denoise/test_nercome.py",
+    "test/data/differentiation/test_adaptive_differentiation.py",
+    "test/data/differentiation/test_differentiation.py",
+    "test/data/distance/test_codependence.py",
+    "test/data/distance/test_distance_metric.py",
+    "test/data/labeling/test_financial_labels.py",
+    "test/data/labeling/test_labeling.py",
+    "test/data/structures/test_hardened_information_driven_bars.py",
+    "test/data/structures/test_imbalance_bars.py",
+    "test/data/structures/test_run_bars.py",
+    "test/data/structures/test_standard_bars.py",
+    "test/data/structures/test_time_bars.py",
+    "test/data/synthetic_data/test_drift_burst_hypothesis.py",
+    "test/data/synthetic_data/test_synthetic_controlled_environment.py",
+    "test/data/weights/test_sample_weights.py",
+    "test/ensemble/test_bagging_classifier_accuracy.py",
+    "test/features/entropy_features/test_entropy.py",
+    "test/features/feature_importance/test_debiased_importance.py",
+    "test/features/feature_importance/test_feature_importance.py",
+    "test/features/feature_importance/test_generate_synthetic_data.py",
+    "test/features/feature_importance/test_orthogonal_features.py",
+    "test/features/feature_importance/test_weighted_tau.py",
+    "test/features/microstructural_features/test_edge.py",
+    "test/features/microstructural_features/test_microstructure.py",
+    "test/features/structural_breaks/test_pelt_change_points.py",
+    "test/features/structural_breaks/test_structural_breaks.py",
+    "test/features/structural_breaks/test_volatility_robust_sadf.py",
+    "test/hpc/test_hpc.py",
+    "test/optimization/test_hedging.py",
+    "test/optimization/test_hrp.py",
+    "test/optimization/test_hyper_parameter_tuning.py",
+    "test/optimization/test_nco.py",
+    "test/pde/test_pde_solver.py",
+    "test/test_consolidation.py",
+    "test/test_deprecation.py",
+    "test/test_performance.py",
+    "test/utils/test_ewma.py",
+    "test/utils/test_momentum_mean_reverting_strategy_sides.py",
+    "test/utils/test_progress.py",
+    "tree.py"
+  ],
+  "candidate_only_control_files": [],
+  "candidate_only_control_policy": "Analytical ledgers and verification records remain outside the candidate root.",
+  "baseline_active_release_files": [
     ".github/workflows/ci.yml",
     "LICENSE",
     "MANIFEST.in",
     "PACKAGE_FILES.json",
-    "PACKAGE_IDENTITY.json",
     "PACKAGE_INSPECTION.md",
     "PUBLIC_API.json",
     "README.md",
@@ -227,10 +584,7 @@
     "test/utils/test_momentum_mean_reverting_strategy_sides.py",
     "test/utils/test_progress.py"
   ],
-  "local_control_files_excluded_from_artifacts": [
-    "PACKAGE_IDENTITY.json"
-  ],
-  "release_source_file_count": 215,
+  "release_source_file_count": 226,
   "release_source_files": [
     ".github/workflows/ci.yml",
     "LICENSE",
@@ -275,11 +629,15 @@
     "src/RiskLabAI/backtest/validation/purged_kfold.py",
     "src/RiskLabAI/backtest/validation/walk_forward.py",
     "src/RiskLabAI/causal_factor_analysis/__init__.py",
+    "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
     "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
     "src/RiskLabAI/causal_factor_analysis/graph_identification.py",
+    "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
     "src/RiskLabAI/causal_factor_analysis/optimizer.py",
     "src/RiskLabAI/causal_factor_analysis/protocol.py",
+    "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
     "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
+    "src/RiskLabAI/causal_factor_analysis/structural_models.py",
     "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
     "src/RiskLabAI/cluster/__init__.py",
     "src/RiskLabAI/cluster/clustering.py",
@@ -394,12 +752,19 @@
     "test/backtest/validation/test_path_bagged_cpcv.py",
     "test/backtest/validation/test_purged_kfold.py",
     "test/backtest/validation/test_walk_forward.py",
+    "test/causal_factor_analysis/fixtures/additive_numeric_parity.tsv",
+    "test/causal_factor_analysis/test_additive_numeric_parity.py",
+    "test/causal_factor_analysis/test_allocation_diagnostics.py",
     "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
     "test/causal_factor_analysis/test_factor_mirage.py",
+    "test/causal_factor_analysis/test_generalized_factor_mirage.py",
     "test/causal_factor_analysis/test_graph_identification.py",
+    "test/causal_factor_analysis/test_graph_roles.py",
     "test/causal_factor_analysis/test_minimum_variance.py",
     "test/causal_factor_analysis/test_protocol.py",
+    "test/causal_factor_analysis/test_search_adjusted_fdr.py",
     "test/causal_factor_analysis/test_specification_diagnostics.py",
+    "test/causal_factor_analysis/test_structural_models.py",
     "test/causal_factor_analysis/test_treatment_effects.py",
     "test/cluster/test_clustering.py",
     "test/controller/test_bars_initializer.py",
@@ -448,7 +813,1906 @@
     "test/utils/test_momentum_mean_reverting_strategy_sides.py",
     "test/utils/test_progress.py"
   ],
-  "runtime_source_file_count": 124,
+  "release_file_list_sha256": "4F54899CA32A5EDFC37C774D001A3D902FD5AA952FDF5320F4C623FA5244CA5C",
+  "release_file_records_excluding_self": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "size": 4352,
+      "sha256": "BF972FE1D397A2FCEFE7ED097F749A27D6194D71F8EF83D1662959B05B94ED78"
+    },
+    {
+      "path": "LICENSE",
+      "size": 1524,
+      "sha256": "C218B2652D7FC88A70415780B13ABC03BDCE419197CBA3C47FBBAFEF396686EA"
+    },
+    {
+      "path": "MANIFEST.in",
+      "size": 435,
+      "sha256": "D54C377EA2FE5E079FBEFD9E61776CCED83627AAA891D3E3268C7DC2F901AF16"
+    },
+    {
+      "path": "PACKAGE_INSPECTION.md",
+      "size": 3799,
+      "sha256": "D2FE6D170C5DC6ECD5118642A05D15342F11B6877D6B53A7456DC3BB1240F044"
+    },
+    {
+      "path": "PUBLIC_API.json",
+      "size": 200159,
+      "sha256": "4DAB507FFCF205F0181ED87D9F76063A6CEA7E4265ACF95E28226AE48D061A5B"
+    },
+    {
+      "path": "README.md",
+      "size": 6615,
+      "sha256": "09D70FA159B02A994D74775BA695BAECF2B9253EAA3ED0665F4E9AE484032273"
+    },
+    {
+      "path": "RELEASE_NOTES_NEXT_MAJOR.md",
+      "size": 2403,
+      "sha256": "F19797FFBB789C6861DE2D2F3C4620CDD3BD36439A981C675EC73F7FCAD8E262"
+    },
+    {
+      "path": "TEST_INVENTORY.json",
+      "size": 22570,
+      "sha256": "2E2EF942FE59EBE41A75C55532F3E8012657EFDCA6C9931870B77C34A94D58FE"
+    },
+    {
+      "path": "docs/causal_factor_analysis.md",
+      "size": 9249,
+      "sha256": "06EA68B7D9F21808025877F76A3C74CAE12B510BD99AAE69077CBCB82B5E4E9E"
+    },
+    {
+      "path": "docs/compatibility.md",
+      "size": 6667,
+      "sha256": "12F5CEA996314FA8D96383BFB73B59C8B9231C26359DC76292C6F58B6BDF51FD"
+    },
+    {
+      "path": "examples/causal_factor_analysis_quickstart.py",
+      "size": 1932,
+      "sha256": "9C091DB31054D145AFDF6D52AE11DA38C569C59A530FFD7B5D9CEB1B959073D8"
+    },
+    {
+      "path": "pyproject.toml",
+      "size": 2878,
+      "sha256": "7691CCCB4F26525405F7ED9AC90CC76625DD8DA9E06401DEB7C69644BF8720F2"
+    },
+    {
+      "path": "src/RiskLabAI/__init__.py",
+      "size": 1095,
+      "sha256": "1CB2A7E2B804267FFEBE4FF124F01AA095DC19F82492DB862C9A4D97C2A1AF0F"
+    },
+    {
+      "path": "src/RiskLabAI/_deprecation.py",
+      "size": 3889,
+      "sha256": "F44F03C24759B46E69B0BD0241B51FF34454A9AAA1CD9A0498364284D5FB9498"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/__init__.py",
+      "size": 6204,
+      "sha256": "59475AA703033C284FED55C308AB258B79AC6E31A8EE5164B01AF6E9396E4C8C"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/advanced_bet_sizing.py",
+      "size": 10098,
+      "sha256": "1D90B97962BED3711265488A7921C651585FBF0D366A412607944EAF44B9C810"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/backtest_overfitting_simulation.py",
+      "size": 61737,
+      "sha256": "F435D84F28A7ACFB3237D329BE0FF82B7F60B1729810E4B8936A324CAA8EF595"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/backtest_statistics.py",
+      "size": 9157,
+      "sha256": "D6365C332C46BE6E6A176B39D3CC70DA170301362A974609613FA370D710E643"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/backtest_synthetic_data.py",
+      "size": 3424,
+      "sha256": "F67B8239A8E5F9EF5BA73F84938614F211C71197CD87AAFCFE10A8EDEBABC627"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/bet_sizing.py",
+      "size": 15577,
+      "sha256": "40704B327DF86A3901B684D6085DDC503947B5641E081BFCBB9B80CBBE1BE889"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/multiple_testing.py",
+      "size": 7855,
+      "sha256": "FAA5E3C9E225869FC204BB5DA4C88830A81989A18FC927706FBC3BCCDEE7936B"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/ou_trading_rules.py",
+      "size": 12573,
+      "sha256": "A202998DC64A9C3F68544AFFF3DA48798C99C4B19A3B9600F5E1030247551182"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+      "size": 4538,
+      "sha256": "3CD56F7C02E0D42CE04E395737DB6039FAEA617B367E6BFBC2F0A74768FA7B49"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+      "size": 5085,
+      "sha256": "C14BB1E1179AAC1D61D56ACF6BF282BF2B9593B143A43E357DC7D9181C7DA373"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/robust_statistics.py",
+      "size": 11911,
+      "sha256": "9432CBA7E36A8C1F9BA69D6F912D226FB78FEC4069E940E8380EFB1543696974"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/sharpe_inference.py",
+      "size": 7721,
+      "sha256": "58A436922785F2D087FC6C40C1881228E84AAB7BC96B4D8C2C0161FA2F05E0A4"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/strategy_risk.py",
+      "size": 10670,
+      "sha256": "00D0E6574F81E68051A95CD762158E7BA52BB8109D8E47FB723C02C06C476447"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/test_set_overfitting.py",
+      "size": 8865,
+      "sha256": "2C813D80E85ED2717F4C3B991244B23DEE1253807C8FFA9EA71A36F37E9DDED0"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/__init__.py",
+      "size": 1925,
+      "sha256": "18D99DF58743C28835ACD00F7B307014D919C5FC322D6A639AE126E44AFDFFB5"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/adaptive_combinatorial_purged.py",
+      "size": 18395,
+      "sha256": "B466BD0C43297F0654467E1A91B135CCB7958CD856A1A45BAFBCDBE372F7FAA0"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/bagged_combinatorial_purged.py",
+      "size": 9472,
+      "sha256": "A881EDEBB301C8C5184248AA37EDCCE94159A9314BA5369026E0C423C5C73B12"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/combinatorial_purged.py",
+      "size": 14461,
+      "sha256": "8CC827C13CE4DE02A70C5A942A663CC2B704BD0EF5B251CDE78F59CDB9F375DB"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/cross_validator_controller.py",
+      "size": 1233,
+      "sha256": "FE635E694640176AA96872AAE26046E4707C0F5FBE8F8AE79E2197BC0A4D6C51"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/cross_validator_factory.py",
+      "size": 2650,
+      "sha256": "EAEECAE7A1F73789F72BA9E5FBF03FE48CC20487AAFF5404613B82F41DE96C77"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/cross_validator_interface.py",
+      "size": 7967,
+      "sha256": "A6FB69106047B94AF0E7ECCDE88FBDCCB5178BE08ED8EE8E03B04564F8E50A7E"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/kfold.py",
+      "size": 12431,
+      "sha256": "BBA92A01B9EA320C89DB7CEBFED147EDBDDAE9CB7FE2D550FF2F2ECFE7ACC15B"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+      "size": 9930,
+      "sha256": "FF0040F22C4710918CD39CF3A08BC48293ED48A70A8F46898B3C4686122B6D2C"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
+      "size": 10437,
+      "sha256": "4257BE918DA88233CE4ABA8AD2A0BAB2859C9B711AE1A591ADABDA33C7312668"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/path_bagged_cpcv.py",
+      "size": 5699,
+      "sha256": "195191CEDCC24386D2862C886EA323E86F9B74371379B5C825CB9EFB069382A2"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/purged_kfold.py",
+      "size": 19267,
+      "sha256": "8E2385391624CFB31E3B9C97B0D8E27B774E1985DF6ED5997F59A1D49ACFF902"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/validation/walk_forward.py",
+      "size": 6474,
+      "sha256": "47C0786EAF7B5F4D774B24537ADEEDC9E80AAC3604FA3D14C52A17864FEC9B7A"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/__init__.py",
+      "size": 6656,
+      "sha256": "96B6E483A72D5CBD00B5EDC5762345E7D31F31F6255B91C793C00B9B2BE62CA4"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
+      "size": 11041,
+      "sha256": "089677E3EF24979A421676BD4253EA684CB6819D7D6405FB78A1575F2F47C35C"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
+      "size": 18292,
+      "sha256": "57D44C3EF8608CD9A6E917589E3B6BD37A2DDAF300A7BF983EFBD8206EF2AC6D"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/graph_identification.py",
+      "size": 37121,
+      "sha256": "E34CED76FDA172EB688B7F45D610F3297332AE43D24639860325CE38E0A180BE"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
+      "size": 6324,
+      "sha256": "415086CF1403FB0EE955184F224C9B11ACC7047943D70A39AB969A1C0CD793AD"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/optimizer.py",
+      "size": 8835,
+      "sha256": "C83DFD2630E82E3D31D45E47E3895FD8926CB2FC67A66842C4C25BDEEF2379A5"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/protocol.py",
+      "size": 64712,
+      "sha256": "97A78E100A01192A9C7511DC8C18CF54300F46BF36187A87E3FF607A5C91011B"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
+      "size": 28380,
+      "sha256": "ADA0F9B213BC90CC3B313EAC8C58DCC50082A2992618C8EAEE99736A6DF5C972"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
+      "size": 9595,
+      "sha256": "5AF8F882F798FF9D0AC8F3955A9A2C9533589AA328B929030CF16930FA28FA65"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/structural_models.py",
+      "size": 6877,
+      "sha256": "CC69BC922ADF6A4292B637CF97E96B607903608529056C03F66E041107BE345D"
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
+      "size": 11832,
+      "sha256": "B3D980B969803C12F0F3C5A6C6C55C37D844827131F45924F53E629F02A1E980"
+    },
+    {
+      "path": "src/RiskLabAI/cluster/__init__.py",
+      "size": 642,
+      "sha256": "1313FCD1DFC97508FB0ECAE567B46BAF5CE9997748C302ABACD0AA4606D931B3"
+    },
+    {
+      "path": "src/RiskLabAI/cluster/clustering.py",
+      "size": 14275,
+      "sha256": "C9ADF94D36C3B1257D33E0DBC7D38243C4876BF1921B72A9092FE81A745610B2"
+    },
+    {
+      "path": "src/RiskLabAI/controller/__init__.py",
+      "size": 73,
+      "sha256": "0DED3F4FAB2B94562CC9337E7D1A170B6ACA95D4F4477C2A6730DF29ABE0A8FF"
+    },
+    {
+      "path": "src/RiskLabAI/controller/bars_initializer.py",
+      "size": 13700,
+      "sha256": "6C45A2CACEB4BD9AAB6B08EA0EDD240E4144CF823FCE361C5297F2DC9FFF9022"
+    },
+    {
+      "path": "src/RiskLabAI/controller/data_structure_controller.py",
+      "size": 5914,
+      "sha256": "4D4CAFBA0B0059A89398A1CD453F57A803E80466C93DC3AC4A0F11BB894DDF8C"
+    },
+    {
+      "path": "src/RiskLabAI/core/__init__.py",
+      "size": 1933,
+      "sha256": "1F57377F2CDCD8958910376A2615F45A23FD96954FDE05FFBEDC8FDC20AD1DE8"
+    },
+    {
+      "path": "src/RiskLabAI/core/_builtins.py",
+      "size": 7247,
+      "sha256": "5D754E23EF41F580D0A4B5CB635DFA95A5A1AB20E3A500B1D4B9F9A75EB333A7"
+    },
+    {
+      "path": "src/RiskLabAI/core/base.py",
+      "size": 6270,
+      "sha256": "47F3B61B748629A7AFBB1209A701A8F6614F2474EA9919B298B4574D3E757C5E"
+    },
+    {
+      "path": "src/RiskLabAI/core/registry.py",
+      "size": 14263,
+      "sha256": "2A48E47D33ED1E2EE074DEE4933C363884433226EB42CA4BFCA949E33AAC1016"
+    },
+    {
+      "path": "src/RiskLabAI/data/__init__.py",
+      "size": 630,
+      "sha256": "BF1701C8581DC602A5D37E10BAE6CDB837D489BD8791781B5F50BA4D067876FD"
+    },
+    {
+      "path": "src/RiskLabAI/data/denoise/__init__.py",
+      "size": 854,
+      "sha256": "DE4D01EA8A0323F1FC39DA81B487F5770D77B4D08DB6BE2F127638B5592CB7EE"
+    },
+    {
+      "path": "src/RiskLabAI/data/denoise/denoising.py",
+      "size": 15138,
+      "sha256": "4F78D615A8B429309E2840AFBE1429D6340231F5DE73BEAA93C4741545AAA06E"
+    },
+    {
+      "path": "src/RiskLabAI/data/denoise/nercome.py",
+      "size": 6469,
+      "sha256": "AA11FB31EBE08631B7D979562E1A568E49B70FE9FD2CBA1304EA12908AD434B8"
+    },
+    {
+      "path": "src/RiskLabAI/data/differentiation/__init__.py",
+      "size": 196,
+      "sha256": "51D73513B8108EF8835E5113E337F336DD62CBC4006BBBD486B50623401B670B"
+    },
+    {
+      "path": "src/RiskLabAI/data/differentiation/adaptive_differentiation.py",
+      "size": 11222,
+      "sha256": "CB0DF7A28212D4CE0B15AF7023235B6AABD0EA9077D64572F3E5EB45D9A6A066"
+    },
+    {
+      "path": "src/RiskLabAI/data/differentiation/differentiation.py",
+      "size": 11859,
+      "sha256": "4E9E45C90AEB0B8949E5F6F774D1AF20AA5973188F5FD23FFB4344E6EF5C5E9F"
+    },
+    {
+      "path": "src/RiskLabAI/data/distance/__init__.py",
+      "size": 102,
+      "sha256": "5BA3546F05199F587C42C2C8A4E80B541616EA3F80A93654B7F2E8D8F548F296"
+    },
+    {
+      "path": "src/RiskLabAI/data/distance/codependence.py",
+      "size": 7268,
+      "sha256": "9033470188D780110795D53CEFD230BC3D5AE54BD8BA945908CB73F3C1B48B9A"
+    },
+    {
+      "path": "src/RiskLabAI/data/distance/distance_metric.py",
+      "size": 8073,
+      "sha256": "89073FAA39E9FF195C7028BEA970410562745534AE52AAFD310C5499E4DC914D"
+    },
+    {
+      "path": "src/RiskLabAI/data/labeling/__init__.py",
+      "size": 1144,
+      "sha256": "CBDD997697143DFFD4287A26E568C257FDE2634BDBA325955438353D65DC86F7"
+    },
+    {
+      "path": "src/RiskLabAI/data/labeling/financial_labels.py",
+      "size": 4424,
+      "sha256": "A2471BEAFFB28F2339D05DAED1811C4384C702CC0602638230D0FC03A4BE6A9C"
+    },
+    {
+      "path": "src/RiskLabAI/data/labeling/labeling.py",
+      "size": 14680,
+      "sha256": "36687544C68B3016B5E4CFDE12ADE104971F45F79D4AC9FEB99BEB298F8E1418"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/__init__.py",
+      "size": 883,
+      "sha256": "051BD4E2CF067134B61FC3CCEA16A9F20B94676F5C3D0DD01041F28541132956"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/abstract_bars.py",
+      "size": 7436,
+      "sha256": "F775F93AE69A634E22EA324A0AB8603E729786CB72A684741D2111E090DA6014"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/abstract_imbalance_bars.py",
+      "size": 6210,
+      "sha256": "E7A54B451B412FD1F2463E59E8706131A1D7AD8C84D3FE6CC1E2B5A3DC8B1B99"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/abstract_information_driven_bars.py",
+      "size": 4021,
+      "sha256": "8601CD7E405A10F66BF6A82192E8EA261F9D71CA2A8C85E48FFA334EBC00D8DF"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/abstract_run_bars.py",
+      "size": 9943,
+      "sha256": "1B7E12ED9C1B2505F014FE5487CF1AFC938463198C8B40F7360ED1739E035EFD"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/hardened_information_driven_bars.py",
+      "size": 6880,
+      "sha256": "E5CF32132DADEF61624F24E2AC42E673C0B4B274DC317DD6488539A3FC0F1741"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/imbalance_bars.py",
+      "size": 4741,
+      "sha256": "D355A01123732210788FAB14EDC8D68ABC6FA4E1035AC5BD636BD11DD4E210AC"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/run_bars.py",
+      "size": 4515,
+      "sha256": "7FE0F23DF5BE39B475073CA69FABD6FDE7126EC6E4289C2D84652D930D251900"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/standard_bars.py",
+      "size": 2669,
+      "sha256": "C4142C10BEE79EF96E8A9DA31F1444EE062933D587630EB567E0A5CE3C81C362"
+    },
+    {
+      "path": "src/RiskLabAI/data/structures/time_bars.py",
+      "size": 4544,
+      "sha256": "F9126A81DA595A4E1D87400164C09071833222CD9C1546D69164F643D0AC582F"
+    },
+    {
+      "path": "src/RiskLabAI/data/synthetic_data/__init__.py",
+      "size": 857,
+      "sha256": "BE3B0444592D9B45C9439E57210EB713C761D4B21CE497609B2B63E955F70768"
+    },
+    {
+      "path": "src/RiskLabAI/data/synthetic_data/drift_burst_hypothesis.py",
+      "size": 3115,
+      "sha256": "3A613F5FE50555654556236EF409BC4F7FB83252CDF3502CA60D46EB29F4BC4C"
+    },
+    {
+      "path": "src/RiskLabAI/data/synthetic_data/simulation.py",
+      "size": 3392,
+      "sha256": "09394D81D758211140D894B5CB4CB6289EACEC862638006C8A7D9A79FD16DC55"
+    },
+    {
+      "path": "src/RiskLabAI/data/synthetic_data/synthetic_controlled_environment.py",
+      "size": 12391,
+      "sha256": "6D5DFCF4C4430A7BAE367A79CB156D3D6DF3D24457C1D60B68A1A4D556CF4AD4"
+    },
+    {
+      "path": "src/RiskLabAI/data/weights/__init__.py",
+      "size": 621,
+      "sha256": "7275D7101AE1F1DC977EF7B6C53819139AC9F46F629742178AA0AA453390A523"
+    },
+    {
+      "path": "src/RiskLabAI/data/weights/sample_weights.py",
+      "size": 6991,
+      "sha256": "4DA73877840EF49BDFF35B087CE1FC52354D14E9136217D16B1948C5577A9BB4"
+    },
+    {
+      "path": "src/RiskLabAI/ensemble/__init__.py",
+      "size": 707,
+      "sha256": "2301547AD658B8DD96941FD1098FBDA9AC3464E487F2A9F1811C6BD656F8F46A"
+    },
+    {
+      "path": "src/RiskLabAI/ensemble/bagging_classifier_accuracy.py",
+      "size": 1255,
+      "sha256": "9B2150DA7DB358161927137E5E2ED9C3FA0249FF71E86401F29C9F96258B839C"
+    },
+    {
+      "path": "src/RiskLabAI/ensemble/empirical_bagging_accuracy.py",
+      "size": 11622,
+      "sha256": "E679640BE29A4986F0E67AF7F5A060894A72EDCD581C3F2B059D9C4177B7415F"
+    },
+    {
+      "path": "src/RiskLabAI/features/__init__.py",
+      "size": 117,
+      "sha256": "CE30ECC88CBFF140893C4FADFBE38DC90EE954024126EF66F1A5200AE0146C2B"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/__init__.py",
+      "size": 883,
+      "sha256": "2DB4F80E1037C4562E8034FF3120C8DF41DE54D85C7F8E1CF04628BBA9A52374"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/bias_corrected.py",
+      "size": 12893,
+      "sha256": "40B156C643E48DAE6F06440D9FD1BE2ED651F18FA8C7A2BD0DB569795E44DCFE"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/kontoyiannis.py",
+      "size": 2793,
+      "sha256": "A69F1FEB3DAC762724F5ED9F17BCAD0E9D9EC88B5946348FA80EA4059AD04119"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/lempel_ziv.py",
+      "size": 976,
+      "sha256": "1F015F187028C1957CC91BC91D944B10202D7D3EF37F3CAAF29D4CFB238C8FF8"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/plug_in.py",
+      "size": 942,
+      "sha256": "799C9ABB1AD8A864BF15E5F1E3267C5FCB482B83C38A4F0FCF9E4C5F2C81B763"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/pmf.py",
+      "size": 1798,
+      "sha256": "55A1BA2FAC7BDC384C15E36B7874E01C0DD0B40D5D8FF6E6113972B81FED8D24"
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/shannon.py",
+      "size": 689,
+      "sha256": "FBA55BE6A0B6E529ABD77BE038F5F885945B034A04DA042CFFD99A278735B37E"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/__init__.py",
+      "size": 2086,
+      "sha256": "E3BD3D4CDB85D31F9096C459F8468DF540D41D4CF619B73A9CBBFF4DFBB1A75D"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
+      "size": 5361,
+      "sha256": "7BF977CB4D65189BB478CAA8378D3094E7D0A8FD672C498AC3BD881FF0B818A6"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
+      "size": 3403,
+      "sha256": "4B2B7A7F98BA4030A8B0B885C2D9077F22445F3D5B07FF470D1E247BF4346516"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/debiased_importance.py",
+      "size": 11396,
+      "sha256": "299068C70E8551367167F221055F52BF54848D048A6C5B12EAF9BAC08727045C"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_controller.py",
+      "size": 1399,
+      "sha256": "52907FFC70EE8654B29E2552FE03AD22D494DFFC9E4777021BE0E2A199E8966A"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_factory.py",
+      "size": 1620,
+      "sha256": "5D44788D9C58D531D4913E7C9D8E4C9BCEB2A634ED3CF05EF60D882EE1084A26"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_mda.py",
+      "size": 4515,
+      "sha256": "872D141D6D96B4CED9660710ACE3EFBFE4FCCB74065BEEA6FEF5344DF1A61861"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_mdi.py",
+      "size": 2651,
+      "sha256": "C201C6FA3986268AE49D7D2AFE177DBB468AA4E5D32CD9B9CA805DAEAA9EE5AE"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_sfi.py",
+      "size": 3865,
+      "sha256": "69ED5D5AEA7F977E72459492D278ED5A1A3B0B5A7099CED6C96D1B5EE26C4833"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/feature_importance_strategy.py",
+      "size": 857,
+      "sha256": "0B5BF2F9EA40AEF208FAF010308BE4E0AF32B9378B395A8B555CF2CB1D97CCAA"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/generate_synthetic_data.py",
+      "size": 2535,
+      "sha256": "67342708D90B9AC31BF31FF851E341D122600D7A75818F20CEFF31CB39E41747"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/orthogonal_features.py",
+      "size": 3140,
+      "sha256": "0250FFD2E9B7E2D1B5BFBF960D63EA32CBB0CD9335249222E37A66724B6B0FF9"
+    },
+    {
+      "path": "src/RiskLabAI/features/feature_importance/weighted_tau.py",
+      "size": 974,
+      "sha256": "706F53A5531A3B5089A9A252883558C7561C9B1B0DB6B251904EE80A8961C098"
+    },
+    {
+      "path": "src/RiskLabAI/features/microstructural_features/__init__.py",
+      "size": 708,
+      "sha256": "5A47422A191048EB40286C2BA1169BA3FF04396BFA08F9582439A26521A06353"
+    },
+    {
+      "path": "src/RiskLabAI/features/microstructural_features/bekker_parkinson_volatility_estimator.py",
+      "size": 2058,
+      "sha256": "BC606B1E368BC738846DCA08DE31C99A0A42D91F0CF5F8BB686EDE14021821FF"
+    },
+    {
+      "path": "src/RiskLabAI/features/microstructural_features/corwin_schultz.py",
+      "size": 3471,
+      "sha256": "9120D5D7F9763E017A896E5F7A3288F02112E1A72AA92C42717E6B2506070532"
+    },
+    {
+      "path": "src/RiskLabAI/features/microstructural_features/edge.py",
+      "size": 6268,
+      "sha256": "98A0A232CDB6D1ECB2C268B0BBAFCACF23981CDE9D998D8936D7F2A3265C38D7"
+    },
+    {
+      "path": "src/RiskLabAI/features/structural_breaks/__init__.py",
+      "size": 1134,
+      "sha256": "EC77F8B7B857C0898C23D9B3968EA957E4A281643644B7911B14E94F0057FA3D"
+    },
+    {
+      "path": "src/RiskLabAI/features/structural_breaks/pelt_change_points.py",
+      "size": 4257,
+      "sha256": "7D84550BB9E246055031963755D99BC180793C92D839BFE4D29ECBB0EFC1D337"
+    },
+    {
+      "path": "src/RiskLabAI/features/structural_breaks/structural_breaks.py",
+      "size": 25436,
+      "sha256": "F81089327CA345631BBBB943BD431E7F91B2AF30728946602C86B115C1759032"
+    },
+    {
+      "path": "src/RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
+      "size": 5957,
+      "sha256": "8DE6D754B46AC7BE870ABC0D44F92B7EC633255CF4B0D11E402579EF4187DD56"
+    },
+    {
+      "path": "src/RiskLabAI/hpc/__init__.py",
+      "size": 511,
+      "sha256": "C08896EA7791033B286FAB38AFDBD8EC5A79F562316AA470DD071F90C6F51384"
+    },
+    {
+      "path": "src/RiskLabAI/hpc/hpc.py",
+      "size": 11306,
+      "sha256": "CC6377F6E22F2BB25D87723DE0D6C36DEB555F4D08C19BDD4B55C64D5FABEED1"
+    },
+    {
+      "path": "src/RiskLabAI/optimization/__init__.py",
+      "size": 1211,
+      "sha256": "8B178E855B01B7AAA4A6988060A26B794A9E4A867CF5E5F3125D1CBC0AE6900C"
+    },
+    {
+      "path": "src/RiskLabAI/optimization/hedging.py",
+      "size": 1962,
+      "sha256": "4A87276BD9FBAF8726F8646E57C6B27E6274C3481692532A04F67CC0B206E149"
+    },
+    {
+      "path": "src/RiskLabAI/optimization/hrp.py",
+      "size": 6108,
+      "sha256": "5DD1818F65CDCE5C07870D96353627600C325ADE1C4297AAB933AB5954538047"
+    },
+    {
+      "path": "src/RiskLabAI/optimization/hyper_parameter_tuning.py",
+      "size": 6152,
+      "sha256": "DCAFAFB9A5541BA40FE48FC8DBDD57E804BBD9DC5C22430F7979B0080AD81D29"
+    },
+    {
+      "path": "src/RiskLabAI/optimization/nco.py",
+      "size": 3992,
+      "sha256": "4FB1EE548E62CEF2BDD71E289F8F3DAD403F92AEE95820DA2BF1DA9409CAAA53"
+    },
+    {
+      "path": "src/RiskLabAI/pde/__init__.py",
+      "size": 1833,
+      "sha256": "C7B95E7E7DF3A7BDD666D940EE776A5D8349ADE4CEE33D8FC453C7C56189C4CA"
+    },
+    {
+      "path": "src/RiskLabAI/pde/equation.py",
+      "size": 10999,
+      "sha256": "4A9A073721FAAC4FFAC3513A61B08586027204248EE8A47F184E5F174DD86E06"
+    },
+    {
+      "path": "src/RiskLabAI/pde/model.py",
+      "size": 12264,
+      "sha256": "98F8C874C57C04E28883BB9B4CFD526C0D1622E27C84F723E5883D30CBFF7001"
+    },
+    {
+      "path": "src/RiskLabAI/pde/solver.py",
+      "size": 13859,
+      "sha256": "A7F2A65833339E5E9258F165B0AC0BA9F37130061F456C12465C81179B740756"
+    },
+    {
+      "path": "src/RiskLabAI/utils/__init__.py",
+      "size": 3409,
+      "sha256": "DE1F4F4832425C9B8FE275BF48A9621ABA3525BB219F43C9D9E38DBBCEAE0582"
+    },
+    {
+      "path": "src/RiskLabAI/utils/constants.py",
+      "size": 3003,
+      "sha256": "751B87152BF9EABFE4AE5BB9CF35F38FBD56E4FE2691BF52B749CC3DAFAACE5A"
+    },
+    {
+      "path": "src/RiskLabAI/utils/ewma.py",
+      "size": 2118,
+      "sha256": "48306B7F06272DFBABFB0CFE2B147F232038884BFCE77FEE072583A8F8F6355B"
+    },
+    {
+      "path": "src/RiskLabAI/utils/momentum_mean_reverting_strategy_sides.py",
+      "size": 2156,
+      "sha256": "F19E1691AD40DF94640AEFBFA06431B39538444139277568B8A6AE247FB48509"
+    },
+    {
+      "path": "src/RiskLabAI/utils/progress.py",
+      "size": 1945,
+      "sha256": "74B4D2EA57526348055B657EB254D92606C00C7A49DBC2B122D5DA34A44F75D2"
+    },
+    {
+      "path": "src/RiskLabAI/utils/publication_plots.py",
+      "size": 5850,
+      "sha256": "B00FD12382E692BB3F74F2B37EFFAB1D95BC3641679F588BBB60FB0C203764D8"
+    },
+    {
+      "path": "src/RiskLabAI/utils/update_figure_layout.py",
+      "size": 1324,
+      "sha256": "8C5C6DAEFE392D1AD59AF598B1D8D76732FD4B0A7A437AB3C4AB160CB1CDFFB2"
+    },
+    {
+      "path": "test/backtest/test_advanced_bet_sizing.py",
+      "size": 3779,
+      "sha256": "73E02C09002FE941032602FAF26E6013261D0C996EBB747A87E984E1F2040095"
+    },
+    {
+      "path": "test/backtest/test_backtest_overfitting_simulation.py",
+      "size": 2489,
+      "sha256": "195EE1482CC4C4F1EC9346D1C8C0A600EBB14898D331BC7E37F0FB29D3E1A68A"
+    },
+    {
+      "path": "test/backtest/test_backtest_statistics.py",
+      "size": 4198,
+      "sha256": "16185AE1BEC34431ECD85EE1BE4E1A49C622C9CDB8B59CA4427148B1B6C2BA0A"
+    },
+    {
+      "path": "test/backtest/test_backtest_synthetic_data.py",
+      "size": 2147,
+      "sha256": "4E81268462F0321FDE82215768BC6ACAD07D5F70F881C5D74CCE0991A1BD6435"
+    },
+    {
+      "path": "test/backtest/test_bet_sizing.py",
+      "size": 5392,
+      "sha256": "7CA2E228BD7421C87F15BFABFD6C79E529D239F34A685ACBF5AEE1620EE1898C"
+    },
+    {
+      "path": "test/backtest/test_multiple_testing.py",
+      "size": 3034,
+      "sha256": "AA6E928AD7A211C4C3D38525CC6FAFF1DF4D5F513C8EA97927D3DEFBF1672802"
+    },
+    {
+      "path": "test/backtest/test_ou_trading_rules.py",
+      "size": 4413,
+      "sha256": "38187A1F848B6C31B6245D45C619AD25278D7B2BF2F36F331BFB1C838E09FC50"
+    },
+    {
+      "path": "test/backtest/test_probabilistic_sharpe_ratio.py",
+      "size": 3242,
+      "sha256": "A62D3309AE74178AA80065FF9CFF4A96CE33A701AEB2D6F54127074875F91CC7"
+    },
+    {
+      "path": "test/backtest/test_probability_of_backtest_overfitting.py",
+      "size": 3715,
+      "sha256": "178F73E2D1E3175C51EDCC0D990DFA49FB21C2843E4CF15D3726E370A42DBCBA"
+    },
+    {
+      "path": "test/backtest/test_robust_statistics.py",
+      "size": 4684,
+      "sha256": "F1118D013AE5BE984BE313A2C4DCB45E76A715F1AE63AA1CD9F1069751EF5255"
+    },
+    {
+      "path": "test/backtest/test_sharpe_inference.py",
+      "size": 3456,
+      "sha256": "814021459A2904B6B5C5C9ADC90EB9E503D5437C1764CFDA431291132ED692E2"
+    },
+    {
+      "path": "test/backtest/test_strategy_risk.py",
+      "size": 3708,
+      "sha256": "E9696D0CDA4EAAFF01F536AD31E611658B36236BCADB5F470F0949EE4CE33820"
+    },
+    {
+      "path": "test/backtest/test_technical_indicators.py",
+      "size": 3947,
+      "sha256": "63D92133A4731E007902E5FD73344F4B2FD6D3238E3124E2B3BD2C44B967B38C"
+    },
+    {
+      "path": "test/backtest/test_test_set_overfitting.py",
+      "size": 3145,
+      "sha256": "C9E6DF7D60DA22FFC20FD9C4386B25A83DE9C2F24BAA7C2EC6985FF0B91949FC"
+    },
+    {
+      "path": "test/backtest/validation/test_adaptive_combinatorial_purged.py",
+      "size": 3326,
+      "sha256": "E63E3168B1C24A68A7A9B97BD6AE86D653781CABBB75B612973D6E526F74A576"
+    },
+    {
+      "path": "test/backtest/validation/test_bagged_combinatorial_purged.py",
+      "size": 2500,
+      "sha256": "36CD1050290F37C76B94776F7EF62D883205350373B2C251963EB3D8F424A8D5"
+    },
+    {
+      "path": "test/backtest/validation/test_combinatorial_purged.py",
+      "size": 4996,
+      "sha256": "2A7176CB64BC3117914123472650C2E28675E127AF721507FEC708A977AB014E"
+    },
+    {
+      "path": "test/backtest/validation/test_cross_validator_controller.py",
+      "size": 1836,
+      "sha256": "B27F524D6BFF839D9D11A2AF3C6F69C4E8725149DA3FF4BE7D47EE4ACFF78664"
+    },
+    {
+      "path": "test/backtest/validation/test_cross_validator_factory.py",
+      "size": 3073,
+      "sha256": "059213105205BA8A4B1EADD6923C513980EB38E7D48AF2ED9261841819E7AD04"
+    },
+    {
+      "path": "test/backtest/validation/test_kfold.py",
+      "size": 4242,
+      "sha256": "42FFA8774B3398D0B2D4F6ABCEEE8934D9A600AA7A2C859E56F958F3291B2409"
+    },
+    {
+      "path": "test/backtest/validation/test_leakage_aware_hpo.py",
+      "size": 3951,
+      "sha256": "7D689924DA7A7C3797E9E59B3BF8AFC14CF1893D28F27BE50D2B89FBBB6917E7"
+    },
+    {
+      "path": "test/backtest/validation/test_path_adaptive_cpcv.py",
+      "size": 9013,
+      "sha256": "AE54E8F04CEA04C46613F7542E3EC22979745F82FC3E7871F36A821516C61858"
+    },
+    {
+      "path": "test/backtest/validation/test_path_bagged_cpcv.py",
+      "size": 4004,
+      "sha256": "E4A0B4DCBAF8D3BA9D3E5242A9E92D8F4800D01CEE76CE9739BEBDD79679E12F"
+    },
+    {
+      "path": "test/backtest/validation/test_purged_kfold.py",
+      "size": 5007,
+      "sha256": "C64CB49639B8AB7E3878AE0A541F42CE3D3853405E8763B9331F6A2A0EA3153D"
+    },
+    {
+      "path": "test/backtest/validation/test_walk_forward.py",
+      "size": 4290,
+      "sha256": "DB6846CCB5C99C47B07F2C54C405C28F2E903E4D5EAB68405DAD4F7B37C27564"
+    },
+    {
+      "path": "test/causal_factor_analysis/fixtures/additive_numeric_parity.tsv",
+      "size": 1200,
+      "sha256": "E2B46AB385DB863D9F4C764F3754D6C0931ED7C62DCB2C589927DB924986DD7E"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_additive_numeric_parity.py",
+      "size": 7060,
+      "sha256": "40EBB18368636E2293C695A8FB3BA89973CD3F28DBFFA174E4EC48B236459F7B"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_allocation_diagnostics.py",
+      "size": 8402,
+      "sha256": "4393191DFF603085216902051FF9CB0EAAEBF4E5CD6CC2F394C4381A07E2C760"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
+      "size": 3644,
+      "sha256": "195A3291A6CB6EAEE929F02951BAA45BD6E933AB751CCC30469402BBDA12DE9A"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_factor_mirage.py",
+      "size": 16311,
+      "sha256": "B64153FE7B39D103022268E503A132F76E967A05DB103D3339A662A9DA0A890C"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_generalized_factor_mirage.py",
+      "size": 8498,
+      "sha256": "16BEA6313136F0BB2D8EEEA4D79C4BF90C265E17AA03BBE823CA9A6381A2739C"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_graph_identification.py",
+      "size": 35155,
+      "sha256": "16CA24092CF9D05D2A7718FF1BACBF050592EFDDE18C7B7CCF2B20121250F789"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_graph_roles.py",
+      "size": 5190,
+      "sha256": "70C2A24EBD466D461F1C54A8DFFC26AA7F7027ECEE2F1B7F7C8377DDE53F9117"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_minimum_variance.py",
+      "size": 17057,
+      "sha256": "9B2D772C018F99D358168AF9462DC48E0B7C53C924370A8B564AC1C4C66CE1FB"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_protocol.py",
+      "size": 38965,
+      "sha256": "E1E456BE476A5D990F781E240868B6C344FA0345FC78DC3C027BE63271BCA240"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_search_adjusted_fdr.py",
+      "size": 28388,
+      "sha256": "510F7D5D0FC64786D496EB9B72EA508AD21F82360E1C7FFEC086C618A20D55B7"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_specification_diagnostics.py",
+      "size": 9088,
+      "sha256": "6FD3A8C9F1DFDC665AE9DCD80E41798D5D1EAE48BB9B2F4EE5AAB61B1B3393D4"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_structural_models.py",
+      "size": 5760,
+      "sha256": "7231FF45CA7273A9687096349A30CC8FC865DC85ABADE17A2AB69CB624D5684C"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_treatment_effects.py",
+      "size": 5955,
+      "sha256": "434750E2D2889FA64E49BAE08372D0E08C9DC145BE88AB5CD58B942B4D1F5B6B"
+    },
+    {
+      "path": "test/cluster/test_clustering.py",
+      "size": 3269,
+      "sha256": "33F301B160E90B4FA6BA369524E6A3D30F3BB63887B4898D6DC6708CCD900A7A"
+    },
+    {
+      "path": "test/controller/test_bars_initializer.py",
+      "size": 2484,
+      "sha256": "13B2E36A9D10E25284C3CDCE19F04320524623790BE64F79C851D31703D3724C"
+    },
+    {
+      "path": "test/controller/test_data_structure_controller.py",
+      "size": 2833,
+      "sha256": "9510A0FBD3B714FE87742519A9200CBFD0D6CEB99C14A9ED369F51EA7E3AAA56"
+    },
+    {
+      "path": "test/core/test_base.py",
+      "size": 2701,
+      "sha256": "0BFC387B4C7A94205708140A7485F1AF1D3BFA1FC9472A1898ACBCEABA2DFE64"
+    },
+    {
+      "path": "test/core/test_builtin_parity.py",
+      "size": 5095,
+      "sha256": "560CB3D389459FEA8572E7C71B5F66563A1EF17C4545B782A989CD8A67FCAD64"
+    },
+    {
+      "path": "test/core/test_registry.py",
+      "size": 5789,
+      "sha256": "C6F667A94DB9803219591A3E4E8F963E820E5508C996A9850386BD4E8A8FED03"
+    },
+    {
+      "path": "test/data/denoise/test_denoising.py",
+      "size": 6035,
+      "sha256": "4CAE78A888AEEE68C65C7A4625208E5EFC0CAD101D7DE05C35D2C0B4F0272FFE"
+    },
+    {
+      "path": "test/data/denoise/test_nercome.py",
+      "size": 4273,
+      "sha256": "A20954A1B85C178B4E3561E38B5ECC7F6D35FF2201D2BD34E62EB2EAACCF7632"
+    },
+    {
+      "path": "test/data/differentiation/test_adaptive_differentiation.py",
+      "size": 3844,
+      "sha256": "940CA6705C77B82ABD55B2B500067B0ED376276ED1D8D6B9234AC3504D540E27"
+    },
+    {
+      "path": "test/data/differentiation/test_differentiation.py",
+      "size": 3712,
+      "sha256": "C95ECCBBC869053624EB81A990F91003C835B4CCB1ABFEA56B01ECA347C54C33"
+    },
+    {
+      "path": "test/data/distance/test_codependence.py",
+      "size": 3374,
+      "sha256": "146693136A612F70CFA26E6DF9AF4EE897F3E09862B6BDDF4A682642A18D9CC8"
+    },
+    {
+      "path": "test/data/distance/test_distance_metric.py",
+      "size": 2758,
+      "sha256": "C20662C35D3253A3C0157456B3385523DDF6042D74C0BD031CF0DAE168D57589"
+    },
+    {
+      "path": "test/data/labeling/test_financial_labels.py",
+      "size": 2624,
+      "sha256": "5B194D19D2565708359FB005A22336DD9C82F6BEED562D8B5E91DCE08387F8FD"
+    },
+    {
+      "path": "test/data/labeling/test_labeling.py",
+      "size": 4598,
+      "sha256": "571BEBC1BBD55A1E1F3F2163B79C1B5D2BB3F07F355A850B5E11106EA28B33E3"
+    },
+    {
+      "path": "test/data/structures/test_hardened_information_driven_bars.py",
+      "size": 4765,
+      "sha256": "19ED1A20708BA49B3294C8406B49BD5E4261938983A37FCCF2301319E76EEB39"
+    },
+    {
+      "path": "test/data/structures/test_imbalance_bars.py",
+      "size": 3432,
+      "sha256": "95B11988BA1E13F67868EDB84E361290E8206214E67A2ADD368EC50A04035678"
+    },
+    {
+      "path": "test/data/structures/test_run_bars.py",
+      "size": 2298,
+      "sha256": "AA84352C3434FA6BE5B36E1E04506FFFB04A71B723F52D1E76E3684AB76F5FD5"
+    },
+    {
+      "path": "test/data/structures/test_standard_bars.py",
+      "size": 2573,
+      "sha256": "7FBDEE31397875FD3CD6AA0755F79376C8298C623EDCEFEC62FCBE02801FDE81"
+    },
+    {
+      "path": "test/data/structures/test_time_bars.py",
+      "size": 1948,
+      "sha256": "777F07CBF7B1285660BE260CF28DAEDD8409119B580220789C06C571E83012A9"
+    },
+    {
+      "path": "test/data/synthetic_data/test_drift_burst_hypothesis.py",
+      "size": 2496,
+      "sha256": "D36F02ED24979C2AC250DA8F78DCF00E84AC15629A66FF0F49B864DC7F29234F"
+    },
+    {
+      "path": "test/data/synthetic_data/test_synthetic_controlled_environment.py",
+      "size": 2706,
+      "sha256": "3EDD684CD47C177AC3B14201D00F92D58B653F80015FBBF5FE8B199681A9CFF3"
+    },
+    {
+      "path": "test/data/weights/test_sample_weights.py",
+      "size": 3920,
+      "sha256": "6A682B9C8273A9480CC40EDEF503F4ADB254FDE03A7C6846A6576B2844177DA5"
+    },
+    {
+      "path": "test/ensemble/test_bagging_classifier_accuracy.py",
+      "size": 1055,
+      "sha256": "B9E9FCDEC62CCA57773D775874B1A49FE9FFDBA70AE75C1A5B44D21BE5F42F70"
+    },
+    {
+      "path": "test/features/entropy_features/test_entropy.py",
+      "size": 8265,
+      "sha256": "EB0639713017FA205239818CF5EB33B37488D1F5015E41BE572DF9B3DC4B92A3"
+    },
+    {
+      "path": "test/features/feature_importance/test_debiased_importance.py",
+      "size": 3145,
+      "sha256": "767C8AC265903BFADCC0CB358C04380F7CC1B080E249CF2605D7C36054DA7841"
+    },
+    {
+      "path": "test/features/feature_importance/test_feature_importance.py",
+      "size": 4539,
+      "sha256": "1CC36BB1739EEDBA96BC9CFE6C784F4B10796AD8B7030D2423BFADDA83AC4BBC"
+    },
+    {
+      "path": "test/features/feature_importance/test_generate_synthetic_data.py",
+      "size": 1297,
+      "sha256": "60E8710D8FB14D2DB9C8A8561B760A7C82E78A40B58D050DE4B454FAD9D09A19"
+    },
+    {
+      "path": "test/features/feature_importance/test_orthogonal_features.py",
+      "size": 1377,
+      "sha256": "2FFF242081857CAE3677849ED9615F812C02C4F8142C2BE3F165EB7F6163E43F"
+    },
+    {
+      "path": "test/features/feature_importance/test_weighted_tau.py",
+      "size": 717,
+      "sha256": "DE4E792D04BE710A70F0531FB3BA4CF6F4FD281CD1CCB0AF66775B2AFF9DEB5B"
+    },
+    {
+      "path": "test/features/microstructural_features/test_edge.py",
+      "size": 2005,
+      "sha256": "E7F97BFC152F1ABC9CDA7ABACCAA96F424E2F5F60178AB358B282944AF7BB1CE"
+    },
+    {
+      "path": "test/features/microstructural_features/test_microstructure.py",
+      "size": 2089,
+      "sha256": "FAF86E2B87ED6C052039270C8FDD500399B71AFFAB9B3833ABD01C2EB7065A93"
+    },
+    {
+      "path": "test/features/structural_breaks/test_pelt_change_points.py",
+      "size": 2490,
+      "sha256": "ADE35736D9A8B8A0621A0D1687CB0EF567D2ACC1AFD1E100F1D3FE5ED43307A8"
+    },
+    {
+      "path": "test/features/structural_breaks/test_structural_breaks.py",
+      "size": 9753,
+      "sha256": "DC76EF79F06F577A1BAA8FE2AA8AC53BD5888C347CE46E595766490E2F72F75D"
+    },
+    {
+      "path": "test/features/structural_breaks/test_volatility_robust_sadf.py",
+      "size": 2742,
+      "sha256": "11A8A9D0446F666FB6B7BCF0B857414EBD6583931CD1CA199CDC2C7ECD37B58F"
+    },
+    {
+      "path": "test/hpc/test_hpc.py",
+      "size": 2213,
+      "sha256": "2E3414DD74A72FD86FED54059515E2A088F99F4C23492A1992A55A5F311F09A8"
+    },
+    {
+      "path": "test/optimization/test_hedging.py",
+      "size": 2026,
+      "sha256": "C34C92CCD66E0B895140B2D45270AC94803AB408532888E04C6FABC9C444BC22"
+    },
+    {
+      "path": "test/optimization/test_hrp.py",
+      "size": 3689,
+      "sha256": "08A03D26DDCA53A9793C46D76AFEC5EA2D1203B8A833895A93C29E0EBCD6A4C7"
+    },
+    {
+      "path": "test/optimization/test_hyper_parameter_tuning.py",
+      "size": 3405,
+      "sha256": "C756502F9BA1FFC0EAFCF2F0EE3E73F500CB07D956378FFADE018CC610AEC650"
+    },
+    {
+      "path": "test/optimization/test_nco.py",
+      "size": 1875,
+      "sha256": "07393543334EED0500954A475403AFDF68BFDB5D9AEC14768E5D21D91E41A2AE"
+    },
+    {
+      "path": "test/pde/test_pde_solver.py",
+      "size": 1764,
+      "sha256": "9606F9460D87E1268B55A2EC5FC8AD7BE92B4E9DB64F219E0C444343CDB763DD"
+    },
+    {
+      "path": "test/test_consolidation.py",
+      "size": 3427,
+      "sha256": "653D2C917A29D41030CE835E18736ED607BCBBC9E7A75B1A16FEFC286F391F8F"
+    },
+    {
+      "path": "test/test_deprecation.py",
+      "size": 1746,
+      "sha256": "1318D33E6B9790C48F3E366568733FB14574D0D7ECCF7086D5EF5D8BE8545930"
+    },
+    {
+      "path": "test/test_performance.py",
+      "size": 6986,
+      "sha256": "857264FBB2C1507995BB18CBD2E9081849D9C3F4EECA73F58FBC0371FAE42F73"
+    },
+    {
+      "path": "test/utils/test_ewma.py",
+      "size": 920,
+      "sha256": "A75275626813BC8DFE6A0A792370FC1B013ED8A5398232468CE7E871137F70D6"
+    },
+    {
+      "path": "test/utils/test_momentum_mean_reverting_strategy_sides.py",
+      "size": 2321,
+      "sha256": "EEBBFAC83B87A3A2BF72C9D9B203DB11D8794D9CBE7CA5125DEBE141C10E3889"
+    },
+    {
+      "path": "test/utils/test_progress.py",
+      "size": 1022,
+      "sha256": "2CC8FBD465B007948A09C0E8975288A13D46590113FB9DA6AA441C07C55F23BA"
+    }
+  ],
+  "self_hash_policy": "PACKAGE_FILES.json is listed but omitted from its own hash records to avoid a self-referential digest.",
+  "preserved_repository_only_file_count": 127,
+  "preserved_repository_only_files": [
+    ".github/workflows/publish.yml",
+    ".gitignore",
+    "CHANGELOG.md",
+    "EXTENDING.md",
+    "INSTALLATION.md",
+    "NAMING_CANON_2.0.0.md",
+    "RiskLabAI/__init__.py",
+    "RiskLabAI/_deprecation.py",
+    "RiskLabAI/backtest/__init__.py",
+    "RiskLabAI/backtest/advanced_bet_sizing.py",
+    "RiskLabAI/backtest/backtest_overfitting_simulation.py",
+    "RiskLabAI/backtest/backtest_statistics.py",
+    "RiskLabAI/backtest/backtest_synthetic_data.py",
+    "RiskLabAI/backtest/bet_sizing.py",
+    "RiskLabAI/backtest/multiple_testing.py",
+    "RiskLabAI/backtest/ou_trading_rules.py",
+    "RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+    "RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+    "RiskLabAI/backtest/robust_statistics.py",
+    "RiskLabAI/backtest/sharpe_inference.py",
+    "RiskLabAI/backtest/strategy_risk.py",
+    "RiskLabAI/backtest/test_set_overfitting.py",
+    "RiskLabAI/backtest/validation/__init__.py",
+    "RiskLabAI/backtest/validation/adaptive_combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/bagged_combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/combinatorial_purged.py",
+    "RiskLabAI/backtest/validation/cross_validator_controller.py",
+    "RiskLabAI/backtest/validation/cross_validator_factory.py",
+    "RiskLabAI/backtest/validation/cross_validator_interface.py",
+    "RiskLabAI/backtest/validation/kfold.py",
+    "RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+    "RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
+    "RiskLabAI/backtest/validation/path_bagged_cpcv.py",
+    "RiskLabAI/backtest/validation/purged_kfold.py",
+    "RiskLabAI/backtest/validation/walk_forward.py",
+    "RiskLabAI/cluster/__init__.py",
+    "RiskLabAI/cluster/clustering.py",
+    "RiskLabAI/controller/__init__.py",
+    "RiskLabAI/controller/bars_initializer.py",
+    "RiskLabAI/controller/data_structure_controller.py",
+    "RiskLabAI/core/__init__.py",
+    "RiskLabAI/core/_builtins.py",
+    "RiskLabAI/core/base.py",
+    "RiskLabAI/core/registry.py",
+    "RiskLabAI/data/__init__.py",
+    "RiskLabAI/data/denoise/__init__.py",
+    "RiskLabAI/data/denoise/denoising.py",
+    "RiskLabAI/data/denoise/nercome.py",
+    "RiskLabAI/data/differentiation/__init__.py",
+    "RiskLabAI/data/differentiation/adaptive_differentiation.py",
+    "RiskLabAI/data/differentiation/differentiation.py",
+    "RiskLabAI/data/distance/__init__.py",
+    "RiskLabAI/data/distance/codependence.py",
+    "RiskLabAI/data/distance/distance_metric.py",
+    "RiskLabAI/data/labeling/__init__.py",
+    "RiskLabAI/data/labeling/financial_labels.py",
+    "RiskLabAI/data/labeling/labeling.py",
+    "RiskLabAI/data/structures/__init__.py",
+    "RiskLabAI/data/structures/abstract_bars.py",
+    "RiskLabAI/data/structures/abstract_imbalance_bars.py",
+    "RiskLabAI/data/structures/abstract_information_driven_bars.py",
+    "RiskLabAI/data/structures/abstract_run_bars.py",
+    "RiskLabAI/data/structures/hardened_information_driven_bars.py",
+    "RiskLabAI/data/structures/imbalance_bars.py",
+    "RiskLabAI/data/structures/run_bars.py",
+    "RiskLabAI/data/structures/standard_bars.py",
+    "RiskLabAI/data/structures/time_bars.py",
+    "RiskLabAI/data/synthetic_data/__init__.py",
+    "RiskLabAI/data/synthetic_data/drift_burst_hypothesis.py",
+    "RiskLabAI/data/synthetic_data/simulation.py",
+    "RiskLabAI/data/synthetic_data/synthetic_controlled_environment.py",
+    "RiskLabAI/data/weights/__init__.py",
+    "RiskLabAI/data/weights/sample_weights.py",
+    "RiskLabAI/ensemble/__init__.py",
+    "RiskLabAI/ensemble/bagging_classifier_accuracy.py",
+    "RiskLabAI/ensemble/empirical_bagging_accuracy.py",
+    "RiskLabAI/features/__init__.py",
+    "RiskLabAI/features/entropy_features/__init__.py",
+    "RiskLabAI/features/entropy_features/bias_corrected.py",
+    "RiskLabAI/features/entropy_features/kontoyiannis.py",
+    "RiskLabAI/features/entropy_features/lempel_ziv.py",
+    "RiskLabAI/features/entropy_features/plug_in.py",
+    "RiskLabAI/features/entropy_features/pmf.py",
+    "RiskLabAI/features/entropy_features/shannon.py",
+    "RiskLabAI/features/feature_importance/__init__.py",
+    "RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
+    "RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
+    "RiskLabAI/features/feature_importance/debiased_importance.py",
+    "RiskLabAI/features/feature_importance/feature_importance_controller.py",
+    "RiskLabAI/features/feature_importance/feature_importance_factory.py",
+    "RiskLabAI/features/feature_importance/feature_importance_mda.py",
+    "RiskLabAI/features/feature_importance/feature_importance_mdi.py",
+    "RiskLabAI/features/feature_importance/feature_importance_sfi.py",
+    "RiskLabAI/features/feature_importance/feature_importance_strategy.py",
+    "RiskLabAI/features/feature_importance/generate_synthetic_data.py",
+    "RiskLabAI/features/feature_importance/orthogonal_features.py",
+    "RiskLabAI/features/feature_importance/weighted_tau.py",
+    "RiskLabAI/features/microstructural_features/__init__.py",
+    "RiskLabAI/features/microstructural_features/bekker_parkinson_volatility_estimator.py",
+    "RiskLabAI/features/microstructural_features/corwin_schultz.py",
+    "RiskLabAI/features/microstructural_features/edge.py",
+    "RiskLabAI/features/structural_breaks/__init__.py",
+    "RiskLabAI/features/structural_breaks/pelt_change_points.py",
+    "RiskLabAI/features/structural_breaks/structural_breaks.py",
+    "RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
+    "RiskLabAI/hpc/__init__.py",
+    "RiskLabAI/hpc/hpc.py",
+    "RiskLabAI/optimization/__init__.py",
+    "RiskLabAI/optimization/hedging.py",
+    "RiskLabAI/optimization/hrp.py",
+    "RiskLabAI/optimization/hyper_parameter_tuning.py",
+    "RiskLabAI/optimization/nco.py",
+    "RiskLabAI/pde/__init__.py",
+    "RiskLabAI/pde/equation.py",
+    "RiskLabAI/pde/model.py",
+    "RiskLabAI/pde/solver.py",
+    "RiskLabAI/utils/__init__.py",
+    "RiskLabAI/utils/constants.py",
+    "RiskLabAI/utils/ewma.py",
+    "RiskLabAI/utils/momentum_mean_reverting_strategy_sides.py",
+    "RiskLabAI/utils/progress.py",
+    "RiskLabAI/utils/publication_plots.py",
+    "RiskLabAI/utils/update_figure_layout.py",
+    "docs/delete",
+    "documenter.py",
+    "style_guide.md",
+    "tree.py"
+  ],
+  "preserved_repository_only_records": [
+    {
+      "path": ".github/workflows/publish.yml",
+      "size": 973,
+      "sha256": "B0F075E6AC7F4D6C192F4C85D033268F97C908D1DC8BD19B922599AB0F6AAA6E"
+    },
+    {
+      "path": ".gitignore",
+      "size": 191,
+      "sha256": "371B312B403BCFA6632199A28D57E50EFC3EE9F865E25BF0BEA01CC42CDF6892"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "size": 10907,
+      "sha256": "B607A87ABAA51A2862F08B5C4285B252C8FCFA9FFC09831042366E74C30F2D53"
+    },
+    {
+      "path": "EXTENDING.md",
+      "size": 6426,
+      "sha256": "C2CD3D7E8AB84E70FF641A0A636FA4472AD79D3CC73D903CCAF07C7DE4250FBB"
+    },
+    {
+      "path": "INSTALLATION.md",
+      "size": 3477,
+      "sha256": "EBE7C2C5A3AAC586D67936682674FFD94CF9C2FC2907BFDBF901D76330D6F5A5"
+    },
+    {
+      "path": "NAMING_CANON_2.0.0.md",
+      "size": 8885,
+      "sha256": "598BA7789FA91B7B1820182F4FD7B2D0D259C23C4E1B475D41F9BA25E1091072"
+    },
+    {
+      "path": "RiskLabAI/__init__.py",
+      "size": 2937,
+      "sha256": "8062C354011E87CEA7349680B9AA3F9AA825758B82742D8AA78B0DCA92FA037E"
+    },
+    {
+      "path": "RiskLabAI/_deprecation.py",
+      "size": 3889,
+      "sha256": "4AA73DE361877A289248332ED5AF7EC0DE302ABEFE5C4B05B4A2500CB2C2D293"
+    },
+    {
+      "path": "RiskLabAI/backtest/__init__.py",
+      "size": 6414,
+      "sha256": "26D4E3A9972AFF0A26181731F5B1082E8A4B70ACA551D47C3BA372EE7370322C"
+    },
+    {
+      "path": "RiskLabAI/backtest/advanced_bet_sizing.py",
+      "size": 10098,
+      "sha256": "1D90B97962BED3711265488A7921C651585FBF0D366A412607944EAF44B9C810"
+    },
+    {
+      "path": "RiskLabAI/backtest/backtest_overfitting_simulation.py",
+      "size": 56278,
+      "sha256": "A2C487F016E7BE716CBD5277EEDE24812FC3E29B3CA8CC5E8D4A0E7F2375CA3F"
+    },
+    {
+      "path": "RiskLabAI/backtest/backtest_statistics.py",
+      "size": 8729,
+      "sha256": "456C5C24F9E457CE82B3CEA214D94CC1C78169CF81E2506F8EB48E329D2902DA"
+    },
+    {
+      "path": "RiskLabAI/backtest/backtest_synthetic_data.py",
+      "size": 3523,
+      "sha256": "9ACDA6D9D81702F611CBC4EBE11899C31463DA899709D9975931F592CD59AF39"
+    },
+    {
+      "path": "RiskLabAI/backtest/bet_sizing.py",
+      "size": 15149,
+      "sha256": "45B32009CA72DD781BB55825CD48BAD535035A05093EDAB403F1E6B37B817C91"
+    },
+    {
+      "path": "RiskLabAI/backtest/multiple_testing.py",
+      "size": 7855,
+      "sha256": "FAA5E3C9E225869FC204BB5DA4C88830A81989A18FC927706FBC3BCCDEE7936B"
+    },
+    {
+      "path": "RiskLabAI/backtest/ou_trading_rules.py",
+      "size": 12557,
+      "sha256": "F4E95F65C430E4E3CC12C5A1B01906AD2E7056E7969AA70763115DF673C2387E"
+    },
+    {
+      "path": "RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+      "size": 4538,
+      "sha256": "3CD56F7C02E0D42CE04E395737DB6039FAEA617B367E6BFBC2F0A74768FA7B49"
+    },
+    {
+      "path": "RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+      "size": 5085,
+      "sha256": "C14BB1E1179AAC1D61D56ACF6BF282BF2B9593B143A43E357DC7D9181C7DA373"
+    },
+    {
+      "path": "RiskLabAI/backtest/robust_statistics.py",
+      "size": 11911,
+      "sha256": "9432CBA7E36A8C1F9BA69D6F912D226FB78FEC4069E940E8380EFB1543696974"
+    },
+    {
+      "path": "RiskLabAI/backtest/sharpe_inference.py",
+      "size": 7721,
+      "sha256": "58A436922785F2D087FC6C40C1881228E84AAB7BC96B4D8C2C0161FA2F05E0A4"
+    },
+    {
+      "path": "RiskLabAI/backtest/strategy_risk.py",
+      "size": 10429,
+      "sha256": "8F368EAA32155038B8E438357FF69F33E7A4245D9E1598CA4C2EDF3FF55A68E7"
+    },
+    {
+      "path": "RiskLabAI/backtest/test_set_overfitting.py",
+      "size": 8865,
+      "sha256": "2C813D80E85ED2717F4C3B991244B23DEE1253807C8FFA9EA71A36F37E9DDED0"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/__init__.py",
+      "size": 1980,
+      "sha256": "52069C5047BBB0F199D42C35F4D4AAC6E2D3AE6EC8BB58E49338AB6A4F2FC62A"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/adaptive_combinatorial_purged.py",
+      "size": 18395,
+      "sha256": "B466BD0C43297F0654467E1A91B135CCB7958CD856A1A45BAFBCDBE372F7FAA0"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/bagged_combinatorial_purged.py",
+      "size": 9472,
+      "sha256": "A881EDEBB301C8C5184248AA37EDCCE94159A9314BA5369026E0C423C5C73B12"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/combinatorial_purged.py",
+      "size": 14461,
+      "sha256": "8CC827C13CE4DE02A70C5A942A663CC2B704BD0EF5B251CDE78F59CDB9F375DB"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/cross_validator_controller.py",
+      "size": 1205,
+      "sha256": "B4AC5AC465BDC7CB8548CAB86020237551F3CDF653116C064515CE26E9BE5BE5"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/cross_validator_factory.py",
+      "size": 2636,
+      "sha256": "40FEFA69DBE7CF76A6194C1E49CEF39663ED6809C58BCCEF2BCB4C66B64D0D6D"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/cross_validator_interface.py",
+      "size": 8202,
+      "sha256": "9BB6CFBFF867C8F863CF0CA0B1FF6384463A4385D88C2FD1FEFFA0775B85FD0D"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/kfold.py",
+      "size": 12431,
+      "sha256": "BBA92A01B9EA320C89DB7CEBFED147EDBDDAE9CB7FE2D550FF2F2ECFE7ACC15B"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+      "size": 9930,
+      "sha256": "FF0040F22C4710918CD39CF3A08BC48293ED48A70A8F46898B3C4686122B6D2C"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
+      "size": 10437,
+      "sha256": "4257BE918DA88233CE4ABA8AD2A0BAB2859C9B711AE1A591ADABDA33C7312668"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/path_bagged_cpcv.py",
+      "size": 5699,
+      "sha256": "195191CEDCC24386D2862C886EA323E86F9B74371379B5C825CB9EFB069382A2"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/purged_kfold.py",
+      "size": 19810,
+      "sha256": "86802CB8E32ECDD092A522FBAC196C2BA5F05FAAAF4227091C705EDBD2DBFCD8"
+    },
+    {
+      "path": "RiskLabAI/backtest/validation/walk_forward.py",
+      "size": 6474,
+      "sha256": "47C0786EAF7B5F4D774B24537ADEEDC9E80AAC3604FA3D14C52A17864FEC9B7A"
+    },
+    {
+      "path": "RiskLabAI/cluster/__init__.py",
+      "size": 669,
+      "sha256": "CC1993BE2778895842431BD777BFEF3B620341E6DB13B4BEDB5A58891CAF14DC"
+    },
+    {
+      "path": "RiskLabAI/cluster/clustering.py",
+      "size": 14275,
+      "sha256": "C9ADF94D36C3B1257D33E0DBC7D38243C4876BF1921B72A9092FE81A745610B2"
+    },
+    {
+      "path": "RiskLabAI/controller/__init__.py",
+      "size": 75,
+      "sha256": "875DCD9EC172311DF8E9DF665C60102BDC0F56218A5CDDE0760E2A081E369230"
+    },
+    {
+      "path": "RiskLabAI/controller/bars_initializer.py",
+      "size": 13999,
+      "sha256": "28284D4877900DE9D3582C2B821FC66173E474E1F62C95F27385190C4A88426F"
+    },
+    {
+      "path": "RiskLabAI/controller/data_structure_controller.py",
+      "size": 6102,
+      "sha256": "237843F3AD293C366607FA555C218F4F3CD8ACCD881F784030B3AA6B12BC8E23"
+    },
+    {
+      "path": "RiskLabAI/core/__init__.py",
+      "size": 1933,
+      "sha256": "1F57377F2CDCD8958910376A2615F45A23FD96954FDE05FFBEDC8FDC20AD1DE8"
+    },
+    {
+      "path": "RiskLabAI/core/_builtins.py",
+      "size": 7247,
+      "sha256": "5D754E23EF41F580D0A4B5CB635DFA95A5A1AB20E3A500B1D4B9F9A75EB333A7"
+    },
+    {
+      "path": "RiskLabAI/core/base.py",
+      "size": 6270,
+      "sha256": "47F3B61B748629A7AFBB1209A701A8F6614F2474EA9919B298B4574D3E757C5E"
+    },
+    {
+      "path": "RiskLabAI/core/registry.py",
+      "size": 14263,
+      "sha256": "2A48E47D33ED1E2EE074DEE4933C363884433226EB42CA4BFCA949E33AAC1016"
+    },
+    {
+      "path": "RiskLabAI/data/__init__.py",
+      "size": 664,
+      "sha256": "F238157F6B54DB5E12E2F910821431BED049AB6E99665B64AD81F95EB7B1488B"
+    },
+    {
+      "path": "RiskLabAI/data/denoise/__init__.py",
+      "size": 834,
+      "sha256": "E4A4B8822827C3CAA9F34A4FC3E589447C641BCFCB681AACD192D7DB2EC7ED9C"
+    },
+    {
+      "path": "RiskLabAI/data/denoise/denoising.py",
+      "size": 11538,
+      "sha256": "411FFBD20F902E19426506D6C5472570960F9091E67E3D0F8626DE09E63B8B92"
+    },
+    {
+      "path": "RiskLabAI/data/denoise/nercome.py",
+      "size": 6469,
+      "sha256": "AA11FB31EBE08631B7D979562E1A568E49B70FE9FD2CBA1304EA12908AD434B8"
+    },
+    {
+      "path": "RiskLabAI/data/differentiation/__init__.py",
+      "size": 196,
+      "sha256": "51D73513B8108EF8835E5113E337F336DD62CBC4006BBBD486B50623401B670B"
+    },
+    {
+      "path": "RiskLabAI/data/differentiation/adaptive_differentiation.py",
+      "size": 11222,
+      "sha256": "CB0DF7A28212D4CE0B15AF7023235B6AABD0EA9077D64572F3E5EB45D9A6A066"
+    },
+    {
+      "path": "RiskLabAI/data/differentiation/differentiation.py",
+      "size": 12258,
+      "sha256": "FD6A1B4247CC3F7B6C794866CD1809770460BD2AFC08375F2F96B02AF0D79E02"
+    },
+    {
+      "path": "RiskLabAI/data/distance/__init__.py",
+      "size": 102,
+      "sha256": "5BA3546F05199F587C42C2C8A4E80B541616EA3F80A93654B7F2E8D8F548F296"
+    },
+    {
+      "path": "RiskLabAI/data/distance/codependence.py",
+      "size": 7268,
+      "sha256": "9033470188D780110795D53CEFD230BC3D5AE54BD8BA945908CB73F3C1B48B9A"
+    },
+    {
+      "path": "RiskLabAI/data/distance/distance_metric.py",
+      "size": 8377,
+      "sha256": "6399EFDB1E12A82ED3BB6831FF6F985E0EAB18D2420D82670CF1599189D51E73"
+    },
+    {
+      "path": "RiskLabAI/data/labeling/__init__.py",
+      "size": 1193,
+      "sha256": "E84DB73F915081EF60F6C8441D10BFE5E759037EE7D42945B1AD2FBB77A10CC3"
+    },
+    {
+      "path": "RiskLabAI/data/labeling/financial_labels.py",
+      "size": 4424,
+      "sha256": "A2471BEAFFB28F2339D05DAED1811C4384C702CC0602638230D0FC03A4BE6A9C"
+    },
+    {
+      "path": "RiskLabAI/data/labeling/labeling.py",
+      "size": 14680,
+      "sha256": "36687544C68B3016B5E4CFDE12ADE104971F45F79D4AC9FEB99BEB298F8E1418"
+    },
+    {
+      "path": "RiskLabAI/data/structures/__init__.py",
+      "size": 883,
+      "sha256": "051BD4E2CF067134B61FC3CCEA16A9F20B94676F5C3D0DD01041F28541132956"
+    },
+    {
+      "path": "RiskLabAI/data/structures/abstract_bars.py",
+      "size": 7436,
+      "sha256": "F775F93AE69A634E22EA324A0AB8603E729786CB72A684741D2111E090DA6014"
+    },
+    {
+      "path": "RiskLabAI/data/structures/abstract_imbalance_bars.py",
+      "size": 6388,
+      "sha256": "350535B7AAF4E997E19242E07991EA7AB22BB41C041490D2243F25B2D4D90111"
+    },
+    {
+      "path": "RiskLabAI/data/structures/abstract_information_driven_bars.py",
+      "size": 4150,
+      "sha256": "2035EA576F53B0CF6B7A4A44CEB2DDC64E531BC91E8F6C98ADACF7578A11306A"
+    },
+    {
+      "path": "RiskLabAI/data/structures/abstract_run_bars.py",
+      "size": 10204,
+      "sha256": "51DDD1B7C662E2FB2D749C5C8483782C76EF00584ACC36FD8314787239DAFFED"
+    },
+    {
+      "path": "RiskLabAI/data/structures/hardened_information_driven_bars.py",
+      "size": 6880,
+      "sha256": "E5CF32132DADEF61624F24E2AC42E673C0B4B274DC317DD6488539A3FC0F1741"
+    },
+    {
+      "path": "RiskLabAI/data/structures/imbalance_bars.py",
+      "size": 4741,
+      "sha256": "D355A01123732210788FAB14EDC8D68ABC6FA4E1035AC5BD636BD11DD4E210AC"
+    },
+    {
+      "path": "RiskLabAI/data/structures/run_bars.py",
+      "size": 4515,
+      "sha256": "7FE0F23DF5BE39B475073CA69FABD6FDE7126EC6E4289C2D84652D930D251900"
+    },
+    {
+      "path": "RiskLabAI/data/structures/standard_bars.py",
+      "size": 2669,
+      "sha256": "C4142C10BEE79EF96E8A9DA31F1444EE062933D587630EB567E0A5CE3C81C362"
+    },
+    {
+      "path": "RiskLabAI/data/structures/time_bars.py",
+      "size": 4544,
+      "sha256": "F9126A81DA595A4E1D87400164C09071833222CD9C1546D69164F643D0AC582F"
+    },
+    {
+      "path": "RiskLabAI/data/synthetic_data/__init__.py",
+      "size": 857,
+      "sha256": "BE3B0444592D9B45C9439E57210EB713C761D4B21CE497609B2B63E955F70768"
+    },
+    {
+      "path": "RiskLabAI/data/synthetic_data/drift_burst_hypothesis.py",
+      "size": 3115,
+      "sha256": "3A613F5FE50555654556236EF409BC4F7FB83252CDF3502CA60D46EB29F4BC4C"
+    },
+    {
+      "path": "RiskLabAI/data/synthetic_data/simulation.py",
+      "size": 3392,
+      "sha256": "09394D81D758211140D894B5CB4CB6289EACEC862638006C8A7D9A79FD16DC55"
+    },
+    {
+      "path": "RiskLabAI/data/synthetic_data/synthetic_controlled_environment.py",
+      "size": 11963,
+      "sha256": "1233C0F9B0DDAD003176DBCBDEC103B37702DFD8EC7BAAD07F2AC0CC2F9C1A2C"
+    },
+    {
+      "path": "RiskLabAI/data/weights/__init__.py",
+      "size": 621,
+      "sha256": "7275D7101AE1F1DC977EF7B6C53819139AC9F46F629742178AA0AA453390A523"
+    },
+    {
+      "path": "RiskLabAI/data/weights/sample_weights.py",
+      "size": 7225,
+      "sha256": "A1AEBA7541663238C20B3B7A76B8706AB62D6860CD171DB6000E2EF92C492724"
+    },
+    {
+      "path": "RiskLabAI/ensemble/__init__.py",
+      "size": 707,
+      "sha256": "2301547AD658B8DD96941FD1098FBDA9AC3464E487F2A9F1811C6BD656F8F46A"
+    },
+    {
+      "path": "RiskLabAI/ensemble/bagging_classifier_accuracy.py",
+      "size": 1300,
+      "sha256": "DF1570D491B4452412103BE1ECDC6B0C4CFDA3D9AAF55D9DDD7620B611134F92"
+    },
+    {
+      "path": "RiskLabAI/ensemble/empirical_bagging_accuracy.py",
+      "size": 11622,
+      "sha256": "E679640BE29A4986F0E67AF7F5A060894A72EDCD581C3F2B059D9C4177B7415F"
+    },
+    {
+      "path": "RiskLabAI/features/__init__.py",
+      "size": 123,
+      "sha256": "8E6EF92F8D1E0E9BCA37E3436806A37308B8B3CB08C221481F4A1261327C5A18"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/__init__.py",
+      "size": 883,
+      "sha256": "2DB4F80E1037C4562E8034FF3120C8DF41DE54D85C7F8E1CF04628BBA9A52374"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/bias_corrected.py",
+      "size": 12893,
+      "sha256": "40B156C643E48DAE6F06440D9FD1BE2ED651F18FA8C7A2BD0DB569795E44DCFE"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/kontoyiannis.py",
+      "size": 2902,
+      "sha256": "08FCF8EEEF1D9C4FFFC4F812A39B77F406050091ED287C9AE1A577E849998A4B"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/lempel_ziv.py",
+      "size": 1017,
+      "sha256": "295BFA3C0E3970C75C924C6D19E2D0B384E29A2B50AED7C8C08E1723A975BF4F"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/plug_in.py",
+      "size": 981,
+      "sha256": "90DB453E95DD416771EAC11232E33584582C7FF1EA9B79DD441588185BADC483"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/pmf.py",
+      "size": 1862,
+      "sha256": "649221CC7406A3CF9607DE10CCA44C0F7D661E2B877209626704EBFF93F0BBC9"
+    },
+    {
+      "path": "RiskLabAI/features/entropy_features/shannon.py",
+      "size": 723,
+      "sha256": "B594B49278CB1904E605CC44083B0A545F71E14B2BDDA6EF0A2BE03FAE2A2DA8"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/__init__.py",
+      "size": 2152,
+      "sha256": "681CBA32A99632E6FAC08636FC4C1E9758DFE385FA9DF0C7A6A7AADD3961CE77"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/clustered_feature_importance_mda.py",
+      "size": 5518,
+      "sha256": "656BBC12FE44777CE8557AF6A0F3292DA11A69B23C0F812E10501E9AFF4E2BF1"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/clustered_feature_importance_mdi.py",
+      "size": 3511,
+      "sha256": "965BFFF4A3EF79239B54C7DD5A09B7590C3EA1DF8F2B2F10695ADFA095CA45C7"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/debiased_importance.py",
+      "size": 11231,
+      "sha256": "2041C34A27484878E4D579219C3D264D1306C3B2D9EF55132FC191D2D7BCB7F0"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_controller.py",
+      "size": 1371,
+      "sha256": "67E55609549A88E0340497880A9529786EDA51FE72ADED3E29E852E6AFA93D2C"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_factory.py",
+      "size": 1592,
+      "sha256": "CC98444936C24A94EA5E2DD41558BD4EA123428706A3DB476E1F2A02DEE6A0E0"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_mda.py",
+      "size": 4650,
+      "sha256": "5E22AE26672B9B3A608CC237791625386C5B500FFBF768AEEC5478154F727CF0"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_mdi.py",
+      "size": 2739,
+      "sha256": "82F93E0DA408EB9D4984856C3C432704DC8093ADC90FE9DC898D2109E7381A92"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_sfi.py",
+      "size": 3984,
+      "sha256": "67CB65A25ACA73457000C23AC4853A1D281CA3C2DB3CE6614C1262AF51B808BF"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/feature_importance_strategy.py",
+      "size": 894,
+      "sha256": "E007852540710974A4C56089DB6A5DE46F11B19760690E400BAFCE154156BD1D"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/generate_synthetic_data.py",
+      "size": 2535,
+      "sha256": "67342708D90B9AC31BF31FF851E341D122600D7A75818F20CEFF31CB39E41747"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/orthogonal_features.py",
+      "size": 3140,
+      "sha256": "0250FFD2E9B7E2D1B5BFBF960D63EA32CBB0CD9335249222E37A66724B6B0FF9"
+    },
+    {
+      "path": "RiskLabAI/features/feature_importance/weighted_tau.py",
+      "size": 974,
+      "sha256": "706F53A5531A3B5089A9A252883558C7561C9B1B0DB6B251904EE80A8961C098"
+    },
+    {
+      "path": "RiskLabAI/features/microstructural_features/__init__.py",
+      "size": 737,
+      "sha256": "69C079797912E65103C77DD079B00F420C30479FEFEB7A3C0C3E70AF7BCC855A"
+    },
+    {
+      "path": "RiskLabAI/features/microstructural_features/bekker_parkinson_volatility_estimator.py",
+      "size": 2058,
+      "sha256": "BC606B1E368BC738846DCA08DE31C99A0A42D91F0CF5F8BB686EDE14021821FF"
+    },
+    {
+      "path": "RiskLabAI/features/microstructural_features/corwin_schultz.py",
+      "size": 3471,
+      "sha256": "9120D5D7F9763E017A896E5F7A3288F02112E1A72AA92C42717E6B2506070532"
+    },
+    {
+      "path": "RiskLabAI/features/microstructural_features/edge.py",
+      "size": 6268,
+      "sha256": "98A0A232CDB6D1ECB2C268B0BBAFCACF23981CDE9D998D8936D7F2A3265C38D7"
+    },
+    {
+      "path": "RiskLabAI/features/structural_breaks/__init__.py",
+      "size": 1134,
+      "sha256": "EC77F8B7B857C0898C23D9B3968EA957E4A281643644B7911B14E94F0057FA3D"
+    },
+    {
+      "path": "RiskLabAI/features/structural_breaks/pelt_change_points.py",
+      "size": 4257,
+      "sha256": "7D84550BB9E246055031963755D99BC180793C92D839BFE4D29ECBB0EFC1D337"
+    },
+    {
+      "path": "RiskLabAI/features/structural_breaks/structural_breaks.py",
+      "size": 26144,
+      "sha256": "36A586A0651EC6D00AFA737E5EAFC2BA5B5FAEACB85B58621C2B3C6F1C98EDA0"
+    },
+    {
+      "path": "RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
+      "size": 5957,
+      "sha256": "8DE6D754B46AC7BE870ABC0D44F92B7EC633255CF4B0D11E402579EF4187DD56"
+    },
+    {
+      "path": "RiskLabAI/hpc/__init__.py",
+      "size": 511,
+      "sha256": "C08896EA7791033B286FAB38AFDBD8EC5A79F562316AA470DD071F90C6F51384"
+    },
+    {
+      "path": "RiskLabAI/hpc/hpc.py",
+      "size": 11685,
+      "sha256": "B5AEFF775459A0AD8A5AD0E10B0806E7FC08137F1CCD0CD85966FFF60D03D1C5"
+    },
+    {
+      "path": "RiskLabAI/optimization/__init__.py",
+      "size": 1231,
+      "sha256": "B72FE375FA3A5970B3CD8C14738D59D8AB69FEB0E0BC69E75255A27AD701DD46"
+    },
+    {
+      "path": "RiskLabAI/optimization/hedging.py",
+      "size": 1962,
+      "sha256": "4A87276BD9FBAF8726F8646E57C6B27E6274C3481692532A04F67CC0B206E149"
+    },
+    {
+      "path": "RiskLabAI/optimization/hrp.py",
+      "size": 6323,
+      "sha256": "5A5F6F3D3145C9F7870CD1FEE15BD88D11A7C7E707D4A6EDCF83F9F43F92AED1"
+    },
+    {
+      "path": "RiskLabAI/optimization/hyper_parameter_tuning.py",
+      "size": 6335,
+      "sha256": "C832378FA5F978B4379984FBB14DD57431B0C5DB8A02FBB7824580CA81EE9B14"
+    },
+    {
+      "path": "RiskLabAI/optimization/nco.py",
+      "size": 4122,
+      "sha256": "96D9A482B49D9E784B6790B46E28EFE706E3C63A262521D721BD75C46A59085A"
+    },
+    {
+      "path": "RiskLabAI/pde/__init__.py",
+      "size": 1805,
+      "sha256": "E47D207736DC6B23D0DB7EB51A780F9C72C567F980DAA5CF65B611ECE177B7B0"
+    },
+    {
+      "path": "RiskLabAI/pde/equation.py",
+      "size": 10999,
+      "sha256": "4A9A073721FAAC4FFAC3513A61B08586027204248EE8A47F184E5F174DD86E06"
+    },
+    {
+      "path": "RiskLabAI/pde/model.py",
+      "size": 12264,
+      "sha256": "98F8C874C57C04E28883BB9B4CFD526C0D1622E27C84F723E5883D30CBFF7001"
+    },
+    {
+      "path": "RiskLabAI/pde/solver.py",
+      "size": 13845,
+      "sha256": "AA5A5B13772CE29ABD051AA5E114E77C2C92A0C908C1D4BB6A30F9BEB4B73CD0"
+    },
+    {
+      "path": "RiskLabAI/utils/__init__.py",
+      "size": 3395,
+      "sha256": "BF7033686E83AB6215472969CAA63D368CEEE42657D303BB966E2320270FC53A"
+    },
+    {
+      "path": "RiskLabAI/utils/constants.py",
+      "size": 3062,
+      "sha256": "31CE9261BA913AAE7E4C187E7AAFEB2FABC9028B159EC463AB532C2546C65AA9"
+    },
+    {
+      "path": "RiskLabAI/utils/ewma.py",
+      "size": 1754,
+      "sha256": "7F64DE6409360FC02D93283E31D7E26B067E53BC74172DD6897A36201A804507"
+    },
+    {
+      "path": "RiskLabAI/utils/momentum_mean_reverting_strategy_sides.py",
+      "size": 2156,
+      "sha256": "F19E1691AD40DF94640AEFBFA06431B39538444139277568B8A6AE247FB48509"
+    },
+    {
+      "path": "RiskLabAI/utils/progress.py",
+      "size": 1945,
+      "sha256": "74B4D2EA57526348055B657EB254D92606C00C7A49DBC2B122D5DA34A44F75D2"
+    },
+    {
+      "path": "RiskLabAI/utils/publication_plots.py",
+      "size": 5850,
+      "sha256": "B00FD12382E692BB3F74F2B37EFFAB1D95BC3641679F588BBB60FB0C203764D8"
+    },
+    {
+      "path": "RiskLabAI/utils/update_figure_layout.py",
+      "size": 1324,
+      "sha256": "8C5C6DAEFE392D1AD59AF598B1D8D76732FD4B0A7A437AB3C4AB160CB1CDFFB2"
+    },
+    {
+      "path": "docs/delete",
+      "size": 1,
+      "sha256": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B"
+    },
+    {
+      "path": "documenter.py",
+      "size": 4742,
+      "sha256": "57869DFC92E1048499FDA60BDDEDB310E8C6A2862FB49139917AF616C3A929C2"
+    },
+    {
+      "path": "style_guide.md",
+      "size": 3172,
+      "sha256": "9ED0A313A5E75589CB40E65ECE10873CDB05D0BC91C696B783BE5E726BF6906C"
+    },
+    {
+      "path": "tree.py",
+      "size": 2923,
+      "sha256": "1838861E627D0AFB96673CE7365D6DFEA2841DC0535C8D025DC41AF765005AFC"
+    }
+  ],
+  "repository_tree_file_count": 353,
+  "repository_tree_file_list_sha256": "FBF55A5B6C5A30E2C52C065431063E59A0280CF8F30B34BC1BC20679BDFBB289",
+  "repository_tree_policy": "The repository tree is the exact disjoint union of active release-source files and already-public repository-only files. Repository-only files are preserved but are not wheel payload members or active package load roots.",
+  "runtime_source_file_count": 128,
   "runtime_source_files": [
     "src/RiskLabAI/__init__.py",
     "src/RiskLabAI/_deprecation.py",
@@ -480,11 +2744,15 @@
     "src/RiskLabAI/backtest/validation/purged_kfold.py",
     "src/RiskLabAI/backtest/validation/walk_forward.py",
     "src/RiskLabAI/causal_factor_analysis/__init__.py",
+    "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
     "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
     "src/RiskLabAI/causal_factor_analysis/graph_identification.py",
+    "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
     "src/RiskLabAI/causal_factor_analysis/optimizer.py",
     "src/RiskLabAI/causal_factor_analysis/protocol.py",
+    "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
     "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
+    "src/RiskLabAI/causal_factor_analysis/structural_models.py",
     "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
     "src/RiskLabAI/cluster/__init__.py",
     "src/RiskLabAI/cluster/clustering.py",
@@ -575,7 +2843,7 @@
     "src/RiskLabAI/utils/publication_plots.py",
     "src/RiskLabAI/utils/update_figure_layout.py"
   ],
-  "test_file_count": 78,
+  "test_file_count": 85,
   "test_files": [
     "test/backtest/test_advanced_bet_sizing.py",
     "test/backtest/test_backtest_overfitting_simulation.py",
@@ -602,12 +2870,19 @@
     "test/backtest/validation/test_path_bagged_cpcv.py",
     "test/backtest/validation/test_purged_kfold.py",
     "test/backtest/validation/test_walk_forward.py",
+    "test/causal_factor_analysis/fixtures/additive_numeric_parity.tsv",
+    "test/causal_factor_analysis/test_additive_numeric_parity.py",
+    "test/causal_factor_analysis/test_allocation_diagnostics.py",
     "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
     "test/causal_factor_analysis/test_factor_mirage.py",
+    "test/causal_factor_analysis/test_generalized_factor_mirage.py",
     "test/causal_factor_analysis/test_graph_identification.py",
+    "test/causal_factor_analysis/test_graph_roles.py",
     "test/causal_factor_analysis/test_minimum_variance.py",
     "test/causal_factor_analysis/test_protocol.py",
+    "test/causal_factor_analysis/test_search_adjusted_fdr.py",
     "test/causal_factor_analysis/test_specification_diagnostics.py",
+    "test/causal_factor_analysis/test_structural_models.py",
     "test/causal_factor_analysis/test_treatment_effects.py",
     "test/cluster/test_clustering.py",
     "test/controller/test_bars_initializer.py",
@@ -687,11 +2962,15 @@
     "src/RiskLabAI/backtest/validation/purged_kfold.py",
     "src/RiskLabAI/backtest/validation/walk_forward.py",
     "src/RiskLabAI/causal_factor_analysis/__init__.py",
+    "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
     "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
     "src/RiskLabAI/causal_factor_analysis/graph_identification.py",
+    "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
     "src/RiskLabAI/causal_factor_analysis/optimizer.py",
     "src/RiskLabAI/causal_factor_analysis/protocol.py",
+    "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
     "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
+    "src/RiskLabAI/causal_factor_analysis/structural_models.py",
     "src/RiskLabAI/causal_factor_analysis/treatment_effects.py",
     "src/RiskLabAI/cluster/__init__.py",
     "src/RiskLabAI/cluster/clustering.py",
@@ -783,6 +3062,6 @@
     "src/RiskLabAI/utils/update_figure_layout.py"
   ],
   "generated_metadata_members": {
-    "policy": "Generated package-manager metadata is not pre-enumerated by filename here; the future artifact inspector must validate its normalized field set and reject undeclared payload files."
+    "policy": "Future package-manager-generated metadata must be validated by normalized fields and must not introduce undeclared payload files."
   }
 }

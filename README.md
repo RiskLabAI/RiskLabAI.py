@@ -9,18 +9,20 @@ implementations of methods associated with Marcos López de Prado's *Advances
 in Financial Machine Learning*, *Machine Learning for Asset Managers*, and
 *Causal Factor Investing*.
 
-RiskLabAI 3.0.0 preserves the previously published Python library and adds a
-clean causal-factor-analysis namespace. The companion
+RiskLabAI 3.1.0 preserves the clean 57-name causal-factor-analysis namespace
+released in 3.0.0 and adds 30 paper-derived names, producing an 87-name causal
+API. The companion
 [RiskLabAI.jl](https://github.com/RiskLabAI/RiskLabAI.jl) package independently
-implements the same 57 causal concepts. This parity statement applies to the
-causal API, not to every Python module.
+implements the same concepts. This parity statement applies to the causal API,
+not to every Python module.
 
 ## What is included
 
 - **Causal factor analysis** - constrained minimum-variance allocation,
-  factor-mirage diagnostics, graphical identification, treatment-effect
-  formulas, specification experiments, and evidence records for the
-  seven-stage causal-factor protocol
+  factor-mirage and allocation-misspecification diagnostics, graphical
+  identification and factor roles, deterministic structural-model evaluation,
+  treatment-effect formulas, search-adjusted false discovery, specification
+  experiments, and evidence records for the seven-stage causal-factor protocol
 - **Financial data structures** - tick, volume, dollar, imbalance, run, and
   time bars
 - **Labeling and sample weights** - triple-barrier, meta-labeling,
@@ -40,8 +42,9 @@ causal API, not to every Python module.
 
 ## Compatibility
 
-RiskLabAI 3.0.0 supports CPython 3.12, 3.13, and 3.14 with NumPy
-`>=2.2,<3`. The complete tested policy and feature-specific limitations are in
+RiskLabAI 3.1.0 supports CPython 3.12,
+3.13, and 3.14 with NumPy `>=2.2,<3`. The complete tested policy and
+feature-specific limitations are in
 [`docs/compatibility.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/docs/compatibility.md).
 
 ## Installation

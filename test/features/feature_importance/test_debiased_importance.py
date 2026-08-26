@@ -37,7 +37,7 @@ def test_mdi_plus_ranks_signal_top():
 
 def test_mdi_plus_rejects_high_cardinality_noise():
     """
-    Replication of the Appraisal 10 mechanism: MDI+ does not let a high-cardinality noise feature
+    Replication of the independent validation mechanism: MDI+ does not let a high-cardinality noise feature
     out-rank the true signal (the inflation MDI is prone to).
     """
     rng = np.random.default_rng(1)

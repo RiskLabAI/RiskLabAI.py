@@ -1,12 +1,21 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "document_type": "RISKLABAI_PYTHON_PUBLIC_API_INVENTORY",
   "product": "RiskLabAI",
   "language": "Python",
-  "version": "3.0.0",
+  "version": "3.1.0",
+  "baseline_contract": {
+    "released_version": "3.0.0",
+    "released_causal_export_count": 57,
+    "additive_export_count": 30,
+    "total_causal_export_count": 87,
+    "package_version_change_deferred": false,
+    "integrated_version": "3.1.0"
+  },
   "inventory_rule": {
     "root_and_package_exports": "Literal __all__ when present; otherwise imported public bindings in package initializers.",
-    "module_definitions": "Every non-underscore top-level function or class and every public uppercase constant is frozen conservatively."
+    "module_definitions": "Every non-underscore top-level function or class and every public uppercase constant is recorded conservatively.",
+    "runtime_origin": "src/RiskLabAI/__init__.py"
   },
   "root_exports": [
     "__version__",
@@ -23,13 +32,13 @@
     "pde",
     "utils"
   ],
-  "runtime_module_count": 124,
+  "runtime_module_count": 128,
   "runtime_modules": [
     {
       "path": "src/RiskLabAI/__init__.py",
       "module": "RiskLabAI",
       "module_kind": "package",
-      "sha256": "70093B30E9B7B92F555E40FB0DF936092A661BC88CA032549F1982624147A4AC",
+      "sha256": "1CB2A7E2B804267FFEBE4FF124F01AA095DC19F82492DB862C9A4D97C2A1AF0F",
       "size": 1095,
       "defined_public_names": [],
       "definitions": []
@@ -67,8 +76,8 @@
       "path": "src/RiskLabAI/backtest/__init__.py",
       "module": "RiskLabAI.backtest",
       "module_kind": "package",
-      "sha256": "BC1D1DB5707902C0C61EFBB1DB1CDC88101388B065BCA30FE7A8CA621667058C",
-      "size": 6172,
+      "sha256": "59475AA703033C284FED55C308AB258B79AC6E31A8EE5164B01AF6E9396E4C8C",
+      "size": 6204,
       "defined_public_names": [],
       "definitions": []
     },
@@ -76,8 +85,8 @@
       "path": "src/RiskLabAI/backtest/advanced_bet_sizing.py",
       "module": "RiskLabAI.backtest.advanced_bet_sizing",
       "module_kind": "module",
-      "sha256": "E50F8275DC235F7DA777146D0715B945BAA3C7B91AEDA1FBDAA210D44C4A099F",
-      "size": 10017,
+      "sha256": "1D90B97962BED3711265488A7921C651585FBF0D366A412607944EAF44B9C810",
+      "size": 10098,
       "defined_public_names": [
         "PlattCalibrator",
         "distributionally_robust_kelly_fraction",
@@ -389,8 +398,8 @@
       "path": "src/RiskLabAI/backtest/multiple_testing.py",
       "module": "RiskLabAI.backtest.multiple_testing",
       "module_kind": "module",
-      "sha256": "8B867AE2529D3A354CE0847D9C08E90DDE29E9E20042C0888683EBB98B89AAA8",
-      "size": 7841,
+      "sha256": "FAA5E3C9E225869FC204BB5DA4C88830A81989A18FC927706FBC3BCCDEE7936B",
+      "size": 7855,
       "defined_public_names": [
         "benjamini_hochberg_yekutieli_adjusted_p_values",
         "haircut_sharpe_ratios",
@@ -424,8 +433,8 @@
       "path": "src/RiskLabAI/backtest/ou_trading_rules.py",
       "module": "RiskLabAI.backtest.ou_trading_rules",
       "module_kind": "module",
-      "sha256": "D48DFA47F2C98EF791E66AA7724C29153813F7742CD244E88FAAFD6062231742",
-      "size": 12532,
+      "sha256": "A202998DC64A9C3F68544AFFF3DA48798C99C4B19A3B9600F5E1030247551182",
+      "size": 12573,
       "defined_public_names": [
         "fit_ornstein_uhlenbeck",
         "hit_upper_probability",
@@ -523,8 +532,8 @@
       "path": "src/RiskLabAI/backtest/robust_statistics.py",
       "module": "RiskLabAI.backtest.robust_statistics",
       "module_kind": "module",
-      "sha256": "6144EAD8326C07605EF783AFC41AC49884A4DB3BD56F6D3DA8CFBE93AD3C0F29",
-      "size": 11865,
+      "sha256": "9432CBA7E36A8C1F9BA69D6F912D226FB78FEC4069E940E8380EFB1543696974",
+      "size": 11911,
       "defined_public_names": [
         "conditional_expected_drawdown",
         "sharpe_difference_test"
@@ -546,8 +555,8 @@
       "path": "src/RiskLabAI/backtest/sharpe_inference.py",
       "module": "RiskLabAI.backtest.sharpe_inference",
       "module_kind": "module",
-      "sha256": "CB3DE49BA2230604868ECAB11B4AA5C1C55AE4BCF47FF6ACD8FE2C71B4839E2C",
-      "size": 7799,
+      "sha256": "58A436922785F2D087FC6C40C1881228E84AAB7BC96B4D8C2C0161FA2F05E0A4",
+      "size": 7721,
       "defined_public_names": [
         "lplz_sharpe_inference",
         "newey_west_automatic_lag",
@@ -693,8 +702,8 @@
       "path": "src/RiskLabAI/backtest/validation/__init__.py",
       "module": "RiskLabAI.backtest.validation",
       "module_kind": "package",
-      "sha256": "88C99E37BE96E2BD23FD54ED0491C962F2BDEDD696E97F9B2627A410D1F8660F",
-      "size": 1896,
+      "sha256": "18D99DF58743C28835ACD00F7B307014D919C5FC322D6A639AE126E44AFDFFB5",
+      "size": 1925,
       "defined_public_names": [],
       "definitions": []
     },
@@ -821,8 +830,8 @@
       "path": "src/RiskLabAI/backtest/validation/leakage_aware_hpo.py",
       "module": "RiskLabAI.backtest.validation.leakage_aware_hpo",
       "module_kind": "module",
-      "sha256": "A8D16874C56CFDB725B92906F5A08A1605DA93B263EDA210B3B561310E188410",
-      "size": 9891,
+      "sha256": "FF0040F22C4710918CD39CF3A08BC48293ED48A70A8F46898B3C4686122B6D2C",
+      "size": 9930,
       "defined_public_names": [
         "deflated_sharpe_gate",
         "leakage_aware_hpo"
@@ -844,8 +853,8 @@
       "path": "src/RiskLabAI/backtest/validation/path_adaptive_cpcv.py",
       "module": "RiskLabAI.backtest.validation.path_adaptive_cpcv",
       "module_kind": "module",
-      "sha256": "4A1BCEDEA466B9C05165C282740CC1EDBB96174629CC377276432C3325C2E3B6",
-      "size": 10541,
+      "sha256": "4257BE918DA88233CE4ABA8AD2A0BAB2859C9B711AE1A591ADABDA33C7312668",
+      "size": 10437,
       "defined_public_names": [
         "adaptive_probability_of_backtest_overfitting",
         "estimate_volatility_regimes"
@@ -867,8 +876,8 @@
       "path": "src/RiskLabAI/backtest/validation/path_bagged_cpcv.py",
       "module": "RiskLabAI.backtest.validation.path_bagged_cpcv",
       "module_kind": "module",
-      "sha256": "CB9FDF560D59DD7E035DD194DC1F78EDB392A9072ADE4959F6D0B55D3EFD5B83",
-      "size": 5682,
+      "sha256": "195191CEDCC24386D2862C886EA323E86F9B74371379B5C825CB9EFB069382A2",
+      "size": 5699,
       "defined_public_names": [
         "bagged_probability_of_backtest_overfitting",
         "moving_block_bootstrap_indices"
@@ -924,17 +933,40 @@
       "path": "src/RiskLabAI/causal_factor_analysis/__init__.py",
       "module": "RiskLabAI.causal_factor_analysis",
       "module_kind": "package",
-      "sha256": "6B6153F1D4C87E8FA6DEDF123CFD27DA3AAD23ED1DEDE271684DFC93E71A3F3C",
-      "size": 4290,
+      "sha256": "96B6E483A72D5CBD00B5EDC5762345E7D31F31F6255B91C793C00B9B2BE62CA4",
+      "size": 6656,
       "defined_public_names": [],
       "definitions": []
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/allocation_diagnostics.py",
+      "module": "RiskLabAI.causal_factor_analysis.allocation_diagnostics",
+      "module_kind": "module",
+      "sha256": "089677E3EF24979A421676BD4253EA684CB6819D7D6405FB78A1575F2F47C35C",
+      "size": 11041,
+      "defined_public_names": [
+        "AllocationMisspecificationDiagnostics",
+        "allocation_misspecification_diagnostics"
+      ],
+      "definitions": [
+        {
+          "name": "AllocationMisspecificationDiagnostics",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "allocation_misspecification_diagnostics",
+          "kind": "function",
+          "signature": "(covariance: ArrayLike, reference_factor_exposures: ArrayLike, reference_target_exposures: ArrayLike, misspecified_factor_exposures: ArrayLike, misspecified_target_exposures: ArrayLike)"
+        }
+      ]
     },
     {
       "path": "src/RiskLabAI/causal_factor_analysis/factor_mirage.py",
       "module": "RiskLabAI.causal_factor_analysis.factor_mirage",
       "module_kind": "module",
-      "sha256": "5E5C44C8F25E926E5C1528D623BAA6886548E32C1308DB65B5AFB907988C522B",
-      "size": 14673,
+      "sha256": "57D44C3EF8608CD9A6E917589E3B6BD37A2DDAF300A7BF983EFBD8206EF2AC6D",
+      "size": 18292,
       "defined_public_names": [
         "ColliderCoefficients",
         "ColliderDiagnostics",
@@ -945,7 +977,9 @@
         "collider_overcontrolled_coefficients",
         "confounder_factor_return",
         "confounder_forecast_return",
-        "confounder_undercontrolled_coefficient"
+        "confounder_undercontrolled_coefficient",
+        "generalized_collider_overcontrolled_coefficients",
+        "generalized_confounder_undercontrolled_coefficient"
       ],
       "definitions": [
         {
@@ -969,6 +1003,11 @@
           "signature": "(beta: Real, gamma: Real, delta: Real)"
         },
         {
+          "name": "generalized_confounder_undercontrolled_coefficient",
+          "kind": "function",
+          "signature": "(beta: Real, gamma: Real, delta: Real, *, confounder_variance: Real, exposure_noise_variance: Real)"
+        },
+        {
           "name": "confounder_factor_return",
           "kind": "function",
           "signature": "(x: Real, z: Real, beta: Real, gamma: Real, delta_estimated: Real, *, delta_realized: Optional[Real]=None)"
@@ -982,6 +1021,11 @@
           "name": "collider_overcontrolled_coefficients",
           "kind": "function",
           "signature": "(beta: Real, gamma: Real, delta: Real)"
+        },
+        {
+          "name": "generalized_collider_overcontrolled_coefficients",
+          "kind": "function",
+          "signature": "(beta: Real, gamma: Real, delta: Real, *, outcome_noise_variance: Real, collider_noise_variance: Real)"
         },
         {
           "name": "collider_factor_return",
@@ -1096,6 +1140,47 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/causal_factor_analysis/graph_roles.py",
+      "module": "RiskLabAI.causal_factor_analysis.graph_roles",
+      "module_kind": "module",
+      "sha256": "415086CF1403FB0EE955184F224C9B11ACC7047943D70A39AB969A1C0CD793AD",
+      "size": 6324,
+      "defined_public_names": [
+        "FactorControlRoles",
+        "TreatmentOutcomeRole",
+        "TreatmentOutcomeRoleEvidence",
+        "classify_treatment_outcome_role",
+        "factor_control_roles"
+      ],
+      "definitions": [
+        {
+          "name": "FactorControlRoles",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "TreatmentOutcomeRole",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "TreatmentOutcomeRoleEvidence",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "factor_control_roles",
+          "kind": "function",
+          "signature": "(dag: CausalDAG, target_factor: str)"
+        },
+        {
+          "name": "classify_treatment_outcome_role",
+          "kind": "function",
+          "signature": "(dag: CausalDAG, treatment: str, outcome: str, node: str)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/causal_factor_analysis/optimizer.py",
       "module": "RiskLabAI.causal_factor_analysis.optimizer",
       "module_kind": "module",
@@ -1196,6 +1281,131 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/causal_factor_analysis/search_adjusted_fdr.py",
+      "module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+      "module_kind": "module",
+      "sha256": "ADA0F9B213BC90CC3B313EAC8C58DCC50082A2992618C8EAEE99736A6DF5C972",
+      "size": 28380,
+      "defined_public_names": [
+        "FDRComparisonEvidence",
+        "FDRNonIdentificationWitness",
+        "GaussianSearchAdjustedFDR",
+        "GaussianTrialMixture",
+        "MaxSelectionFamilyErrors",
+        "SelectionLevelProbabilityEvidence",
+        "compare_single_and_family_fdr",
+        "conditional_upper_tail_probability",
+        "family_level_false_discovery_rate",
+        "fdr_nonidentification_witness",
+        "gaussian_max_selection_cdf",
+        "gaussian_max_selection_log_density",
+        "gaussian_max_selection_log_likelihood",
+        "gaussian_search_adjusted_false_discovery_rate",
+        "gaussian_trial_mixture_cdf",
+        "max_selection_family_errors",
+        "max_selection_null_probability",
+        "maximum_mixture_cdf",
+        "single_trial_false_discovery_rate"
+      ],
+      "definitions": [
+        {
+          "name": "MaxSelectionFamilyErrors",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "FDRComparisonEvidence",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "GaussianTrialMixture",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "GaussianSearchAdjustedFDR",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "FDRNonIdentificationWitness",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "SelectionLevelProbabilityEvidence",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "single_trial_false_discovery_rate",
+          "kind": "function",
+          "signature": "(type_i_error: Real, type_ii_error: Real, trial_null_probability: Real)"
+        },
+        {
+          "name": "family_level_false_discovery_rate",
+          "kind": "function",
+          "signature": "(family_type_i_error: Real, family_type_ii_error: Real, trial_null_probability: Real, n_trials: Integral)"
+        },
+        {
+          "name": "max_selection_family_errors",
+          "kind": "function",
+          "signature": "(trial_type_i_error: Real, trial_type_ii_error: Real, trial_null_probability: Real, n_trials: Integral)"
+        },
+        {
+          "name": "compare_single_and_family_fdr",
+          "kind": "function",
+          "signature": "(trial_type_i_error: Real, trial_type_ii_error: Real, trial_null_probability: Real, n_trials: Integral, *, family_type_i_error: Real, family_type_ii_error: Real, relative_tolerance: Real=1e-12, absolute_tolerance: Real=1e-15)"
+        },
+        {
+          "name": "maximum_mixture_cdf",
+          "kind": "function",
+          "signature": "(null_cdf: Real, alternative_cdf: Real, trial_null_probability: Real, n_trials: Integral)"
+        },
+        {
+          "name": "conditional_upper_tail_probability",
+          "kind": "function",
+          "signature": "(cdf_at_value: Real, cdf_at_threshold: Real)"
+        },
+        {
+          "name": "gaussian_trial_mixture_cdf",
+          "kind": "function",
+          "signature": "(model: GaussianTrialMixture, x: Real)"
+        },
+        {
+          "name": "gaussian_max_selection_cdf",
+          "kind": "function",
+          "signature": "(model: GaussianTrialMixture, x: Real, n_trials: Integral)"
+        },
+        {
+          "name": "gaussian_max_selection_log_density",
+          "kind": "function",
+          "signature": "(model: GaussianTrialMixture, x: Real, n_trials: Integral)"
+        },
+        {
+          "name": "gaussian_max_selection_log_likelihood",
+          "kind": "function",
+          "signature": "(model: GaussianTrialMixture, observations: ArrayLike, n_trials: Integral)"
+        },
+        {
+          "name": "gaussian_search_adjusted_false_discovery_rate",
+          "kind": "function",
+          "signature": "(model: GaussianTrialMixture, thresholds: ArrayLike, n_trials: Integral)"
+        },
+        {
+          "name": "fdr_nonidentification_witness",
+          "kind": "function",
+          "signature": "(observable_cdf_at_threshold: Real, target_false_discovery_rate: Real)"
+        },
+        {
+          "name": "max_selection_null_probability",
+          "kind": "function",
+          "signature": "(threshold: Real, trial_null_probability: Real, n_trials: Integral, *, null_density: Callable[[float], Real], mixture_cdf: Callable[[float], Real], absolute_tolerance: Real=1e-12, relative_tolerance: Real=1e-10, max_subintervals: Integral=200)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/causal_factor_analysis/specification_diagnostics.py",
       "module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
       "module_kind": "module",
@@ -1263,6 +1473,29 @@
           "name": "confounded_mediator_specification_experiment",
           "kind": "function",
           "signature": "(sample_size: Integral=5000, seed: Integral=0)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/structural_models.py",
+      "module": "RiskLabAI.causal_factor_analysis.structural_models",
+      "module_kind": "module",
+      "sha256": "CC69BC922ADF6A4292B637CF97E96B607903608529056C03F66E041107BE345D",
+      "size": 6877,
+      "defined_public_names": [
+        "StructuralCausalModelResult",
+        "evaluate_structural_causal_model"
+      ],
+      "definitions": [
+        {
+          "name": "StructuralCausalModelResult",
+          "kind": "class",
+          "signature": null
+        },
+        {
+          "name": "evaluate_structural_causal_model",
+          "kind": "function",
+          "signature": "(dag: CausalDAG, mechanisms: Mapping[str, Callable[[NDArray[np.float64], NDArray[np.float64]], ArrayLike]], exogenous_inputs: Mapping[str, ArrayLike])"
         }
       ]
     },
@@ -1547,8 +1780,8 @@
       "path": "src/RiskLabAI/data/denoise/__init__.py",
       "module": "RiskLabAI.data.denoise",
       "module_kind": "package",
-      "sha256": "72E4069E071BF4ED278796A6FF14751B99ED9B64D71D0175F57150C1F00427F0",
-      "size": 844,
+      "sha256": "DE4D01EA8A0323F1FC39DA81B487F5770D77B4D08DB6BE2F127638B5592CB7EE",
+      "size": 854,
       "defined_public_names": [],
       "definitions": []
     },
@@ -1587,16 +1820,16 @@
           "kind": "function",
           "signature": "(eigenvalues: np.ndarray, q: float, bandwidth: float)"
         },
-      {
-        "name": "denoised_corr",
-        "kind": "function",
-        "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_facts: int)"
-      },
-      {
-        "name": "denoised_corr2",
-        "kind": "function",
-        "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_factors: int, alpha: float=0.0)"
-      },
+        {
+          "name": "denoised_corr",
+          "kind": "function",
+          "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_facts: int)"
+        },
+        {
+          "name": "denoised_corr2",
+          "kind": "function",
+          "signature": "(eigenvalues: np.ndarray, eigenvectors: np.ndarray, num_factors: int, alpha: float=0.0)"
+        },
         {
           "name": "pca",
           "kind": "function",
@@ -1633,8 +1866,8 @@
       "path": "src/RiskLabAI/data/denoise/nercome.py",
       "module": "RiskLabAI.data.denoise.nercome",
       "module_kind": "module",
-      "sha256": "81FEA0C543026F0C927DBC54CAC60DA5F3829DAFD84EAB788B59F7F8462BAFBB",
-      "size": 6386,
+      "sha256": "AA11FB31EBE08631B7D979562E1A568E49B70FE9FD2CBA1304EA12908AD434B8",
+      "size": 6469,
       "defined_public_names": [
         "nercome_denoised_covariance"
       ],
@@ -1659,8 +1892,8 @@
       "path": "src/RiskLabAI/data/differentiation/adaptive_differentiation.py",
       "module": "RiskLabAI.data.differentiation.adaptive_differentiation",
       "module_kind": "module",
-      "sha256": "BD56143C44222FBACDF490FA366063CA04559FD180FF4B62E667F9288139F610",
-      "size": 11374,
+      "sha256": "CB0DF7A28212D4CE0B15AF7023235B6AABD0EA9077D64572F3E5EB45D9A6A066",
+      "size": 11222,
       "defined_public_names": [
         "DEFAULT_ADF_MAXLAG",
         "DEFAULT_ADF_SIGNIFICANCE",
@@ -1766,8 +1999,8 @@
       "path": "src/RiskLabAI/data/distance/codependence.py",
       "module": "RiskLabAI.data.distance.codependence",
       "module_kind": "module",
-      "sha256": "DF6E672A5D25468FCE63B36C6AFAAF55B6AD14486E34D4CC42D84D7B43F278DA",
-      "size": 7241,
+      "sha256": "9033470188D780110795D53CEFD230BC3D5AE54BD8BA945908CB73F3C1B48B9A",
+      "size": 7268,
       "defined_public_names": [
         "distance_correlation",
         "ksg_mutual_information"
@@ -1927,8 +2160,8 @@
       "path": "src/RiskLabAI/data/structures/__init__.py",
       "module": "RiskLabAI.data.structures",
       "module_kind": "package",
-      "sha256": "F0E79621D4AF2B9E8C8BE1EBEF26EBE66536A5A3A50CF09E1A16BAEA94834398",
-      "size": 873,
+      "sha256": "051BD4E2CF067134B61FC3CCEA16A9F20B94676F5C3D0DD01041F28541132956",
+      "size": 883,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2004,8 +2237,8 @@
       "path": "src/RiskLabAI/data/structures/hardened_information_driven_bars.py",
       "module": "RiskLabAI.data.structures.hardened_information_driven_bars",
       "module_kind": "module",
-      "sha256": "48BCDD8B73D5DED1815505696C36D56528ECBAED3A295EDCE31DE56AB2B3B8EB",
-      "size": 6781,
+      "sha256": "E5CF32132DADEF61624F24E2AC42E673C0B4B274DC317DD6488539A3FC0F1741",
+      "size": 6880,
       "defined_public_names": [
         "HardenedExpectedImbalanceBars",
         "HardenedExpectedRunBars"
@@ -2326,8 +2559,8 @@
       "path": "src/RiskLabAI/features/entropy_features/bias_corrected.py",
       "module": "RiskLabAI.features.entropy_features.bias_corrected",
       "module_kind": "module",
-      "sha256": "B6E66D401B569B26452EC1129A8FB5F0B150A990595BEEBFA92437457B1DAC1D",
-      "size": 12824,
+      "sha256": "40B156C643E48DAE6F06440D9FD1BE2ED651F18FA8C7A2BD0DB569795E44DCFE",
+      "size": 12893,
       "defined_public_names": [
         "grassberger_entropy",
         "miller_madow_entropy",
@@ -2452,8 +2685,8 @@
       "path": "src/RiskLabAI/features/feature_importance/__init__.py",
       "module": "RiskLabAI.features.feature_importance",
       "module_kind": "package",
-      "sha256": "24C80AA3C46B3237D6FBC513C4E4A7EED88A54304C94792E5F24F295A00AFB73",
-      "size": 2076,
+      "sha256": "E3BD3D4CDB85D31F9096C459F8468DF540D41D4CF619B73A9CBBFF4DFBB1A75D",
+      "size": 2086,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2495,8 +2728,8 @@
       "path": "src/RiskLabAI/features/feature_importance/debiased_importance.py",
       "module": "RiskLabAI.features.feature_importance.debiased_importance",
       "module_kind": "module",
-      "sha256": "49B8D749041A18283724E5563E1FBB70F4143BECE89C109EA70B2D1BC7BB5750",
-      "size": 11360,
+      "sha256": "299068C70E8551367167F221055F52BF54848D048A6C5B12EAF9BAC08727045C",
+      "size": 11396,
       "defined_public_names": [
         "conditional_predictive_impact",
         "mdi_plus_importance"
@@ -2738,8 +2971,8 @@
       "path": "src/RiskLabAI/features/microstructural_features/edge.py",
       "module": "RiskLabAI.features.microstructural_features.edge",
       "module_kind": "module",
-      "sha256": "D9C99CB172B1AA9B6F33AF39723D9BE4880214466F863F6177D7B028D7F73B61",
-      "size": 6251,
+      "sha256": "98A0A232CDB6D1ECB2C268B0BBAFCACF23981CDE9D998D8936D7F2A3265C38D7",
+      "size": 6268,
       "defined_public_names": [
         "edge_estimator"
       ],
@@ -2755,8 +2988,8 @@
       "path": "src/RiskLabAI/features/structural_breaks/__init__.py",
       "module": "RiskLabAI.features.structural_breaks",
       "module_kind": "package",
-      "sha256": "46AA8C0C7DA4955E2A6397B7FCCC51B6D48C3A7016E9413A4D356EDF22D69C2F",
-      "size": 1122,
+      "sha256": "EC77F8B7B857C0898C23D9B3968EA957E4A281643644B7911B14E94F0057FA3D",
+      "size": 1134,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2764,8 +2997,8 @@
       "path": "src/RiskLabAI/features/structural_breaks/pelt_change_points.py",
       "module": "RiskLabAI.features.structural_breaks.pelt_change_points",
       "module_kind": "module",
-      "sha256": "1F913C5EE9BEF2144D687068F0526C8A0F0AE5A9B0A51991E5EC686701307070",
-      "size": 4218,
+      "sha256": "7D84550BB9E246055031963755D99BC180793C92D839BFE4D29ECBB0EFC1D337",
+      "size": 4257,
       "defined_public_names": [
         "pelt_change_points"
       ],
@@ -2781,8 +3014,8 @@
       "path": "src/RiskLabAI/features/structural_breaks/structural_breaks.py",
       "module": "RiskLabAI.features.structural_breaks.structural_breaks",
       "module_kind": "module",
-      "sha256": "0C562C044C063DFA0606EB88D74A33B54B08A69FA19A126D1B8DB7FCD3276242",
-      "size": 25396,
+      "sha256": "F81089327CA345631BBBB943BD431E7F91B2AF30728946602C86B115C1759032",
+      "size": 25436,
       "defined_public_names": [
         "compute_beta",
         "get_bsadf_sequence",
@@ -2858,8 +3091,8 @@
       "path": "src/RiskLabAI/features/structural_breaks/volatility_robust_sadf.py",
       "module": "RiskLabAI.features.structural_breaks.volatility_robust_sadf",
       "module_kind": "module",
-      "sha256": "69B7F026E05E66DE4755E1A591602A59AD3B5CFE49B29DE03724F37919BDD27E",
-      "size": 5904,
+      "sha256": "8DE6D754B46AC7BE870ABC0D44F92B7EC633255CF4B0D11E402579EF4187DD56",
+      "size": 5957,
       "defined_public_names": [
         "volatility_robust_sadf"
       ],
@@ -3560,7 +3793,37 @@
         "minimum_variance_factor_weights",
         "randomized_mean_difference",
         "treatment_effect_decomposition",
-        "validate_causal_factor_protocol"
+        "validate_causal_factor_protocol",
+        "AllocationMisspecificationDiagnostics",
+        "FDRComparisonEvidence",
+        "FDRNonIdentificationWitness",
+        "FactorControlRoles",
+        "GaussianSearchAdjustedFDR",
+        "GaussianTrialMixture",
+        "MaxSelectionFamilyErrors",
+        "SelectionLevelProbabilityEvidence",
+        "StructuralCausalModelResult",
+        "TreatmentOutcomeRole",
+        "TreatmentOutcomeRoleEvidence",
+        "allocation_misspecification_diagnostics",
+        "classify_treatment_outcome_role",
+        "compare_single_and_family_fdr",
+        "conditional_upper_tail_probability",
+        "evaluate_structural_causal_model",
+        "factor_control_roles",
+        "family_level_false_discovery_rate",
+        "fdr_nonidentification_witness",
+        "gaussian_max_selection_cdf",
+        "gaussian_max_selection_log_density",
+        "gaussian_max_selection_log_likelihood",
+        "gaussian_search_adjusted_false_discovery_rate",
+        "gaussian_trial_mixture_cdf",
+        "generalized_collider_overcontrolled_coefficients",
+        "generalized_confounder_undercontrolled_coefficient",
+        "max_selection_family_errors",
+        "max_selection_null_probability",
+        "maximum_mixture_cdf",
+        "single_trial_false_discovery_rate"
       ]
     },
     {
@@ -3903,7 +4166,7 @@
     }
   ],
   "causal_factor_analysis": {
-    "export_count": 57,
+    "export_count": 87,
     "ordered_exports": [
       "BackdoorAdjustmentEvidence",
       "BacktestStage",
@@ -3961,14 +4224,45 @@
       "minimum_variance_factor_weights",
       "randomized_mean_difference",
       "treatment_effect_decomposition",
-      "validate_causal_factor_protocol"
+      "validate_causal_factor_protocol",
+      "AllocationMisspecificationDiagnostics",
+      "FDRComparisonEvidence",
+      "FDRNonIdentificationWitness",
+      "FactorControlRoles",
+      "GaussianSearchAdjustedFDR",
+      "GaussianTrialMixture",
+      "MaxSelectionFamilyErrors",
+      "SelectionLevelProbabilityEvidence",
+      "StructuralCausalModelResult",
+      "TreatmentOutcomeRole",
+      "TreatmentOutcomeRoleEvidence",
+      "allocation_misspecification_diagnostics",
+      "classify_treatment_outcome_role",
+      "compare_single_and_family_fdr",
+      "conditional_upper_tail_probability",
+      "evaluate_structural_causal_model",
+      "factor_control_roles",
+      "family_level_false_discovery_rate",
+      "fdr_nonidentification_witness",
+      "gaussian_max_selection_cdf",
+      "gaussian_max_selection_log_density",
+      "gaussian_max_selection_log_likelihood",
+      "gaussian_search_adjusted_false_discovery_rate",
+      "gaussian_trial_mixture_cdf",
+      "generalized_collider_overcontrolled_coefficients",
+      "generalized_confounder_undercontrolled_coefficient",
+      "max_selection_family_errors",
+      "max_selection_null_probability",
+      "maximum_mixture_cdf",
+      "single_trial_false_discovery_rate"
     ],
-    "ordered_export_sha256": "6EF5A71729FA52EF02B2275A9E10868F3284ADDDA3C21585AA9D3074BDB751F1",
+    "ordered_export_sha256": "31F7167C72B0EC62C6D6BC6ACE66D3DF79C9C6296B4541E22CBC05D7A9D42CC0",
+    "canonical_name_set_sha256": "F8CFCE9626450B46CB9C094625F7B6AB5B99B830954CC2B962EF744B1E5380E8",
     "entries": [
       {
         "name": "BackdoorAdjustmentEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.BackdoorAdjustmentEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(treatment: ForwardRef('str'), outcome: ForwardRef('str'), adjustment_set: ForwardRef('NodeTuple'), all_observed: ForwardRef('bool'), endpoints_in_set: ForwardRef('NodeTuple'), descendants_in_set: ForwardRef('NodeTuple'), open_backdoor_paths: ForwardRef('tuple[PathEvidence, ...]'), admissible: ForwardRef('bool'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -3985,14 +4279,22 @@
       {
         "name": "BacktestStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.BacktestStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(method_labels: 'tuple[str, ...]', trial_family_id: 'str', declared_trial_ids: 'tuple[str, ...]', validation: 'Optional[ValidationEvidence]' = None, monte_carlo_dgp: 'Optional[str]' = None) -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "method_labels",
+          "trial_family_id",
+          "declared_trial_ids",
+          "validation",
+          "monte_carlo_dgp"
+        ],
+        "frozen": true
       },
       {
         "name": "CausalDAG",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalDAG",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(nodes, directed_edges, observed_nodes)",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4004,56 +4306,146 @@
       {
         "name": "CausalAdjustmentSetStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalAdjustmentSetStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(treatment: 'str', outcome: 'str', method_label: 'str', identified: 'bool', admissible_adjustment_sets: 'tuple[tuple[str, ...], ...]', selected_adjustment_set: 'tuple[str, ...]', confounders: 'tuple[str, ...]', descendants: 'tuple[str, ...]', mediators: 'tuple[str, ...]', colliders: 'tuple[str, ...]', instruments: 'tuple[str, ...]', control_justifications: 'tuple[tuple[str, str], ...]', open_backdoor_paths: 'tuple[str, ...]', frontdoor_criteria_satisfied: 'Optional[bool]' = None, instrument_relevance_satisfied: 'Optional[bool]' = None, instrument_exclusion_satisfied: 'Optional[bool]' = None, instrument_exogeneity_satisfied: 'Optional[bool]' = None) -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "treatment",
+          "outcome",
+          "method_label",
+          "identified",
+          "admissible_adjustment_sets",
+          "selected_adjustment_set",
+          "confounders",
+          "descendants",
+          "mediators",
+          "colliders",
+          "instruments",
+          "control_justifications",
+          "open_backdoor_paths",
+          "frontdoor_criteria_satisfied",
+          "instrument_relevance_satisfied",
+          "instrument_exclusion_satisfied",
+          "instrument_exogeneity_satisfied"
+        ],
+        "frozen": true
       },
       {
         "name": "ColliderCoefficients",
         "qualified_name": "RiskLabAI.causal_factor_analysis.ColliderCoefficients",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(beta_hat: 'float', theta_hat: 'float') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage",
+        "record_fields": [
+          "beta_hat",
+          "theta_hat"
+        ],
+        "frozen": true
       },
       {
         "name": "ColliderDiagnostics",
         "qualified_name": "RiskLabAI.causal_factor_analysis.ColliderDiagnostics",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(residual_variance: 'float', outcome_variance: 'float', correct_r_squared: 'float', overcontrolled_r_squared: 'float', correct_adjusted_r_squared: 'float', overcontrolled_adjusted_r_squared: 'float', correct_beta_variance: 'float', overcontrolled_beta_variance: 'float', collider_coefficient_variance: 'float', correct_beta_t_statistic: 'float', overcontrolled_beta_t_statistic: 'float', collider_t_statistic: 'float', adjusted_r_squared_prefers_overcontrolled: 'bool', absolute_beta_t_prefers_overcontrolled: 'bool') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage",
+        "record_fields": [
+          "residual_variance",
+          "outcome_variance",
+          "correct_r_squared",
+          "overcontrolled_r_squared",
+          "correct_adjusted_r_squared",
+          "overcontrolled_adjusted_r_squared",
+          "correct_beta_variance",
+          "overcontrolled_beta_variance",
+          "collider_coefficient_variance",
+          "correct_beta_t_statistic",
+          "overcontrolled_beta_t_statistic",
+          "collider_t_statistic",
+          "adjusted_r_squared_prefers_overcontrolled",
+          "absolute_beta_t_prefers_overcontrolled"
+        ],
+        "frozen": true
       },
       {
         "name": "CausalDiscoveryStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalDiscoveryStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(method_labels: 'tuple[str, ...]', graph_id: 'str', graph_nodes: 'tuple[str, ...]', directed_edges: 'tuple[tuple[str, str], ...]', graph_kind: 'str', ambiguous_edges: 'tuple[tuple[str, str], ...]', assumptions: 'tuple[str, ...]') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "method_labels",
+          "graph_id",
+          "graph_nodes",
+          "directed_edges",
+          "graph_kind",
+          "ambiguous_edges",
+          "assumptions"
+        ],
+        "frozen": true
       },
       {
         "name": "CausalExplanatoryAndPredictivePowerStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalExplanatoryAndPredictivePowerStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(task_types: 'tuple[str, ...]', estimator_label: 'str', explanatory_metric_labels: 'tuple[str, ...]', predictive_metric_labels: 'tuple[str, ...]', explanatory_evidence_id: 'Optional[str]', predictive_evidence_id: 'Optional[str]', naive_benchmark_id: 'str', validation: 'ValidationEvidence', multiclass_encoding: 'Optional[str]' = None, averaging_method: 'Optional[str]' = None) -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "task_types",
+          "estimator_label",
+          "explanatory_metric_labels",
+          "predictive_metric_labels",
+          "explanatory_evidence_id",
+          "predictive_evidence_id",
+          "naive_benchmark_id",
+          "validation",
+          "multiclass_encoding",
+          "averaging_method"
+        ],
+        "frozen": true
       },
       {
         "name": "CausalFactorProtocolReport",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalFactorProtocolReport",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(trial_family_id: 'str', declared_trial_ids: 'tuple[str, ...]', variable_selection: 'VariableSelectionStage', causal_discovery: 'CausalDiscoveryStage', causal_adjustment_set: 'CausalAdjustmentSetStage', causal_explanatory_and_predictive_power: 'CausalExplanatoryAndPredictivePowerStage', causal_portfolio_construction: 'CausalPortfolioConstructionStage', backtest: 'BacktestStage', multiple_testing_adjustments: 'MultipleTestingAdjustmentsStage') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "trial_family_id",
+          "declared_trial_ids",
+          "variable_selection",
+          "causal_discovery",
+          "causal_adjustment_set",
+          "causal_explanatory_and_predictive_power",
+          "causal_portfolio_construction",
+          "backtest",
+          "multiple_testing_adjustments",
+          "source_oracle",
+          "source_locator"
+        ],
+        "frozen": true
       },
       {
         "name": "CausalPortfolioConstructionStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.CausalPortfolioConstructionStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(method_labels: 'tuple[str, ...]', causal_exposures: 'tuple[str, ...]', controlled_unintended_exposures: 'tuple[str, ...]', cost_model_id: 'str', constraint_set_id: 'str', economic_rationale: 'str', fragility_scenarios: 'tuple[str, ...]', transfer_coefficient: 'Real') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "method_labels",
+          "causal_exposures",
+          "controlled_unintended_exposures",
+          "cost_model_id",
+          "constraint_set_id",
+          "economic_rationale",
+          "fragility_scenarios",
+          "transfer_coefficient"
+        ],
+        "frozen": true
       },
       {
         "name": "DSeparationEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.DSeparationEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(left: ForwardRef('NodeTuple'), right: ForwardRef('NodeTuple'), conditioned: ForwardRef('NodeTuple'), separated: ForwardRef('bool'), paths: ForwardRef('tuple[PathEvidence, ...]'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4067,7 +4459,7 @@
       {
         "name": "DifferenceInDifferencesEstimate",
         "qualified_name": "RiskLabAI.causal_factor_analysis.DifferenceInDifferencesEstimate",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(treated_change: ForwardRef('float'), control_change: ForwardRef('float'), estimate: ForwardRef('float'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.treatment_effects",
         "record_fields": [
@@ -4079,21 +4471,38 @@
       {
         "name": "EventHorizon",
         "qualified_name": "RiskLabAI.causal_factor_analysis.EventHorizon",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(observation_id: 'str', start: 'Real', end: 'Real') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "observation_id",
+          "start",
+          "end"
+        ],
+        "frozen": true
       },
       {
         "name": "FoldEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.FoldEvidence",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(fold_id: 'str', path_id: 'str', train_ids: 'tuple[str, ...]', test_ids: 'tuple[str, ...]', fit_ids: 'tuple[str, ...]', prediction_ids: 'tuple[str, ...]', refit_id: 'str', refit_components: 'tuple[str, ...]') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "fold_id",
+          "path_id",
+          "train_ids",
+          "test_ids",
+          "fit_ids",
+          "prediction_ids",
+          "refit_id",
+          "refit_components"
+        ],
+        "frozen": true
       },
       {
         "name": "FrontdoorAdjustmentEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.FrontdoorAdjustmentEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(treatment: ForwardRef('str'), outcome: ForwardRef('str'), mediator_set: ForwardRef('NodeTuple'), all_observed: ForwardRef('bool'), endpoints_in_set: ForwardRef('NodeTuple'), directed_path_exists: ForwardRef('bool'), unintercepted_directed_paths: ForwardRef('tuple[PathEvidence, ...]'), open_treatment_mediator_backdoor_paths: ForwardRef('tuple[PathEvidence, ...]'), open_mediator_outcome_backdoor_paths_given_treatment: ForwardRef('tuple[PathEvidence, ...]'), graphically_admissible: ForwardRef('bool'), positivity_required: ForwardRef('bool'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4113,7 +4522,7 @@
       {
         "name": "InstrumentEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.InstrumentEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(instrument: ForwardRef('str'), treatment: ForwardRef('str'), outcome: ForwardRef('str'), conditioned: ForwardRef('NodeTuple'), all_observed: ForwardRef('bool'), conditioning_disjoint: ForwardRef('bool'), conditioning_unaffected_by_treatment: ForwardRef('bool'), pearl_relevance: ForwardRef('bool'), pearl_exclusion_exogeneity: ForwardRef('bool'), pearl_graphical: ForwardRef('bool'), cfi_direct_relevance: ForwardRef('bool'), cfi_full_mediation: ForwardRef('bool'), cfi_exogeneity: ForwardRef('bool'), cfi_simple: ForwardRef('bool'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4136,14 +4545,32 @@
       {
         "name": "MultipleTestingAdjustmentsStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.MultipleTestingAdjustmentsStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(method_labels: 'tuple[str, ...]', trial_family_id: 'str', declared_trial_ids: 'tuple[str, ...]', family_partitions: 'tuple[tuple[str, tuple[str, ...]], ...]', alpha: 'Real', backtests_independent: 'bool', p_value_estimator: 'Optional[str]' = None, time_dependence_model: 'Optional[str]' = None, p_value_inputs_assume_independence: 'Optional[bool]' = None, sharpe_variance: 'Optional[Real]' = None, effective_trials: 'Optional[Real]' = None, sample_length: 'Optional[Integral]' = None, skewness: 'Optional[Real]' = None, kurtosis: 'Optional[Real]' = None, selection_bias_evidence_id: 'Optional[str]' = None) -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "method_labels",
+          "trial_family_id",
+          "declared_trial_ids",
+          "family_partitions",
+          "alpha",
+          "backtests_independent",
+          "p_value_estimator",
+          "time_dependence_model",
+          "p_value_inputs_assume_independence",
+          "sharpe_variance",
+          "effective_trials",
+          "sample_length",
+          "skewness",
+          "kurtosis",
+          "selection_bias_evidence_id"
+        ],
+        "frozen": true
       },
       {
         "name": "NodeRoleEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.NodeRoleEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(node: ForwardRef('str'), treatment: ForwardRef('str'), outcome: ForwardRef('str'), collider_on_paths: ForwardRef('tuple[PathTuple, ...]'), noncollider_on_paths: ForwardRef('tuple[PathTuple, ...]'), mediator_on_directed_paths: ForwardRef('tuple[PathTuple, ...]'), backdoor_noncollider_on_paths: ForwardRef('tuple[PathTuple, ...]'), common_cause_paths: ForwardRef('tuple[PathTuple, ...]'), descendant_of_treatment: ForwardRef('bool'), ancestor_of_outcome: ForwardRef('bool'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4162,7 +4589,7 @@
       {
         "name": "PathEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.PathEvidence",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(nodes: ForwardRef('PathTuple'), colliders: ForwardRef('NodeTuple'), noncolliders: ForwardRef('NodeTuple'), conditioned_noncolliders: ForwardRef('NodeTuple'), activated_colliders: ForwardRef('NodeTuple'), blocking_colliders: ForwardRef('NodeTuple'), is_open: ForwardRef('bool'), is_directed_from_left: ForwardRef('bool'), is_backdoor_from_left: ForwardRef('bool'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.graph_identification",
         "record_fields": [
@@ -4180,7 +4607,7 @@
       {
         "name": "PopulationRegressionDiagnostics",
         "qualified_name": "RiskLabAI.causal_factor_analysis.PopulationRegressionDiagnostics",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(coefficient_names: ForwardRef('Tuple[str, ...]'), coefficients: ForwardRef('Tuple[float, ...]'), r_squared: ForwardRef('float'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
         "record_fields": [
@@ -4192,7 +4619,7 @@
       {
         "name": "RegressionDiagnostics",
         "qualified_name": "RiskLabAI.causal_factor_analysis.RegressionDiagnostics",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(coefficient_names: ForwardRef('Tuple[str, ...]'), coefficients: ForwardRef('Tuple[float, ...]'), standard_errors: ForwardRef('Tuple[float, ...]'), t_statistics: ForwardRef('Tuple[float, ...]'), r_squared: ForwardRef('float'), adjusted_r_squared: ForwardRef('float'), residual_variance: ForwardRef('float'), n_observations: ForwardRef('int'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
         "record_fields": [
@@ -4209,7 +4636,7 @@
       {
         "name": "SpecificationExperimentResult",
         "qualified_name": "RiskLabAI.causal_factor_analysis.SpecificationExperimentResult",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(structure: ForwardRef('str'), conditioning_variable_role: ForwardRef('str'), unconditioned: ForwardRef('RegressionDiagnostics'), conditioned: ForwardRef('RegressionDiagnostics'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
         "record_fields": [
@@ -4222,7 +4649,7 @@
       {
         "name": "SpecificationPopulationResult",
         "qualified_name": "RiskLabAI.causal_factor_analysis.SpecificationPopulationResult",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(structure: ForwardRef('str'), conditioning_variable_role: ForwardRef('str'), unconditioned: ForwardRef('PopulationRegressionDiagnostics'), conditioned: ForwardRef('PopulationRegressionDiagnostics'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.specification_diagnostics",
         "record_fields": [
@@ -4235,14 +4662,19 @@
       {
         "name": "StrategyPerformance",
         "qualified_name": "RiskLabAI.causal_factor_analysis.StrategyPerformance",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(correct: 'float', misspecified: 'float') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage",
+        "record_fields": [
+          "correct",
+          "misspecified"
+        ],
+        "frozen": true
       },
       {
         "name": "TreatmentEffectDecomposition",
         "qualified_name": "RiskLabAI.causal_factor_analysis.TreatmentEffectDecomposition",
-        "kind": "record_type",
+        "kind": "named_tuple",
         "signature": "(observed_difference: ForwardRef('float'), average_treatment_effect_on_treated: ForwardRef('float'), sample_selection_bias: ForwardRef('float'))",
         "implementation_module": "RiskLabAI.causal_factor_analysis.treatment_effects",
         "record_fields": [
@@ -4254,16 +4686,32 @@
       {
         "name": "ValidationEvidence",
         "qualified_name": "RiskLabAI.causal_factor_analysis.ValidationEvidence",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(method_labels: 'tuple[str, ...]', event_horizons: 'tuple[EventHorizon, ...]', folds: 'tuple[FoldEvidence, ...]', embargo: 'Real' = 0.0) -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "method_labels",
+          "event_horizons",
+          "folds",
+          "embargo"
+        ],
+        "frozen": true
       },
       {
         "name": "VariableSelectionStage",
         "qualified_name": "RiskLabAI.causal_factor_analysis.VariableSelectionStage",
-        "kind": "class",
+        "kind": "dataclass",
         "signature": "(purpose: 'str', selected_variables: 'tuple[str, ...]', method_labels: 'tuple[str, ...]', overlapping_returns: 'bool', strong_time_dependence: 'bool', validation: 'Optional[ValidationEvidence]') -> None",
-        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+        "implementation_module": "RiskLabAI.causal_factor_analysis.protocol",
+        "record_fields": [
+          "purpose",
+          "selected_variables",
+          "method_labels",
+          "overlapping_returns",
+          "strong_time_dependence",
+          "validation"
+        ],
+        "frozen": true
       },
       {
         "name": "average_treatment_effect",
@@ -4474,6 +4922,326 @@
         "kind": "function",
         "signature": "(report: 'CausalFactorProtocolReport') -> 'CausalFactorProtocolReport'",
         "implementation_module": "RiskLabAI.causal_factor_analysis.protocol"
+      },
+      {
+        "name": "AllocationMisspecificationDiagnostics",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.AllocationMisspecificationDiagnostics",
+        "kind": "dataclass",
+        "signature": "(reference_weights: 'NDArray[np.float64]', misspecified_weights: 'NDArray[np.float64]', reference_target_exposures: 'NDArray[np.float64]', reference_achieved_exposures: 'NDArray[np.float64]', misspecified_reference_exposures: 'NDArray[np.float64]', misspecified_model_target_exposures: 'NDArray[np.float64]', misspecified_model_achieved_exposures: 'NDArray[np.float64]', reference_exposure_error: 'NDArray[np.float64]', weight_sign_reversals: 'NDArray[np.bool_]', reference_variance: 'float', misspecified_variance: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.allocation_diagnostics",
+        "record_fields": [
+          "reference_weights",
+          "misspecified_weights",
+          "reference_target_exposures",
+          "reference_achieved_exposures",
+          "misspecified_reference_exposures",
+          "misspecified_model_target_exposures",
+          "misspecified_model_achieved_exposures",
+          "reference_exposure_error",
+          "weight_sign_reversals",
+          "reference_variance",
+          "misspecified_variance"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "FDRComparisonEvidence",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.FDRComparisonEvidence",
+        "kind": "dataclass",
+        "signature": "(n_trials: 'int', single_trial_false_discovery_rate: 'float', family_level_false_discovery_rate: 'float', log_observed_type_i_inflation: 'float', log_required_type_i_inflation: 'float', equation_13_log_gap: 'float', identification_condition_holds: 'bool', single_trial_upper_bounds_family: 'bool') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "n_trials",
+          "single_trial_false_discovery_rate",
+          "family_level_false_discovery_rate",
+          "log_observed_type_i_inflation",
+          "log_required_type_i_inflation",
+          "equation_13_log_gap",
+          "identification_condition_holds",
+          "single_trial_upper_bounds_family"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "FDRNonIdentificationWitness",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.FDRNonIdentificationWitness",
+        "kind": "dataclass",
+        "signature": "(n_trials: 'int', target_false_discovery_rate: 'float', trial_null_probability: 'float', observable_cdf_at_threshold: 'float', latent_trial_cdf_at_threshold: 'float', family_null_probability: 'float', family_type_i_error: 'float', family_type_ii_error: 'float', family_false_discovery_rate: 'float', reconstructed_observable_cdf_at_threshold: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "n_trials",
+          "target_false_discovery_rate",
+          "trial_null_probability",
+          "observable_cdf_at_threshold",
+          "latent_trial_cdf_at_threshold",
+          "family_null_probability",
+          "family_type_i_error",
+          "family_type_ii_error",
+          "family_false_discovery_rate",
+          "reconstructed_observable_cdf_at_threshold"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "FactorControlRoles",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.FactorControlRoles",
+        "kind": "dataclass",
+        "signature": "(target_factor: 'str', ancestor_factors: 'tuple[str, ...]', descendant_factors: 'tuple[str, ...]', other_factors: 'tuple[str, ...]', unobserved_ancestors: 'tuple[str, ...]', unobserved_descendants: 'tuple[str, ...]') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.graph_roles",
+        "record_fields": [
+          "target_factor",
+          "ancestor_factors",
+          "descendant_factors",
+          "other_factors",
+          "unobserved_ancestors",
+          "unobserved_descendants"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "GaussianSearchAdjustedFDR",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.GaussianSearchAdjustedFDR",
+        "kind": "dataclass",
+        "signature": "(n_trials: 'int', thresholds: 'NDArray[np.float64]', trial_type_i_errors: 'NDArray[np.float64]', trial_type_ii_errors: 'NDArray[np.float64]', family_type_i_errors: 'NDArray[np.float64]', family_type_ii_errors: 'NDArray[np.float64]', mean_family_type_i_error: 'float', mean_family_type_ii_error: 'float', family_null_probability: 'float', false_discovery_rate: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "n_trials",
+          "thresholds",
+          "trial_type_i_errors",
+          "trial_type_ii_errors",
+          "family_type_i_errors",
+          "family_type_ii_errors",
+          "mean_family_type_i_error",
+          "mean_family_type_ii_error",
+          "family_null_probability",
+          "false_discovery_rate"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "GaussianTrialMixture",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.GaussianTrialMixture",
+        "kind": "dataclass",
+        "signature": "(trial_null_probability: 'float', null_standard_deviation: 'float', alternative_mean: 'float', alternative_standard_deviation: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "trial_null_probability",
+          "null_standard_deviation",
+          "alternative_mean",
+          "alternative_standard_deviation"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "MaxSelectionFamilyErrors",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.MaxSelectionFamilyErrors",
+        "kind": "dataclass",
+        "signature": "(n_trials: 'int', trial_null_probability: 'float', trial_type_i_error: 'float', trial_type_ii_error: 'float', family_null_probability: 'float', family_type_i_error: 'float', family_type_ii_error: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "n_trials",
+          "trial_null_probability",
+          "trial_type_i_error",
+          "trial_type_ii_error",
+          "family_null_probability",
+          "family_type_i_error",
+          "family_type_ii_error"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "SelectionLevelProbabilityEvidence",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.SelectionLevelProbabilityEvidence",
+        "kind": "dataclass",
+        "signature": "(joint_null_and_selection_probability: 'float', selection_probability: 'float', conditional_null_probability: 'float', quadrature_absolute_error: 'float') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr",
+        "record_fields": [
+          "joint_null_and_selection_probability",
+          "selection_probability",
+          "conditional_null_probability",
+          "quadrature_absolute_error"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "StructuralCausalModelResult",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.StructuralCausalModelResult",
+        "kind": "dataclass",
+        "signature": "(node_order: 'tuple[str, ...]', values: 'NDArray[np.float64]') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.structural_models",
+        "record_fields": [
+          "node_order",
+          "values"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "TreatmentOutcomeRole",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.TreatmentOutcomeRole",
+        "kind": "enum",
+        "signature": "(*values)",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.graph_roles",
+        "enum_values": {
+          "CAUSE_OF_TREATMENT": "cause_of_treatment",
+          "CONSEQUENCE_OF_TREATMENT": "consequence_of_treatment",
+          "CAUSE_OF_OUTCOME": "cause_of_outcome",
+          "CONSEQUENCE_OF_OUTCOME": "consequence_of_outcome",
+          "CONFOUNDER": "confounder",
+          "COLLIDER": "collider",
+          "MEDIATOR": "mediator",
+          "INDEPENDENT": "independent"
+        }
+      },
+      {
+        "name": "TreatmentOutcomeRoleEvidence",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.TreatmentOutcomeRoleEvidence",
+        "kind": "dataclass",
+        "signature": "(node: 'str', treatment: 'str', outcome: 'str', role: 'TreatmentOutcomeRole', node_to_treatment: 'bool', treatment_to_node: 'bool', node_to_outcome: 'bool', outcome_to_node: 'bool') -> None",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.graph_roles",
+        "record_fields": [
+          "node",
+          "treatment",
+          "outcome",
+          "role",
+          "node_to_treatment",
+          "treatment_to_node",
+          "node_to_outcome",
+          "outcome_to_node"
+        ],
+        "frozen": true
+      },
+      {
+        "name": "allocation_misspecification_diagnostics",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.allocation_misspecification_diagnostics",
+        "kind": "function",
+        "signature": "(covariance: 'ArrayLike', reference_factor_exposures: 'ArrayLike', reference_target_exposures: 'ArrayLike', misspecified_factor_exposures: 'ArrayLike', misspecified_target_exposures: 'ArrayLike') -> 'AllocationMisspecificationDiagnostics'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.allocation_diagnostics"
+      },
+      {
+        "name": "classify_treatment_outcome_role",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.classify_treatment_outcome_role",
+        "kind": "function",
+        "signature": "(dag: 'CausalDAG', treatment: 'str', outcome: 'str', node: 'str') -> 'TreatmentOutcomeRoleEvidence'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.graph_roles"
+      },
+      {
+        "name": "compare_single_and_family_fdr",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.compare_single_and_family_fdr",
+        "kind": "function",
+        "signature": "(trial_type_i_error: 'Real', trial_type_ii_error: 'Real', trial_null_probability: 'Real', n_trials: 'Integral', *, family_type_i_error: 'Real', family_type_ii_error: 'Real', relative_tolerance: 'Real' = 1e-12, absolute_tolerance: 'Real' = 1e-15) -> 'FDRComparisonEvidence'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "conditional_upper_tail_probability",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.conditional_upper_tail_probability",
+        "kind": "function",
+        "signature": "(cdf_at_value: 'Real', cdf_at_threshold: 'Real') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "evaluate_structural_causal_model",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.evaluate_structural_causal_model",
+        "kind": "function",
+        "signature": "(dag: 'CausalDAG', mechanisms: 'Mapping[str, Callable[[NDArray[np.float64], NDArray[np.float64]], ArrayLike]]', exogenous_inputs: 'Mapping[str, ArrayLike]') -> 'StructuralCausalModelResult'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.structural_models"
+      },
+      {
+        "name": "factor_control_roles",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.factor_control_roles",
+        "kind": "function",
+        "signature": "(dag: 'CausalDAG', target_factor: 'str') -> 'FactorControlRoles'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.graph_roles"
+      },
+      {
+        "name": "family_level_false_discovery_rate",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.family_level_false_discovery_rate",
+        "kind": "function",
+        "signature": "(family_type_i_error: 'Real', family_type_ii_error: 'Real', trial_null_probability: 'Real', n_trials: 'Integral') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "fdr_nonidentification_witness",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.fdr_nonidentification_witness",
+        "kind": "function",
+        "signature": "(observable_cdf_at_threshold: 'Real', target_false_discovery_rate: 'Real') -> 'FDRNonIdentificationWitness'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "gaussian_max_selection_cdf",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.gaussian_max_selection_cdf",
+        "kind": "function",
+        "signature": "(model: 'GaussianTrialMixture', x: 'Real', n_trials: 'Integral') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "gaussian_max_selection_log_density",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.gaussian_max_selection_log_density",
+        "kind": "function",
+        "signature": "(model: 'GaussianTrialMixture', x: 'Real', n_trials: 'Integral') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "gaussian_max_selection_log_likelihood",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.gaussian_max_selection_log_likelihood",
+        "kind": "function",
+        "signature": "(model: 'GaussianTrialMixture', observations: 'ArrayLike', n_trials: 'Integral') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "gaussian_search_adjusted_false_discovery_rate",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.gaussian_search_adjusted_false_discovery_rate",
+        "kind": "function",
+        "signature": "(model: 'GaussianTrialMixture', thresholds: 'ArrayLike', n_trials: 'Integral') -> 'GaussianSearchAdjustedFDR'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "gaussian_trial_mixture_cdf",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.gaussian_trial_mixture_cdf",
+        "kind": "function",
+        "signature": "(model: 'GaussianTrialMixture', x: 'Real') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "generalized_collider_overcontrolled_coefficients",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.generalized_collider_overcontrolled_coefficients",
+        "kind": "function",
+        "signature": "(beta: 'Real', gamma: 'Real', delta: 'Real', *, outcome_noise_variance: 'Real', collider_noise_variance: 'Real') -> 'ColliderCoefficients'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage"
+      },
+      {
+        "name": "generalized_confounder_undercontrolled_coefficient",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.generalized_confounder_undercontrolled_coefficient",
+        "kind": "function",
+        "signature": "(beta: 'Real', gamma: 'Real', delta: 'Real', *, confounder_variance: 'Real', exposure_noise_variance: 'Real') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.factor_mirage"
+      },
+      {
+        "name": "max_selection_family_errors",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.max_selection_family_errors",
+        "kind": "function",
+        "signature": "(trial_type_i_error: 'Real', trial_type_ii_error: 'Real', trial_null_probability: 'Real', n_trials: 'Integral') -> 'MaxSelectionFamilyErrors'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "max_selection_null_probability",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.max_selection_null_probability",
+        "kind": "function",
+        "signature": "(threshold: 'Real', trial_null_probability: 'Real', n_trials: 'Integral', *, null_density: 'Callable[[float], Real]', mixture_cdf: 'Callable[[float], Real]', absolute_tolerance: 'Real' = 1e-12, relative_tolerance: 'Real' = 1e-10, max_subintervals: 'Integral' = 200) -> 'SelectionLevelProbabilityEvidence'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "maximum_mixture_cdf",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.maximum_mixture_cdf",
+        "kind": "function",
+        "signature": "(null_cdf: 'Real', alternative_cdf: 'Real', trial_null_probability: 'Real', n_trials: 'Integral') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
+      },
+      {
+        "name": "single_trial_false_discovery_rate",
+        "qualified_name": "RiskLabAI.causal_factor_analysis.single_trial_false_discovery_rate",
+        "kind": "function",
+        "signature": "(type_i_error: 'Real', type_ii_error: 'Real', trial_null_probability: 'Real') -> 'float'",
+        "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
       }
     ]
   }

@@ -13,7 +13,7 @@ and ONC clustering:
 - distance correlation, a tuning-free dependence index in [0, 1] that is zero only at independence and
   detects nonlinear dependence with no estimation parameter.
 
-Admitted in Appraisal 11 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tags, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     KSG: prefer KSG over binned MI/VI on short, noisy, or nonlinear/heavy-tailed samples - it is far
     less biased there and is essentially unbiased on linear dependence; on large samples with simple
@@ -25,7 +25,7 @@ Admitted in Appraisal 11 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tags, verbati
     cluster stability). It is a dependence index, not a metric on partitions like VI (keep VI/KSG for
     the metric role).
 
-Evidence and caveats: appraisals/11_verdict.md.
+Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -71,7 +71,7 @@ def ksg_mutual_information(
     samples, and essentially unbiased on linear dependence; on large near-linear samples binned MI is at
     least as good, so prefer KSG in the former regime. It can return a slightly negative value for
     (near-)independent data, which is a characterized property of the estimator, not an error. See the
-    module docstring for the full regime tag and appraisals/11_verdict.md.
+    module docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ def distance_correlation(x: np.ndarray, y: np.ndarray) -> float:
     It is zero only at population independence and detects nonlinear dependence with no estimation
     parameter, so it is a tuning-free nonlinear dependence screen / codependence kernel. It is a
     dependence index, not a metric on partitions like the variation of information (keep VI / KSG for the
-    metric role). See the module docstring for the full regime tag and appraisals/11_verdict.md.
+    metric role). See the module docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

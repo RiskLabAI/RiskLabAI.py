@@ -1,10 +1,11 @@
 # Python runtime and dependency support
 
-Status: **matrix verified; release blocked**.
+Status: **3.1.0 local integration candidate; publication and release blocked**.
 
-This policy applies to the blocked RiskLabAI `3.0.0` release candidate. The
-assigned version does not authorize a build, package, upload, publication, or
-release.
+RiskLabAI 3.1.0 retains the support policy released with RiskLabAI 3.0.0 while
+adding 30 causal names. Package metadata is frozen for local integration and
+artifact inspection. No version shown in this document authorizes a
+version-control action, upload, publication, or release.
 
 ## Supported interpreter and NumPy policy
 
@@ -25,7 +26,7 @@ NumPy source release onto a newer interpreter.
 The NumPy lower bound was reconsidered at metadata freeze on 2026-08-21. NumPy
 2.2 remains inside the two-year Scientific Python SPEC 0 support window through
 2026-12-08 and has passed the approved Python 3.12 and 3.13 minimum lanes, so
-`numpy>=2.2,<3` is retained for RiskLabAI 3.0.0. Python 3.14 resolves NumPy
+`numpy>=2.2,<3` is retained for RiskLabAI 3.1.0. Python 3.14 resolves NumPy
 2.3.2 or newer because that is its first tested compatible binary lane. A
 future RiskLabAI release must reassess the floor rather than silently carrying
 it forward. See https://scientific-python.org/specs/spec-0000/.
@@ -89,44 +90,46 @@ satisfy a new style tool.
 
 ## Deprecation policy
 
-Public compatibility aliases retained in RiskLabAI 3.0.0 remain callable and
+Public compatibility aliases retained in RiskLabAI 3.1.0 remain callable and
 emit `DeprecationWarning`. Their removal target is 4.0.0. Package-scoped tests
 bind both continued availability and the stated target; no preserved alias is
 deleted in this release.
 
 ## Matrix evidence
 
-Every required base lane passed all 342 frozen causal-factor tests. Across six
-lanes this is 2,052 causal assertions with no failures.
+The causal tree collects exactly 507 tests: the released 57-name suite, the 30
+additive-name suite, independent analytical and graph oracles, boundary and
+stability checks, and 12 shared numerical-fixture cases. All 507 passed on each
+supported interpreter line. The fixture also passed at every minimum and
+current NumPy endpoint.
 
-The final self-contained package test tree collects exactly 704 tests: 354
-preserved-library tests, 342 causal-factor tests, and 8 independent technical-
-indicator oracles. Its complete Python 3.12 current-dependency run succeeded
-with 703 passes and one declared Windows platform skip. The package inventory
-records both the collected suite and the 692-test applicable base matrix used
-on every supported interpreter/dependency lane.
+Before the fixture was added, every required base endpoint passed the complete
+preserved library with 845 passes and seven declared optional or platform
+skips. The 12-case fixture then passed independently on all six unchanged
+environments, closing each base endpoint at 857 passes and seven declared
+skips. Across those endpoints this is 5,142 passes and 42 expected skips.
 
-The complete preserved base suite passed 342 applicable tests per lane. Five
-platform or optional-capability cases were skipped by their declared guards;
-the two QuantEcon-dependent cases were exercised separately in the `synth`
-lanes. The new indicator-oracle suite passed 8 tests in every lane. Numba's
-compiled and pure-Python paths agreed in every lane. PyTorch 2.10 and 2.13 both
-passed the preserved PDE tests on all three interpreter lines. Plotting,
-symbolic, profiling, HPO, and synthetic-data smoke tests passed in their
-feature-specific environments.
+The maximally applicable Python 3.12 optional environment collects 869 cases;
+its final complete run passed 868 and skipped only the Windows `lscpu` case.
+The corresponding Python 3.13 evidence is 868 passes and one Windows skip.
+Python 3.14 records 863 passes and two declared skips: Windows `lscpu` and the
+unavailable changepoint backend. Numba's compiled and pure-Python paths agree,
+the PyTorch PDE tests pass, and the preserved optional-feature smoke tests pass
+within their declared groups.
 
 One real conditional floor was discovered: Joblib releases before 1.5.2 are
 not reliable for the preserved Windows parallel-HPO path on Python 3.14.
 Joblib 1.5.2 and 1.5.3 pass; older Python lines continue to pass with Joblib
 1.4.x.
 
-The causal public design remains exactly 57 concepts. Compatibility repairs
-did not import or reintroduce the excluded legacy causal implementation.
+The causal public design is exactly 87 names: the released 57-name contract as
+an unchanged prefix plus 30 documented additions. The candidate did not import, modify, or
+reintroduce the excluded legacy causal implementation.
 
 ## Remaining release gates
 
-The metadata, public surface, tests, source allowlists, installed-origin probes,
-and CI contract are complete. Source installs used isolated verification
-environments and retained no wheel or source-distribution artifact. Formal
-artifact inspection and separate human authorization for version-control,
-publication, and release remain outstanding.
+The public surface, analytical matrix, exact source and test inventories, and
+final hygiene controls are complete. Temporary local wheel and
+source-distribution artifacts are permitted only for inspection and must remain
+under the isolated integration root. Every version-control, publication,
+upload, and release action remains separately human-controlled.

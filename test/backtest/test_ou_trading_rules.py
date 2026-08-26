@@ -61,7 +61,7 @@ def test_hit_probability_and_exit_time_sane():
 
 def test_closed_form_matches_monte_carlo_grid_within_resolution():
     """
-    Replication of the Appraisal 23 mechanism: where the price is OU, the closed-form optimal profit-take
+    Replication of the independent validation mechanism: where the price is OU, the closed-form optimal profit-take
     agrees with the Monte-Carlo grid argmax within the grid spacing.
     """
     theta, sigma, gap, cost, dt = theta_from_half_life(10.0), 0.10, 1.0, 0.0, 1.0

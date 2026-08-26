@@ -13,7 +13,7 @@ from .standard_bars import StandardBars
 # Exports from time_bars.py
 from .time_bars import TimeBars
 
-# Hardened (anti-degeneracy) information-driven bars (Appraisal 19 robustness fix)
+# Hardened (anti-degeneracy) information-driven bars (independent validation robustness fix)
 from .hardened_information_driven_bars import (
     HardenedExpectedImbalanceBars,
     HardenedExpectedRunBars,

@@ -27,7 +27,7 @@ def _bubble(t, rng, magnitude=1.06):
 
 def test_holds_size_on_variance_break_null():
     """
-    Replication of the Appraisal 26 mechanism: under a non-stationary-volatility (variance-break) random
+    Replication of the independent validation mechanism: under a non-stationary-volatility (variance-break) random
     walk with NO bubble, the volatility-robust SADF does not spuriously reject at anything like the rate a
     homoskedastic test would (it holds roughly nominal size).
     """

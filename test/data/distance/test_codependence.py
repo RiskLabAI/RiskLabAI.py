@@ -30,7 +30,7 @@ def test_ksg_matches_gaussian_closed_form():
 
 def test_ksg_beats_binned_on_short_nonlinear_sample():
     """
-    Replication of the Appraisal 11 mechanism: on short nonlinear samples KSG has lower error against
+    Replication of the independent validation mechanism: on short nonlinear samples KSG has lower error against
     the true MI than the binned baseline (averaged over seeds).
     """
     rho = 0.6

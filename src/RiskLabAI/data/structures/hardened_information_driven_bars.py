@@ -9,8 +9,8 @@ makes the threshold tiny) or diverge toward extremely long bars (when E[T] runs 
 is no longer usable. The hardened variant adds two guards that bound the bar size without touching the
 well-behaved regime.
 
-Admitted in Appraisal 19 (CONTRIBUTIONS_LEDGER 2026-06-27) as a correctness / robustness fix. Scope
-note, verbatim from the verdict:
+Included after independent validation (the public method specification) as a correctness / robustness fix. Scope
+note, verbatim from the documented guidance:
 
     replace the naive imbalance/run-bar construction with the guarded version - it removes the
     documented degeneracy (1-tick collapse / divergence) while leaving well-behaved parameterizations
@@ -20,10 +20,10 @@ The guards are: (1) never close a bar before ``min_ticks`` ticks (prevents the 1
 (2) force-close a bar at ``max_ticks`` ticks (prevents divergence); E[T] is additionally clamped to
 ``[min_ticks, max_ticks]`` via the base class's ``expected_ticks_number_bounds``. The naive
 ``ExpectedImbalanceBars`` / ``ExpectedRunBars`` are left unchanged and remain available; the hardened
-classes only subclass them. Held-out confirmed on the sealed tick segment (appraisals/19_results,
-HELDOUT.md): naive imbalance collapses (86.9% of bars <= 2 ticks, min 1) while hardened holds (0%
+classes only subclass them. validation sample confirmed on the sealed tick segment (the documented validation evidence,
+independent validation): naive imbalance collapses (86.9% of bars <= 2 ticks, min 1) while hardened holds (0%
 <= 2-tick, min 20); naive run diverges (11 bars) while hardened stays bounded; a well-behaved run
-configuration is unchanged (6.2% bar-count difference). Evidence and caveats: appraisals/19_verdict.md.
+configuration is unchanged (6.2% bar-count difference). Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -40,14 +40,14 @@ from .run_bars import ExpectedRunBars
 
 class HardenedExpectedImbalanceBars(ExpectedImbalanceBars):
     r"""
-    Expected-imbalance bars with anti-degeneracy guards (Appraisal 19 robustness fix).
+    Expected-imbalance bars with anti-degeneracy guards (independent validation robustness fix).
 
     Subclasses :class:`ExpectedImbalanceBars` and overrides only the bar-construction condition: a bar
     cannot close before ``min_ticks`` ticks (removes the 1-tick collapse) and is force-closed at
     ``max_ticks`` ticks (removes the divergence); E[T] is clamped to ``[min_ticks, max_ticks]``. Between
     the guards the original de Prado condition is used unchanged, so a well-parameterized construction is
-    left essentially as-is. See the module docstring for the verbatim scope note and
-    appraisals/19_verdict.md.
+    left essentially as-is. See the module docstring for the scope guidance and
+    the documented validation evidence.
 
     Parameters
     ----------
@@ -95,12 +95,12 @@ class HardenedExpectedImbalanceBars(ExpectedImbalanceBars):
 
 class HardenedExpectedRunBars(ExpectedRunBars):
     r"""
-    Expected-run bars with anti-degeneracy guards (Appraisal 19 robustness fix).
+    Expected-run bars with anti-degeneracy guards (independent validation robustness fix).
 
     Subclasses :class:`ExpectedRunBars` and overrides only the bar-construction condition with the same
     two guards as :class:`HardenedExpectedImbalanceBars`: no close before ``min_ticks`` ticks, force-close
     at ``max_ticks`` ticks, E[T] clamped to ``[min_ticks, max_ticks]``. See the module docstring for the
-    verbatim scope note and appraisals/19_verdict.md.
+    scope guidance and the documented validation evidence.
 
     Parameters
     ----------

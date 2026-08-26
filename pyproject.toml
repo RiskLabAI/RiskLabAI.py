@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RiskLabAI"
-version = "3.0.0"
+version = "3.1.0"
 description = "Financial machine-learning and causal-factor analysis tools for research and model validation."
 readme = "README.md"
 requires-python = ">=3.12,<3.15"

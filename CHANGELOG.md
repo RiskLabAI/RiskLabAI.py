@@ -3,6 +3,29 @@
 All notable changes to RiskLabAI.py are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [3.1.0] - Unreleased
+
+### Added
+
+- Preserved the released 57-name `RiskLabAI.causal_factor_analysis` contract
+  and added 30 paper-derived names, producing an 87-name causal API with
+  matching Julia concepts.
+- Added general-variance factor-mirage coefficients,
+  allocation-misspecification diagnostics, accepted-DAG factor roles,
+  deterministic structural-model evaluation, and separate family- and
+  selection-level false-discovery analytics for searched trials.
+- Added direct analytical examples, independent mathematical and graph oracles,
+  randomized and stability checks, validation boundaries, and a shared
+  numerical Python-Julia fixture.
+
+### Documentation
+
+- Classified every relevant causal-factor source found in the systematic
+  library review. Thirteen contradictory or under-specified method units remain
+  explicitly source-blocked rather than being approximated or guessed.
+- Froze the additive candidate metadata at 3.1.0 for final local integration;
+  version-control, publication, and release actions remain human-controlled.
+
 ## [2.0.1]
 
 ### Fixed

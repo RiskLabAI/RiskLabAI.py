@@ -1,38 +1,51 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "document_type": "RISKLABAI_PYTHON_TEST_INVENTORY",
   "product": "RiskLabAI",
   "language": "Python",
-  "version": "3.0.0",
-  "runner": "pytest / six base lanes / three optional-feature lanes",
-  "file_count": 78,
+  "version": "3.1.0",
+  "version_note": "Final local integration candidate; every version-control and release action remains human-controlled.",
+  "runner": "pytest / six base endpoints / three optional-feature interpreter lines",
+  "file_count": 85,
   "file_groups": {
-    "CAUSAL_FACTOR_ANALYSIS": 7,
+    "CAUSAL_FACTOR_ANALYSIS": 13,
+    "CAUSAL_PARITY_FIXTURE": 1,
     "PRESERVED_LIBRARY": 70,
     "TECHNICAL_INDICATOR_ORACLES": 1
   },
-  "collected_cases_in_reference_full_feature_environment": {
-    "preserved_library": 354,
-    "causal_factor_analysis": 342,
-    "technical_indicator_oracles": 8,
-    "total": 704
+  "collected_cases": {
+    "causal_factor_analysis": 507,
+    "maximally_applicable_python_3_12": 869
   },
-  "verified_required_matrix_cases_per_lane": {
-    "preserved_library_applicable": 342,
-    "causal_factor_analysis": 342,
-    "technical_indicator_oracles": 8,
-    "total_applicable": 692
+  "base_matrix": {
+    "lane_count": 6,
+    "passed_per_lane": 857,
+    "declared_skips_per_lane": 7,
+    "passed_total": 5142,
+    "declared_skips_total": 42
   },
-  "required_lane_count": 6,
-  "required_lane_case_total": 4152,
-  "base_lane_count": 6,
-  "optional_feature_lane_count": 3,
-  "ci_execution_count": 9,
+  "optional_feature_lanes": [
+    {
+      "python": "3.12",
+      "passed": 868,
+      "declared_skips": 1
+    },
+    {
+      "python": "3.13",
+      "passed": 868,
+      "declared_skips": 1
+    },
+    {
+      "python": "3.14",
+      "passed": 863,
+      "declared_skips": 2
+    }
+  ],
   "files": [
     {
       "path": "test/backtest/test_advanced_bet_sizing.py",
-      "size": 3755,
-      "sha256": "F6AF65AA18989A2C3BBB4B43698719227F2199B825366553A7D177D1642572C2",
+      "size": 3779,
+      "sha256": "73E02C09002FE941032602FAF26E6013261D0C996EBB747A87E984E1F2040095",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 8
     },
@@ -73,8 +86,8 @@
     },
     {
       "path": "test/backtest/test_ou_trading_rules.py",
-      "size": 4403,
-      "sha256": "12498715145DA0BF5CEC21CFBCFF8EA206B7F82C01CEC15F05292C94F47A1C15",
+      "size": 4413,
+      "sha256": "38187A1F848B6C31B6245D45C619AD25278D7B2BF2F36F331BFB1C838E09FC50",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
@@ -94,8 +107,8 @@
     },
     {
       "path": "test/backtest/test_robust_statistics.py",
-      "size": 4672,
-      "sha256": "4954FF5BB03F7E6B040CAE874D10E04EE937DB1EEA85E7F0719FCD01A3DBA0FC",
+      "size": 4684,
+      "sha256": "F1118D013AE5BE984BE313A2C4DCB45E76A715F1AE63AA1CD9F1069751EF5255",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 6
     },
@@ -171,22 +184,22 @@
     },
     {
       "path": "test/backtest/validation/test_leakage_aware_hpo.py",
-      "size": 3941,
-      "sha256": "C36A724AA150622F41C083A6C4370AF51E791D5FB27A1109F2F3A7F52B4F1CB2",
+      "size": 3951,
+      "sha256": "7D689924DA7A7C3797E9E59B3BF8AFC14CF1893D28F27BE50D2B89FBBB6917E7",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
     {
       "path": "test/backtest/validation/test_path_adaptive_cpcv.py",
-      "size": 8956,
-      "sha256": "5DDCF270F911FD61C06898BFBBF32E524711F035DBE27044E3137EED3BBC57DF",
+      "size": 9013,
+      "sha256": "AE54E8F04CEA04C46613F7542E3EC22979745F82FC3E7871F36A821516C61858",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 10
     },
     {
       "path": "test/backtest/validation/test_path_bagged_cpcv.py",
-      "size": 3965,
-      "sha256": "A040B21C906867C5CA0B196755CDC8C3F4F79032E9E6E5A045C779AEB43197B1",
+      "size": 4004,
+      "sha256": "E4A0B4DCBAF8D3BA9D3E5242A9E92D8F4800D01CEE76CE9739BEBDD79679E12F",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
@@ -205,6 +218,26 @@
       "declared_test_functions": 5
     },
     {
+      "path": "test/causal_factor_analysis/fixtures/additive_numeric_parity.tsv",
+      "size": 1200,
+      "sha256": "E2B46AB385DB863D9F4C764F3754D6C0931ED7C62DCB2C589927DB924986DD7E",
+      "group": "CAUSAL_PARITY_FIXTURE"
+    },
+    {
+      "path": "test/causal_factor_analysis/test_additive_numeric_parity.py",
+      "size": 7060,
+      "sha256": "40EBB18368636E2293C695A8FB3BA89973CD3F28DBFFA174E4EC48B236459F7B",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 1
+    },
+    {
+      "path": "test/causal_factor_analysis/test_allocation_diagnostics.py",
+      "size": 8402,
+      "sha256": "4393191DFF603085216902051FF9CB0EAAEBF4E5CD6CC2F394C4381A07E2C760",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 9
+    },
+    {
       "path": "test/causal_factor_analysis/test_cfi_book_graph_examples.py",
       "size": 3644,
       "sha256": "195A3291A6CB6EAEE929F02951BAA45BD6E933AB751CCC30469402BBDA12DE9A",
@@ -219,11 +252,25 @@
       "declared_test_functions": 32
     },
     {
+      "path": "test/causal_factor_analysis/test_generalized_factor_mirage.py",
+      "size": 8498,
+      "sha256": "16BEA6313136F0BB2D8EEEA4D79C4BF90C265E17AA03BBE823CA9A6381A2739C",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 11
+    },
+    {
       "path": "test/causal_factor_analysis/test_graph_identification.py",
       "size": 35155,
       "sha256": "16CA24092CF9D05D2A7718FF1BACBF050592EFDDE18C7B7CCF2B20121250F789",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 47
+    },
+    {
+      "path": "test/causal_factor_analysis/test_graph_roles.py",
+      "size": 5190,
+      "sha256": "70C2A24EBD466D461F1C54A8DFFC26AA7F7027ECEE2F1B7F7C8377DDE53F9117",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 7
     },
     {
       "path": "test/causal_factor_analysis/test_minimum_variance.py",
@@ -240,11 +287,25 @@
       "declared_test_functions": 43
     },
     {
+      "path": "test/causal_factor_analysis/test_search_adjusted_fdr.py",
+      "size": 28388,
+      "sha256": "510F7D5D0FC64786D496EB9B72EA508AD21F82360E1C7FFEC086C618A20D55B7",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 42
+    },
+    {
       "path": "test/causal_factor_analysis/test_specification_diagnostics.py",
       "size": 9088,
       "sha256": "6FD3A8C9F1DFDC665AE9DCD80E41798D5D1EAE48BB9B2F4EE5AAB61B1B3393D4",
       "group": "CAUSAL_FACTOR_ANALYSIS",
       "declared_test_functions": 10
+    },
+    {
+      "path": "test/causal_factor_analysis/test_structural_models.py",
+      "size": 5760,
+      "sha256": "7231FF45CA7273A9687096349A30CC8FC865DC85ABADE17A2AB69CB624D5684C",
+      "group": "CAUSAL_FACTOR_ANALYSIS",
+      "declared_test_functions": 8
     },
     {
       "path": "test/causal_factor_analysis/test_treatment_effects.py",
@@ -304,15 +365,15 @@
     },
     {
       "path": "test/data/denoise/test_nercome.py",
-      "size": 4263,
-      "sha256": "9B3799A2EB458510D869EE2624B525C2746D923E09BB11C5FB4EBDFA6385FA8C",
+      "size": 4273,
+      "sha256": "A20954A1B85C178B4E3561E38B5ECC7F6D35FF2201D2BD34E62EB2EAACCF7632",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
     {
       "path": "test/data/differentiation/test_adaptive_differentiation.py",
-      "size": 3832,
-      "sha256": "63AF31E69F26F186EA26B531189FEEDFEC653055DC6FA954E714F92F0A419CA5",
+      "size": 3844,
+      "sha256": "940CA6705C77B82ABD55B2B500067B0ED376276ED1D8D6B9234AC3504D540E27",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
@@ -325,8 +386,8 @@
     },
     {
       "path": "test/data/distance/test_codependence.py",
-      "size": 3364,
-      "sha256": "1E206FE53D4C899011C33D2B08E5CA5D8A0CFAD47391E4EAD5A08FD24DEA78FF",
+      "size": 3374,
+      "sha256": "146693136A612F70CFA26E6DF9AF4EE897F3E09862B6BDDF4A682642A18D9CC8",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 7
     },
@@ -353,8 +414,8 @@
     },
     {
       "path": "test/data/structures/test_hardened_information_driven_bars.py",
-      "size": 4756,
-      "sha256": "EC65CE1DDC9C43C72569E0E2087203309EC4C557F06FBDAA6DE4A88BF74C6650",
+      "size": 4765,
+      "sha256": "19ED1A20708BA49B3294C8406B49BD5E4261938983A37FCCF2301319E76EEB39",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 6
     },
@@ -423,8 +484,8 @@
     },
     {
       "path": "test/features/feature_importance/test_debiased_importance.py",
-      "size": 3135,
-      "sha256": "9CB7F3A10AADC4263C5A3BC18952A832C61DD1E106E7C6D97E44480D9B77E303",
+      "size": 3145,
+      "sha256": "767C8AC265903BFADCC0CB358C04380F7CC1B080E249CF2605D7C36054DA7841",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 6
     },
@@ -472,22 +533,22 @@
     },
     {
       "path": "test/features/structural_breaks/test_pelt_change_points.py",
-      "size": 2480,
-      "sha256": "41D6A781C71F971EDF58728FC9C7F963C751CA07B23B8ADA7F640542EBA80DEF",
+      "size": 2490,
+      "sha256": "ADE35736D9A8B8A0621A0D1687CB0EF567D2ACC1AFD1E100F1D3FE5ED43307A8",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 5
     },
     {
       "path": "test/features/structural_breaks/test_structural_breaks.py",
-      "size": 9740,
-      "sha256": "3AB71A45767135BA7B3104135A86E45C301F2131FCEB190695FCAA7B5FD34872",
+      "size": 9753,
+      "sha256": "DC76EF79F06F577A1BAA8FE2AA8AC53BD5888C347CE46E595766490E2F72F75D",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 14
     },
     {
       "path": "test/features/structural_breaks/test_volatility_robust_sadf.py",
-      "size": 2732,
-      "sha256": "F098186FFD06AC96600F32986039804A177193313D1E237F2EE97264968E7BB8",
+      "size": 2742,
+      "sha256": "11A8A9D0446F666FB6B7BCF0B857414EBD6583931CD1CA199CDC2C7ECD37B58F",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 4
     },

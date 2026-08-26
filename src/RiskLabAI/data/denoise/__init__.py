@@ -35,6 +35,6 @@ __all__ = [
     "corr_to_cov",
     "denoise_cov",
     "optimal_portfolio",
-    # NERCOME (Appraisal 24 admit)
+    # NERCOME (independent validation admit)
     "nercome_denoised_covariance",
 ]
