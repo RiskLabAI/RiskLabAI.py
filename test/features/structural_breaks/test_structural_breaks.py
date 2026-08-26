@@ -170,7 +170,7 @@ def test_psy_minimum_window():
 def test_bsadf_sequence_matches_get_bsadf_statistic(random_walk):
     """
     Replication: the fast BSADF sequence agrees with the validated per-endpoint
-    ``get_bsadf_statistic`` on shared windows (the appraisal saw ~1e-14).
+    ``get_bsadf_statistic`` on shared windows (the independent validation saw ~1e-14).
     """
     nmin = psy_minimum_window(len(random_walk))
     seq = get_bsadf_sequence(random_walk, nmin)

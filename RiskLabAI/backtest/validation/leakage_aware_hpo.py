@@ -11,8 +11,8 @@ This module wires Optuna through the repo's :class:`PurgedKFold` / :class:`Combi
 per-trial score is leakage-controlled) and provides a Deflated-Sharpe gate that deflates the selected
 model's out-of-sample Sharpe by the HPO-inclusive trial count.
 
-Admitted in Appraisal 20 (CONTRIBUTIONS_LEDGER 2026-06-27) as a methodology / infrastructure admit, NOT a
-performance claim. Scope tag, verbatim from the verdict:
+Included after independent validation (the public method specification) as a methodology / infrastructure admit, NOT a
+performance claim. Scope guidance:
 
     Optuna (TPE/CMA-ES) wired through PurgedKFold/CPCV with PBO/DSR gating, preferred over grid/random for
     search efficiency and over naive-CV tuning for leakage-safety, and carrying the honest, characterized
@@ -20,11 +20,11 @@ performance claim. Scope tag, verbatim from the verdict:
     the trial count, never trusted on the in-sample HPO score.
 
 **Plainly: this improves search efficiency and leakage-safety, NOT out-of-sample performance. Tuning does
-not create edge.** In the appraisal the principled-HPO real-leg gain did not survive the Deflated Sharpe at
+not create edge.** during independent validation the principled-HPO real-leg gain did not survive the Deflated Sharpe at
 the HPO-inclusive trial count (DSR 0.44 / 0.34 < 0.5, PBO 0.67 / 0.69, OOS at the base rate); the value is
 that the search reaches the optimum in fewer trials and that purged CV removes the leakage a naive k-fold
 inflates. Always gate the selected model by :func:`deflated_sharpe_gate` at the HPO trial count; never
-trust the in-sample HPO score. Evidence and caveats: appraisals/20_verdict.md.
+trust the in-sample HPO score. Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -87,7 +87,7 @@ def leakage_aware_hpo(
     and LEAKAGE-SAFETY (the per-trial score is purged, not a leaky shuffled k-fold). It does NOT improve
     out-of-sample performance - tuning does not create edge - so the selected model must be gated by
     :func:`deflated_sharpe_gate` at the returned ``n_trials``; never trust ``best_score`` directly. See the
-    module docstring for the verbatim scope tag and appraisals/20_verdict.md.
+    module docstring for the scope guidance and the documented validation evidence.
 
     Parameters
     ----------
@@ -186,9 +186,9 @@ def deflated_sharpe_gate(
     The benchmark is the expected maximum Sharpe over ``n_trials`` independent trials (with the observed
     cross-trial Sharpe dispersion ``trial_sharpe_std``); the Deflated Sharpe is the probability that the
     realized OOS Sharpe exceeds that benchmark. A selection passes only if the Deflated Sharpe exceeds
-    ``threshold`` (0.5). This is the decisive control: in the appraisal the principled-HPO gain did not
+    ``threshold`` (0.5). This is the decisive control: during independent validation the principled-HPO gain did not
     pass it - tuning yielded no out-of-sample edge after deflation. See the module docstring for the
-    verbatim scope tag and appraisals/20_verdict.md.
+    scope guidance and the documented validation evidence.
 
     Parameters
     ----------

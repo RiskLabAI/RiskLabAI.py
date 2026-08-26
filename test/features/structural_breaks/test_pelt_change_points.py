@@ -18,7 +18,7 @@ def _near(cps, target, tol=15):
 
 def test_recovers_multiple_mean_shifts():
     """
-    Replication of the Appraisal 26 mechanism: PELT recovers multiple mean change-points (which CUSUM,
+    Replication of the independent validation mechanism: PELT recovers multiple mean change-points (which CUSUM,
     targeting a single shift, misses).
     """
     rng = np.random.default_rng(0)

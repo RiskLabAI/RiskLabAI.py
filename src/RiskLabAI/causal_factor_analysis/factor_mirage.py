@@ -5,6 +5,10 @@ Prado and Zoonekynd (2026), Equations 2, 5-19 and Appendices D-E. Factor
 returns condition on the supplied exposures. Forecast returns integrate over
 the exposure distribution assumed by the article.
 
+The generalized coefficient functions retain the disturbance variances from
+the population normal equations. The released standardized functions remain
+the unit-variance special cases with unchanged signatures.
+
 Appendix F is not exposed as a separate parameter-shift model because its
 equations contain only the training-regime parameters.
 """
@@ -29,6 +33,8 @@ __all__ = [
     "confounder_factor_return",
     "confounder_forecast_return",
     "confounder_undercontrolled_coefficient",
+    "generalized_collider_overcontrolled_coefficients",
+    "generalized_confounder_undercontrolled_coefficient",
 ]
 
 
@@ -98,6 +104,13 @@ def _fraction(value: float) -> Fraction:
     return Fraction.from_float(value)
 
 
+def _positive_fraction(name: str, value: Real) -> Fraction:
+    result = _as_finite_real(name, value)
+    if result <= 0.0:
+        raise ValueError(f"{name} must be strictly positive")
+    return _fraction(result)
+
+
 def _as_result(name: str, value: Fraction) -> float:
     try:
         result = float(value)
@@ -159,6 +172,44 @@ def confounder_undercontrolled_coefficient(
         "undercontrolled coefficient",
         _confounder_coefficient(beta_value, gamma_value, delta_value),
     )
+
+
+def generalized_confounder_undercontrolled_coefficient(
+    beta: Real,
+    gamma: Real,
+    delta: Real,
+    *,
+    confounder_variance: Real,
+    exposure_noise_variance: Real,
+) -> float:
+    r"""Return the omitted-confounder coefficient for general variances.
+
+    For ``X = delta * Z + v`` and ``Y = beta * X + gamma * Z + u``, with
+    independent centered disturbances, the population coefficient is
+
+    ``beta + delta * gamma * Var(Z) / (delta**2 * Var(Z) + Var(v))``.
+
+    Both variances must be strictly positive. Setting both to one reproduces
+    :func:`confounder_undercontrolled_coefficient` exactly.
+    """
+
+    beta_value = _fraction(_as_finite_real("beta", beta))
+    gamma_value = _fraction(_as_finite_real("gamma", gamma))
+    delta_value = _fraction(_as_finite_real("delta", delta))
+    confounder_variance_value = _positive_fraction(
+        "confounder_variance", confounder_variance
+    )
+    exposure_noise_variance_value = _positive_fraction(
+        "exposure_noise_variance", exposure_noise_variance
+    )
+    denominator = (
+        delta_value * delta_value * confounder_variance_value
+        + exposure_noise_variance_value
+    )
+    coefficient = beta_value + (
+        delta_value * gamma_value * confounder_variance_value / denominator
+    )
+    return _as_result("generalized undercontrolled coefficient", coefficient)
 
 
 def confounder_factor_return(
@@ -251,6 +302,51 @@ def collider_overcontrolled_coefficients(
     return ColliderCoefficients(
         beta_hat=_as_result("overcontrolled beta coefficient", beta_hat),
         theta_hat=_as_result("collider coefficient", theta_hat),
+    )
+
+
+def generalized_collider_overcontrolled_coefficients(
+    beta: Real,
+    gamma: Real,
+    delta: Real,
+    *,
+    outcome_noise_variance: Real,
+    collider_noise_variance: Real,
+) -> ColliderCoefficients:
+    r"""Return collider-conditioned coefficients for general variances.
+
+    For ``Y = beta * X + u`` and ``Z = gamma * Y + delta * X + v``, with
+    independent centered disturbances, the population coefficients are
+
+    ``beta_hat = (beta * Var(v) - delta * gamma * Var(u)) /
+    (Var(v) + gamma**2 * Var(u))`` and
+    ``theta_hat = gamma * Var(u) / (Var(v) + gamma**2 * Var(u))``.
+
+    Both variances must be strictly positive. Setting both to one reproduces
+    :func:`collider_overcontrolled_coefficients` exactly.
+    """
+
+    beta_value = _fraction(_as_finite_real("beta", beta))
+    gamma_value = _fraction(_as_finite_real("gamma", gamma))
+    delta_value = _fraction(_as_finite_real("delta", delta))
+    outcome_noise_variance_value = _positive_fraction(
+        "outcome_noise_variance", outcome_noise_variance
+    )
+    collider_noise_variance_value = _positive_fraction(
+        "collider_noise_variance", collider_noise_variance
+    )
+    denominator = (
+        collider_noise_variance_value
+        + gamma_value * gamma_value * outcome_noise_variance_value
+    )
+    beta_hat = (
+        beta_value * collider_noise_variance_value
+        - delta_value * gamma_value * outcome_noise_variance_value
+    ) / denominator
+    theta_hat = gamma_value * outcome_noise_variance_value / denominator
+    return ColliderCoefficients(
+        beta_hat=_as_result("generalized overcontrolled beta coefficient", beta_hat),
+        theta_hat=_as_result("generalized collider coefficient", theta_hat),
     )
 
 

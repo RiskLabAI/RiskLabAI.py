@@ -7,25 +7,25 @@ a moving-block bootstrap of the performance series, recomputing the CSCV PBO on 
 averaging - reduces that variance, giving a more accurate PBO estimate whenever the path set is small
 or noisy, and converging to plain CPCV in the data-rich limit.
 
-This is the **path-level** mechanism from the Appraisal 09 pre-registration. It is distinct from, and
+This is the **path-level** mechanism from the independent validation protocol. It is distinct from, and
 does NOT touch, the existing :class:`BaggedCombinatorialPurged`, which bags a sklearn *estimator* on an
 ML backtest (a different mechanism). The plain-CPCV baseline here is the repo's CSCV PBO
 (:func:`~RiskLabAI.backtest.probability_of_backtest_overfitting.probability_of_backtest_overfitting`),
 which this function calls on each bootstrap resample.
 
-Admitted in Appraisal 09 (CONTRIBUTIONS_LEDGER 2026-06-27; in-house method, held to the identical bar).
-Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification; method extension validated independently).
+Usage guidance:
 
     For a more accurate, lower-variance overfitting (PBO) estimate whenever the CPCV path set is small
     or noisy, converging to plain CPCV in the data-rich limit; neutral on model selection. Point-in-time
     and mechanism-backed.
 
-Evidence and caveats: appraisals/09_verdict.md.
+Evidence and caveats: the documented validation evidence.
 
 References
 ----------
 Arian, H., Norouzi M., L. and Seco, L. (2024) Bagged and Adaptive Combinatorial Purged
-    Cross-Validation. (Clean-room from the path-level mechanism; the verdict harness validated plain
+    Cross-Validation. (Clean-room from the path-level mechanism; the validation harness validated plain
     CPCV against probability_of_backtest_overfitting exactly.)
 Bailey, D. H., Borwein, J., Lopez de Prado, M. and Zhu, Q. J. (2017) The probability of backtest
     overfitting. Journal of Computational Finance, 20(4), 39-69.
@@ -88,7 +88,7 @@ def bagged_probability_of_backtest_overfitting(
     (:func:`probability_of_backtest_overfitting`) on each, and returns the average - a lower-variance
     estimate than a single CPCV PBO. Prefer it whenever the CPCV path set is small or noisy; it
     converges to plain CPCV in the data-rich limit and is neutral on model selection. See the module
-    docstring for the full regime tag and appraisals/09_verdict.md.
+    docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

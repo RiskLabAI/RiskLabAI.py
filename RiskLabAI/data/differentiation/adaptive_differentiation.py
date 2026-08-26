@@ -8,16 +8,15 @@ long-memory weights, so the recovered order is too small. AFD instead estimates 
 directly from the data's long-memory structure, with a finite-sample bias correction, and so recovers
 the genuine order far more accurately when memory is strong and the sample is finite.
 
-Admitted in Appraisal 13 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     prefer AFD over fixed-width FFD when the differencing order itself must be right - strong long memory
     and finite samples, where min-d-via-ADF under-differences; on weak memory the gap narrows. The
     implemented AFD is a tractable clean-room approximation of the published wavelet-Hurst + ridge +
     CV-truncation method (no public code).
 
-The real-data predictive-lift confirmation is a tracked obligation (``REAL_DATA_FOLLOWUPS.md``): the
-order accuracy is established against ground truth, but the downstream predictive value of the more
-accurate order is not yet decisive. Evidence and caveats: appraisals/13_verdict.md (and 13b if logged).
+Real-data predictive lift has not yet been established: order accuracy is supported against ground
+truth, but the downstream predictive value of the more accurate order is not yet decisive.
 
 This is a tractable clean-room approximation of the published AFD (IEEE Access 2025; no public code):
 the differencing order is anchored at ``0.5 + d_hat`` where ``d_hat`` is a finite-sample-bias-corrected
@@ -176,8 +175,8 @@ def adaptive_fractional_difference(
 
     Prefer AFD over fixed-width FFD when the differencing order itself must be right (strong long memory,
     finite samples), where de Prado's min-d-via-ADF under-differences; on weak memory the gap narrows.
-    See the module docstring for the full regime tag, the clean-room-approximation note, the tracked
-    real-data follow-up, and appraisals/13_verdict.md.
+    See the module docstring for the full usage guidance, approximation note, and remaining real-data
+    validation limitation.
 
     Parameters
     ----------

@@ -40,7 +40,7 @@ def _rel_frobenius(estimate, true):
 
 def test_nercome_lower_covariance_error_on_no_gap_spectrum():
     """
-    Replication of the Appraisal 24 mechanism: on a no-gap (slowly-decaying) spectrum NERCOME recovers
+    Replication of the independent validation mechanism: on a no-gap (slowly-decaying) spectrum NERCOME recovers
     the covariance with lower relative Frobenius error than MP eigenvalue clipping.
     """
     p = 20

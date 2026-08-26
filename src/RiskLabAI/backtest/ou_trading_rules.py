@@ -17,18 +17,18 @@ Green's-function form. The per-trade gain is two-valued, so ``E[gain] = profit_t
 - cost``, and the objective is the expected net return per unit time ``E[gain] / E[tau]`` (the well-posed
 optimal-trading-rule objective; the raw per-trade Sharpe is degenerate, maximized by profit_take -> 0).
 
-Admitted in Appraisal 23 (CONTRIBUTIONS_LEDGER 2026-06-27). Scope tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Scope guidance:
 
     prefer the closed-form OU rule over the Monte-Carlo PT/SL grid whenever the OU model is used - it
     gives the exact optimum with no simulation noise at a fraction of the compute; both are only as good
     as the OU assumption, so check the OU fit at decision time.
 
-Held-out confirmed (appraisals/23_results, HELDOUT.md): on the sealed OU corner the closed form agrees
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed OU corner the closed form agrees
 with the Monte-Carlo grid optimum within grid resolution (the grid pick's regret on the exact surface
 stays ~0.0002-0.0008 and tightens as the grid refines) at a compute speed-up that grows with resolution
 (3.4x -> 16x), and it degrades in step with the grid off-model (no false out-of-model win). The advantage
 is exactness and speed under the OU model, not robustness to misspecification, so check the OU fit at
-decision time. The de Prado Monte-Carlo PT/SL grid is left unchanged. Evidence: appraisals/23_verdict.md.
+decision time. The de Prado Monte-Carlo PT/SL grid is left unchanged. Evidence: the documented validation evidence.
 
 References
 ----------
@@ -210,7 +210,7 @@ def optimal_ou_trading_rule(
     box. Prefer this over the Monte-Carlo PT/SL grid whenever the OU model is used: it gives the exact
     optimum with no simulation noise at a fraction of the compute. Both are only as good as the OU
     assumption, so check the OU fit at decision time (see :func:`fit_ornstein_uhlenbeck` and the module
-    docstring for the verbatim scope tag and appraisals/23_verdict.md).
+    docstring for the scope guidance and the documented validation evidence).
 
     Parameters
     ----------

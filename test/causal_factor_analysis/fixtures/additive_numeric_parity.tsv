@@ -1,0 +1,14 @@
+case_id	method	arg1	arg2	arg3	arg4	arg5	arg6	arg7	arg8	expected1	expected2	expected3
+mirage_confounder_general	generalized_confounder	2	3	4	5	6				2.697674418604651		
+mirage_collider_general	generalized_collider	2	3	4	5	6				-0.9411764705882353	0.29411764705882354	
+fdr_single_source_b	single_trial_fdr	0.024997895148220373	0.9515427737332771	0.15						0.08344067427559433		
+fdr_max_source_a	max_selection_errors	0.024997895148220373	0.9515427737332771	0.95	10					0.5987369392383787	0.22365361940347483	0.7531960884251255
+fdr_max_sensitivity	max_selection_errors	0.05	0.9	0.9	5					0.5904900000000001	0.2262190625000002	0.7245771630882027
+maximum_mixture_simple	maximum_mixture_cdf	0.4	0.8	0.25	3					0.343		
+conditional_tail_simple	conditional_upper_tail	0.75	0.25							0.3333333333333333		
+gaussian_identical_cdf	gaussian_max_cdf	0.37	1	0	1	0	3			0.125		
+gaussian_identical_log_density	gaussian_max_log_density	0.37	1	0	1	0	3			-1.2066206056564532		
+nonidentification_simple	nonidentification_witness	0.36	0.49							0.7	0.6	0.49
+selection_exponential	selection_exponential	0.4	0.63	5						0.9961054013913372	0.6275464028765424	0.63
+allocation_two_asset	allocation_two_asset									0.5	-0.5	-1
+

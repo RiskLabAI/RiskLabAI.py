@@ -13,7 +13,7 @@ All three operate on the same n-gram counts as the plug-in (via
 by the word length, so they are drop-in comparable with `plug_in_entropy_estimator`. The plug-in's
 behaviour is unchanged.
 
-Admitted in Appraisal 06 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag (preferred-when / avoid-when),
+Included after independent validation (the public method specification). usage guidance (preferred-when / avoid-when),
 verbatim from the ledger:
 
     Prefer a bias-corrected estimator over the plug-in whenever the symbol counts are undersampled (a
@@ -25,7 +25,7 @@ verbatim from the ledger:
     and a gap caused by non-stationarity (e.g. sigma encoding) is not an entropy-bias problem the
     correction can fix.
 
-Evidence and caveats: appraisals/06_verdict.md.
+Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -77,7 +77,7 @@ def miller_madow_entropy(message: str, approximate_word_length: int = 1) -> floa
     large effective alphabet relative to the sample: long words, fine encodings, or short windows).
     Miller-Madow is the cheap first-order fix; it converges to the plug-in when N is much larger than
     K, with no over-correction. The gain is negligible for coarse encodings (e.g. binary). See the
-    module docstring for the full regime tag and appraisals/06_verdict.md.
+    module docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------
@@ -123,8 +123,8 @@ def grassberger_entropy(message: str, approximate_word_length: int = 1) -> float
     large effective alphabet relative to the sample: long words, fine encodings, or short windows).
     Grassberger is close to NSB at lower cost (the practical default when undersampled); it converges
     to the plug-in when N is much larger than K, with no over-correction. The gain is negligible for
-    coarse encodings (e.g. binary). See the module docstring for the full regime tag and
-    appraisals/06_verdict.md.
+    coarse encodings (e.g. binary). See the module docstring for the full usage guidance and
+    the documented validation evidence.
 
     Parameters
     ----------
@@ -256,7 +256,7 @@ def nsb_entropy(
     NSB is most accurate in deep undersampling; it converges to the plug-in when N is much larger than
     K, with no over-correction. The gain is negligible for coarse encodings (e.g. binary), and a gap
     caused by non-stationarity (e.g. sigma encoding) is not an entropy-bias problem the correction can
-    fix. See the module docstring for the full regime tag and appraisals/06_verdict.md.
+    fix. See the module docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

@@ -14,7 +14,7 @@ from RiskLabAI.backtest.validation.path_bagged_cpcv import (
 
 
 def _noisy_panel(seed, t_len=240, n_strategies=12):
-    """A noisy strategy panel with a faint mean spread (the appraisal-style controlled setup)."""
+    """A noisy strategy panel with a faint mean spread (the independent validation-style controlled setup)."""
     rng = np.random.default_rng(seed)
     means = np.linspace(-0.04, 0.04, n_strategies)
     return rng.standard_normal((t_len, n_strategies)) + means
@@ -40,7 +40,7 @@ def test_bagged_pbo_in_unit_interval_and_shapes():
 def test_bagging_reduces_variance_vs_plain_pbo():
     """
     The core mechanism: across independent panels the bagged PBO has lower variance than the single
-    plain CSCV PBO (replication of the appraisal's variance-reduction finding).
+    plain CSCV PBO (replication of the independent validation's variance-reduction finding).
     """
     plain, bagged = [], []
     for seed in range(40):
@@ -74,7 +74,7 @@ def _true_pbo(true_sharpes, t_len, n_partitions, n_sims):
 
 def test_bagged_pbo_closer_to_truth_than_plain():
     """
-    Replication of the appraisal's headline: the bagged PBO has lower estimation error against the
+    Replication of the independent validation's headline: the bagged PBO has lower estimation error against the
     known true PBO than the single plain CSCV PBO (variance reduction -> lower error).
     """
     true_sharpes = np.linspace(

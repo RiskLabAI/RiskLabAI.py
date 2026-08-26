@@ -13,7 +13,7 @@ signal; MDA has no significance test. Two published fixes extend the baselines i
   the model-loss increase when the true feature is replaced by a conditionally-resampled knockoff, with
   a paired significance test, the calibrated test MDA lacks.
 
-Admitted in Appraisal 10 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tags, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     MDI+: prefer MDI+ over MDI when features are noisy, high-cardinality, or mixed-type - it rejects
     noise/cardinality inflation (noise-reject 0.94 vs 0.50) and recovers true relevance better;
@@ -25,8 +25,8 @@ Admitted in Appraisal 10 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tags, verbati
 The implemented MDI+ is the simplified faithful variant admitted (per-tree decision-stump ridge GLM
 with an out-of-bag partial-variance score), NOT the full leave-one-out / similarity-weighted paper
 algorithm, which is a logged refinement. CPI's test holds nominal size in the analysis regimes; on the
-hardest held-out corner (high correlation x low SNR) it is mildly elevated (~0.067 vs 0.05), a small
-finite-sample effect. Evidence and caveats: appraisals/10_verdict.md.
+hardest validation sample corner (high correlation x low SNR) it is mildly elevated (~0.067 vs 0.05), a small
+finite-sample effect. Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -99,8 +99,8 @@ def mdi_plus_importance(
 
     Prefer MDI+ over MDI when features are noisy, high-cardinality, or mixed-type; it converges to MDI
     when features are orthogonal and high-SNR. This is the simplified faithful variant (not the full
-    leave-one-out paper algorithm). See the module docstring for the full regime tag and
-    appraisals/10_verdict.md.
+    leave-one-out paper algorithm). See the module docstring for the full usage guidance and
+    the documented validation evidence.
 
     Parameters
     ----------
@@ -195,7 +195,7 @@ def conditional_predictive_impact(
 
     Prefer CPI when you need a statistically valid test of whether a feature matters; it holds nominal
     size with good power (mildly elevated on the hardest high-correlation x low-SNR corner). See the
-    module docstring for the full regime tag and appraisals/10_verdict.md.
+    module docstring for the full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

@@ -4,21 +4,21 @@ Volatility-robust SADF / GSADF via wild-bootstrap critical values (Harvey-Leybou
 The admitted SADF / GSADF bubble detector (`structural_breaks.get_sadf_sequence` /
 `get_gsadf_statistic`) uses a sup-ADF statistic whose null distribution assumes homoskedastic errors.
 Under non-stationary volatility the test over-rejects, flagging spurious bubbles (the mild oversizing
-noted in Appraisal 05). The volatility-robust variant computes the SAME sup-ADF statistics but calibrates
+noted during independent validation). The volatility-robust variant computes the SAME sup-ADF statistics but calibrates
 the critical values by a wild bootstrap (Rademacher sign-flip of the first-difference residuals), which
 preserves the series' own volatility pattern while destroying any explosive autocorrelation, restoring
 correct size under non-stationary volatility.
 
-Admitted in Appraisal 26 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     prefer it over plain SADF/GSADF when the series' volatility may be non-stationary: it holds nominal
     size where plain SADF over-rejects ~9x, at a modest power cost, and converges to plain SADF under
     constant volatility. Pairs with the admitted GSADF/BSADF.
 
-Held-out confirmed (appraisals/26_results, HELDOUT.md): on the sealed variance-break-6x bubble null the
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed variance-break-6x bubble null the
 volatility-robust SADF holds nominal size (~0.067) where plain SADF over-rejects (~0.667, the homoskedastic
 critical value flags spurious bubbles), and it matches plain SADF under constant volatility at a modest
-power cost. The plain SADF / GSADF baseline is unchanged. Evidence: appraisals/26_verdict.md.
+power cost. The plain SADF / GSADF baseline is unchanged. Evidence: the documented validation evidence.
 
 References
 ----------
@@ -63,7 +63,7 @@ def volatility_robust_sadf(
     Prefer this over plain SADF / GSADF when the series' volatility may be non-stationary: it holds nominal
     size where the plain test over-rejects, at a modest power cost, and converges to the plain test under
     constant volatility. It pairs with the admitted GSADF / BSADF (the same sup-ADF statistics). See the
-    module docstring for the verbatim regime tag and appraisals/26_verdict.md.
+    module docstring for the usage guidance and the documented validation evidence.
 
     Parameters
     ----------

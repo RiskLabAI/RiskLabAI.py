@@ -6,6 +6,11 @@ protocol, without importing the broader causal or portfolio-optimization
 namespaces.
 """
 
+from .allocation_diagnostics import (
+    AllocationMisspecificationDiagnostics,
+    allocation_misspecification_diagnostics,
+)
+
 from .factor_mirage import (
     ColliderCoefficients,
     ColliderDiagnostics,
@@ -17,6 +22,8 @@ from .factor_mirage import (
     confounder_factor_return,
     confounder_forecast_return,
     confounder_undercontrolled_coefficient,
+    generalized_collider_overcontrolled_coefficients,
+    generalized_confounder_undercontrolled_coefficient,
 )
 from .graph_identification import (
     BackdoorAdjustmentEvidence,
@@ -33,6 +40,13 @@ from .graph_identification import (
     d_separation,
     minimal_backdoor_adjustment_sets,
     minimal_frontdoor_adjustment_sets,
+)
+from .graph_roles import (
+    FactorControlRoles,
+    TreatmentOutcomeRole,
+    TreatmentOutcomeRoleEvidence,
+    classify_treatment_outcome_role,
+    factor_control_roles,
 )
 from .optimizer import minimum_variance_factor_weights
 from .protocol import (
@@ -60,6 +74,31 @@ from .specification_diagnostics import (
     confounded_mediator_specification_experiment,
     fork_population_diagnostics,
     fork_specification_experiment,
+)
+from .search_adjusted_fdr import (
+    FDRComparisonEvidence,
+    FDRNonIdentificationWitness,
+    GaussianSearchAdjustedFDR,
+    GaussianTrialMixture,
+    MaxSelectionFamilyErrors,
+    SelectionLevelProbabilityEvidence,
+    compare_single_and_family_fdr,
+    conditional_upper_tail_probability,
+    family_level_false_discovery_rate,
+    fdr_nonidentification_witness,
+    gaussian_max_selection_cdf,
+    gaussian_max_selection_log_density,
+    gaussian_max_selection_log_likelihood,
+    gaussian_search_adjusted_false_discovery_rate,
+    gaussian_trial_mixture_cdf,
+    max_selection_family_errors,
+    max_selection_null_probability,
+    maximum_mixture_cdf,
+    single_trial_false_discovery_rate,
+)
+from .structural_models import (
+    StructuralCausalModelResult,
+    evaluate_structural_causal_model,
 )
 from .treatment_effects import (
     DifferenceInDifferencesEstimate,
@@ -132,4 +171,34 @@ __all__ = [
     "randomized_mean_difference",
     "treatment_effect_decomposition",
     "validate_causal_factor_protocol",
+    "AllocationMisspecificationDiagnostics",
+    "FDRComparisonEvidence",
+    "FDRNonIdentificationWitness",
+    "FactorControlRoles",
+    "GaussianSearchAdjustedFDR",
+    "GaussianTrialMixture",
+    "MaxSelectionFamilyErrors",
+    "SelectionLevelProbabilityEvidence",
+    "StructuralCausalModelResult",
+    "TreatmentOutcomeRole",
+    "TreatmentOutcomeRoleEvidence",
+    "allocation_misspecification_diagnostics",
+    "classify_treatment_outcome_role",
+    "compare_single_and_family_fdr",
+    "conditional_upper_tail_probability",
+    "evaluate_structural_causal_model",
+    "factor_control_roles",
+    "family_level_false_discovery_rate",
+    "fdr_nonidentification_witness",
+    "gaussian_max_selection_cdf",
+    "gaussian_max_selection_log_density",
+    "gaussian_max_selection_log_likelihood",
+    "gaussian_search_adjusted_false_discovery_rate",
+    "gaussian_trial_mixture_cdf",
+    "generalized_collider_overcontrolled_coefficients",
+    "generalized_confounder_undercontrolled_coefficient",
+    "max_selection_family_errors",
+    "max_selection_null_probability",
+    "maximum_mixture_cdf",
+    "single_trial_false_discovery_rate",
 ]

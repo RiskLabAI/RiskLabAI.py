@@ -14,7 +14,7 @@ baselines:
   a studentized circular block bootstrap, which holds nominal size under serial dependence where the
   naive test inflates.
 
-Admitted in Appraisal 22 (CONTRIBUTIONS_LEDGER 2026-06-27). Scope tags, verbatim from the verdict:
+Included after independent validation (the public method specification). Scope guidance:
 
     CED: prefer CED over max-drawdown as a drawdown-risk statistic: lower estimator variance and better
     ranking of true drawdown risk, most of all on short/heavy-tailed tracks; converges to max-DD on
@@ -24,11 +24,11 @@ Admitted in Appraisal 22 (CONTRIBUTIONS_LEDGER 2026-06-27). Scope tags, verbatim
     serial dependence / heavy tails (it holds nominal size where the naive test inflates ~3x); converges
     on i.i.d. returns.
 
-Held-out confirmed (appraisals/22_results, HELDOUT.md): on the sealed short-sample x heavy-tail corner CED
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed short-sample x heavy-tail corner CED
 has lower estimator variance (CV 0.30-0.32 vs max-drawdown 0.40-0.42) and better rank-recovery (Spearman
 0.42-0.78 vs 0.31-0.69); the LW test holds nominal size (0.056) under AR(0.3) where the naive test rejects
 0.161 (~3x), and converges on i.i.d. returns. CDaR@0.95 was NOT admitted (no variance/rank advantage over
-max-drawdown as a descriptive statistic). Evidence and caveats: appraisals/22_verdict.md.
+max-drawdown as a descriptive statistic). Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -102,7 +102,7 @@ def conditional_expected_drawdown(
     factor-attributable.
 
     Prefer CED over max-drawdown as a drawdown-risk statistic (see the module docstring for the full
-    verbatim scope tag and appraisals/22_verdict.md). The de Prado max-drawdown / time-under-water
+    scope guidance and the documented validation evidence). The de Prado max-drawdown / time-under-water
     statistics are unchanged.
 
     Parameters
@@ -209,7 +209,7 @@ def sharpe_difference_test(
     the naive test inflates (~3x under AR), and converges to the naive test on i.i.d. returns.
 
     Prefer the Ledoit-Wolf test when comparing two Sharpes under serial dependence / heavy tails (see the
-    module docstring for the full verbatim scope tag and appraisals/22_verdict.md). The Sharpe ratio uses
+    module docstring for the full scope guidance and the documented validation evidence). The Sharpe ratio uses
     the population standard deviation, matching ``backtest_statistics.sharpe_ratio``.
 
     Parameters

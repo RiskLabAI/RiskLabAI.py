@@ -32,7 +32,7 @@ def test_ced_in_unit_interval_and_monotone_in_alpha():
 
 def test_ced_lower_estimator_variance_than_maxdrawdown():
     """
-    Replication of the Appraisal 22 mechanism: on short heavy-tailed tracks CED (a tail mean of the
+    Replication of the independent validation mechanism: on short heavy-tailed tracks CED (a tail mean of the
     max-drawdown distribution) has lower across-seed estimator variance than max-drawdown (a single
     extreme order statistic).
     """
@@ -75,7 +75,7 @@ def _ar_pair(rng, n, phi, scale=0.01):
 
 def test_lw_holds_size_where_naive_overrejects_under_dependence():
     """
-    Replication of the held-out mechanism: under AR(0.3) the naive Sharpe-difference test over-rejects
+    Replication of the validation mechanism: under AR(0.3) the naive Sharpe-difference test over-rejects
     the (true) null while the Ledoit-Wolf test holds roughly nominal size.
     """
     n_sims = 80

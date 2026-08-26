@@ -7,10 +7,13 @@ from RiskLabAI.causal_factor_analysis import (
     CausalDAG,
     average_treatment_effect,
     check_backdoor_adjustment_set,
+    classify_treatment_outcome_role,
+    generalized_confounder_undercontrolled_coefficient,
+    max_selection_family_errors,
     minimum_variance_factor_weights,
 )
 
-assert RiskLabAI.__version__ == "3.0.0"
+assert RiskLabAI.__version__ == "3.1.0"
 
 
 covariance = np.diag([1.0, 2.0, 4.0])
@@ -31,7 +34,29 @@ dag = CausalDAG(
 )
 assert not check_backdoor_adjustment_set(dag, "T", "Y").admissible
 assert check_backdoor_adjustment_set(dag, "T", "Y", ("U",)).admissible
+role = classify_treatment_outcome_role(dag, "T", "Y", "U")
+assert role.role.value == "confounder"
+
+generalized_coefficient = generalized_confounder_undercontrolled_coefficient(
+    2.0,
+    3.0,
+    4.0,
+    confounder_variance=5.0,
+    exposure_noise_variance=6.0,
+)
+assert generalized_coefficient == 116.0 / 43.0
+
+family_errors = max_selection_family_errors(
+    0.024997895148220373,
+    0.9515427737332771,
+    0.95,
+    10,
+)
+assert np.isclose(family_errors.family_type_i_error, 0.22365361940347483)
 
 print("minimum-variance weights:", weights)
 print("average treatment effect:", effect)
 print("back-door adjustment set: ('U',)")
+print("one-hop role for U:", role.role.value)
+print("general-variance confounder coefficient:", generalized_coefficient)
+print("ten-trial family Type-I error:", family_errors.family_type_i_error)

@@ -51,7 +51,7 @@ __all__ = [
     "FeatureImportanceMDA",
     "ClusteredFeatureImportanceMDA",
     "FeatureImportanceSFI",
-    # Debiased / conditional importance (Appraisal 10)
+    # Debiased / conditional importance (independent validation)
     "mdi_plus_importance",
     "conditional_predictive_impact",
     # Imported utilities from *other* modules

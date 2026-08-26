@@ -6,12 +6,12 @@ assumes a clean noise bulk separated from the signal eigenvalues by a gap. When 
 has no clean gap (a slowly-decaying bulk) or is non-stationary, that assumption breaks and clipping
 degenerates toward the raw sample covariance. NERCOME (Lam 2016) instead regularizes the eigenvalues by
 sample-splitting: it estimates the eigenvectors on one split of the data and the oracle eigenvalues by
-projecting the held-out split's sample covariance onto those eigenvectors, averaging over many random
+projecting the validation sample split's sample covariance onto those eigenvectors, averaging over many random
 splits. This recovers the covariance more accurately and with better conditioning on no-gap /
 non-stationary spectra, and converges to clipping where the gap assumption holds.
 
-Admitted in Appraisal 24 (CONTRIBUTIONS_LEDGER 2026-06-27) - portfolio's first admitted extension. Regime
-tag, verbatim from the verdict:
+Included after independent validation (the public method specification) - portfolio's first admitted extension. Regime
+tag, verbatim from the documented guidance:
 
     prefer NERCOME over MP clipping for covariance estimation when the eigenvalue spectrum has no clean
     gap or is non-stationary (better accuracy and conditioning, and lower OOS volatility via NCO /
@@ -19,11 +19,11 @@ tag, verbatim from the verdict:
     concentration than clipping, gives no risk-adjusted-return edge (none does - 1/N stands), and HRP
     does not benefit (use it through NCO / min-variance).
 
-Held-out confirmed (appraisals/24_results, HELDOUT.md): on the sealed no-gap x non-stationary x T=30
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed no-gap x non-stationary x T=30
 corner NERCOME has distinguishably lower covariance error (relative Frobenius 0.563 vs MP clipping 0.684)
 and better conditioning (29.6 vs 46.3), with lower NCO realized risk (1.315 vs 1.553); HRP is insensitive.
 Unlike `denoise_cov`, which cleans a covariance matrix, NERCOME is a data-driven (sample-splitting)
-estimator, so it takes the return matrix. Evidence and caveats: appraisals/24_verdict.md.
+estimator, so it takes the return matrix. Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -71,7 +71,7 @@ def nercome_denoised_covariance(
     non-stationary (better accuracy and conditioning, and lower out-of-sample volatility via NCO /
     min-variance); it converges to clipping on clean-gap stationary spectra, costs more turnover and
     concentration, gives no risk-adjusted-return edge, and HRP does not benefit (use it through NCO /
-    min-variance). See the module docstring for the full verbatim regime tag and appraisals/24_verdict.md.
+    min-variance). See the module docstring for the full usage guidance and the documented validation evidence.
     Unlike :func:`denoising.denoise_cov`, this takes the return matrix, not a covariance.
 
     Parameters

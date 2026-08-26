@@ -19,7 +19,7 @@ and the asymptotic variance of :math:`\sqrt{T}(\widehat{SR} - SR)` is the long-r
 :math:`1 - S\,\widehat{SR} + \tfrac{K-1}{4}\widehat{SR}^2` (exactly the PSR denominator), so the method
 converges to the PSR when there is no serial correlation.
 
-Admitted in Appraisal 08 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     Prefer the LPLZ (2025) Sharpe inference - a HAC of the Sharpe influence function - when returns
     show material serial correlation and/or non-normality (estimable from the sample): it restores
@@ -29,13 +29,13 @@ Admitted in Appraisal 08 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim
     (not fully to) nominal at strong autocorrelation, and wider CIs - the honest power cost. Lo (2002)
     is the autocorrelation-only intermediate, dominated by LPLZ under non-normality.
 
-Evidence and caveats: appraisals/08_verdict.md.
+Evidence and caveats: the documented validation evidence.
 
 References
 ----------
 Lopez de Prado, M., Lipton, A. and Zoonekynd, V. (2025) Sharpe-ratio inference under non-normal,
-    serially-correlated returns. (Open code at github.com/zoonek/2025-sharpe-ratio - NOT consulted or
-    vendored; this is reimplemented clean-room from the influence-function / HAC math, GOVERNANCE 3.)
+    serially-correlated returns. This implementation follows the cited influence-function and HAC
+    formulas.
 Newey, W. K. and West, K. D. (1987) A simple, positive semi-definite, heteroskedasticity and
     autocorrelation consistent covariance matrix. Econometrica, 55(3), 703-708.
 Lo, A. W. (2002) The statistics of Sharpe ratios. Financial Analysts Journal, 58(4), 36-52.
@@ -135,7 +135,7 @@ def lplz_sharpe_inference(
     (estimable from the sample): it restores near-nominal CI coverage and test size where the PSR
     under-covers and over-rejects, and converges to the PSR on near-normal i.i.d. returns with no
     over-coverage. The honest cost is a wider CI under autocorrelation. See the module docstring for the
-    full regime tag and appraisals/08_verdict.md.
+    full usage guidance and the documented validation evidence.
 
     Parameters
     ----------

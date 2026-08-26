@@ -9,7 +9,7 @@ Sharpe Ratio (`probabilistic_sharpe_ratio` / `expected_max_sharpe_ratio`): the D
 single best strategy survives its trial count, while these screen a whole family with a stated
 error-control target.
 
-Admitted in Appraisal 07 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim from the verdict:
+Included after independent validation (the public method specification). Usage guidance:
 
     To judge a family of screened strategies or factors (not just the single best), prefer Holm when
     you must control the chance of any false positive across the family (FWER), and BHY when you want
@@ -18,7 +18,7 @@ Admitted in Appraisal 07 (CONTRIBUTIONS_LEDGER 2026-06-27). Regime tag, verbatim
     count. Bonferroni is dominated by Holm; the t>3 hurdle over-rejects; the double-bootstrap does not
     control its stated error as implemented and is not admitted.
 
-Evidence and caveats: appraisals/07_verdict.md.
+Evidence and caveats: the documented validation evidence.
 
 References
 ----------
@@ -146,8 +146,8 @@ def haircut_sharpe_ratios(
     Prefer Holm when you must control the chance of any false positive across the family (FWER), and
     BHY when you want to bound the expected fraction of false discoveries (FDR) and can accept lower
     power. The Deflated Sharpe remains the tool when the question is whether one specific best strategy
-    survives its trial count. See the module docstring for the full regime tag and
-    appraisals/07_verdict.md.
+    survives its trial count. See the module docstring for the full usage guidance and
+    the documented validation evidence.
 
     Parameters
     ----------

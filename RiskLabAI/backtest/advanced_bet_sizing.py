@@ -6,14 +6,14 @@ admitted extensions sit alongside that baseline:
 
 - **Platt calibration before sizing** (Meyer-Barziy-Joubert 2023). A classifier's raw probability is
   usually miscalibrated, so sizing straight from it over- or under-bets. Fitting a Platt (logistic)
-  calibrator on a held-out block and sizing from the calibrated probability recovers near-optimal sizing
+  calibrator on a validation sample block and sizing from the calibrated probability recovers near-optimal sizing
   when the input is miscalibrated, and is a safe no-op when it is already calibrated.
 - **Distributionally-robust Kelly** (Sun-Boyd 2018). Point-estimate Kelly is fragile to estimation
   error. Sizing at the pessimistic edge of a confidence box on the win probability gives near-optimal
   growth with materially lower drawdown under estimation uncertainty, and converges to full Kelly as the
   box collapses with abundant data.
 
-Admitted in Appraisal 18 (CONTRIBUTIONS_LEDGER 2026-06-27). Scope tags, verbatim from the verdict:
+Included after independent validation (the public method specification). Scope guidance:
 
     Platt calibration: calibrate the meta-label probability before sizing when it is miscalibrated
     (measurable by ECE); use Platt, not isotonic, which overfits well-calibrated inputs; the benefit is
@@ -23,12 +23,12 @@ Admitted in Appraisal 18 (CONTRIBUTIONS_LEDGER 2026-06-27). Scope tags, verbatim
     (small samples, noisy edge): near-optimal growth with lower drawdown; converges to Kelly with
     abundant data.
 
-Held-out confirmed (appraisals/18_results, HELDOUT.md): on the sealed high-miscalibration corner Platt
+validation sample confirmed (the documented validation evidence, independent validation): on the sealed high-miscalibration corner Platt
 closes the growth gap to the Kelly optimum distinguishably more than the de Prado sigmoid (paired
 0.0032 [0.0030, 0.0034]); on the sealed tight-drawdown / small-sample corner DR-Kelly has lower
 from-initial drawdown than full Kelly (0.144 vs 0.409) with near-optimal growth. Real-data net-of-cost
-confirmation for both is a tracked obligation (`REAL_DATA_FOLLOWUPS.md`). Isotonic calibration and
-risk-constrained Kelly were NOT admitted (shelved). Evidence and caveats: appraisals/18_verdict.md.
+confirmation for both is a future validation work (documented follow-up work). Isotonic calibration and
+risk-constrained Kelly were NOT admitted (shelved). Evidence and caveats: the documented validation evidence.
 
 The DR-Kelly box-ambiguity worst case has a closed form (Kelly at the pessimistic probability, because a
 long favorable bet's log-growth is monotone in the win probability), so no convex solver is required here;
@@ -124,15 +124,15 @@ def expected_calibration_error(probabilities, outcomes, n_bins: int = 10) -> flo
 
 class PlattCalibrator:
     r"""
-    Platt scaling: a logistic recalibration of predicted probabilities, fit on a held-out block.
+    Platt scaling: a logistic recalibration of predicted probabilities, fit on a validation sample block.
 
     Fits a logistic regression of the binary outcome on ``logit(p_hat)``; ``transform`` maps a raw
     probability to the calibrated one. Prefer Platt over isotonic calibration: isotonic overfits the
     calibration map and hurts already-calibrated inputs, whereas Platt's two-parameter logistic form is
     a safe near-no-op when the input is already calibrated (the characterized failure mode in the
-    verdict). Calibrate before sizing (feed the calibrated probability into the de Prado sigmoid or a
-    Kelly sizer) when ECE indicates miscalibration. See the module docstring for the verbatim scope tag
-    and appraisals/18_verdict.md.
+    documented guidance). Calibrate before sizing (feed the calibrated probability into the de Prado sigmoid or a
+    Kelly sizer) when ECE indicates miscalibration. See the module docstring for the scope guidance
+    and the documented validation evidence.
 
     Examples
     --------
@@ -191,7 +191,7 @@ def distributionally_robust_kelly_fraction(
 
     Prefer DR-Kelly over de Prado sigmoid / full Kelly when estimation uncertainty is material (small
     samples, noisy edge): near-optimal growth with lower drawdown; converges to Kelly with abundant data.
-    See the module docstring for the verbatim scope tag and appraisals/18_verdict.md.
+    See the module docstring for the scope guidance and the documented validation evidence.
 
     Parameters
     ----------

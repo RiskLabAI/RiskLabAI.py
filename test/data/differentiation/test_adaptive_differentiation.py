@@ -63,7 +63,7 @@ def test_hurst_sanity_on_known_d():
 
 def test_afd_recovers_order_better_than_ffd_strong_memory():
     """
-    Replication of the Appraisal 13 held-out mechanism: on strong-memory short samples (d=0.45, N=250),
+    Replication of the independent validation validation mechanism: on strong-memory short samples (d=0.45, N=250),
     posed on the integrated price (true boundary order tau = 1 + d = 1.45), AFD recovers the order with
     a smaller mean error than de Prado's min-d-via-ADF baseline.
     """

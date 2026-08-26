@@ -58,7 +58,7 @@ jobs:
         working-directory: ${{ runner.temp }}
         env:
           RISKLABAI_REPOSITORY_ROOT: ${{ github.workspace }}
-        run: python -B -c "import os; from pathlib import Path; import RiskLabAI; origin = Path(RiskLabAI.__file__).resolve(); repository = Path(os.environ['RISKLABAI_REPOSITORY_ROOT']).resolve(); assert not origin.is_relative_to(repository), (origin, repository); assert RiskLabAI.__version__ == '3.0.0'; print(origin)"
+        run: python -B -c "import os; from pathlib import Path; import RiskLabAI; origin = Path(RiskLabAI.__file__).resolve(); repository = Path(os.environ['RISKLABAI_REPOSITORY_ROOT']).resolve(); assert not origin.is_relative_to(repository), (origin, repository); assert RiskLabAI.__version__ == '3.1.0'; print(origin)"
       - name: Run the installed base package tests
         working-directory: ${{ runner.temp }}
         run: python -B -m pytest -q -p no:cacheprovider -c "$GITHUB_WORKSPACE/pyproject.toml" "$GITHUB_WORKSPACE/test"
@@ -91,7 +91,7 @@ jobs:
         working-directory: ${{ runner.temp }}
         env:
           RISKLABAI_REPOSITORY_ROOT: ${{ github.workspace }}
-        run: python -B -c "import os; from pathlib import Path; import RiskLabAI; origin = Path(RiskLabAI.__file__).resolve(); repository = Path(os.environ['RISKLABAI_REPOSITORY_ROOT']).resolve(); assert not origin.is_relative_to(repository), (origin, repository); assert RiskLabAI.__version__ == '3.0.0'; print(origin)"
+        run: python -B -c "import os; from pathlib import Path; import RiskLabAI; origin = Path(RiskLabAI.__file__).resolve(); repository = Path(os.environ['RISKLABAI_REPOSITORY_ROOT']).resolve(); assert not origin.is_relative_to(repository), (origin, repository); assert RiskLabAI.__version__ == '3.1.0'; print(origin)"
       - name: Run the installed optional-feature tests
         working-directory: ${{ runner.temp }}
         run: python -B -m pytest -q -p no:cacheprovider -c "$GITHUB_WORKSPACE/pyproject.toml" "$GITHUB_WORKSPACE/test"
