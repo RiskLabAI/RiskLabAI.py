@@ -1,65 +1,136 @@
-# Installation & Development Setup
+# Installation and development setup
 
-## Install (users)
+## Supported environments
 
-```bash
-pip install RiskLabAI
-```
+RiskLabAI 3.0.0 supports:
 
-Optional extras pull in heavier dependencies only when you need them:
+- CPython 3.12, 3.13, and 3.14
+- NumPy `>=2.2,<3`
 
-```bash
-pip install "RiskLabAI[pde]"     # torch — the Deep-BSDE PDE solver
-pip install "RiskLabAI[plot]"    # matplotlib / seaborn / plotly — plotting helpers
-pip install "RiskLabAI[synth]"   # quantecon — synthetic-data utilities
-pip install "RiskLabAI[all]"     # everything above
-```
+The complete tested matrix and feature-specific limitations are documented in
+[`docs/compatibility.md`](docs/compatibility.md).
 
-The base install is intentionally lightweight: `import RiskLabAI` does not pull
-in torch or plotting libraries — sub-packages that need them are imported lazily.
+## Install from PyPI
 
-## Development setup (contributors)
+Create an isolated environment with either `venv` or Conda.
 
-### 1. Create and activate an environment
+### `venv`
 
 ```bash
-conda create -n risklab python=3.11 -y
-conda activate risklab
+python -m venv .venv
 ```
 
-(Any Python 3.9–3.12 works; a venv is fine too.)
+Activate it on Windows PowerShell:
 
-### 2. Install in editable mode with all extras and test tooling
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-Dependencies are declared in `pyproject.toml` (there is **no** `requirements.txt`).
-From the repository root:
+Activate it on macOS or Linux:
 
 ```bash
-pip install -e ".[all]" pytest black ruff
+source .venv/bin/activate
 ```
 
-The editable install (`-e`) links the package to your source tree so the test
-suite imports your local code.
-
-> On some setuptools versions the plain editable install does not expose all
-> sub-modules. If `import RiskLabAI.backtest.bet_sizing` fails, reinstall with
-> the compatibility mode:
-> ```bash
-> pip install -e . --config-settings editable_mode=compat
-> ```
-
-### 3. Run the tests
+### Conda
 
 ```bash
-pytest -q --ignore=test/pde
+conda create -n risklabai-3 python=3.12 -y
+conda activate risklabai-3
 ```
 
-`test/pde` is skipped unless you have a working `torch` runtime (install the
-`[pde]` extra to include it).
-
-### 4. Lint and format before committing
+Then install RiskLabAI:
 
 ```bash
-black RiskLabAI test
-ruff check RiskLabAI test
+python -m pip install --upgrade pip
+python -m pip install RiskLabAI
 ```
+
+Confirm the installed version:
+
+```bash
+python -c "import RiskLabAI; print(RiskLabAI.__version__)"
+```
+
+## Optional dependency groups
+
+Install only the capabilities you need:
+
+```bash
+python -m pip install "RiskLabAI[speed]"
+python -m pip install "RiskLabAI[pde]"
+python -m pip install "RiskLabAI[synth]"
+python -m pip install "RiskLabAI[hpo]"
+python -m pip install "RiskLabAI[plot]"
+python -m pip install "RiskLabAI[symbolic]"
+python -m pip install "RiskLabAI[profile]"
+python -m pip install "RiskLabAI[simulation]"
+python -m pip install "RiskLabAI[changepoints]"
+```
+
+The groups provide:
+
+| Extra | Capability |
+|---|---|
+| `speed` | Numba acceleration |
+| `pde` | Deep-BSDE PDE solver using PyTorch |
+| `synth` | synthetic-control utilities using QuantEcon |
+| `hpo` | hyperparameter tuning using Optuna |
+| `plot` | Matplotlib, Seaborn, and Plotly helpers |
+| `symbolic` | symbolic analysis using SymPy |
+| `profile` | memory profiling |
+| `simulation` | simulation progress support |
+| `changepoints` | changepoint detection on Python 3.12-3.13 |
+| `test` | the supported pytest test runner |
+
+There is intentionally no `all` extra. To reproduce the complete optional CI
+environment, install the declared groups explicitly:
+
+```bash
+python -m pip install "RiskLabAI[speed,pde,synth,hpo,plot,symbolic,profile,simulation,changepoints,test]"
+```
+
+Notes:
+
+- The `speed` group currently constrains NumPy to `<2.6`; the base package does
+  not have that additional restriction.
+- The `changepoints` dependency is available on Python 3.12 and 3.13. On
+  Python 3.14, the rest of RiskLabAI remains supported while this optional
+  backend is unavailable.
+- PyWavelets is part of the base installation because its absence changes
+  analytical behavior rather than only disabling acceleration.
+
+## Development installation
+
+Clone the repository, switch to a supported Python version, and run the
+following commands from the repository root:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -e ".[test]" "black==26.5.1" "ruff==0.15.17"
+```
+
+To work on optional features, install the relevant groups. To reproduce the
+complete optional CI environment:
+
+```bash
+python -m pip install -e ".[speed,pde,synth,hpo,plot,symbolic,profile,simulation,changepoints,test]"
+```
+
+## Tests and static checks
+
+Run the complete test suite:
+
+```bash
+python -m pytest -q
+```
+
+Run the static checks used by the release workflow:
+
+```bash
+black --check src/RiskLabAI/causal_factor_analysis test/causal_factor_analysis
+ruff check src/RiskLabAI/causal_factor_analysis test/causal_factor_analysis
+```
+
+The package uses a `src` layout. An editable installation is therefore the
+supported way to import local source during development.
