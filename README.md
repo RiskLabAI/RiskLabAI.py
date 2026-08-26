@@ -1,90 +1,184 @@
-# RiskLabAI 3.0.0 pre-package source
+# RiskLabAI
 
-Status: **local-only and blocked**.
+[![PyPI version](https://badge.fury.io/py/RiskLabAI.svg)](https://badge.fury.io/py/RiskLabAI)
+[![CI](https://github.com/RiskLabAI/RiskLabAI.py/actions/workflows/ci.yml/badge.svg)](https://github.com/RiskLabAI/RiskLabAI.py/actions/workflows/ci.yml)
 
-This directory is a temporary clean release nucleus for the next major
-RiskLabAI release across Python and Julia. It is not a separate product. The
-Python distribution and import namespace remain `RiskLabAI`; the Julia package
-remains `RiskLabAI` with UUID `a72881da-fdaa-49c1-8962-99caf4ccfee8`.
+RiskLabAI is a Python library for quantitative finance, financial machine
+learning, and causal factor analysis. It provides research-oriented
+implementations of methods associated with Marcos López de Prado's *Advances
+in Financial Machine Learning*, *Machine Learning for Asset Managers*, and
+*Causal Factor Investing*.
 
-The distributable metadata contract is complete, but no wheel or source
-distribution exists for this corrected source state, and nothing has been
-published, registered, or released. The approved target version is `3.0.0`.
-The source remains blocked until a separately authorized temporary artifact is
-inspected and the owner separately authorizes version-control and release
-actions.
+RiskLabAI 3.0.0 preserves the previously published Python library and adds a
+clean causal-factor-analysis namespace. The companion
+[RiskLabAI.jl](https://github.com/RiskLabAI/RiskLabAI.jl) package independently
+implements the same 57 causal concepts. This parity statement applies to the
+causal API, not to every Python module.
 
-## Final Python source scope
+## What is included
 
-The `src` tree preserves all 117 runtime-source paths captured from the
-current public Python `main` baseline and adds seven reviewed
-`causal_factor_analysis` source files. The prior modules remain organized under
-`backtest`, `cluster`, `controller`, `core`, `data`, `ensemble`, `features`,
-`hpc`, `optimization`, `pde`, and `utils`. Their captured bytes are retained as
-a continuity baseline; this does not clear later local changes or make the full
-surface release-ready.
+- **Causal factor analysis** - constrained minimum-variance allocation,
+  factor-mirage diagnostics, graphical identification, treatment-effect
+  formulas, specification experiments, and evidence records for the
+  seven-stage causal-factor protocol
+- **Financial data structures** - tick, volume, dollar, imbalance, run, and
+  time bars
+- **Labeling and sample weights** - triple-barrier, meta-labeling,
+  trend-scanning, uniqueness, and time-decay methods
+- **Fractional differentiation and denoising** - fixed-width fractional
+  differentiation, Marcenko-Pastur denoising, and targeted shrinkage
+- **Validation and feature importance** - purged and combinatorial
+  cross-validation, walk-forward validation, MDI, MDA, SFI, and clustered
+  variants
+- **Portfolio and backtest analytics** - HRP, NCO, hedging, PSR/DSR, PBO, and
+  strategy-risk tools
+- **Market features** - microstructure, entropy, structural-break, and
+  technical-indicator utilities
+- **Optional capabilities** - plotting, optimization, simulation, symbolic
+  analysis, changepoint detection, acceleration, synthetic-control tools, and
+  a Deep-BSDE PDE solver
 
-The completed book-derived causal-factor namespace exposes 57 public concepts:
+## Compatibility
 
-- minimum-variance target-exposure allocation;
-- published confounder and collider analytical diagnostics;
-- immutable graphical-identification evidence and checks; and
-- immutable evidence records for the seven-stage causal-factor protocol;
-- randomized, stratified, difference-in-differences, and instrumental-variable
-  treatment-effect identities; and
-- exact fork, collider, and confounded-mediator population diagnostics with
-  deterministic specification experiments.
+RiskLabAI 3.0.0 supports CPython 3.12, 3.13, and 3.14 with NumPy
+`>=2.2,<3`. The complete tested policy and feature-specific limitations are in
+[`docs/compatibility.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/docs/compatibility.md).
 
-The complete preserved source library has passed its approved compatibility
-matrix on CPython 3.12.13, 3.13.9, and 3.14.3. The base policy is NumPy
-`>=2.2,<3`, tested at the lowest genuinely compatible and current NumPy 2.x
-release for each interpreter. Feature-specific dependencies remain optional;
-Numba does not constrain the non-Numba base, and the unavailable Python 3.14
-changepoint backend disables only that feature.
+## Installation
 
-## Scope and parity hold
+Install the base package from PyPI:
 
-No path from the current public repository baseline has been deleted. The
-completed 57-concept causal namespace is integrated here, and the Julia
-candidate independently verifies the same 57 concepts. The full-library
-runtime and dependency matrix, exact public API inventory, 78-file
-package-scoped test inventory, distributable metadata, documentation, and
-intended package file list are complete. The exact Python `3.0.0` and Julia
-`1.0.0` targets are assigned. Artifact inspection and human-controlled
-version-control, publication, and release decisions remain blocked.
+```bash
+python -m pip install RiskLabAI
+```
 
-The graph routines report implications of a caller-supplied DAG; they do not
-discover or certify that graph, prove positivity or instrument strength, or
-estimate an effect. The protocol validator checks structural evidence records;
-it does not perform the empirical stages or prove that caller declarations are
-true. The analytical functions implement only the source-consistent public
-results recorded by the publication audit; source-conflicted results remain
-excluded.
+Optional dependency groups can be installed individually or together:
 
-## Confirmed identity and stewardship
+| Extra | Enables |
+|---|---|
+| `speed` | Numba acceleration |
+| `pde` | Deep-BSDE PDE solver using PyTorch |
+| `synth` | synthetic-control utilities using QuantEcon |
+| `hpo` | hyperparameter tuning using Optuna |
+| `plot` | Matplotlib, Seaborn, and Plotly helpers |
+| `symbolic` | symbolic analysis using SymPy |
+| `profile` | memory profiling |
+| `simulation` | simulation progress support |
+| `changepoints` | changepoint detection on Python 3.12-3.13 |
+| `test` | the supported pytest test runner |
 
-- Product and package identity: `RiskLabAI`
-- Intended license: BSD-3-Clause
-- Rights holder and public maintainer: Hamid Arian
-- Copyright: 2022-2026
-- Contact: arian@risklab.ai
-- Python repository: https://github.com/RiskLabAI/RiskLabAI.py
-- Python issues: https://github.com/RiskLabAI/RiskLabAI.py/issues
-- Julia repository: https://github.com/RiskLabAI/RiskLabAI.jl
-- Documentation: https://github.com/RiskLabAI/RiskLabAI.py#readme
+For example:
 
-The rights holder has confirmed permission to publish and license every file
-admitted to the clean public package. This confirmation does not remove the
-artifact-inspection or human-authorization blocks.
+```bash
+python -m pip install "RiskLabAI[plot,speed]"
+```
 
-See `PACKAGE_IDENTITY.json` for the fail-closed machine-readable state.
+There is intentionally no `all` extra. See
+[`INSTALLATION.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/INSTALLATION.md) for environment setup, all tested optional
+groups, and development instructions.
 
-The complete Python contract is recorded in `pyproject.toml`,
-`PUBLIC_API.json`, `TEST_INVENTORY.json`, and `PACKAGE_FILES.json`. The future
-artifact checks are specified in `PACKAGE_INSPECTION.md`; that document is an
-inspection plan, not build or release authorization.
+## Causal-factor quick start
 
-The 57-concept contract is documented in `docs/causal_factor_analysis.md`, and
-runtime details are in `docs/compatibility.md`. A small deterministic example
-is in `examples/causal_factor_analysis_quickstart.py`, and the blocked
-next-major summary is in `RELEASE_NOTES_NEXT_MAJOR.md`.
+```python
+import numpy as np
+
+from RiskLabAI.causal_factor_analysis import (
+    CausalDAG,
+    average_treatment_effect,
+    check_backdoor_adjustment_set,
+    minimum_variance_factor_weights,
+)
+
+covariance = np.diag([1.0, 2.0, 4.0])
+factor_exposures = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])
+target_exposures = np.array([0.0, 1.0])
+
+weights = minimum_variance_factor_weights(
+    covariance,
+    factor_exposures,
+    target_exposures,
+)
+np.testing.assert_allclose(weights, [-2.0 / 7.0, 5.0 / 7.0, 2.0 / 7.0])
+
+effect = average_treatment_effect(3.5, 1.25)
+assert effect == 2.25
+
+dag = CausalDAG(
+    nodes=("T", "U", "Y"),
+    directed_edges=(("U", "T"), ("U", "Y"), ("T", "Y")),
+    observed_nodes=("T", "U", "Y"),
+)
+assert check_backdoor_adjustment_set(dag, "T", "Y", ("U",)).admissible
+```
+
+The complete deterministic example is
+[`examples/causal_factor_analysis_quickstart.py`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/examples/causal_factor_analysis_quickstart.py).
+The causal API and its limits are documented in
+[`docs/causal_factor_analysis.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/docs/causal_factor_analysis.md).
+
+## Financial-data quick start
+
+```python
+from RiskLabAI.data.structures.standard_bars import StandardBars
+from RiskLabAI.utils.constants import CUMULATIVE_DOLLAR
+
+ticks = [
+    ("2020-01-01 10:00:00", 100.0, 10),
+    ("2020-01-01 10:00:01", 101.0, 5),
+    ("2020-01-01 10:00:02", 100.0, 20),
+]
+
+bars = StandardBars(bar_type=CUMULATIVE_DOLLAR, threshold=3000)
+bar_list = bars.construct_bars_from_data(ticks)
+```
+
+## Extending the library
+
+The `RiskLabAI.core` registries provide discovery and construction points for
+bars, cross-validators, feature-importance models, labelers, bet sizers, and
+portfolio optimizers. For example:
+
+```python
+import pandas as pd
+
+from RiskLabAI.core import CROSS_VALIDATORS, list_components
+
+catalogue = list_components()
+start_times = pd.to_datetime(["2024-01-02", "2024-01-03", "2024-01-04"])
+event_times = pd.Series(
+    pd.to_datetime(["2024-01-03", "2024-01-04", "2024-01-05"]),
+    index=start_times,
+)
+cross_validator = CROSS_VALIDATORS.create(
+    "purgedkfold",
+    n_splits=5,
+    times=event_times,
+)
+```
+
+See [`EXTENDING.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/EXTENDING.md)
+for the extension interfaces and examples.
+
+## Development
+
+```bash
+python -m pip install -e ".[test]" "black==26.5.1" "ruff==0.15.17"
+python -m pytest -q
+black --check src/RiskLabAI/causal_factor_analysis test/causal_factor_analysis
+ruff check src/RiskLabAI/causal_factor_analysis test/causal_factor_analysis
+```
+
+Please branch from `main`, keep changes focused, and include tests for behavior
+changes.
+
+## Scope
+
+RiskLabAI is research software, not investment advice. Graph routines evaluate
+criteria on a caller-supplied directed acyclic graph; they do not discover or
+certify that graph. Protocol records validate declared evidence structures;
+they do not prove that empirical assumptions are true.
+
+## License
+
+RiskLabAI is distributed under the
+[BSD 3-Clause License](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/LICENSE).
