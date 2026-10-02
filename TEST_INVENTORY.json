@@ -4,14 +4,15 @@
   "product": "RiskLabAI",
   "language": "Python",
   "version": "3.1.0",
-  "version_note": "Final local integration candidate; every version-control and release action remains human-controlled.",
+  "version_note": "Current file records include local approved Python book-method implementations and the approved neural-SDE correction. Collected-case counts and matrices below remain historical 3.1.0 evidence. Current regression results are recorded separately in reports/public_library_alignment_20261001/python_library_corrected_final_tests.xml. No release certification is asserted.",
   "runner": "pytest / six base endpoints / three optional-feature interpreter lines",
-  "file_count": 85,
+  "file_count": 93,
   "file_groups": {
-    "CAUSAL_FACTOR_ANALYSIS": 13,
-    "CAUSAL_PARITY_FIXTURE": 1,
     "PRESERVED_LIBRARY": 70,
-    "TECHNICAL_INDICATOR_ORACLES": 1
+    "TECHNICAL_INDICATOR_ORACLES": 1,
+    "CAUSAL_PARITY_FIXTURE": 1,
+    "CAUSAL_FACTOR_ANALYSIS": 13,
+    "LOCAL_BOOK_REQUIREMENTS": 8
   },
   "collected_cases": {
     "causal_factor_analysis": 507,
@@ -463,10 +464,10 @@
     },
     {
       "path": "test/data/weights/test_sample_weights.py",
-      "size": 3920,
-      "sha256": "6A682B9C8273A9480CC40EDEF503F4ADB254FDE03A7C6846A6576B2844177DA5",
+      "size": 12928,
+      "sha256": "E7D932C7B8A5421876004FB281FA2F47C93A393B7E91F950D6EB621493C3ABD8",
       "group": "PRESERVED_LIBRARY",
-      "declared_test_functions": 4
+      "declared_test_functions": 18
     },
     {
       "path": "test/ensemble/test_bagging_classifier_accuracy.py",
@@ -560,6 +561,20 @@
       "declared_test_functions": 5
     },
     {
+      "path": "test/optimization/test_clearing.py",
+      "size": 3574,
+      "sha256": "95AF6C20FB2DD5F402B93FBD8334820410B89E8BAAF806422D9B705FF119973F",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 6
+    },
+    {
+      "path": "test/optimization/test_execution.py",
+      "size": 5228,
+      "sha256": "B0560BA63CEA23270E0B79D02ED68F9AA38CEE008B5FA971C9CDEAE1C6509C0E",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 9
+    },
+    {
       "path": "test/optimization/test_hedging.py",
       "size": 2026,
       "sha256": "C34C92CCD66E0B895140B2D45270AC94803AB408532888E04C6FABC9C444BC22",
@@ -581,6 +596,13 @@
       "declared_test_functions": 4
     },
     {
+      "path": "test/optimization/test_majorization.py",
+      "size": 6535,
+      "sha256": "052FFDDE6ACF17D0520D428B66677A0BF39158D5A6B2177FB9A53861C417BC9A",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 11
+    },
+    {
       "path": "test/optimization/test_nco.py",
       "size": 1875,
       "sha256": "07393543334EED0500954A475403AFDF68BFDB5D9AEC14768E5D21D91E41A2AE",
@@ -588,11 +610,32 @@
       "declared_test_functions": 3
     },
     {
+      "path": "test/pde/test_neural_sde.py",
+      "size": 17167,
+      "sha256": "6D212FE87E2A3A309E9FD3120F577E1E9838E093983B1F001B1CBF5844FD3CED",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 14
+    },
+    {
       "path": "test/pde/test_pde_solver.py",
       "size": 1764,
       "sha256": "9606F9460D87E1268B55A2EC5FC8AD7BE92B4E9DB64F219E0C444343CDB763DD",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 2
+    },
+    {
+      "path": "test/test_book_method_validation.py",
+      "size": 4390,
+      "sha256": "DD6540E190E5FD5A8FF934037CBA6C29F21AB6396110AC0B3C8DA20658BBD896",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 5
+    },
+    {
+      "path": "test/test_book_methods.py",
+      "size": 15286,
+      "sha256": "A32E1A6A3EB17DC7E3B70E0F16030FC13A4D4115ABA91070A940E76526A1DE1D",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 19
     },
     {
       "path": "test/test_consolidation.py",
@@ -607,6 +650,20 @@
       "sha256": "1318D33E6B9790C48F3E366568733FB14574D0D7ECCF7086D5EF5D8BE8545930",
       "group": "PRESERVED_LIBRARY",
       "declared_test_functions": 4
+    },
+    {
+      "path": "test/test_existing_book_routes.py",
+      "size": 3988,
+      "sha256": "CAC8FECF9032735CD18925D1002EAE1FE71D8C3FC9EE2DD45DC033F0BAE31BBA",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 4
+    },
+    {
+      "path": "test/test_learned_book_methods.py",
+      "size": 9282,
+      "sha256": "CC79AD4EDB6B2400F2FC3E1F70A57A853AF3A8E7E96837C9E17108BD8275DC52",
+      "group": "LOCAL_BOOK_REQUIREMENTS",
+      "declared_test_functions": 10
     },
     {
       "path": "test/test_performance.py",

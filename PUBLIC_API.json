@@ -32,7 +32,7 @@
     "pde",
     "utils"
   ],
-  "runtime_module_count": 128,
+  "runtime_module_count": 144,
   "runtime_modules": [
     {
       "path": "src/RiskLabAI/__init__.py",
@@ -76,10 +76,27 @@
       "path": "src/RiskLabAI/backtest/__init__.py",
       "module": "RiskLabAI.backtest",
       "module_kind": "package",
-      "sha256": "59475AA703033C284FED55C308AB258B79AC6E31A8EE5164B01AF6E9396E4C8C",
-      "size": 6204,
+      "sha256": "7B88C6D36058FF9143C0B79CFEE3B804B4F0FBB7D8371DB4501CF31D8628E177",
+      "size": 6488,
       "defined_public_names": [],
       "definitions": []
+    },
+    {
+      "path": "src/RiskLabAI/backtest/adaptation.py",
+      "size": 2792,
+      "sha256": "C60C11C2CF7614DF052AA14171C808E1F18CF9D7F7136F70487C406F58577D29",
+      "module": "RiskLabAI.backtest.adaptation",
+      "module_kind": "module",
+      "defined_public_names": [
+        "prequential_adaptation"
+      ],
+      "definitions": [
+        {
+          "name": "prequential_adaptation",
+          "kind": "function",
+          "signature": "(features, targets, estimator, *, loss_function, window_size, min_samples, delta)"
+        }
+      ]
     },
     {
       "path": "src/RiskLabAI/backtest/advanced_bet_sizing.py",
@@ -395,6 +412,52 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/backtest/deep_hedging.py",
+      "size": 8315,
+      "sha256": "44A5DCF044FCA3CA2FBE765A978E420BDABD521D761EB4C1E03252EED8470499",
+      "module": "RiskLabAI.backtest.deep_hedging",
+      "module_kind": "module",
+      "defined_public_names": [
+        "DeepHedge",
+        "black_scholes_call_delta",
+        "entropic_risk",
+        "gbm_hedging_paths",
+        "hedging_pnl",
+        "train_deep_hedge"
+      ],
+      "definitions": [
+        {
+          "name": "gbm_hedging_paths",
+          "kind": "function",
+          "signature": "(*, spot, maturity, volatility, drift, steps, paths, seed)"
+        },
+        {
+          "name": "hedging_pnl",
+          "kind": "function",
+          "signature": "(prices, positions, *, strike, cost_rate, premium=0.0)"
+        },
+        {
+          "name": "entropic_risk",
+          "kind": "function",
+          "signature": "(pnl, risk_aversion)"
+        },
+        {
+          "name": "black_scholes_call_delta",
+          "kind": "function",
+          "signature": "(prices, *, strike, maturity, volatility)"
+        },
+        {
+          "name": "DeepHedge",
+          "kind": "class"
+        },
+        {
+          "name": "train_deep_hedge",
+          "kind": "function",
+          "signature": "(model, training_prices, *, strike, maturity, cost_rate, risk_aversion, iterations, learning_rate=0.001)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/backtest/multiple_testing.py",
       "module": "RiskLabAI.backtest.multiple_testing",
       "module_kind": "module",
@@ -642,6 +705,35 @@
           "name": "calculate_strategy_risk",
           "kind": "function",
           "signature": "(mu1: float, mu2: float, sigma1: float, sigma2: float, probability: float, n_obs: int, frequency: float, target_sharpe_ratio: float)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/backtest/tail_risk.py",
+      "size": 5850,
+      "sha256": "E0551901DCC25E6B7ED9847285628482CDE3907FBDB8685B5B080AA5A841771A",
+      "module": "RiskLabAI.backtest.tail_risk",
+      "module_kind": "module",
+      "defined_public_names": [
+        "fit_pot_tail_risk",
+        "generalized_pareto_tail_risk",
+        "quantile_exception_tests"
+      ],
+      "definitions": [
+        {
+          "name": "generalized_pareto_tail_risk",
+          "kind": "function",
+          "signature": "(threshold, exceedance_probability, shape, scale, probability)"
+        },
+        {
+          "name": "fit_pot_tail_risk",
+          "kind": "function",
+          "signature": "(losses, *, threshold, probability)"
+        },
+        {
+          "name": "quantile_exception_tests",
+          "kind": "function",
+          "signature": "(exceptions, *, exception_probability)"
         }
       ]
     },
@@ -933,8 +1025,8 @@
       "path": "src/RiskLabAI/causal_factor_analysis/__init__.py",
       "module": "RiskLabAI.causal_factor_analysis",
       "module_kind": "package",
-      "sha256": "96B6E483A72D5CBD00B5EDC5762345E7D31F31F6255B91C793C00B9B2BE62CA4",
-      "size": 6656,
+      "sha256": "16850DE616B0253426617174652C23FD739C5A1D0CE57C9799C3CBA5298490F2",
+      "size": 6954,
       "defined_public_names": [],
       "definitions": []
     },
@@ -958,6 +1050,29 @@
           "name": "allocation_misspecification_diagnostics",
           "kind": "function",
           "signature": "(covariance: ArrayLike, reference_factor_exposures: ArrayLike, reference_target_exposures: ArrayLike, misspecified_factor_exposures: ArrayLike, misspecified_target_exposures: ArrayLike)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/bounds_transport.py",
+      "size": 3088,
+      "sha256": "DE2A45CF82F7D9AF78CE480F8B14A1F90A232B261EC6A57F3A7E43680D7E59ED",
+      "module": "RiskLabAI.causal_factor_analysis.bounds_transport",
+      "module_kind": "module",
+      "defined_public_names": [
+        "manski_ate_bounds",
+        "transported_ate"
+      ],
+      "definitions": [
+        {
+          "name": "manski_ate_bounds",
+          "kind": "function",
+          "signature": "(outcomes, treatment, *, lower, upper)"
+        },
+        {
+          "name": "transported_ate",
+          "kind": "function",
+          "signature": "(treated_means, control_means, target_probabilities, source_treated_counts, source_control_counts)"
         }
       ]
     },
@@ -1181,6 +1296,23 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/causal_factor_analysis/interference.py",
+      "size": 2758,
+      "sha256": "6583CBD9D9E1908E7758282B78B0EE3F92D6E028E12A7C4A332899D112262F76",
+      "module": "RiskLabAI.causal_factor_analysis.interference",
+      "module_kind": "module",
+      "defined_public_names": [
+        "exposure_mean_contrast"
+      ],
+      "definitions": [
+        {
+          "name": "exposure_mean_contrast",
+          "kind": "function",
+          "signature": "(outcomes, exposures, exposure_probabilities, *, first, second)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/causal_factor_analysis/optimizer.py",
       "module": "RiskLabAI.causal_factor_analysis.optimizer",
       "module_kind": "module",
@@ -1194,6 +1326,29 @@
           "name": "minimum_variance_factor_weights",
           "kind": "function",
           "signature": "(covariance: ArrayLike, factor_exposures: ArrayLike, target_exposures: ArrayLike)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/causal_factor_analysis/policy_evaluation.py",
+      "size": 5230,
+      "sha256": "DCC991B45D29D119125750ED4EB4801EA3B80660E76C42F086E60CA5CDAA6DF3",
+      "module": "RiskLabAI.causal_factor_analysis.policy_evaluation",
+      "module_kind": "module",
+      "defined_public_names": [
+        "evaluate_policy",
+        "select_policy"
+      ],
+      "definitions": [
+        {
+          "name": "evaluate_policy",
+          "kind": "function",
+          "signature": "(actions, rewards, behavior_probabilities, policy_probabilities, outcome_predictions)"
+        },
+        {
+          "name": "select_policy",
+          "kind": "function",
+          "signature": "(actions, rewards, behavior_probabilities, candidate_probabilities, outcome_predictions, *, training_indices, evaluation_indices)"
         }
       ]
     },
@@ -2439,11 +2594,45 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/data/synthetic_data/timegan.py",
+      "size": 14446,
+      "sha256": "20F71FF83307217FD2CEAEC9B5C25DC626843CBE0990160D1CCE4B8238189764",
+      "module": "RiskLabAI.data.synthetic_data.timegan",
+      "module_kind": "module",
+      "defined_public_names": [
+        "TimeGAN",
+        "chronological_timegan_data",
+        "fit_timegan",
+        "timegan_quality_report"
+      ],
+      "definitions": [
+        {
+          "name": "chronological_timegan_data",
+          "kind": "function",
+          "signature": "(series, *, training_end, window_length)"
+        },
+        {
+          "name": "TimeGAN",
+          "kind": "class"
+        },
+        {
+          "name": "fit_timegan",
+          "kind": "function",
+          "signature": "(model, training_windows, *, embedding_steps, supervised_steps, joint_steps, batch_size, learning_rate=0.001, embedding_weight=1.0, generator_weight=10.0, seed=0)"
+        },
+        {
+          "name": "timegan_quality_report",
+          "kind": "function",
+          "signature": "(real_training, real_validation, synthetic_training, synthetic_validation)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/data/weights/__init__.py",
       "module": "RiskLabAI.data.weights",
       "module_kind": "package",
-      "sha256": "7275D7101AE1F1DC977EF7B6C53819139AC9F46F629742178AA0AA453390A523",
-      "size": 621,
+      "sha256": "9B450E6DD143EEA9CD700337C1C65E385B2B47E8EC5AC0A3FBFF2798F3D3B302",
+      "size": 675,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2451,13 +2640,14 @@
       "path": "src/RiskLabAI/data/weights/sample_weights.py",
       "module": "RiskLabAI.data.weights.sample_weights",
       "module_kind": "module",
-      "sha256": "4DA73877840EF49BDFF35B087CE1FC52354D14E9136217D16B1948C5577A9BB4",
-      "size": 6991,
+      "sha256": "5F47BD2E64EA1215D4A80C0156C246CFA2691E3CC792CED2A62E9CACF48C87AD",
+      "size": 11021,
       "defined_public_names": [
         "calculate_average_uniqueness",
         "calculate_time_decay",
         "expand_label_for_meta_labeling",
-        "sample_weight_absolute_return_meta_labeling"
+        "sample_weight_absolute_return_meta_labeling",
+        "sequential_bootstrap"
       ],
       "definitions": [
         {
@@ -2469,6 +2659,11 @@
           "name": "calculate_average_uniqueness",
           "kind": "function",
           "signature": "(index_matrix: pd.DataFrame)"
+        },
+        {
+          "name": "sequential_bootstrap",
+          "kind": "function",
+          "signature": "(indicator_matrix: pd.DataFrame | np.ndarray, sample_length: int | None=None, random_state: int | np.random.Generator | None=None)"
         },
         {
           "name": "sample_weight_absolute_return_meta_labeling",
@@ -2550,10 +2745,33 @@
       "path": "src/RiskLabAI/features/entropy_features/__init__.py",
       "module": "RiskLabAI.features.entropy_features",
       "module_kind": "package",
-      "sha256": "2DB4F80E1037C4562E8034FF3120C8DF41DE54D85C7F8E1CF04628BBA9A52374",
-      "size": 883,
+      "sha256": "316BB9196C89283AE1A378B353F9465D1E820B981D4C71A876FE44B1E58C9CC4",
+      "size": 1027,
       "defined_public_names": [],
       "definitions": []
+    },
+    {
+      "path": "src/RiskLabAI/features/entropy_features/ambiguity.py",
+      "size": 2985,
+      "sha256": "37C9EDB6111606EA78B8A34B206BCF0E1948617CF28F1F2121E1C3E19F538358",
+      "module": "RiskLabAI.features.entropy_features.ambiguity",
+      "module_kind": "module",
+      "defined_public_names": [
+        "normal_prior_bin_probabilities",
+        "probability_ambiguity"
+      ],
+      "definitions": [
+        {
+          "name": "probability_ambiguity",
+          "kind": "function",
+          "signature": "(probabilities, *, prior_weights=None, bin_width=None)"
+        },
+        {
+          "name": "normal_prior_bin_probabilities",
+          "kind": "function",
+          "signature": "(means, standard_deviations, *, edges=None)"
+        }
+      ]
     },
     {
       "path": "src/RiskLabAI/features/entropy_features/bias_corrected.py",
@@ -2904,8 +3122,8 @@
       "path": "src/RiskLabAI/features/microstructural_features/__init__.py",
       "module": "RiskLabAI.features.microstructural_features",
       "module_kind": "package",
-      "sha256": "5A47422A191048EB40286C2BA1169BA3FF04396BFA08F9582439A26521A06353",
-      "size": 708,
+      "sha256": "34FEB260DD09858D9952A3483AD09A8D7BA33179A567B354BC4B51BC30D4C802",
+      "size": 1044,
       "defined_public_names": [],
       "definitions": []
     },
@@ -2981,6 +3199,53 @@
           "name": "edge_estimator",
           "kind": "function",
           "signature": "(open: _ArrayLike, high: _ArrayLike, low: _ArrayLike, close: _ArrayLike, sign: bool=False)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/features/microstructural_features/order_flow.py",
+      "size": 7027,
+      "sha256": "1B00415D5AB22FB7CD6AF4C675BC1D6292456AAED10D12D175F042E4278311A6",
+      "module": "RiskLabAI.features.microstructural_features.order_flow",
+      "module_kind": "module",
+      "defined_public_names": [
+        "fit_hawkes",
+        "hawkes_integrated_intensity",
+        "hawkes_intensity",
+        "hawkes_log_likelihood",
+        "simulate_hawkes",
+        "volume_synchronized_pin"
+      ],
+      "definitions": [
+        {
+          "name": "hawkes_intensity",
+          "kind": "function",
+          "signature": "(times, events, mu, alpha, beta)"
+        },
+        {
+          "name": "hawkes_integrated_intensity",
+          "kind": "function",
+          "signature": "(events, horizon, mu, alpha, beta)"
+        },
+        {
+          "name": "hawkes_log_likelihood",
+          "kind": "function",
+          "signature": "(events, horizon, mu, alpha, beta)"
+        },
+        {
+          "name": "simulate_hawkes",
+          "kind": "function",
+          "signature": "(horizon, mu, alpha, beta, *, random_state=None, max_events=100000)"
+        },
+        {
+          "name": "fit_hawkes",
+          "kind": "function",
+          "signature": "(events, horizon, *, initial=None)"
+        },
+        {
+          "name": "volume_synchronized_pin",
+          "kind": "function",
+          "signature": "(buy_volume, sell_volume, *, bucket_volume, window)"
         }
       ]
     },
@@ -3176,10 +3441,90 @@
       "path": "src/RiskLabAI/optimization/__init__.py",
       "module": "RiskLabAI.optimization",
       "module_kind": "package",
-      "sha256": "8B178E855B01B7AAA4A6988060A26B794A9E4A867CF5E5F3125D1CBC0AE6900C",
-      "size": 1211,
+      "sha256": "E916F6AFEF6F07AC99DB728D77C0B70B52DA80429697A08F89E10117D5826C35",
+      "size": 1865,
       "defined_public_names": [],
       "definitions": []
+    },
+    {
+      "path": "src/RiskLabAI/optimization/clearing.py",
+      "size": 3641,
+      "sha256": "892332557820600EE01D7E4A4710CABC0B3A8A41F59206D47E508256C02291A4",
+      "module": "RiskLabAI.optimization.clearing",
+      "module_kind": "module",
+      "defined_public_names": [
+        "eisenberg_noe_clearing"
+      ],
+      "definitions": [
+        {
+          "name": "eisenberg_noe_clearing",
+          "kind": "function",
+          "signature": "(external_assets: np.ndarray, nominal_liabilities: np.ndarray, relative_liabilities: np.ndarray, *, atol: float=1e-08)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/optimization/constrained.py",
+      "size": 5689,
+      "sha256": "CEFC077B047AF14792632E2E77C0A6B2D22B632749BD94372DD36FBE9E07DD82",
+      "module": "RiskLabAI.optimization.constrained",
+      "module_kind": "module",
+      "defined_public_names": [
+        "constrained_minimum_variance",
+        "robust_mean_variance"
+      ],
+      "definitions": [
+        {
+          "name": "constrained_minimum_variance",
+          "kind": "function",
+          "signature": "(covariance, *, expected_returns=None, return_floor=None, caps=None)"
+        },
+        {
+          "name": "robust_mean_variance",
+          "kind": "function",
+          "signature": "(expected_returns, covariance, uncertainty_loading, *, radius, risk_aversion, caps=None, return_floor=None)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/optimization/decision_focused.py",
+      "size": 4068,
+      "sha256": "13FFBA950E6C9F266F3336F6F0F0AD6C1213FA97A0AD35D87484CF4154DD9C39",
+      "module": "RiskLabAI.optimization.decision_focused",
+      "module_kind": "module",
+      "defined_public_names": [
+        "spo_plus_loss",
+        "spo_plus_torch"
+      ],
+      "definitions": [
+        {
+          "name": "spo_plus_loss",
+          "kind": "function",
+          "signature": "(predicted_cost, true_cost, vertices)"
+        },
+        {
+          "name": "spo_plus_torch",
+          "kind": "function",
+          "signature": "(predicted_cost, true_cost, vertices)"
+        }
+      ]
+    },
+    {
+      "path": "src/RiskLabAI/optimization/execution.py",
+      "size": 4759,
+      "sha256": "267DF39571C0337A36A11860CAED26ADE731B2ED71221B012694FEEC1EDD0332",
+      "module": "RiskLabAI.optimization.execution",
+      "module_kind": "module",
+      "defined_public_names": [
+        "almgren_chriss_execution"
+      ],
+      "definitions": [
+        {
+          "name": "almgren_chriss_execution",
+          "kind": "function",
+          "signature": "(inventory: float, horizon: float, intervals: int, *, volatility: float, temporary_impact: float, permanent_impact: float=0.0, risk_aversion: float=0.0)"
+        }
+      ]
     },
     {
       "path": "src/RiskLabAI/optimization/hedging.py",
@@ -3275,6 +3620,41 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/optimization/majorization.py",
+      "size": 8494,
+      "sha256": "7EBA0DBEB1D5075C7378FB07C4169DEC3187F3A3A7AC32919CF937C1203339B3",
+      "module": "RiskLabAI.optimization.majorization",
+      "module_kind": "module",
+      "defined_public_names": [
+        "birkhoff_von_neumann_decomposition",
+        "is_doubly_stochastic",
+        "is_majorized",
+        "majorization_matrix"
+      ],
+      "definitions": [
+        {
+          "name": "is_doubly_stochastic",
+          "kind": "function",
+          "signature": "(matrix: np.ndarray, *, atol: float=1e-10)"
+        },
+        {
+          "name": "is_majorized",
+          "kind": "function",
+          "signature": "(target: np.ndarray, source: np.ndarray, *, atol: float=1e-10)"
+        },
+        {
+          "name": "majorization_matrix",
+          "kind": "function",
+          "signature": "(target: np.ndarray, source: np.ndarray, *, atol: float=1e-10)"
+        },
+        {
+          "name": "birkhoff_von_neumann_decomposition",
+          "kind": "function",
+          "signature": "(matrix: np.ndarray, *, atol: float=1e-10)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/optimization/nco.py",
       "module": "RiskLabAI.optimization.nco",
       "module_kind": "module",
@@ -3301,8 +3681,8 @@
       "path": "src/RiskLabAI/pde/__init__.py",
       "module": "RiskLabAI.pde",
       "module_kind": "package",
-      "sha256": "C7B95E7E7DF3A7BDD666D940EE776A5D8349ADE4CEE33D8FC453C7C56189C4CA",
-      "size": 1833,
+      "sha256": "086B22784DB4A842AFF4AFDE40D74D244DAFDA649524F25DCD61617499D4ED43",
+      "size": 2483,
       "defined_public_names": [],
       "definitions": []
     },
@@ -3431,6 +3811,75 @@
       ]
     },
     {
+      "path": "src/RiskLabAI/pde/neural_sde.py",
+      "size": 27255,
+      "sha256": "85F05D3596659AB03068BCE1CA1707D66E5680891BBF520C753EF4FCF61D8C59",
+      "module": "RiskLabAI.pde.neural_sde",
+      "module_kind": "module",
+      "defined_public_names": [
+        "IntervalNeuralSDE",
+        "PolytopeNeuralSDE",
+        "affine_price_state_interval",
+        "fit_interval_neural_sde",
+        "fit_polytope_neural_sde",
+        "hjm_drift_residual",
+        "normalized_call_grid_constraints",
+        "normalized_call_grid_witness",
+        "simulate_interval_neural_sde",
+        "simulate_polytope_neural_sde"
+      ],
+      "definitions": [
+        {
+          "name": "normalized_call_grid_constraints",
+          "kind": "function",
+          "signature": "(strikes, maturities)"
+        },
+        {
+          "name": "normalized_call_grid_witness",
+          "kind": "function",
+          "signature": "(strikes, maturities, prices)"
+        },
+        {
+          "name": "affine_price_state_interval",
+          "kind": "function",
+          "signature": "(offset, loading, matrix, bounds)"
+        },
+        {
+          "name": "IntervalNeuralSDE",
+          "kind": "class"
+        },
+        {
+          "name": "fit_interval_neural_sde",
+          "kind": "function",
+          "signature": "(model, states, next_states, *, dt, iterations, learning_rate=0.001)"
+        },
+        {
+          "name": "simulate_interval_neural_sde",
+          "kind": "function",
+          "signature": "(model, initial, brownian_increments, *, dt)"
+        },
+        {
+          "name": "PolytopeNeuralSDE",
+          "kind": "class"
+        },
+        {
+          "name": "hjm_drift_residual",
+          "kind": "function",
+          "signature": "(price_basis, drift, diffusion, required_price_drift)"
+        },
+        {
+          "name": "fit_polytope_neural_sde",
+          "kind": "function",
+          "signature": "(model, states, next_states, *, dt, iterations, learning_rate=0.001)"
+        },
+        {
+          "name": "simulate_polytope_neural_sde",
+          "kind": "function",
+          "signature": "(model, initial, brownian_increments, *, dt)"
+        }
+      ]
+    },
+    {
       "path": "src/RiskLabAI/pde/solver.py",
       "module": "RiskLabAI.pde.solver",
       "module_kind": "module",
@@ -3467,6 +3916,41 @@
       "size": 3409,
       "defined_public_names": [],
       "definitions": []
+    },
+    {
+      "path": "src/RiskLabAI/utils/_validation.py",
+      "size": 1688,
+      "sha256": "E45F7090314449D3632E53B376B30931B672A17EFD6660C361169011D39D13E2",
+      "module": "RiskLabAI.utils._validation",
+      "module_kind": "module",
+      "defined_public_names": [
+        "positive_integer",
+        "probability_rows",
+        "real_array",
+        "real_scalar"
+      ],
+      "definitions": [
+        {
+          "name": "real_array",
+          "kind": "function",
+          "signature": "(value, name, ndim=None, *, empty=False)"
+        },
+        {
+          "name": "real_scalar",
+          "kind": "function",
+          "signature": "(value, name, *, minimum=None, strict=False)"
+        },
+        {
+          "name": "positive_integer",
+          "kind": "function",
+          "signature": "(value, name)"
+        },
+        {
+          "name": "probability_rows",
+          "kind": "function",
+          "signature": "(value, name, ndim=2)"
+        }
+      ]
     },
     {
       "path": "src/RiskLabAI/utils/constants.py",
@@ -3632,6 +4116,10 @@
       "module": "RiskLabAI.backtest",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "prequential_adaptation",
+        "generalized_pareto_tail_risk",
+        "fit_pot_tail_risk",
+        "quantile_exception_tests",
         "validation",
         "PlattCalibrator",
         "distributionally_robust_kelly_fraction",
@@ -3737,6 +4225,11 @@
       "module": "RiskLabAI.causal_factor_analysis",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "manski_ate_bounds",
+        "transported_ate",
+        "exposure_mean_contrast",
+        "evaluate_policy",
+        "select_policy",
         "BackdoorAdjustmentEvidence",
         "BacktestStage",
         "CausalDAG",
@@ -3968,7 +4461,8 @@
         "expand_label_for_meta_labeling",
         "calculate_average_uniqueness",
         "sample_weight_absolute_return_meta_labeling",
-        "calculate_time_decay"
+        "calculate_time_decay",
+        "sequential_bootstrap"
       ]
     },
     {
@@ -3995,6 +4489,8 @@
       "module": "RiskLabAI.features.entropy_features",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "probability_ambiguity",
+        "normal_prior_bin_probabilities",
         "shannon_entropy",
         "lempel_ziv_entropy",
         "probability_mass_function",
@@ -4034,6 +4530,12 @@
       "module": "RiskLabAI.features.microstructural_features",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "hawkes_intensity",
+        "hawkes_integrated_intensity",
+        "hawkes_log_likelihood",
+        "simulate_hawkes",
+        "fit_hawkes",
+        "volume_synchronized_pin",
         "beta_estimates",
         "gamma_estimates",
         "alpha_estimates",
@@ -4080,6 +4582,16 @@
       "module": "RiskLabAI.optimization",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "constrained_minimum_variance",
+        "robust_mean_variance",
+        "spo_plus_loss",
+        "spo_plus_torch",
+        "eisenberg_noe_clearing",
+        "almgren_chriss_execution",
+        "birkhoff_von_neumann_decomposition",
+        "is_doubly_stochastic",
+        "is_majorized",
+        "majorization_matrix",
         "cluster_variance",
         "quasi_diagonal",
         "recursive_bisection",
@@ -4096,6 +4608,16 @@
       "module": "RiskLabAI.pde",
       "export_rule": "EXPLICIT___ALL__",
       "ordered_exports": [
+        "normalized_call_grid_constraints",
+        "normalized_call_grid_witness",
+        "affine_price_state_interval",
+        "IntervalNeuralSDE",
+        "PolytopeNeuralSDE",
+        "fit_interval_neural_sde",
+        "simulate_interval_neural_sde",
+        "fit_polytope_neural_sde",
+        "simulate_polytope_neural_sde",
+        "hjm_drift_residual",
         "Equation",
         "PricingDefaultRisk",
         "HJBLQ",

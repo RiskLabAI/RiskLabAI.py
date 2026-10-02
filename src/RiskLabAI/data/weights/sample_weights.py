@@ -33,18 +33,20 @@ def expand_label_for_meta_labeling(
     timestamp : pd.Series
         Series where index is event start time, value is event end time.
     molecule : pd.Index
-        The subset of event start times to process.
+        The subset of event start times to process. All overlapping events
+        in `timestamp` contribute to concurrency, including events outside
+        this subset.
 
     Returns
     -------
     pd.Series
-        A Series indexed by `close_index` where each value is the
-        count of active events at that timestamp.
+        A Series on `close_index` from the first start in `molecule` through
+        its latest event end, containing the count of all active events.
     """
     # Filter events that are relevant to this molecule
     ts = timestamp.fillna(close_index[-1])
-    ts = ts[ts.index.isin(molecule)]
-    ts = ts[ts > molecule[0]]
+    molecule_end = ts.loc[molecule].max()
+    ts = ts[(ts >= molecule[0]) & (ts.index <= molecule_end)]
 
     if ts.empty:
         # Return an empty series; align in the caller will handle it
@@ -52,7 +54,7 @@ def expand_label_for_meta_labeling(
 
     # Find min/max index locations
     iloc_min = close_index.searchsorted(ts.index[0])
-    iloc_max = close_index.searchsorted(ts.max())
+    iloc_max = close_index.searchsorted(molecule_end)
 
     # Create a count series over the relevant time span
     count = pd.Series(0, index=close_index[iloc_min : iloc_max + 1])
@@ -63,7 +65,7 @@ def expand_label_for_meta_labeling(
         t_out = min(t_out, count.index[-1])
         count.loc[t_in:t_out] += 1
 
-    return count.loc[molecule[0] : ts.max()]
+    return count.loc[molecule[0] : molecule_end]
 
 
 def calculate_average_uniqueness(
@@ -109,6 +111,90 @@ def calculate_average_uniqueness(
     average_uniqueness = average_uniqueness.fillna(0)
 
     return average_uniqueness
+
+
+def sequential_bootstrap(
+    indicator_matrix: pd.DataFrame | np.ndarray,
+    sample_length: int | None = None,
+    random_state: int | np.random.Generator | None = None,
+) -> np.ndarray:
+    """Draw event positions with replacement using average added uniqueness.
+
+    Parameters
+    ----------
+    indicator_matrix : pd.DataFrame or np.ndarray
+        Binary matrix with observation intervals in rows and events in columns.
+        Each event must contain at least one active interval. Row ordering and
+        DataFrame labels do not affect the sampling probabilities.
+    sample_length : int or None, default=None
+        Number of draws. Defaults to the number of event columns. Must be a
+        nonnegative integer. A matrix with no columns permits only zero draws.
+    random_state : int, np.random.Generator or None, default=None
+        Nonnegative seed or generator. A supplied generator advances in place.
+        None creates a new generator. The legacy global random state is unused.
+
+    Returns
+    -------
+    np.ndarray
+        Integer column positions in draw order, including repeated selections.
+        For DataFrame column labels, use ``indicator_matrix.columns.take`` on
+        the returned positions. A zero-length draw consumes no random numbers.
+
+    Raises
+    ------
+    ValueError
+        If the matrix is not two-dimensional, real numeric or boolean, finite,
+        binary, or has an event with no active intervals; if the requested
+        length is invalid; or if random_state is unsupported.
+
+    Notes
+    -----
+    For candidate j, average 1 / (c_t + 1) over its active intervals, where c_t
+    counts previous selections, including repetitions. Normalize these scores
+    to obtain the next draw probabilities. The first draw is uniform. This is
+    the Chapter 4 sampling method described in the module reference, not a
+    guarantee of improved model performance for every sample.
+
+    Examples
+    --------
+    >>> sequential_bootstrap(np.ones((2, 1)), sample_length=3, random_state=0)
+    array([0, 0, 0])
+    """
+    values = np.asarray(indicator_matrix)
+    if values.ndim != 2 or values.dtype.kind not in "biuf":
+        raise ValueError("indicator_matrix must be a two-dimensional binary matrix")
+    if not np.all(np.isfinite(values)) or not np.all((values == 0) | (values == 1)):
+        raise ValueError("indicator_matrix must contain only finite zeros and ones")
+    matrix = values.astype(float, copy=False)
+    event_count = matrix.shape[1]
+    durations = matrix.sum(axis=0)
+    if np.any(durations == 0):
+        raise ValueError("each event must contain at least one active interval")
+    if sample_length is None:
+        sample_length = event_count
+    if (
+        isinstance(sample_length, (bool, np.bool_))
+        or not isinstance(sample_length, (int, np.integer))
+        or sample_length < 0
+    ):
+        raise ValueError("sample_length must be a nonnegative integer")
+    if event_count == 0 and sample_length > 0:
+        raise ValueError("cannot draw from an indicator matrix with no events")
+    if random_state is not None and not isinstance(random_state, np.random.Generator):
+        if (
+            isinstance(random_state, (bool, np.bool_))
+            or not isinstance(random_state, (int, np.integer))
+            or random_state < 0
+        ):
+            raise ValueError("random_state must be a nonnegative seed or Generator")
+    generator = np.random.default_rng(random_state)
+    selected = np.empty(sample_length, dtype=np.intp)
+    concurrency = np.zeros(matrix.shape[0], dtype=float)
+    for draw in range(sample_length):
+        scores = (matrix.T @ (1.0 / (concurrency + 1.0))) / durations
+        selected[draw] = generator.choice(event_count, p=scores / scores.sum())
+        concurrency += matrix[:, selected[draw]]
+    return selected
 
 
 def sample_weight_absolute_return_meta_labeling(

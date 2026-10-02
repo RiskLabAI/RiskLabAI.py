@@ -8,6 +8,10 @@ Implements advanced portfolio optimization techniques, including:
 - Custom Hyper-Parameter Tuning
 """
 
+from .clearing import eisenberg_noe_clearing
+from .constrained import constrained_minimum_variance, robust_mean_variance
+from .decision_focused import spo_plus_loss, spo_plus_torch
+from .execution import almgren_chriss_execution
 from .hedging import (
     pca_weights,
 )
@@ -22,6 +26,12 @@ from .hyper_parameter_tuning import (
     SampleWeightedPipeline,
     clf_hyper_fit,
 )
+from .majorization import (
+    birkhoff_von_neumann_decomposition,
+    is_doubly_stochastic,
+    is_majorized,
+    majorization_matrix,
+)
 from .nco import (
     # cluster_kmeans_base is imported into nco.py, not defined there.
     # It should be imported from RiskLabAI.cluster.clustering directly
@@ -31,6 +41,16 @@ from .nco import (
 )
 
 __all__ = [
+    "constrained_minimum_variance",
+    "robust_mean_variance",
+    "spo_plus_loss",
+    "spo_plus_torch",
+    "eisenberg_noe_clearing",
+    "almgren_chriss_execution",
+    "birkhoff_von_neumann_decomposition",
+    "is_doubly_stochastic",
+    "is_majorized",
+    "majorization_matrix",
     # hrp.py
     "cluster_variance",
     "quasi_diagonal",

@@ -6,6 +6,7 @@ as Shannon, Lempel-Ziv, and Kontoyiannis, plus the bias-corrected family
 (Miller-Madow, Grassberger, NSB) for undersampled symbol counts.
 """
 
+from .ambiguity import probability_ambiguity, normal_prior_bin_probabilities
 from .bias_corrected import (
     grassberger_entropy,
     miller_madow_entropy,
@@ -18,6 +19,8 @@ from .pmf import ngram_counts, probability_mass_function
 from .shannon import shannon_entropy
 
 __all__ = [
+    "probability_ambiguity",
+    "normal_prior_bin_probabilities",
     "shannon_entropy",
     "lempel_ziv_entropy",
     "probability_mass_function",

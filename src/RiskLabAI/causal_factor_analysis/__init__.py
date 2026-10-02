@@ -6,6 +6,9 @@ protocol, without importing the broader causal or portfolio-optimization
 namespaces.
 """
 
+from .bounds_transport import manski_ate_bounds, transported_ate
+from .interference import exposure_mean_contrast
+from .policy_evaluation import evaluate_policy, select_policy
 from .allocation_diagnostics import (
     AllocationMisspecificationDiagnostics,
     allocation_misspecification_diagnostics,
@@ -114,6 +117,11 @@ from .treatment_effects import (
 )
 
 __all__ = [
+    "manski_ate_bounds",
+    "transported_ate",
+    "exposure_mean_contrast",
+    "evaluate_policy",
+    "select_policy",
     "BackdoorAdjustmentEvidence",
     "BacktestStage",
     "CausalDAG",
