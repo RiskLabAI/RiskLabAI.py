@@ -1,10 +1,12 @@
 # Python runtime and dependency support
 
-Status: **3.1.0 local integration candidate; publication and release blocked**.
+Status: **3.2.0 candidate; not yet released**.
 
-RiskLabAI 3.1.0 retains the support policy released with RiskLabAI 3.0.0 while
-adding 30 causal names. Package metadata is frozen for local integration and
-artifact inspection. No version shown in this document authorizes a
+RiskLabAI 3.2.0 retains the Python and dependency support policy of 3.1.0.
+The new Python methods preserve the existing optional dependency boundaries.
+CVXPY, River, and PySensemakr are additional optional suppliers installed
+separately for selected methods; see `INSTALLATION.md`. Package metadata is
+prepared for local artifact inspection. No version shown in this document authorizes a
 version-control action, upload, publication, or release.
 
 ## Supported interpreter and NumPy policy
@@ -13,6 +15,9 @@ RiskLabAI supports standard GIL builds of CPython 3.12, 3.13, and 3.14. The
 base numerical policy is `numpy>=2.2,<3`. A matrix lane uses only versions for
 which compatible distributions actually exist; it never forces an older
 NumPy source release onto a newer interpreter.
+
+The following exact versions describe the historical 3.1.0 validation matrix.
+They are not a claim that these versions were rerun for 3.2.0.
 
 | Lane | CPython | NumPy | Required-dependency position |
 |---|---:|---:|---|
@@ -95,7 +100,7 @@ emit `DeprecationWarning`. Their removal target is 4.0.0. Package-scoped tests
 bind both continued availability and the stated target; no preserved alias is
 deleted in this release.
 
-## Matrix evidence
+## Historical 3.1.0 matrix evidence
 
 The causal tree collects exactly 507 tests: the released 57-name suite, the 30
 additive-name suite, independent analytical and graph oracles, boundary and
@@ -125,6 +130,19 @@ Joblib 1.5.2 and 1.5.3 pass; older Python lines continue to pass with Joblib
 The causal public design is exactly 87 names: the released 57-name contract as
 an unchanged prefix plus 30 documented additions. The candidate did not import, modify, or
 reintroduce the excluded legacy causal implementation.
+
+## 3.2.0 validation scope
+
+The existing Python and NumPy floors remain unchanged for this additive
+candidate. The implementation commit passed the six base and three optional
+GitHub CI lanes and the static checks. The version update requires a new CI
+run before merging. Historical pass counts above are not 3.2.0 results.
+The 3.2.0 candidate passed 1,178 tests locally on Python 3.13, with one
+Windows platform skip and 73 existing warnings.
+Supplemental CVXPY, River, and PySensemakr checks were run locally on Python
+3.13; the existing optional CI groups do not install those three suppliers.
+The causal namespace now contains 92 names, retaining the previous 87 names.
+The five new causal exports do not imply new Julia parity.
 
 ## Remaining release gates
 

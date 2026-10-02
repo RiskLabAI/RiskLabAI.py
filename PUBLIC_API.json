@@ -3,7 +3,7 @@
   "document_type": "RISKLABAI_PYTHON_PUBLIC_API_INVENTORY",
   "product": "RiskLabAI",
   "language": "Python",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "baseline_contract": {
     "released_version": "3.0.0",
     "released_causal_export_count": 57,
@@ -38,7 +38,7 @@
       "path": "src/RiskLabAI/__init__.py",
       "module": "RiskLabAI",
       "module_kind": "package",
-      "sha256": "1CB2A7E2B804267FFEBE4FF124F01AA095DC19F82492DB862C9A4D97C2A1AF0F",
+      "sha256": "CDC3F50B0C33EB8AA6E7999E88C67CEA062D71B6D3554DAEF24DA247BFF4C9A8",
       "size": 1095,
       "defined_public_names": [],
       "definitions": []
@@ -5766,5 +5766,12 @@
         "implementation_module": "RiskLabAI.causal_factor_analysis.search_adjusted_fdr"
       }
     ]
+  },
+  "current_contract": {
+    "version": "3.2.0",
+    "total_causal_export_count": 92,
+    "preserved_3_1_0_causal_export_count": 87,
+    "new_python_causal_export_count": 5,
+    "new_julia_parity_asserted": false
   }
 }

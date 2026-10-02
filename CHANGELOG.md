@@ -3,7 +3,38 @@
 All notable changes to RiskLabAI.py are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
-## [3.1.0] - Unreleased
+## [3.2.0] - Unreleased
+
+### Added
+
+- Sequential bootstrap sampling, majorization-based optimization, financial
+  network clearing, and optimal execution utilities.
+- Ambiguity calculations for supplied priors, order-flow features, regime and
+  drift adaptation, and tail-risk estimation and backtesting.
+- Constrained and robust portfolio optimization and decision-focused losses.
+- Causal bounds, finite-stratum transport, design-based interference, and
+  inverse-probability and doubly robust policy evaluation.
+- PyTorch implementations of TimeGAN, deep hedging, and finite-grid neural SDEs.
+- Analytical examples, independent numerical checks, boundary validation, and
+  regression tests for the new methods.
+
+### Fixed
+
+- Sample-concurrency counting for events that begin before the selected window.
+
+### Scope and dependencies
+
+- The neural-SDE implementation uses an explicitly corrected fixed-coordinate
+  diffusion operator rather than the literal published nearest-frame
+  construction. Its guarantees are bounded to the implemented finite grid;
+  general dynamic no-arbitrage and empirical market performance are not claimed.
+- Required dependencies and supported Python versions are unchanged. PyTorch
+  is available through the existing `pde` extra. Selected new methods require
+  separately installed CVXPY, River, or PySensemakr; these remain optional.
+- The additions are Python implementations. Corresponding Julia additions and
+  book notebooks are deferred.
+
+## [3.1.0] - Historical preparation notes
 
 ### Added
 

@@ -4,7 +4,7 @@ from importlib import import_module as _import_module
 
 from . import causal_factor_analysis
 
-__version__ = "3.1.0"
+__version__ = "3.2.0"
 
 _LEGACY_SUBMODULES = frozenset(
     {

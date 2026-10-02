@@ -3,8 +3,8 @@
   "document_type": "RISKLABAI_PYTHON_TEST_INVENTORY",
   "product": "RiskLabAI",
   "language": "Python",
-  "version": "3.1.0",
-  "version_note": "Current file records include local approved Python book-method implementations and the approved neural-SDE correction. Collected-case counts and matrices below remain historical 3.1.0 evidence. Current regression results are recorded separately in reports/public_library_alignment_20261001/python_library_corrected_final_tests.xml. No release certification is asserted.",
+  "version": "3.2.0",
+  "version_note": "The file inventory describes the 3.2.0 candidate. Collected-case counts and matrices below remain historical 3.1.0 evidence. The 3.2.0 candidate passed 1178 tests with one platform skip locally on Python 3.13. Fresh supported-interpreter CI must rerun after the version commit. No release certification is asserted.",
   "runner": "pytest / six base endpoints / three optional-feature interpreter lines",
   "file_count": 93,
   "file_groups": {

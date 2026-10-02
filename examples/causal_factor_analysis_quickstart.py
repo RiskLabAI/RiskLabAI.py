@@ -13,7 +13,7 @@ from RiskLabAI.causal_factor_analysis import (
     minimum_variance_factor_weights,
 )
 
-assert RiskLabAI.__version__ == "3.1.0"
+assert RiskLabAI.__version__ == "3.2.0"
 
 
 covariance = np.diag([1.0, 2.0, 4.0])
