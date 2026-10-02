@@ -1,7 +1,7 @@
 # Future Python package inspection specification
 
 This specification governs temporary local artifacts built from the exact
-RiskLabAI 3.1.0 additive integration candidate. It does not authorize using
+RiskLabAI 3.2.0 additive integration candidate. It does not authorize using
 version control, uploading, publishing, tagging, or releasing anything.
 
 ## Inputs
@@ -50,8 +50,9 @@ the reviewed source bytes.
 In fresh, isolated environments for every supported Python and valid NumPy
 lane, verify the exact module origins, the approved version binding, the root
 exports, all module and package exports in `PUBLIC_API.json`, and the complete
-87-name causal API. Require the released 57-name causal prefix to remain exact
-and the 30 additions to match the parity contract. For every module that
+92-name causal API. Require the released 87 causal names to retain their relative
+order, including the original 57 names and 30 parity additions. The five new
+Python causal exports do not carry a Julia parity claim. For every module that
 declares `__all__`, require every listed name to be bound on that installed
 module and resolvable by an explicit import; an advertised but unbound name
 rejects the artifact. Run the exact package-scoped test inventory and the valid

@@ -17,8 +17,22 @@ from .corwin_schultz import (
     gamma_estimates,
 )
 from .edge import edge_estimator
+from .order_flow import (
+    hawkes_intensity,
+    hawkes_integrated_intensity,
+    hawkes_log_likelihood,
+    simulate_hawkes,
+    fit_hawkes,
+    volume_synchronized_pin,
+)
 
 __all__ = [
+    "hawkes_intensity",
+    "hawkes_integrated_intensity",
+    "hawkes_log_likelihood",
+    "simulate_hawkes",
+    "fit_hawkes",
+    "volume_synchronized_pin",
     "beta_estimates",
     "gamma_estimates",
     "alpha_estimates",

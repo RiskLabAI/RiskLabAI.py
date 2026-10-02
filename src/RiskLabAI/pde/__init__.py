@@ -46,8 +46,30 @@ from .solver import (
     FBSNNSolver,
     initialize_weights,
 )
+from .neural_sde import (
+    normalized_call_grid_constraints,
+    normalized_call_grid_witness,
+    affine_price_state_interval,
+    IntervalNeuralSDE,
+    PolytopeNeuralSDE,
+    fit_interval_neural_sde,
+    simulate_interval_neural_sde,
+    fit_polytope_neural_sde,
+    simulate_polytope_neural_sde,
+    hjm_drift_residual,
+)
 
 __all__ = [
+    "normalized_call_grid_constraints",
+    "normalized_call_grid_witness",
+    "affine_price_state_interval",
+    "IntervalNeuralSDE",
+    "PolytopeNeuralSDE",
+    "fit_interval_neural_sde",
+    "simulate_interval_neural_sde",
+    "fit_polytope_neural_sde",
+    "simulate_polytope_neural_sde",
+    "hjm_drift_residual",
     # Equations
     "Equation",
     "PricingDefaultRisk",

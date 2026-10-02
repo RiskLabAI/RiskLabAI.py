@@ -9,12 +9,17 @@ implementations of methods associated with Marcos López de Prado's *Advances
 in Financial Machine Learning*, *Machine Learning for Asset Managers*, and
 *Causal Factor Investing*.
 
-RiskLabAI 3.1.0 preserves the clean 57-name causal-factor-analysis namespace
-released in 3.0.0 and adds 30 paper-derived names, producing an 87-name causal
+Version 3.1.0 preserved the clean 57-name causal-factor-analysis namespace
+released in 3.0.0 and added 30 paper-derived names, producing an 87-name causal
 API. The companion
 [RiskLabAI.jl](https://github.com/RiskLabAI/RiskLabAI.jl) package independently
 implements the same concepts. This parity statement applies to the causal API,
 not to every Python module.
+
+The 3.2.0 candidate adds Python methods for sampling, optimization, market
+features, causal evaluation, synthetic data, and neural financial models.
+See [the release notes](RELEASE_NOTES_NEXT_MAJOR.md) for scope and limitations.
+Julia implementations of these new additions are deferred.
 
 ## What is included
 
@@ -42,7 +47,7 @@ not to every Python module.
 
 ## Compatibility
 
-RiskLabAI 3.1.0 supports CPython 3.12,
+RiskLabAI 3.2.0 supports CPython 3.12,
 3.13, and 3.14 with NumPy `>=2.2,<3`. The complete tested policy and
 feature-specific limitations are in
 [`docs/compatibility.md`](https://github.com/RiskLabAI/RiskLabAI.py/blob/main/docs/compatibility.md).
@@ -60,7 +65,7 @@ Optional dependency groups can be installed individually or together:
 | Extra | Enables |
 |---|---|
 | `speed` | Numba acceleration |
-| `pde` | Deep-BSDE PDE solver using PyTorch |
+| `pde` | PyTorch support for Deep-BSDE, neural SDEs, TimeGAN, and deep hedging |
 | `synth` | synthetic-control utilities using QuantEcon |
 | `hpo` | hyperparameter tuning using Optuna |
 | `plot` | Matplotlib, Seaborn, and Plotly helpers |

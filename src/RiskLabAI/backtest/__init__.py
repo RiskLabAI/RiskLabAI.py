@@ -9,6 +9,12 @@ This package provides tools for:
 """
 
 from . import validation
+from .adaptation import prequential_adaptation
+from .tail_risk import (
+    generalized_pareto_tail_risk,
+    fit_pot_tail_risk,
+    quantile_exception_tests,
+)
 from .advanced_bet_sizing import (
     PlattCalibrator,
     distributionally_robust_kelly_fraction,
@@ -116,6 +122,10 @@ from .test_set_overfitting import (
 
 # Define what `from RiskLabAI.backtest import *` will import
 __all__ = [
+    "prequential_adaptation",
+    "generalized_pareto_tail_risk",
+    "fit_pot_tail_risk",
+    "quantile_exception_tests",
     "validation",
     # from advanced_bet_sizing (independent validation includes)
     "PlattCalibrator",

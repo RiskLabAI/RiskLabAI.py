@@ -2,7 +2,7 @@
 
 ## Supported environments
 
-RiskLabAI 3.1.0 supports:
+RiskLabAI 3.2.0 supports:
 
 - CPython 3.12, 3.13, and 3.14
 - NumPy `>=2.2,<3`
@@ -73,7 +73,7 @@ The groups provide:
 | Extra | Capability |
 |---|---|
 | `speed` | Numba acceleration |
-| `pde` | Deep-BSDE PDE solver using PyTorch |
+| `pde` | PyTorch support for Deep-BSDE, neural SDEs, TimeGAN, and deep hedging |
 | `synth` | synthetic-control utilities using QuantEcon |
 | `hpo` | hyperparameter tuning using Optuna |
 | `plot` | Matplotlib, Seaborn, and Plotly helpers |
@@ -99,6 +99,18 @@ Notes:
   backend is unavailable.
 - PyWavelets is part of the base installation because its absence changes
   analytical behavior rather than only disabling acceleration.
+
+## Additional method dependencies
+
+Selected methods added in 3.2.0 use CVXPY (constrained or robust optimization),
+River (ADWIN drift adaptation), or PySensemakr (sensitivity analysis).
+These packages are installed separately when needed; they are not base
+dependencies or named extras. Local Python 3.13 validation used CVXPY 1.9.3,
+River 0.26.1, and PySensemakr 0.0.8. This does not establish compatibility with
+every version of those packages or every supported interpreter.
+
+The 3.2.0 version is a release candidate until published. An unpinned PyPI
+installation retrieves the latest published version.
 
 ## Development installation
 
